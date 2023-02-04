@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -22,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import kotlin.random.Random
 
 class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, AndroidScopeComponent {
@@ -31,6 +33,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val emailWrapper: EmailWrapper by inject()
     private val shareWrapper: AndroidShareWrapper by inject()
+    private val buildConfig: BuildConfigDomain by inject()
 
     private val versionCategory
         get() = findPreference(R.string.prefs_root_version_key)
@@ -48,14 +51,18 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val sharePreference
         get() = findPreference(R.string.prefs_root_share_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
+    private val debugPreference
+        get() = findPreference(R.string.prefs_root_debug_cat_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_debug_key")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
-            (onCreateView as ViewGroup).addView(it, 0)
+            (view as ViewGroup).addView(it, 0)
             it.setupWithNavController(findNavController())
         }
-        return onCreateView
+        view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        return view
     }
 
     override fun onAttach(context: Context) {
@@ -78,6 +85,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
         setPreferencesFromResource(R.xml.pref_root, rootKey)
         remoteServiceCategory.isVisible = BuildConfig.cuerRemoteEnabled
         remoteServicePreference.isVisible = BuildConfig.cuerRemoteEnabled
+        debugPreference.isVisible = buildConfig.isDebug
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {

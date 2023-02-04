@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
@@ -56,13 +57,15 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
-            (onCreateView as ViewGroup).addView(it, 0)
+            (view as ViewGroup).addView(it, 0)
             //(activity as AppCompatActivity).setSupportActionBar(it)
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
-        return onCreateView
+        view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        return view
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
