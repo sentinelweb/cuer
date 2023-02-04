@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.domain.ext.*
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 
+// fixme: note some tests are flaky - run them manually when modifying this class (or fIx them!!!)
 class QueueMediator constructor(
     private val state: QueueMediatorState,
     private val playlistOrchestrator: PlaylistOrchestrator,
@@ -83,6 +84,7 @@ class QueueMediator constructor(
                                     refreshQueueFrom(plist)
                                 }
                             }
+
                             DELETE -> {
                                 _currentItemFlow.emit(null)
                                 refreshQueue(state.playlistIdentifier)// should load default
@@ -111,6 +113,7 @@ class QueueMediator constructor(
                                 ?.takeIf { it != state.playlist }
                                 ?.apply { refreshQueueFrom(this) }
                         }
+
                         DELETE ->
                             state.playlist
                                 ?.let { playlistMutator.remove(it, plistItem) }
