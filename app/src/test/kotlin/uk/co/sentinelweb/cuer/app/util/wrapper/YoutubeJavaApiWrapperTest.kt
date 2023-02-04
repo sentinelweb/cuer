@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.util.wrapper
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import com.flextrade.jfixture.JFixture
 import com.google.android.youtube.player.YouTubeIntents
 import io.mockk.*
 import org.junit.Assert.assertTrue
@@ -12,9 +11,11 @@ import org.junit.Ignore
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
 // todo make another test with robolectric activity spy
 class YoutubeJavaApiWrapperTest {
+    private val fixture = kotlinFixtureDefaultConfig
 
     private var mockActivity: AppCompatActivity = mockk(relaxUnitFun = true)
     private var mockLinkScanner: LinkScanner = mockk(relaxUnitFun = true)
@@ -22,8 +23,7 @@ class YoutubeJavaApiWrapperTest {
         every { setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK) } returns this
     }
     private var mockUri: Uri = mockk(relaxUnitFun = true)
-    private val fixture: JFixture = JFixture()
-    private val fixtMedia: MediaDomain = fixture.create(MediaDomain::class.java)
+    private val fixtMedia: MediaDomain = fixture()
 
     private var sut: YoutubeJavaApiWrapper = spyk(YoutubeJavaApiWrapper(mockActivity, mockLinkScanner))
 
