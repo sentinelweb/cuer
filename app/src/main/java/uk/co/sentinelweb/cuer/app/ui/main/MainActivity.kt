@@ -40,12 +40,10 @@ import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+
 
 class MainActivity :
     AppCompatActivity(),
@@ -134,7 +132,7 @@ class MainActivity :
                 navController.navigate(
                     R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
                 )
-            }//.show()// todo enable after fixing
+            }.positionAbovePlayer().show()
 
             FAIL -> snackBarWrapper.makeError(
                 msg = getString(R.string.backup_fix_message),

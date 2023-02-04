@@ -578,7 +578,7 @@ class PlaylistMviFragment : Fragment(),
             snackbar?.dismiss()
             snackbar = null
         }
-        snackbar?.show()
+        snackbar?.positionAbovePlayer()?.show()
     }
 
     private fun scrollToItem(index: Int) {

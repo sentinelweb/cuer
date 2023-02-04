@@ -273,7 +273,7 @@ class PlaylistsMviFragment :
             viewProxy.dispatch(Event.OnUndo(undoType))
             snackbar?.dismiss()
         }
-        snackbar?.show()
+        snackbar?.positionAbovePlayer()?.show()
     }
 
     private fun showMessage(msg: String) {
