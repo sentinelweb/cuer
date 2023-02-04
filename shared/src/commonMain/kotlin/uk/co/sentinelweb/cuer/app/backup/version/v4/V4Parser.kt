@@ -12,8 +12,9 @@ class V4Parser constructor() : Parser {
             medias = parsed.playlists
                 .map { it.items.map { it.media } }
                 .flatten()
-                .distinctBy { it.platformId }
-                .map { it.copy(channelData = it.channelData.copy(id = null)) }
+                .distinctBy { listOf(it.platform, it.platformId) }
+            // todo check this still works
+            //.map { it.copy(channelData = it.channelData.copy(id = null)) }
         )
     }
 }

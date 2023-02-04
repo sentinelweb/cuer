@@ -73,8 +73,8 @@ class BackupFileManager constructor(
     private suspend fun backupDataJson(playlists: List<PlaylistDomain>) =
         withContext(contextProvider.IO) {
             BackupFileModel(
-                version = 3, // todo to v4
-                medias = listOf(), // todo remove
+                version = BACKUP_VERSION,
+                medias = listOf(), // todo remove?
                 playlists = playlists
             ).serialise()
         }
@@ -92,9 +92,7 @@ class BackupFileManager constructor(
 
                         else -> { // assume image
                             File(imageFileRepository._dir.path, entry.name).outputStream()
-                                .use { output ->
-                                    input.copyTo(output)
-                                }
+                                .use { output -> input.copyTo(output) }
                         }
                     }
                 }
@@ -112,7 +110,7 @@ class BackupFileManager constructor(
     }
 
     companion object {
-        const val BACKUP_VERSION = 3
+        const val BACKUP_VERSION = 4
         const val DB_FILE_JSON = "database.json"
     }
 }

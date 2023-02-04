@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.backup.version.v3.mapper
 
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.DEFAULT_PLAYLIST_ID
+import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer.Companion.PHILOSOPHY_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
@@ -26,7 +28,7 @@ class V3ToV4Mapper(private val guidGenerator: GuidCreator) {
     val playlistIdMap = mutableMapOf<Long, Identifier<GUID>>()
     fun mapPlaylist(v3: PlaylistDomainV3): PlaylistDomain =
         PlaylistDomain(
-            id = playlistIdMap.getOrCreateNewId(v3.id!!),
+            id = playlistIdentifier(v3),
             title = v3.title,
             items = v3.items.map { mapPlaylistItem(it) },
             currentIndex = v3.currentIndex,
@@ -44,6 +46,17 @@ class V3ToV4Mapper(private val guidGenerator: GuidCreator) {
             playItemsFromStart = v3.playItemsFromStart,
             config = v3.config,
         )
+
+    private fun playlistIdentifier(v3: uk.co.sentinelweb.cuer.app.backup.version.v3.domain.PlaylistDomain) =
+        if (v3.title.lowercase() == "default") {
+            playlistIdMap.put(v3.id!!, DEFAULT_PLAYLIST_ID)
+            DEFAULT_PLAYLIST_ID
+        } else if (v3.title.lowercase() == "philosophy") {
+            playlistIdMap.put(v3.id!!, PHILOSOPHY_PLAYLIST_ID)
+            PHILOSOPHY_PLAYLIST_ID
+        } else {
+            playlistIdMap.getOrCreateNewId(v3.id!!)
+        }
 
     val playlistItemIdMap = mutableMapOf<Long, Identifier<GUID>>()
     fun mapPlaylistItem(v3: PlaylistItemDomainV3): PlaylistItemDomain =

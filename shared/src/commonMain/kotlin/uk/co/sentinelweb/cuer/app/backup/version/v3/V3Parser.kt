@@ -16,7 +16,7 @@ class V3Parser(val v4Mapper: V3ToV4Mapper) : Parser {
             medias = parsed.playlists
                 .map { it.items.map { it.media } }
                 .flatten()
-                .distinctBy { it.platformId }
+                .distinctBy { listOf(it.platform, it.platformId) }
             //.map { it.copy(channelData = it.channelData.copy(id = null)) }
         )
     }
