@@ -52,12 +52,12 @@ class PlaylistsItemMviContract {
     }
 
     companion object {
-        val ID_APP_HEADER = Identifier("5e9b262f-0ce8-4b95-a4f7-a9565d01732a".toGUID(), MEMORY)
-        val ID_APP_LIST = Identifier("5c609f4a-d7d7-4124-bf09-65ab79dc0a21".toGUID(), MEMORY)
-        val ID_RECENT_HEADER = Identifier("4b44b22f-0c3c-4767-b5ae-7b20b39f5dd2".toGUID(), MEMORY)
-        val ID_RECENT_LIST = Identifier("956151dc-670a-4e46-b8b4-a72ef5a719ed".toGUID(), MEMORY)
-        val ID_STARRED_HEADER = Identifier("50478d2b-6c4c-4e6f-8a18-403a4acc6520".toGUID(), MEMORY)
-        val ID_STARRED_LIST = Identifier("50f44d8b-9261-4eab-9ddb-937603e90168".toGUID(), MEMORY)
-        val ID_ALL_HEADER = Identifier("1b857a31-01ab-44ed-a05a-5704f13b1c2e".toGUID(), MEMORY)
+        val ID_APP_HEADER = Identifier("id-app-header".toGUID(), MEMORY)
+        val ID_APP_LIST = Identifier("id-app-list".toGUID(), MEMORY)
+        val ID_RECENT_HEADER = Identifier("id-recent-header".toGUID(), MEMORY)
+        val ID_RECENT_LIST = Identifier("id-recent-list".toGUID(), MEMORY)
+        val ID_STARRED_HEADER = Identifier("id-starred-header".toGUID(), MEMORY)
+        val ID_STARRED_LIST = Identifier("id-starred-list".toGUID(), MEMORY)
+        val ID_ALL_HEADER = Identifier("id-all-header".toGUID(), MEMORY)
     }
 }

@@ -85,9 +85,9 @@ class PlaylistsModelMapper constructor(
     )
 
     companion object {
-        val ID_CHANNEL_HEADER = Identifier("157bd426-2508-4d08-8c55-3aa23905f85c".toGUID(), MEMORY)
-        val ID_RECENT_HEADER = Identifier("4b44b22f-0c3c-4767-b5ae-7b20b39f5dd2".toGUID(), MEMORY)
-        val ID_ALL_HEADER = Identifier("1b857a31-01ab-44ed-a05a-5704f13b1c2e".toGUID(), MEMORY)
+        val ID_CHANNEL_HEADER = Identifier("id-channel-header".toGUID(), MEMORY)
+        val ID_RECENT_HEADER = Identifier("id-recent-header".toGUID(), MEMORY)
+        val ID_ALL_HEADER = Identifier("id-all-header".toGUID(), MEMORY)
     }
 
 }
