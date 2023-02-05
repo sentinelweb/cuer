@@ -25,10 +25,16 @@
         "source": "LOCAL"
       },
       "title": "Philosophy",
+      "type": "PLATFORM",
+      "platformId": "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe",
+      "platform": "YOUTUBE",
       "items": [],
       "currentIndex": 0,
       "image": {
         "url": "https://cuer-275020.web.app/images/headers/art-school-of-athens-1143741_640.jpg"
+      },
+      "config": {
+        "deletable": false
       }
     }
   ],

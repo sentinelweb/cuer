@@ -3,7 +3,9 @@ package uk.co.sentinelweb.cuer.app.db.init
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.backup.IBackupJsonManager
 import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -12,6 +14,8 @@ class JsonDatabaseInitializer constructor(
     private val backup: IBackupJsonManager,
     private val preferences: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
+    private val playlistUpdateUsecase: PlaylistUpdateUsecase,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
     private val log: LogWrapper,
 ) : DatabaseInitializer {
 
@@ -27,8 +31,10 @@ class JsonDatabaseInitializer constructor(
             assetOperations.getAsString(path)
                 ?.apply { backup.restoreData(this) }
                 ?.apply { preferences.dbInitialised = true }
-                ?.apply { preferences.currentPlayingPlaylistId = DatabaseInitializer.PHILOSOPHY_PLAYLIST_ID }
+                ?.apply { playlistUpdateUsecase.update(DatabaseInitializer.PHILOSOPHY_PLAYLIST_ID) }
+//                ?.apply { preferences.currentPlayingPlaylistId = DatabaseInitializer.PHILOSOPHY_PLAYLIST_ID }
                 ?.apply { preferences.lastViewedPlaylistId = DatabaseInitializer.PHILOSOPHY_PLAYLIST_ID }
+                ?.apply { recentLocalPlaylists.addRecentId(DatabaseInitializer.PHILOSOPHY_PLAYLIST_ID.id) }
                 ?.apply { log.d("DB initialised") }
                 ?.apply { listeners.forEach { it.invoke(true) } }
         }

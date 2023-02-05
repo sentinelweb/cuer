@@ -43,7 +43,7 @@ class QueueMediator constructor(
         get() = state.currentItem?.let { item -> state.playlist?.items?.indexOfFirst { item.id == it.id } }
     override val playlist: PlaylistDomain?
         get() = state.playlist
-    override val playlistId: Identifier<*>?
+    override val playlistId: Identifier<GUID>?
         get() = if (state.playlistIdentifier != NO_PLAYLIST) state.playlistIdentifier else null
     override val source: Source
         get() = state.playlistIdentifier.source
@@ -60,7 +60,7 @@ class QueueMediator constructor(
         state.playlistIdentifier = prefsWrapper.currentPlayingPlaylistId
         _currentItemFlow = MutableStateFlow(state.currentItem)
         coroutines.computationScope.launch {
-            refreshQueue(state.playlistIdentifier)
+            playlistId?.apply { refreshQueue(this) }
         }
         listenToDb()
     }

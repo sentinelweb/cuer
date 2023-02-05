@@ -117,7 +117,10 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = domain.config.deletableItems,
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
                 canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
-                itemsText = "${domain.currentIndex.plus(1)}/${domain.items.size}"
+                itemsText = domain.items
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { "${domain.currentIndex.plus(1)}/${it.size}" }
+                    ?: "-/-"
             ),
             items = items,
             isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),

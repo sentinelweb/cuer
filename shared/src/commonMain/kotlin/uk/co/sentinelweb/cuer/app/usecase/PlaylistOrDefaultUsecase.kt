@@ -23,7 +23,9 @@ class PlaylistOrDefaultUsecase constructor(
     ): PlaylistDomain? =
         when (playlistId?.source) {
             OrchestratorContract.Source.MEMORY ->
-                playlistMemoryRepository.load(playlistId.id, playlistId.source.deepOptions()) // todo FALLBACK OR ERROR?
+                playlistId.id
+                    .takeIf { it != OrchestratorContract.NO_PLAYLIST.id }
+                    ?.let { playlistMemoryRepository.load(it, playlistId.source.deepOptions()) }
                     ?.apply { delay(20) } // fixme: menu items don't load in time since memory is sequential
                     ?: getPlaylistOrDefaultInternal(null)
 

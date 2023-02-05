@@ -48,7 +48,7 @@ object SharedAppModule {
     }
 
     private val dbModule = module {
-        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get()) }
+        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get(), get(), get()) }
     }
 
     private val orchestratorModule = module {
