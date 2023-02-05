@@ -349,9 +349,10 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                     archived = itemDomain1.archived.not(),
                 )
 
-        val actual = sut.save(itemConflict, flat = false, emit = false)
-        assertFalse(actual.isSuccessful)
-        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
+        // returns the original item
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!!)
     }
 
     @Test
