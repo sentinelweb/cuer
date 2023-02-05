@@ -80,18 +80,17 @@ class SqldelightPlaylistItemDatabaseRepository(
                                             " existing: ${platformCheck.id}  thisid: ${itemDomain.id} "
                                 )
                             }
-                            //itemEntity.also { update(it) }
                             update(playlistItemMapper.map(itemDomain))
                             load(itemDomain.id!!.id.value).executeAsOne()
                         } else {
                             if (platformCheck != null) {
-                                throw ConflictException("playlistitem already exists: ${itemDomain.media.id}_${itemDomain.playlistId}")
+                                //throw ConflictException("playlistitem already exists: ${itemDomain.media.id}_${itemDomain.playlistId}")
+                                platformCheck
+                            } else {
+                                guidCreator.create().toIdentifier(source)
+                                    .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
+                                    .also { create(it) }
                             }
-                            guidCreator.create().toIdentifier(source)
-                                .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
-                                .also { create(it) }
-//                            create(itemEntity)
-//                            itemEntity.copy(id = getInsertId().executeAsOne())
                         }
                     }
                 }
@@ -295,17 +294,16 @@ class SqldelightPlaylistItemDatabaseRepository(
                                             " existing: ${platformCheck.id}  thisid:${itemDomain.id}"
                                 )
                             }
-
                             playlistItemMapper.map(itemDomain).also { update(it) }
                         } else {
                             if (platformCheck != null) {
-                                throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}")
+                                //throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}")
+                                platformCheck
+                            } else {
+                                guidCreator.create().toIdentifier(source)
+                                    .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
+                                    .also { create(it) }
                             }
-                            guidCreator.create().toIdentifier(source)
-                                .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
-                                .also { create(it) }
-//                            create(itemEntity)
-//                            itemEntity.copy(id = getInsertId().executeAsOne())
                         }
                     }
                 }

@@ -309,10 +309,10 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                     order = itemDomain1.order
                 )
 
-        // itemConflict should overwrite the original
+        // returns the original item
         val savedConflict = sut.save(itemConflict, flat = false, emit = false)
-        assertFalse(savedConflict.isSuccessful)
-        assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!!)
     }
 
     @Test
@@ -329,10 +329,10 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                         order = itemDomain1.order
                     )
             )
-        // itemConflict should overwrite the original
+        // returns the original item
         val savedConflict = sut.save(itemConflict, flat = false, emit = false)
-        assertFalse(savedConflict.isSuccessful)
-        assertEquals((savedConflict as RepoResult.Error<*>).t::class, ConflictException::class)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!![0])
     }
 
     // if we try to save the same media on same playlist with different ordering then it will be an exception which is ok

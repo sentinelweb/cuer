@@ -48,7 +48,6 @@ import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 // todo uncomment
 @ExperimentalCoroutinesApi
 class QueueMediatorTest {
-    // private val fixture = JFixture()
     private val fixture = kotlinFixtureDefaultConfig
 
     @MockK
@@ -754,7 +753,6 @@ class QueueMediatorTest {
         assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
         assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
         assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
-        //verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
         coVerify {
             playlistOrDefaultUsecase.updateCurrentIndex(
                 fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
@@ -776,7 +774,6 @@ class QueueMediatorTest {
         assertThat(sut.currentItemIndex).isEqualTo(expectedIndex)
         assertThat(sut.currentItem).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
         assertThat(captureItemFlow.last()).isEqualTo(fixtCurrentPlaylist.items.get(expectedIndex))
-        //verify { mockMediaSessionManager.setMedia(fixtCurrentPlaylist.items.get(expectedIndex).media, queue.playlist) }
         coVerify {
             playlistOrDefaultUsecase.updateCurrentIndex(
                 fixtCurrentPlaylist.copy(currentIndex = expectedIndex),
