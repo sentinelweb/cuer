@@ -186,7 +186,7 @@ class PlaylistMutatorTest {
 
         val actual = sut.gotoPreviousItem(fixWithIndex)
 
-        assertEquals(-1, actual.currentIndex)
+        assertEquals(0, actual.currentIndex)
     }
 
     @Test

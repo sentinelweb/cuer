@@ -7,11 +7,13 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
@@ -57,7 +59,7 @@ class PlaylistMviModelMapperTest {
     @Test
     fun mapPlaylist() {
         val initial = generatePlaylist(fixture).let {
-            it.copy(id = it.id!!, items = it.items.filter { it.id != null })
+            it.copy(id = it.id ?: GuidCreator().create().toIdentifier(fixture()), items = it.items.filter { it.id != null })
         }
 
         val identifier = initial.id!!
