@@ -19,6 +19,6 @@ class PlaylistMediaUpdateUsecase constructor(
                 mediaOrchestrator.update(update, options.copy(source = OrchestratorContract.Source.LOCAL))
             } else null
             OrchestratorContract.Source.LOCAL -> mediaOrchestrator.update(update, options)
-            else -> throw UnsupportedOperationException("Media update not suppoted for ${options.source}")
+            else -> throw UnsupportedOperationException("Media update not supported for ${options.source}")
         }
 }

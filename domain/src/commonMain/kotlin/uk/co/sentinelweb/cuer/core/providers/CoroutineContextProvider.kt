@@ -1,9 +1,6 @@
 package uk.co.sentinelweb.cuer.core.providers
 
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 
 
 interface DispatcherProvider {
@@ -61,3 +58,6 @@ open class CoroutineContextProvider constructor(
         _ioScope.cancel()
     }
 }
+
+@Suppress("unused")
+fun Job.ignoreJob() = Unit

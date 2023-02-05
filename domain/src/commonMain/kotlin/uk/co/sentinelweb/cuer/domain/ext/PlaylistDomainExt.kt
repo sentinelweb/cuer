@@ -193,7 +193,7 @@ fun PlaylistTreeDomain.isDescendent(check: PlaylistTreeDomain): Boolean {
 }
 
 fun PlaylistDomain.summarise(): String = """
-    id: $id, platform: $platform - $platformId, type: $type, title: $title, 
+    PLAYLIST: id: $id, platform: $platform - $platformId, type: $type, title: $title, 
     items:${items.map { it.summarise() }.joinToString("\n")}
 """.trimIndent()
 

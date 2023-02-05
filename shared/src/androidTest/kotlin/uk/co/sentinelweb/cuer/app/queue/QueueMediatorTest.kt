@@ -15,6 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
+import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
@@ -74,6 +75,7 @@ class QueueMediatorTest {
     private val coroutines: CoroutineContextProvider = CoroutineContextTestProvider(testCoroutineDispatcher)
     private val playlistMutator: PlaylistMutator = PlaylistMutator()
     private val log: LogWrapper = SystemLogWrapper()
+    private val testLog: LogWrapper = SystemLogWrapper()
     private val guidCreator: GuidCreator = GuidCreator()
 
     private lateinit var fixtCurrentPlaylist: PlaylistDomain
@@ -100,7 +102,7 @@ class QueueMediatorTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxed = true)
-
+        testLog.tag(this)
         fixtCurrentPlaylist = generatePlaylist(fixture)
         fixtCurrentPlaylist = fixtCurrentPlaylist.copy(
             id = guidCreator.create().toIdentifier(fixture()),
@@ -143,13 +145,13 @@ class QueueMediatorTest {
         )
         sut.currentItemFlow
             .onEach {
-                log.d("flow item changed: $it")
+                testLog.d("flow item changed: $it")
                 captureItemFlow.add(it)
             }
             .launchIn(coroutines.computationScope)
         sut.currentPlaylistFlow
             .onEach {
-                log.d("flow playlist changed: $it")
+                testLog.d("flow playlist changed: $it")
                 capturePlaylistFlow.add(it)
             }
             .launchIn(coroutines.computationScope)
@@ -683,10 +685,29 @@ class QueueMediatorTest {
     @Test
     @Ignore("flaky")
     fun onItemSelected_simple() = runTest {
+        // QueueMediatorState(playlist = fixtCurrentPlaylist, playlistIdentifier = fixtCurrentIdentifier)
         createSut()
         val selectedItemIndex = 4
         val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
-
+        testLog.d("onItemSelected_simple:${selectedItem.summarise()}")
+//        val mediaPositionUpdate = MediaPositionUpdateDomain(
+//            id = selectedItem.media.id!!,
+//            positon = selectedItem.media.positon,
+//            duration = selectedItem.media.duration,
+//            dateLastPlayed = selectedItem.media.dateLastPlayed,
+//            watched = true
+//        )
+//        val expectedMediaAfterUpdate = selectedItem.media.copy(
+//            positon = mediaPositionUpdate.positon,
+//            duration = mediaPositionUpdate.duration,
+//            dateLastPlayed = mediaPositionUpdate.dateLastPlayed,
+//            watched = mediaPositionUpdate.watched
+//        )
+//        coEvery {
+//            mediaUpdate.updateMedia(
+//                fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
+//            )
+//        } answers { testLog.d("mock return media"); expectedMediaAfterUpdate}
         // test
         sut.onItemSelected(selectedItem)
 
