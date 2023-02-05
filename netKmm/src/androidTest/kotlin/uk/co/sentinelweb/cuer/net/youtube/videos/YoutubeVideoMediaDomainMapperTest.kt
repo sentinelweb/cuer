@@ -113,7 +113,7 @@ class YoutubeVideoMediaDomainMapperTest {
             if (dto.items[index].contentDetails != null) {
                 assertEquals(fixtDuration, domain.duration)
             } else {
-                assertEquals(-1, domain.duration)
+                assertEquals(-1L, domain.duration)
             }
             assertEquals(dto.items[index].id, domain.platformId)
             assertEquals(MediaDomain.MediaTypeDomain.VIDEO, domain.mediaType)
