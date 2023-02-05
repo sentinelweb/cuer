@@ -7,8 +7,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertTrue
@@ -68,8 +67,7 @@ class QueueMediatorTest {
     @MockK
     lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
 
-    private val testCoroutineDispatcher = TestCoroutineDispatcher()
-    private val testCoroutineScope = TestCoroutineScope(TestCoroutineDispatcher())
+    private val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
     private val coroutines: CoroutineContextProvider = CoroutineContextTestProvider(testCoroutineDispatcher)
     private val playlistMutator: PlaylistMutator = PlaylistMutator()
