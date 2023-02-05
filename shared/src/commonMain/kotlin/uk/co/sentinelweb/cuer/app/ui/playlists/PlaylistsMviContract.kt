@@ -7,10 +7,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.ItemPassView
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
-import uk.co.sentinelweb.cuer.domain.Domain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 class PlaylistsMviContract {
 
@@ -50,11 +47,11 @@ class PlaylistsMviContract {
             var dragTo: Int? = null,
             var playlistStats: List<PlaylistStatDomain> = listOf(),
             var treeRoot: PlaylistTreeDomain = PlaylistTreeDomain(),
-            var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
-            val currentPlayingPlaylistId: Identifier<Long>? = null,
+            var treeLookup: Map<Identifier<GUID>, PlaylistTreeDomain> = mapOf(),
+            val currentPlayingPlaylistId: Identifier<GUID>? = null,
             val appLists: Map<PlaylistDomain, PlaylistStatDomain> = mapOf(),
-            val recentPlaylists: List<Identifier<Long>> = listOf(),
-            val pinnedPlaylistId: Long? = null,
+            val recentPlaylists: List<Identifier<GUID>> = listOf(),
+            val pinnedPlaylistId: GUID? = null,
         )
     }
 
@@ -65,7 +62,7 @@ class PlaylistsMviContract {
         data class Model(
             val title: String,
             val imageUrl: String = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
-            val currentPlaylistId: Identifier<*>?, // todo non null?
+            val currentPlaylistId: Identifier<GUID>?, // todo non null?
             val items: List<PlaylistsItemMviContract.Model>
         )
 
@@ -96,6 +93,7 @@ class PlaylistsMviContract {
     }
 
     open class Strings {
+        // todo move to StringResources
         open val playlists_section_app: String = "App"
         open val playlists_section_recent: String = "Recent"
         open val playlists_section_starred: String = "Starred"

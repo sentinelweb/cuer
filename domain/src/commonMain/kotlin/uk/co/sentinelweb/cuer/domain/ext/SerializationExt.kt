@@ -6,6 +6,7 @@ import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
@@ -86,46 +87,36 @@ fun deserialisePlaylistList(input: String) = domainJsonSerializer.decodeFromStri
     PlaylistDomain.serializer(), input
 )
 
-fun deserialisePlaylistConfig(input: String) = domainJsonSerializer.decodeFromString(
-    PlaylistDomain.PlaylistConfigDomain.serializer(), input
-)
+fun deserialisePlaylistConfig(input: String) = domainJsonSerializer.decodeFromString(PlaylistDomain.PlaylistConfigDomain.serializer(), input)
 
-fun deserialiseImage(input: String) = domainJsonSerializer.decodeFromString(
-    ImageDomain.serializer(), input
-)
+fun deserialiseImage(input: String) = domainJsonSerializer.decodeFromString(ImageDomain.serializer(), input)
 
-fun deserialisePlaylistItem(input: String) = domainJsonSerializer.decodeFromString(
-    PlaylistItemDomain.serializer(), input
-)
+fun deserialisePlaylistItem(input: String) = domainJsonSerializer.decodeFromString(PlaylistItemDomain.serializer(), input)
 
-fun BackupFileModel.serialise() = domainJsonSerializer.encodeToString(
-    BackupFileModel.serializer(), this
-)
+fun Identifier<GUID>.serialise() = domainJsonSerializer.encodeToString(Identifier.serializer(GUID.serializer()), this)
 
-fun deserialiseBackupFileModel(input: String) = domainJsonSerializer.decodeFromString(
-    BackupFileModel.serializer(), input
-)
+fun deserialiseGuidIdentifier(input: String) = domainJsonSerializer.decodeFromString(Identifier.serializer(GUID.serializer()), input)
 
-fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(
-    ResponseDomain.serializer(), this
-)
+fun GUID.serialise() = domainJsonSerializer.encodeToString(GUID.serializer(), this)
 
-fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(
-    ResponseDomain.serializer(), input
-)
+fun deserialiseGuid(input: String) = domainJsonSerializer.decodeFromString(GUID.serializer(), input)
 
-fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(
-    CategoryDomain.serializer(), input
-)
+// backup
+fun BackupFileModel.serialise() = domainJsonSerializer.encodeToString(BackupFileModel.serializer(), this)
+
+fun deserialiseBackupFileModel(input: String) = domainJsonSerializer.decodeFromString(BackupFileModel.serializer(), input)
+
+// response
+fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(ResponseDomain.serializer(), this)
+
+fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(ResponseDomain.serializer(), input)
+
+fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(CategoryDomain.serializer(), input)
 
 // AppDetailsDomain
-fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(
-    ListSerializer(AppDetailsDomain.serializer()), this
-)
+fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(ListSerializer(AppDetailsDomain.serializer()), this)
 
-fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(
-    AppDetailsDomain.serializer(), input
-)
+fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(AppDetailsDomain.serializer(), input)
 
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {

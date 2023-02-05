@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.entity
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -19,13 +16,15 @@ import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.Companion.FLAG_STARRED
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import kotlin.test.assertEquals
 
 class PlaylistEntityTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -44,6 +43,7 @@ class PlaylistEntityTest : KoinTest {
     }
 
     val database: Database by inject()
+    private val guidCreator = GuidCreator()
 
     @Before
     fun before() {
@@ -81,12 +81,15 @@ class PlaylistEntityTest : KoinTest {
         val playlist1 = createPlaylist()
         createPlaylist()
         val playlist3 = createPlaylist()
+        val playlistIds = listOf(playlist1.id, playlist3.id)
         val actual = database.playlistEntityQueries
-            .loadAllByIds(listOf(playlist1.id, playlist3.id))
+            .loadAllByIds(playlistIds)
             .executeAsList()
+            .sortedBy { it.id }
+        val expected = listOf(playlist1, playlist3).sortedBy { it.id }
+
         assertEquals(2, actual.size)
-        assertEquals(playlist1, actual[0])
-        assertEquals(playlist3, actual[1])
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -156,21 +159,25 @@ class PlaylistEntityTest : KoinTest {
 
     @Test
     fun findPlaylistForChannelPlatformId() {
+        val guid = guidCreator.create()
         val playlistInitial =
-            fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
+            fixture<Playlist>().copy(id = guid.value, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(playlistInitial)
-        val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
-        val playlist = playlistInitial.copy(id = playlistId)
+        //val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
+        val playlist = playlistInitial
 
-        val channel = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
+        val guidChannel = guidCreator.create()
+        val channel = fixture<Channel>().copy(id = guidChannel.value, image_id = null, thumb_id = null)
         database.channelEntityQueries.create(channel)
-        val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
+        //val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
 
-        val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
+        val guidMedia = guidCreator.create()
+        val media = fixture<Media>().copy(id = guidMedia.value, channel_id = guidChannel.value, image_id = null, thumb_id = null)
         database.mediaEntityQueries.create(media)
-        val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
+        //val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
 
-        val item = fixture<Playlist_item>().copy(id = 0, media_id = mediaId, playlist_id = playlistId)
+        val guidItem = guidCreator.create()
+        val item = fixture<Playlist_item>().copy(id = guidItem.value, media_id = guidMedia.value, playlist_id = guid.value)
         database.playlistItemEntityQueries.create(item)
 
         val actual = database.playlistEntityQueries
@@ -201,12 +208,13 @@ class PlaylistEntityTest : KoinTest {
         assertEquals(initial.size.toLong(), actual)
     }
 
-    private fun createPlaylist(channelId: Long? = null): Playlist {
+    private fun createPlaylist(channelId: String? = null): Playlist {
+        val guid = guidCreator.create()
         val initial =
-            fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = channelId, image_id = null, thumb_id = null)
+            fixture<Playlist>().copy(id = guid.value, parent_id = null, channel_id = channelId, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(initial)
-        val insertId = database.playlistEntityQueries.getInsertId().executeAsOne()
-        val expected = initial.copy(id = insertId)
-        return expected
+        //val insertId = database.playlistEntityQueries.getInsertId().executeAsOne()
+        //val expected = initial.copy(id = insertId)
+        return initial
     }
 }

@@ -3,8 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
@@ -21,7 +20,7 @@ class PlaylistMviContract {
 
     interface MviStore : Store<Intent, State, Label> {
         data class State(
-            var playlistIdentifier: OrchestratorContract.Identifier<*> = OrchestratorContract.NO_PLAYLIST,
+            var playlistIdentifier: Identifier<GUID> = OrchestratorContract.NO_PLAYLIST,
             var playlist: PlaylistDomain? = null,
             var deletedPlaylistItem: PlaylistItemDomain? = null,
             var movedPlaylistItem: PlaylistItemDomain? = null,
@@ -30,22 +29,23 @@ class PlaylistMviContract {
             var dragTo: Int? = null,
             var selectedPlaylistItem: PlaylistItemDomain? = null,
             var playlistsTree: PlaylistTreeDomain? = null,
-            var playlistsTreeLookup: Map<Long, PlaylistTreeDomain>? = null,
-            var addPlaylistParent: Long? = null,
+            var playlistsTreeLookup: Map<Identifier<GUID>, PlaylistTreeDomain>? = null,
+            var addPlaylistParent: Identifier<GUID>? = null,
             var isModified: Boolean = false,
             var isCards: Boolean = false,
             var isHeadless: Boolean = false,
-            val itemsIdMap: MutableMap<Long, PlaylistItemDomain> = mutableMapOf(),
+            val itemsIdMap: MutableMap<Identifier<GUID>, PlaylistItemDomain> = mutableMapOf(),
+            val itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>> = mutableMapOf(),
         )
 
         sealed class Intent {
             object Refresh : Intent()
             data class SetPlaylistData(
-                val plId: Long? = null,
-                val plItemId: Long? = null,
+                val plId: GUID? = null,
+                val plItemId: GUID? = null,
                 val playNow: Boolean = false,
                 val source: Source = Source.LOCAL,
-                val addPlaylistParent: Long? = null
+                val addPlaylistParent: GUID? = null
             ) : Intent()
 
             data class Move(val fromPosition: Int, val toPosition: Int) : Intent()
@@ -119,9 +119,8 @@ class PlaylistMviContract {
                 Label()
 
             data class ShowItem(
-                val modelId: Long,
-                val item: PlaylistItemDomain,
-                val source: OrchestratorContract.Source
+                val modelId: Identifier<GUID>,
+                val item: PlaylistItemDomain
             ) :
                 Label()
 
@@ -140,7 +139,7 @@ class PlaylistMviContract {
             val header: Header,
             val items: List<Item>?,
             val isCards: Boolean,
-            val identifier: OrchestratorContract.Identifier<*>?,
+            val identifier: Identifier<*>?,
             val playingIndex: Int?
         )
 
@@ -187,11 +186,11 @@ class PlaylistMviContract {
             data class OnCommit(val afterCommit: ShareCommitter.AfterCommit) : Event()
             data class OnPlaylistSelected(val playlist: PlaylistDomain) : Event()
             data class OnSetPlaylistData(
-                val plId: Long? = null,
-                val plItemId: Long? = null,
+                val plId: GUID? = null,
+                val plItemId: GUID? = null,
                 val playNow: Boolean = false,
                 val source: Source = Source.LOCAL,
-                val addPlaylistParent: Long? = null
+                val addPlaylistParent: GUID? = null
             ) : Event()
 
             data class OnShowCards(val isCards: Boolean) : Event()

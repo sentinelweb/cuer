@@ -10,7 +10,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
@@ -178,7 +177,7 @@ class PlayerStoreFactory(
                         it.media.copy(starred = it.media.starred.not()),
                         LOCAL.deepOptions(true)
                     )
-                    playlistItemOrchestrator.loadById(it.id!!, LOCAL.deepOptions(false))
+                    playlistItemOrchestrator.loadById(it.id!!.id, LOCAL.deepOptions(false))
                         ?.apply { dispatch(Result.SetVideo(this)) }
                 }
         }
@@ -192,7 +191,6 @@ class PlayerStoreFactory(
 
         private fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
             item.playlistId
-                ?.toIdentifier(LOCAL)
                 ?.apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
                 ?.apply { livePlaybackController.clear(item.media.platformId) }
                 ?.apply { queueProducer.playNow(this, item.id) }
@@ -277,7 +275,6 @@ class PlayerStoreFactory(
 
         private fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
             item.playlistId
-                ?.toIdentifier(LOCAL)
                 ?.apply { livePlaybackController.clear(item.media.platformId) }
                 ?.apply { queueProducer.onItemSelected(item, false, resetPosition) }
         }

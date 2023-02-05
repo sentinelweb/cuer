@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.filter
 
-import com.flextrade.jfixture.JFixture
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -11,10 +10,11 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.tools.ext.build
+import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
+import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
 class PlatformIdFilterTest {
-    private val fixture = JFixture()
+    private val fixture = kotlinFixtureDefaultConfig
 
     private val sut: PlatformIdFilter = PlatformIdFilter()
 
@@ -24,8 +24,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldMatchPlaylistPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: PlaylistDomain = fixture.build<PlaylistDomain>()
+        val targetId: String = fixture()
+        val playlist: PlaylistDomain = generatePlaylist(fixture)
             .copy(
                 platformId = targetId,
                 platform = PlatformDomain.YOUTUBE
@@ -38,8 +38,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldNotMatchPlaylistPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: PlaylistDomain = fixture.build<PlaylistDomain>()
+        val targetId: String = fixture()
+        val playlist: PlaylistDomain = generatePlaylist(fixture)
             .copy(
                 platformId = "differentId",
                 platform = PlatformDomain.YOUTUBE
@@ -52,8 +52,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldMatchPlaylistItemPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().let {
+        val targetId: String = fixture()
+        val playlist: PlaylistItemDomain = fixture<PlaylistItemDomain>().let {
             it.copy(
                 media = it.media.copy(
                     platformId = targetId,
@@ -69,8 +69,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldNotMatchPlaylistItemPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: PlaylistItemDomain = fixture.build<PlaylistItemDomain>().let {
+        val targetId: String = fixture()
+        val playlist: PlaylistItemDomain = fixture<PlaylistItemDomain>().let {
             it.copy(
                 media = it.media.copy(
                     platformId = "differentId",
@@ -86,8 +86,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldMatchMediaPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: MediaDomain = fixture.build<MediaDomain>().copy(
+        val targetId: String = fixture()
+        val playlist: MediaDomain = fixture<MediaDomain>().copy(
             platformId = targetId,
             platform = PlatformDomain.YOUTUBE
         )
@@ -100,8 +100,8 @@ class PlatformIdFilterTest {
 
     @Test
     fun shouldNotMatchMediaPlatformId() {
-        val targetId: String = fixture.build()
-        val playlist: MediaDomain = fixture.build<MediaDomain>().copy(
+        val targetId: String = fixture()
+        val playlist: MediaDomain = fixture<MediaDomain>().copy(
             platformId = "differentId",
             platform = PlatformDomain.YOUTUBE
         )

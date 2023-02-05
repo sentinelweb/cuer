@@ -3,10 +3,11 @@ package uk.co.sentinelweb.cuer.domain
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 
 @Serializable
 data class ChannelDomain constructor(
-    val id: Long? = null,
+    val id: Identifier<GUID>? = null,
     val platformId: String?,
     val platform: PlatformDomain,
     val country: String? = null,

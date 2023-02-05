@@ -68,7 +68,7 @@ class ScanPresenter(
         }.firstOrNull()
             ?.let { media ->
                 playlistItemOrchestrator
-                    .loadList(MediaIdListFilter(listOf(media.id!!)), Options(LOCAL))
+                    .loadList(MediaIdListFilter(listOf(media.id!!.id)), Options(LOCAL))
                     .let {
                         modelMapper.mapMediaResult(uriString, false, it.size > 0, media)
                     }
@@ -87,7 +87,7 @@ class ScanPresenter(
                         ?.let { it to false }
                         ?: playlistOrchestrator.loadByPlatformId(it, PLATFORM.deepOptions(emit = false))
                             ?.copy(
-                                id = Shared.id,
+                                id = Shared.identifier(),
                                 config = scannedPlaylist.config.copy(
                                     playable = false,
                                     editableItems = false,

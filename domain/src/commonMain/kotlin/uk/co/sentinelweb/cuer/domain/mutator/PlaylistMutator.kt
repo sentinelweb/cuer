@@ -55,6 +55,8 @@ class PlaylistMutator {
             newPosition--
             if (playlist.mode == LOOP && newPosition < 0) {
                 newPosition = playlist.items.size - 1
+            } else if (newPosition < 0) {
+                newPosition = 0
             }
 
         } else if (playlist.mode == SHUFFLE && playlist.items.size > 0) {

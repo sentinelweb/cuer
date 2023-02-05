@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_ALL_HEADER
@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companio
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Companion.ID_STARRED_LIST
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract.View
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
@@ -37,8 +38,8 @@ class PlaylistsMviModelMapper(
     private fun buildItems(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
         appPlaylists: Map<PlaylistDomain, PlaylistStatDomain?>,
-        recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
-        pinnedId: Long?,
+        recentPlaylists: List<Identifier<GUID>>,
+        pinnedId: GUID?,
         root: PlaylistTreeDomain
     ): List<PlaylistsItemMviContract.Model> {
         val starred = buildStarredList(domains)
@@ -52,7 +53,7 @@ class PlaylistsMviModelMapper(
             PlaylistsItemMviContract.Model.List(
                 ID_APP_LIST,
                 appPlaylists.keys.map {
-                    itemModel(it, it.id == pinnedId, appPlaylists[it], 0)
+                    itemModel(it, it.id?.id == pinnedId, appPlaylists[it], 0)
                 }),
 
             PlaylistsItemMviContract.Model.Header(
@@ -61,7 +62,7 @@ class PlaylistsMviModelMapper(
             ),
             PlaylistsItemMviContract.Model.List(ID_RECENT_LIST,
                 recent.map {
-                    itemModel(it, it.id == pinnedId, domains[it], 0)
+                    itemModel(it, it.id?.id == pinnedId, domains[it], 0)
                 }),
 
             PlaylistsItemMviContract.Model.Header(
@@ -71,7 +72,7 @@ class PlaylistsMviModelMapper(
             PlaylistsItemMviContract.Model.List(
                 ID_STARRED_LIST,
                 starred.map {
-                    itemModel(it, it.id == pinnedId, domains[it], 0)
+                    itemModel(it, it.id?.id == pinnedId, domains[it], 0)
                 }),
 
             PlaylistsItemMviContract.Model.Header(
@@ -81,7 +82,7 @@ class PlaylistsMviModelMapper(
         )
         root.iterate { tree, depth ->
             tree.node?.also {
-                list.add(itemModel(it, it.id == pinnedId, domains[it], depth - 1))
+                list.add(itemModel(it, it.id?.id == pinnedId, domains[it], depth - 1))
             }
         }
         return list
@@ -89,10 +90,10 @@ class PlaylistsMviModelMapper(
 
     private fun buildRecentList(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>,
-        recentPlaylists: List<OrchestratorContract.Identifier<Long>>,
+        recentPlaylists: List<Identifier<GUID>>,
     ): List<PlaylistDomain> =
         recentPlaylists
-            .mapNotNull { identifier -> domains.keys.find { it.id == identifier.id } }
+            .mapNotNull { identifier -> domains.keys.find { it.id == identifier } }
 
     private fun buildStarredList(
         domains: Map<PlaylistDomain, PlaylistStatDomain?>

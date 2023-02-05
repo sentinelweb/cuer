@@ -3,12 +3,13 @@ package uk.co.sentinelweb.cuer.app.ui.share
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.exception.NoDefaultPlaylistException
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.MediaIdListFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
@@ -66,7 +67,7 @@ class SharePresenter constructor(
 //            .launchIn(coroutines.mainScope)
 //    }
 
-    override fun setPlaylistParent(cat: CategoryDomain?, parentId: Long) {
+    override fun setPlaylistParent(cat: CategoryDomain?, parentId: Identifier<GUID>) {
         state.category = cat
         state.parentPlaylistId = parentId
     }
@@ -118,7 +119,6 @@ class SharePresenter constructor(
                     PlaylistItemDomain(null, it, timeProvider.instant(), 0, false, null)
                 view.showMedia(
                     itemDomain,
-                    if (result.isNew) MEMORY else LOCAL,
                     state.parentPlaylistId
                 )
 //                platformIdFilter.targetDomainClass = PlaylistItemDomain::class
@@ -146,7 +146,8 @@ class SharePresenter constructor(
 //                        platformIdFilter.targetDomainClass = PlaylistDomain::class
 //                        platformIdFilter.targetPlatformId = playlist.platformId
                         view.showPlaylist(
-                            id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
+                            //id.toIdentifier(if (result.isNew) MEMORY else LOCAL),
+                            id.copy(source = if (result.isNew) MEMORY else LOCAL),
                             state.parentPlaylistId
                         )
                         mapModel()
@@ -211,22 +212,10 @@ class SharePresenter constructor(
                 when (state.scanResult?.type) {
                     MEDIA ->
                         (state.scanResult?.result as MediaDomain)
-                            .let {
-                                playlistItemOrchestrator.loadList(
-                                    MediaIdListFilter(listOf(it.id!!)),
-                                    Options(LOCAL)
-                                )
-                            }
-                            .let {
-                                afterCommit(PLAYLIST_ITEM, it, play, forward)
-                            }
+                            .let { playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it.id!!.id)), LOCAL.flatOptions()) }
+                            .let { afterCommit(PLAYLIST_ITEM, it, play, forward) }
 
-                    PLAYLIST -> afterCommit(
-                        PLAYLIST,
-                        listOf(state.scanResult?.result as PlaylistDomain),
-                        play,
-                        forward
-                    )
+                    PLAYLIST -> afterCommit(PLAYLIST, listOf(state.scanResult?.result as PlaylistDomain), play, forward)
 
                     else -> throw IllegalArgumentException("unsupported type: ${state.scanResult?.type}")
                 }
@@ -247,35 +236,23 @@ class SharePresenter constructor(
         try {
             val isConnected = ytContextHolder.isConnected()
             val currentPlaylistId = prefsWrapper.currentPlayingPlaylistId
-            val playId: Pair<Long, Long?> = when (type) {
-                PLAYLIST -> (data as List<PlaylistDomain>).let {
-                    (if (it.size > 0) {
-                        it[0].id!!
-                    } else currentPlaylistId.id) to (null as Long?)
-                }
+            val playId: Pair<Identifier<GUID>, Identifier<GUID>?> = when (type) {
+                PLAYLIST -> selectPlaylist(data as List<PlaylistDomain>, currentPlaylistId)
 
-                PLAYLIST_ITEM -> (data as List<PlaylistItemDomain>)
-                    .let { playlistItemList ->
-                        val playlistItem: PlaylistItemDomain? = chooseItem(playlistItemList, currentPlaylistId.id)
-                        playlistItem
-                            ?.let { it.playlistId!! to it.id }
-                            ?: let { currentPlaylistId.id to (null as Long?) }
-                    }
+                PLAYLIST_ITEM -> selectPlaylistItem(data as List<PlaylistItemDomain>, currentPlaylistId)
 
                 else -> throw java.lang.IllegalStateException("Unsupported type")
             }
-            recentLocalPlaylists.addRecentId(playId.first)
+            recentLocalPlaylists.addRecentId(playId.first.id)
             if (forward) {
-                log.d("finish:play = $play, playlistItemId=${playId.second}, itemId = $playId")
-                view.gotoMain(playId.first, plItemId = playId.second, LOCAL, play)
+                log.d("finish:play = $play, playlistItemId = ${playId.second}, itemId = $playId")
+                view.gotoMain(playId.first, plItemId = playId.second, play)
                 view.exit()
             } else { // return play is hidden for not connected
                 playId
                     .takeIf { play && isConnected }
                     ?.let {
-                        playId.first.let { itemPlaylistId ->
-                            queue.playNow(itemPlaylistId.toIdentifier(LOCAL), playId.second)
-                        }
+                        playId.first.let { itemPlaylistId -> queue.playNow(itemPlaylistId, playId.second) }
                     }
                 view.exit()
             }
@@ -289,10 +266,16 @@ class SharePresenter constructor(
         }
     }
 
-    private fun chooseItem(
-        playlistItemList: List<PlaylistItemDomain>,
-        currentPlaylistId: Long?
-    ): PlaylistItemDomain? {
+    private fun selectPlaylist(data: List<PlaylistDomain>, currentPlaylistId: Identifier<GUID>) =
+        (data.firstOrNull()?.id ?: currentPlaylistId) to null
+
+    private fun selectPlaylistItem(data: List<PlaylistItemDomain>, currentPlaylistId: Identifier<GUID>) =
+        chooseItem(data, currentPlaylistId)
+            ?.let { it.playlistId!! to it.id }
+            ?: let { currentPlaylistId to null }
+
+
+    private fun chooseItem(playlistItemList: List<PlaylistItemDomain>, currentPlaylistId: Identifier<GUID>?): PlaylistItemDomain? {
         val size = playlistItemList.size
         val playlistItem: PlaylistItemDomain? = if (size == 1) {
             playlistItemList.get(0)

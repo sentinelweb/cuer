@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.domain.update
 
 import kotlinx.datetime.Instant
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
@@ -11,7 +13,7 @@ sealed class MediaUpdateDomain : UpdateDomain<MediaDomain>()
 
 // todo move inside sealed class?
 data class MediaPositionUpdateDomain(
-    val id: Long,
+    val id: OrchestratorContract.Identifier<GUID>,
     val duration: Long?,
     val positon: Long?,
     val dateLastPlayed: Instant?,
@@ -21,6 +23,6 @@ data class MediaPositionUpdateDomain(
 sealed class PlaylistUpdateDomain : UpdateDomain<PlaylistDomain>()
 
 data class PlaylistIndexUpdateDomain(
-    val id: Long,
+    val id: OrchestratorContract.Identifier<GUID>,
     val currentIndex: Int,
 ) : PlaylistUpdateDomain()

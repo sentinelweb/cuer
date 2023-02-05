@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 
 class ItemPresenter(
     val view: ItemContract.View,
@@ -79,7 +81,7 @@ class ItemPresenter(
         view.setProgress(state.item?.progress ?: 0f)
     }
 
-    override fun isViewForId(id: Long): Boolean = state.item?.id == id
+    override fun isViewForId(id: OrchestratorContract.Identifier<GUID>): Boolean = state.item?.id == id
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)

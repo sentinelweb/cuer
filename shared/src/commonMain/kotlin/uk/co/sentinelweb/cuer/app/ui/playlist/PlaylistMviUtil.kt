@@ -16,6 +16,7 @@ class PlaylistMviUtil(
 
     fun isPlaylistPinned(state: State): Boolean =
         state.playlist
-            ?.let { multiPrefs.pinnedPlaylistId == state.playlist?.id }
+            ?.takeIf { multiPrefs.pinnedPlaylistId != null }
+            ?.let { multiPrefs.pinnedPlaylistId == state.playlist?.id?.id }
             ?: false
 }

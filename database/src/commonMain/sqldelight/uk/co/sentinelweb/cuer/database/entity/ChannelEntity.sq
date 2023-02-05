@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = 'ON';
 
 CREATE TABLE channel (
-    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    id TEXT NOT NULL PRIMARY KEY,
     flags INTEGER  NOT NULL DEFAULT 0,
     title TEXT,
     description TEXT,
@@ -9,8 +9,8 @@ CREATE TABLE channel (
     country TEXT,
     platform TEXT AS uk.co.sentinelweb.cuer.domain.PlatformDomain NOT NULL,
     platform_id TEXT NOT NULL,
-    thumb_id INTEGER,
-    image_id INTEGER,
+    thumb_id TEXT,
+    image_id TEXT,
     published TEXT AS kotlinx.datetime.LocalDateTime,
     FOREIGN KEY (thumb_id) REFERENCES image(id),
     FOREIGN KEY (image_id) REFERENCES image(id)
@@ -25,14 +25,14 @@ CREATE INDEX channel_flags_index ON channel(flags);
 CREATE INDEX channel_title_index ON channel(title);
 
 create:
-INSERT INTO channel (flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
+INSERT INTO channel (id, flags, title, description, custom_url, country, platform, platform_id, thumb_id, image_id, published)
 VALUES ?;
 
-getInsertId:
-SELECT last_insert_rowid() FROM channel LIMIT 1;
+-- getInsertId:
+-- SELECT last_insert_rowid() FROM channel LIMIT 1;
 
 update:
-REPLACE INTO channel (id, flags,title,description,custom_url,country,platform,platform_id,thumb_id,image_id,published)
+REPLACE INTO channel (id, flags, title, description, custom_url, country, platform, platform_id, thumb_id, image_id, published)
 VALUES ?;
 
 load:

@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -24,7 +25,7 @@ class PlaylistItemOrchestrator constructor(
         get() = playlistItemDatabaseRepository.updates
             .map { it.first to LOCAL then it.second }
 
-    suspend override fun loadById(id: Long, options: Options): PlaylistItemDomain? =
+    suspend override fun loadById(id: GUID, options: Options): PlaylistItemDomain? =
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> (playlistItemDatabaseRepository.load(id, options.flat)
@@ -56,7 +57,7 @@ class PlaylistItemOrchestrator constructor(
         when (options.source) {
             MEMORY -> TODO()
             LOCAL -> domain.id?.let {
-                playlistItemDatabaseRepository.load(it, options.flat)
+                playlistItemDatabaseRepository.load(it.id, options.flat)
                     .forceDatabaseSuccess()
             }
 

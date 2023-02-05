@@ -1,15 +1,16 @@
 package uk.co.sentinelweb.cuer.app.impl
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class ProxyFilter {
     fun allFilter() = Filter.AllFilter
     fun defaultFilter() = Filter.DefaultFilter
-    fun idListFilter(list: List<Long>) =
+    fun idListFilter(list: List<GUID>) =
         Filter.IdListFilter(list)
 
-    fun mediaListFilter(ids: List<Long>) = Filter.MediaIdListFilter(ids)
+    fun mediaListFilter(ids: List<GUID>) = Filter.MediaIdListFilter(ids)
     fun platformIdListFilter(ids: List<String>, platform: PlatformDomain = PlatformDomain.YOUTUBE) =
         Filter.PlatformIdListFilter(ids, platform)
 
@@ -21,8 +22,8 @@ class ProxyFilter {
         Filter.UnfinishedMediaFilter(minPercent, maxPercent, limit)
 
     fun titleFilter(title: String) = Filter.TitleFilter(title)
-    fun searchFilter(text: String, isWatched: Boolean, isNew: Boolean, isLive: Boolean, playlistIds: List<Long>?) =
+    fun searchFilter(text: String, isWatched: Boolean, isNew: Boolean, isLive: Boolean, playlistIds: List<GUID>?) =
         Filter.SearchFilter(text, isWatched, isNew, isLive, playlistIds)
 
-    fun playlistIdLFilter(id: Long) = Filter.PlaylistIdLFilter(id)
+    fun playlistIdLFilter(id: GUID) = Filter.PlaylistIdLFilter(id)
 }

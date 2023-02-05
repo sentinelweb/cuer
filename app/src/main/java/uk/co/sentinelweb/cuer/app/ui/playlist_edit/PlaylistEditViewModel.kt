@@ -6,14 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.PLAY_START
@@ -26,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.ext.*
@@ -71,22 +68,24 @@ class PlaylistEditViewModel constructor(
         // coroutines cancel via viewModelScope
     }
 
-    fun setData(playlistId: Long?, source: Source) {
+    fun setData(playlistId: OrchestratorContract.Identifier<GUID>?) {
         viewModelScope.launch {
             if (!state.isLoaded) {
-                state.source = source
-                playlistId?.let {
-                    playlistOrchestrator.loadById(it, source.deepOptions())
-                        ?.also {
-                            state.isAllWatched = it.isAllWatched()
-                            state.defaultInitial = it.default
-                            state.playlistEdit = it.copy(items = listOf())
-                            it.parentId?.also {
-                                state.playlistParent =
-                                    playlistOrchestrator.loadById(it, LOCAL.flatOptions())
+                state.source = playlistId?.source ?: LOCAL
+                playlistId
+                    ?.let {
+                        playlistOrchestrator.loadById(it.id, it.source.deepOptions())
+                            ?.also {
+                                state.isAllWatched = it.isAllWatched()
+                                state.defaultInitial = it.default
+                                state.playlistEdit = it.copy(items = listOf())
+                                it.parentId?.also {
+                                    state.playlistParent =
+                                        playlistOrchestrator.loadById(it.id, LOCAL.flatOptions())
+                                }
                             }
-                        } ?: makeCreateModel()
-                } ?: makeCreateModel()
+                    }
+                    ?: makeCreateModel()
                 update()
                 state.isLoaded = true
             }
@@ -94,7 +93,7 @@ class PlaylistEditViewModel constructor(
     }
 
     private fun update() {
-        val pinned = prefsWrapper.pinnedPlaylistId == state.playlistEdit.id
+        val pinned = state.playlistEdit.id?.let { prefsWrapper.pinnedPlaylistId == it.id } ?: false
         _modelLiveData.value = mapper.mapModel(
             state = state,
             pinned = pinned,
@@ -159,7 +158,7 @@ class PlaylistEditViewModel constructor(
                         recentLocalPlaylists.addRecent(it)
                     }
                     .takeIf { state.isCreate }
-                    ?.also { recentLocalPlaylists.addRecentId(it.id!!) }
+                    ?.also { recentLocalPlaylists.addRecentId(it.id!!.id) }
             }
         }
     }
@@ -179,8 +178,8 @@ class PlaylistEditViewModel constructor(
     fun onPinClick() {
         state.playlistEdit.id?.apply {
             val pinnedId = prefsWrapper.pinnedPlaylistId
-            if (pinnedId != state.playlistEdit.id) {
-                prefsWrapper.pinnedPlaylistId = this
+            if (pinnedId != null && pinnedId != state.playlistEdit.id?.id) {
+                prefsWrapper.pinnedPlaylistId = this.id
             } else {
                 prefsWrapper.pinnedPlaylistId = null
             }
@@ -194,7 +193,7 @@ class PlaylistEditViewModel constructor(
         val watched = state.isAllWatched != false
         val newWatched = !watched
         log.d("watched load mem items = ${state.playlistEdit.id}")
-        playlistOrchestrator.loadById(state.playlistEdit.id!!, state.source.deepOptions())
+        playlistOrchestrator.loadById(state.playlistEdit.id!!.id, state.source.deepOptions())
             ?.apply {
                 mediaOrchestrator.save(
                     items.map { it.media.copy(watched = newWatched) },

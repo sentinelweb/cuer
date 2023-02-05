@@ -1,11 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 interface PlaylistsMviDialogContract {
     enum class Label { Dismiss }
@@ -28,7 +26,7 @@ interface PlaylistsMviDialogContract {
         var dragFrom: Int? = null,
         var dragTo: Int? = null,
         var playlistStats: List<PlaylistStatDomain> = listOf(),
-        var channelPlaylistIds: MutableList<Long> = mutableListOf(),
+        var channelPlaylistIds: MutableList<Identifier<GUID>> = mutableListOf(),
         var pinWhenSelected: Boolean = false,
         var playlistsModel: PlaylistsMviContract.View.Model? = null
     ) {

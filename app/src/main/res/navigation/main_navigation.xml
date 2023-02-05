@@ -54,6 +54,7 @@
         <!--            app:popExitAnim="@anim/slide_out_right"-->
     </fragment>
 
+    <!-- todo check params: compare with share and fragment -->
     <fragment
         android:id="@+id/navigation_playlist"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment"
@@ -62,8 +63,7 @@
     >
         <argument
             android:name="PLAYLIST_ID"
-            android:defaultValue="-1L"
-            app:argType="long"
+            app:argType="string"
             app:nullable="false"/>
 
         <argument
@@ -165,8 +165,7 @@
         tools:layout="@layout/fragment_playlist_edit">
         <argument
             android:name="PLAYLIST_ID"
-            android:defaultValue="-1L"
-            app:argType="long"
+            app:argType="string"
             app:nullable="false"/>
 
         <argument
@@ -200,9 +199,8 @@
 
         <argument
             android:name="PLAYLIST_PARENT"
-            android:defaultValue="-1L"
-            app:argType="long"
-            app:nullable="false"
+            app:argType="string"
+            app:nullable="true"
         />
 
         <argument

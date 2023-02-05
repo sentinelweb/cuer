@@ -1,15 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-class IdGenerator {
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
-    private var _modelIdGenerator = 0L
+class IdGenerator(private val guidCreator: GuidCreator) {
 
-    var value: Long = 0
-        get() {
-            _modelIdGenerator--
-            return _modelIdGenerator
-        }
-        set(value) = if (value != 0L) {
-            throw IllegalArgumentException("You can only reset the generator")
-        } else field = value
+    val value: OrchestratorContract.Identifier<GUID>
+        get() = guidCreator.create().toIdentifier(OrchestratorContract.Source.MEMORY)
+
 }

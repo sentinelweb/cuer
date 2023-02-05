@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.db.update
 
 import kotlinx.datetime.Instant
-import uk.co.sentinelweb.cuer.db.AppData
+import uk.co.sentinelweb.cuer.domain.GUID
 
 data class MediaPositionUpdateEntity(
-    val id: Long = AppData.INITIAL_ID,
+    val id: GUID,
 
     val duration: Long?,
 

@@ -122,14 +122,14 @@ class PlaylistItemEditViewModel constructor(
     fun setData(
         item: PlaylistItemDomain,
         source: Source,
-        parentId: Long?,
+        parentId: GUID?,
         allowPlay: Boolean,
         isOnSharePlaylist: Boolean
     ) {
         item.let {
             state.editingPlaylistItem = it
             state.source = source
-            state.parentPlaylistId = parentId ?: -1
+            state.parentPlaylistId = parentId?.toIdentifier(source)
             state.allowPlay = allowPlay
             state.isOnSharePlaylist = isOnSharePlaylist
             it.media.let { setData(it) }
@@ -142,10 +142,7 @@ class PlaylistItemEditViewModel constructor(
             media?.let { originalMedia ->
                 state.media = originalMedia
                 originalMedia.id?.let {
-                    playlistItemOrchestrator.loadList(
-                        MediaIdListFilter(listOf(it)),
-                        Options(state.source)
-                    )
+                    playlistItemOrchestrator.loadList(MediaIdListFilter(listOf(it.id)), Options(state.source))
                         .takeIf { it.size > 0 }
                         ?.also { if (isNew) state.editingPlaylistItem = it[0] }
                         ?.also {
@@ -153,19 +150,17 @@ class PlaylistItemEditViewModel constructor(
                                 .distinct()
                                 .filterNotNull()
                                 .also {
-                                    playlistOrchestrator.loadList(
-                                        IdListFilter(it),
-                                        state.source.flatOptions()
-                                    )
+                                    playlistOrchestrator.loadList(IdListFilter(it.map { it.id }), state.source.flatOptions())
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }
                 }
 
-                if (state.parentPlaylistId > 0L) {
-                    playlistOrchestrator.loadById(state.parentPlaylistId, LOCAL.flatOptions())
-                        ?.also { state.selectedPlaylists.add(it) }
-                }
+                state.parentPlaylistId
+                    ?.apply {
+                        playlistOrchestrator.loadById(this.id, LOCAL.flatOptions())
+                            ?.also { state.selectedPlaylists.add(it) }
+                    }
 
                 prefsWrapper.pinnedPlaylistId
                     ?.takeIf { state.selectedPlaylists.size == 0 }
@@ -206,7 +201,7 @@ class PlaylistItemEditViewModel constructor(
                             .maxByOrNull { it.size } // should get the largest list of items
                             ?.get(0)
                             ?.playlistId
-                            ?.let { playlistOrchestrator.loadById(it, LOCAL.flatOptions()) }
+                            ?.let { playlistOrchestrator.loadById(it.id, LOCAL.flatOptions()) }
                             ?.also { state.selectedPlaylists.add(it) }
                     }
                 }
@@ -333,8 +328,11 @@ class PlaylistItemEditViewModel constructor(
                 },
                 {
                     state.media = state.media?.copy(
-                        watched = state.editSettings.watched ?: originalMedia.watched,
-                        positon = state.editSettings.watched?.takeIf { it.not() }?.let { 0 }
+                        watched = state.editSettings.watched
+                            ?: originalMedia.watched,
+                        positon = state.editSettings.watched
+                            ?.takeIf { it.not() }
+                            ?.let { 0 }
                             ?: originalMedia.positon,
                         playFromStart = state.editSettings.playFromStart
                             ?: originalMedia.playFromStart
@@ -347,9 +345,9 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
-        val plId = chipModel.value?.toLong()
+        val plId = chipModel.value!!.toGUID()
         state.selectedPlaylists
-            .find { it.id == plId }
+            .find { it.id?.id == plId }
             ?.also {
                 state.selectedPlaylists.remove(it)
                 state.deletedPlayLists.add(it)
@@ -502,8 +500,8 @@ class PlaylistItemEditViewModel constructor(
                                     )
                                         .takeIf { saveSource == LOCAL && isNew }
                                         ?.also {
-                                            prefsWrapper.lastAddedPlaylistId = it.playlistId!!
-                                            recentLocalPlaylists.addRecentId(it.playlistId!!)
+                                            prefsWrapper.lastAddedPlaylistId = it.playlistId!!.id
+                                            recentLocalPlaylists.addRecentId(it.playlistId!!.id)
                                         }
                                 }
                         }

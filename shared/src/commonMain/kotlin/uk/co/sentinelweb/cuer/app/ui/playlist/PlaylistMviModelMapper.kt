@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Header
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -21,7 +22,7 @@ class PlaylistMviModelMapper constructor(
     private val itemModelMapper: PlaylistMviItemModelMapper,
     private val iconMapper: IconMapper,
     private val strings: StringDecoder,
-    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor>,
+    private val appPlaylistInteractors: Map<Identifier<GUID>, AppPlaylistInteractor>,
     private val util: PlaylistMviUtil,
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper
@@ -39,7 +40,7 @@ class PlaylistMviModelMapper constructor(
                 playlists = state.playlistsTreeLookup,
                 pinned = util.isPlaylistPinned(state),
                 appPlaylist = state.playlist?.id?.let { appPlaylistInteractors[it] },
-                itemsIdMap = state.itemsIdMap,
+                itemsIdMapReversed = state.itemsIdMapReversed,
                 blockItem = state.deletedPlaylistItem ?: state.movedPlaylistItem
             )
         } ?: PlaylistMviContract.View.Model(
@@ -77,16 +78,16 @@ class PlaylistMviModelMapper constructor(
         domain: PlaylistDomain,
         isPlaying: Boolean,
         isMapItems: Boolean = true,
-        id: OrchestratorContract.Identifier<*>,
+        id: Identifier<*>,
         pinned: Boolean,
-        playlists: Map<Long, PlaylistTreeDomain>?,
+        playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
-        itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
+        itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
         blockItem: PlaylistItemDomain?
     ): PlaylistMviContract.View.Model {
         log.d("map")
         val items = if (isMapItems) {
-            mapItems(domain, itemsIdMap, playlists, appPlaylist, blockItem)
+            mapItems(domain, itemsIdMapReversed, playlists, appPlaylist, blockItem)
         } else null
         return PlaylistMviContract.View.Model(
             header = Header(
@@ -116,7 +117,10 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = domain.config.deletableItems,
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
                 canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
-                itemsText = "${domain.currentIndex.plus(1)}/${domain.items.size}"
+                itemsText = domain.items
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { "${domain.currentIndex.plus(1)}/${it.size}" }
+                    ?: "-/-"
             ),
             items = items,
             isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),
@@ -127,16 +131,16 @@ class PlaylistMviModelMapper constructor(
 
     private fun mapItems(
         domain: PlaylistDomain,
-        itemsIdMap: MutableMap<Long, PlaylistItemDomain>,
-        playlists: Map<Long, PlaylistTreeDomain>?,
+        reverseLookup: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
+        playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
         blockItem: PlaylistItemDomain?
     ): List<PlaylistItemMviContract.Model.Item> {
-        //log.d("items: ${itemsIdMap.size}")
-        val reverseLookup: Map<PlaylistItemDomain, Long> = itemsIdMap.keys.associateBy { itemsIdMap[it]!! }
-        //log.d("reverseLookup: ${reverseLookup.keys.map { "${it.id} -> ${reverseLookup[it]}" }.joinToString(":")}")
         return domain.items
-            .filter { blockItem == null || it.id != blockItem.id }
+//            .also { log.d("state.items: ${it.size}") }
+//            .also { log.d("guids: ${it.map { it.id }.joinToString(", ")}") }
+            .filter { blockItem == null || blockItem.id == null || it.id != blockItem.id }
+//            .also { log.d("state.items.filtered: ${it.size}, blockItem: $blockItem") }
             .mapIndexedNotNull { index, item ->
                 reverseLookup.get(item)?.let { modelId ->
                     itemModelMapper.mapItem(
@@ -156,13 +160,13 @@ class PlaylistMviModelMapper constructor(
                     // throw IllegalStateException("Couldn't get item: ${item.id} ${item.media.title}")
                     null
                 }
-            }
+            }//.also { log.d("mapped.items: ${it.size}") }
     }
 
     fun mapPlaylistText(
         item: PlaylistItemDomain,
         domain: PlaylistDomain?,
-        playlists: Map<Long, PlaylistTreeDomain>?
+        playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?
     ): String? {
         val playlistText = item.playlistId?.let { itemPlaylistId ->
             if (itemPlaylistId != domain?.id) playlists?.get(itemPlaylistId)?.node?.title else null

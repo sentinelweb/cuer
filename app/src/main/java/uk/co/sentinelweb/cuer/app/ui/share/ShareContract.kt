@@ -8,8 +8,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
@@ -21,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -33,7 +33,7 @@ interface ShareContract {
         fun scanResult(result: ScanContract.Result)
         fun afterItemEditNavigation()
         fun isAlreadyScanned(urlOrText: String): Boolean
-        fun setPlaylistParent(cat: CategoryDomain?, parentId: Long)
+        fun setPlaylistParent(cat: CategoryDomain?, parentId: Identifier<GUID>)
         fun onReady(ready: Boolean)
         fun serializeState(): String?
         fun restoreState(s: String)
@@ -42,13 +42,13 @@ interface ShareContract {
 
     interface View {
         fun exit()
-        fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean = false)
+        fun gotoMain(plId: Identifier<GUID>, plItemId: Identifier<GUID>?, play: Boolean = false)
         fun setData(model: Model)
         fun error(msg: String)
         fun warning(msg: String)
         suspend fun commit(afterCommit: ShareCommitter.AfterCommit)
-        fun showMedia(itemDomain: PlaylistItemDomain, source: Source, playlistParentId: Long?)
-        fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?)
+        fun showMedia(itemDomain: PlaylistItemDomain, playlistParentId: Identifier<GUID>?)
+        fun showPlaylist(id: Identifier<GUID>, playlistParentId: Identifier<GUID>?)
         fun navigate(nav: NavigationModel)
         fun canCommit(type: ObjectTypeDomain?): Boolean
         fun hideWarning()
@@ -76,7 +76,7 @@ interface ShareContract {
     data class State(
         @Transient
         var model: Model? = null,
-        var parentPlaylistId: Long? = null,
+        var parentPlaylistId: Identifier<GUID>? = null,
         var scanResult: ScanContract.Result? = null,
         var ready: Boolean = false,
         var category: CategoryDomain? = null,

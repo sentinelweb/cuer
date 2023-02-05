@@ -4,11 +4,13 @@ import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemDiffCallback
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemViewHolder
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 
 
 class PlaylistAdapter constructor(
@@ -84,7 +86,7 @@ class PlaylistAdapter constructor(
 
     override fun getItemCount(): Int = _data.size
 
-    fun getItemViewForId(id: Long): ItemContract.View? {
+    fun getItemViewForId(id: Identifier<GUID>): ItemContract.View? {
         recyclerView.children.forEach { childView ->
             if (childView is ItemContract.View) {
                 if (childView.isViewForId(id)) {

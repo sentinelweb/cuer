@@ -31,7 +31,7 @@ class BackupUseCase(
     override suspend fun restoreData(data: String): Boolean = withContext(contextProvider.IO) {
         val backupFileModel = parserFactory.create(data).parse(data)
 
-        if (backupFileModel.version == 3) {
+        if (backupFileModel.version == 3 || backupFileModel.version == 4) {
             return@withContext mediaRepository.deleteAll()
                 .takeIf { it.isSuccessful }
                 ?.let { channelRepository.deleteAll() }
@@ -45,12 +45,14 @@ class BackupUseCase(
                 ?.let {
                     backupFileModel.medias.chunked(CHUNK_SIZE)
                         .map { mediaRepository.save(it, flat = false, emit = false) }
-                        .reduce { acc: RepoResult<List<MediaDomain>>, result: RepoResult<List<MediaDomain>> ->
+                        .takeIf { it.isNotEmpty() }
+                        ?.reduce { acc: RepoResult<List<MediaDomain>>, result: RepoResult<List<MediaDomain>> ->
                             RepoResult.Composite<List<MediaDomain>>(
                                 acc.isSuccessful && result.isSuccessful,
                                 result.data?.let { acc.data?.plus(it) }
                             )
                         }
+                        ?: RepoResult.Data(emptyList())
                 }
                 ?.takeIf { it.isSuccessful }
                 ?.data

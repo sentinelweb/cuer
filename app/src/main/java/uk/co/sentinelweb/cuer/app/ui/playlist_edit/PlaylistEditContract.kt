@@ -8,6 +8,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -19,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.validator.ValidatorModel
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
@@ -54,7 +56,7 @@ interface PlaylistEditContract {
         var playlistParent: PlaylistDomain? = null,
         var defaultInitial: Boolean = false,
         @Transient
-        var treeLookup: Map<Long, PlaylistTreeDomain> = mapOf(),
+        var treeLookup: Map<Identifier<GUID>, PlaylistTreeDomain> = mapOf(),
         var isLoaded: Boolean = false,
         var isDialog: Boolean = false
     ) {

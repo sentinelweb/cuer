@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
@@ -15,15 +12,18 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
+import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
 class PlaylistMviModelMapperTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     private val itemModelMapper: PlaylistMviItemModelMapper = mockk(relaxed = true)
     private val iconMapper: IconMapper = mockk(relaxed = true)
     private val strings: StringDecoder = mockk(relaxed = true)
-    private val appPlaylistInteractors: Map<Long, AppPlaylistInteractor> = mapOf()
+    private val appPlaylistInteractors: Map<OrchestratorContract.Identifier<GUID>, AppPlaylistInteractor> = mapOf()
     private val util: PlaylistMviUtil = mockk(relaxed = true)
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper = mockk(relaxed = true)
     private val log: LogWrapper = mockk(relaxed = true)
@@ -58,15 +58,16 @@ class PlaylistMviModelMapperTest {
 
     @Test
     fun mapPlaylist() {
-        val playlist = fixture<PlaylistDomain>().let {
-            it.copy(id = it.id ?: 3L, items = it.items.filter { it.id != null })
+        val initial = generatePlaylist(fixture).let {
+            it.copy(id = it.id ?: GuidCreator().create().toIdentifier(fixture()), items = it.items.filter { it.id != null })
         }
 
-        val identifier = playlist.id!!.toIdentifier(OrchestratorContract.Source.LOCAL)
+        val identifier = initial.id!!
         val state = PlaylistMviContract.MviStore.State(
-            playlist = playlist,
+            playlist = initial,
             playlistIdentifier = identifier,
-            itemsIdMap = playlist.items.associate { it.id!! to it }.toMutableMap()
+            itemsIdMap = initial.items.associate { it.id!! to it }.toMutableMap(),
+            itemsIdMapReversed = initial.items.associate { it to it.id!! }.toMutableMap(),
         )
         every {
             itemModelMapper.mapItem(
@@ -77,7 +78,7 @@ class PlaylistMviModelMapperTest {
         val actual = sut.map(state)
 
         assertEquals(identifier, actual.identifier)
-        assertEquals(playlist.items.size, actual.items?.size)
-        assertEquals(playlist.currentIndex, actual.playingIndex)
+        assertEquals(initial.items.size, actual.items?.size)
+        assertEquals(initial.currentIndex, actual.playingIndex)
     }
 }

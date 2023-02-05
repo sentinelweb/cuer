@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -26,8 +25,8 @@ class PlaylistMergeUsecase constructor(
 
     suspend fun merge(toDelete: PlaylistDomain, toReceive: PlaylistDomain): PlaylistDomain {
         if (!checkMerge(toDelete, toReceive)) throw IllegalArgumentException("Cannot merge these playlists")
-        val toDeleteFull = playlistOrchestrator.loadById(toDelete.id!!, LOCAL.deepOptions())!!
-        val toReceiveFull = playlistOrchestrator.loadById(toReceive.id!!, LOCAL.deepOptions())!!
+        val toDeleteFull = playlistOrchestrator.loadById(toDelete.id!!.id, toDelete.id!!.source.deepOptions())!!
+        val toReceiveFull = playlistOrchestrator.loadById(toReceive.id!!.id, toReceive.id!!.source.deepOptions())!!
         val merged = toReceiveFull.copy(
             type = if (toDeleteFull.type == PLATFORM) PLATFORM else toReceiveFull.type,
             channelData = if (toDeleteFull.type == PLATFORM && toReceiveFull.type == USER) toDeleteFull.channelData else toReceiveFull.channelData,
@@ -49,11 +48,11 @@ class PlaylistMergeUsecase constructor(
             )
         )
         //log.d("MERGED:" + merged.serialise())
-        return playlistOrchestrator.save(merged, LOCAL.deepOptions())
+        return playlistOrchestrator.save(merged, toReceive.id!!.source.deepOptions())
             //.apply { log.d("SAVED:" + this.serialise()) }
             .also {
                 if (toDeleteFull.config.deletable) {
-                    playlistOrchestrator.delete(toDeleteFull, LOCAL.deepOptions())
+                    playlistOrchestrator.delete(toDeleteFull, toDelete.id!!.source.deepOptions())
                 }
             }
     }

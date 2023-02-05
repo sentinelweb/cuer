@@ -243,7 +243,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$ver_mockito"
     testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
-    testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"// todo remove
+    testImplementation "com.appmattus.fixture:fixture:$ver_kotlin_fixture"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines"
     testImplementation "org.robolectric:robolectric:$ver_robolectric"
     testImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"

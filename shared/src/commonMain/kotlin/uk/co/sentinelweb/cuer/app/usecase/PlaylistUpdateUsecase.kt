@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -35,6 +36,12 @@ class PlaylistUpdateUsecase constructor(
     )
 
     fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
+
+    suspend fun update(id: OrchestratorContract.Identifier<GUID>): UpdateResult {
+        return playlistOrchestrator.loadById(id.id, id.source.deepOptions())
+            ?.let { update(it) }
+            ?: UpdateResult(false, "Playlist not found")
+    }
 
     suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
         return playlistDomain

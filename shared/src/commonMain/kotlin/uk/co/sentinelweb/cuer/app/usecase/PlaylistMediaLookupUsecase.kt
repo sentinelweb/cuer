@@ -39,7 +39,7 @@ class PlaylistMediaLookupUsecase constructor(
 
     suspend fun lookupPlaylistItemsAndReplace(playlist: PlaylistDomain): PlaylistDomain =
         buildMediaLookup(playlist)
-            .let { it.values.mapNotNull { it.id } }
+            .let { it.values.mapNotNull { it.id?.id } }
             .let { playlistItemOrchestrator.loadList(MediaIdListFilter(it), LOCAL.deepOptions(emit = false)) }
             .distinctBy { it.media.platformId }
             .associateBy { it.media.platformId }

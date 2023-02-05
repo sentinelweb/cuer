@@ -1,17 +1,21 @@
 package uk.co.sentinelweb.cuer.app.backup.version
 
 import uk.co.sentinelweb.cuer.app.backup.version.v2.V2Parser
-import uk.co.sentinelweb.cuer.app.db.backup.version.v2.V3Parser
+import uk.co.sentinelweb.cuer.app.backup.version.v3.V3Parser
+import uk.co.sentinelweb.cuer.app.backup.version.v3.mapper.V3ToV4Mapper
+import uk.co.sentinelweb.cuer.app.backup.version.v4.V4Parser
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class ParserFactory {
 
     fun create(data: String): Parser {
         val version = getVersion(data)
         return when (version) {
-            //1 -> V1Parser(V1Mapper())
+            // 1 -> V1Parser(V1Mapper())
             2 -> V2Parser()
-            3 -> V3Parser()
-            else -> throw UnsupportedOperationException("Can't get parser for version:$version")
+            3 -> V3Parser(v4Mapper = V3ToV4Mapper(guidGenerator = GuidCreator()))
+            4 -> V4Parser()
+            else -> throw UnsupportedOperationException("Can't get parser for version: $version")
         }
     }
 
@@ -25,5 +29,4 @@ class ParserFactory {
             return 1
         }
     }
-
 }

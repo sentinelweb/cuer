@@ -8,10 +8,12 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.impl.ProxyFilter
 import uk.co.sentinelweb.cuer.app.impl.Utils
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.usecase.AddBrowsePlaylistUsecase
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
 class OrchestratorFactory : KoinComponent {
@@ -24,7 +26,7 @@ class OrchestratorFactory : KoinComponent {
     val utils: Utils by inject()
     private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject() // todo UsecaseFactory
 
-    fun addBrowsePlaylistUsecaseExecute(category: CategoryDomain, parentId: Long?): NativeSuspend<PlaylistDomain?> =
+    fun addBrowsePlaylistUsecaseExecute(category: CategoryDomain, parentId: OrchestratorContract.Identifier<GUID>?): NativeSuspend<PlaylistDomain?> =
         nativeSuspend {
             addBrowsePlaylistUsecase
                 .execute(category, parentId)

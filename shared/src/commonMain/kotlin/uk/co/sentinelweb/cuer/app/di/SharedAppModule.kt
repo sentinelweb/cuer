@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
@@ -47,7 +48,7 @@ object SharedAppModule {
     }
 
     private val dbModule = module {
-        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get()) }
+        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get(), get(), get()) }
     }
 
     private val orchestratorModule = module {
@@ -61,22 +62,15 @@ object SharedAppModule {
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
         single { UnfinishedItemsPlayistInteractor(get(), get(), get(), get(named(Unfinished))) }
         single { LocalSearchPlayistInteractor(get(), get(), get()) }
-        single {
-            YoutubeSearchPlayistInteractor(
-                get(),
-                get(),
-                get(),
-                YoutubeSearchPlayistInteractor.State()
-            )
-        }
+        single { YoutubeSearchPlayistInteractor(get(), get(), get(), YoutubeSearchPlayistInteractor.State()) }
         factory {
             mapOf(
-                NewItems.id to get<NewMediaPlayistInteractor>(),
-                Recent.id to get<RecentItemsPlayistInteractor>(),
-                LocalSearch.id to get<LocalSearchPlayistInteractor>(),
-                YoutubeSearch.id to get<YoutubeSearchPlayistInteractor>(),
-                Starred.id to get<StarredItemsPlayistInteractor>(),
-                Unfinished.id to get<UnfinishedItemsPlayistInteractor>(),
+                NewItems.identifier() to get<NewMediaPlayistInteractor>(),
+                Recent.identifier() to get<RecentItemsPlayistInteractor>(),
+                LocalSearch.identifier() to get<LocalSearchPlayistInteractor>(),
+                YoutubeSearch.identifier() to get<YoutubeSearchPlayistInteractor>(),
+                Starred.identifier() to get<StarredItemsPlayistInteractor>(),
+                Unfinished.identifier() to get<UnfinishedItemsPlayistInteractor>(),
             )
         }
     }
@@ -105,6 +99,7 @@ object SharedAppModule {
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
         factory { BackupCheck(get(), get(), get(), get()) }
+        factory { IdGenerator(get()) }
         factory<IBackupJsonManager> {
             BackupUseCase(
                 channelRepository = get(),

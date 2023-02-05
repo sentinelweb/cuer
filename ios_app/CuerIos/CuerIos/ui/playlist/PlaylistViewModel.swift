@@ -40,7 +40,7 @@ final class PlaylistViewModel: ObservableObject {
     
     private var playlistIdSubscription: AnyCancellable? = nil
     
-    @Published var plId:Int = -1
+    @Published var plId: DomainOrchestratorContractIdentifier<DomainGUID>? = nil
     
     init(dependencies: Dependencies) {
         self.dependencies = dependencies
@@ -49,14 +49,14 @@ final class PlaylistViewModel: ObservableObject {
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{plId in
             if (self.plId != plId) {
                 self.plId = plId
-                if (plId > 0) {
-                    self.loadPlaylist(plId: plId)
+                if (plId != nil) {
+                    self.loadPlaylist(plId: plId!)
                 }
             }
         })
     }
     
-    func loadPlaylist(plId: Int) {
+    func loadPlaylist(plId: DomainOrchestratorContractIdentifier<DomainGUID>) {
 //        let task = Task{
             do {
                 orchestrator.playlistOrchestrator.count(

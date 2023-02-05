@@ -7,6 +7,7 @@ import org.junit.Test
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.RECENT_PLAYLISTS
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.tools.ext.guid
 
 class RecentLocalPlaylistsTest {
 
@@ -27,12 +28,13 @@ class RecentLocalPlaylistsTest {
     @Test
     @Ignore("broken after refactor")
     fun getRecent() {
-        sut.addRecentId(1)
-        sut.addRecentId(2)
-        sut.addRecentId(3)
-        sut.addRecentId(4)
+        val ids = (1..4).map { guid() }
+        sut.addRecentId(ids[0])
+        sut.addRecentId(ids[1])
+        sut.addRecentId(ids[2])
+        sut.addRecentId(ids[3])
 
-        assertEquals(listOf(4L, 3L, 2L, 1L), sut.getRecent().reversed())
+        assertEquals(ids.reversed(), sut.getRecent())
     }
 
 //    @Test

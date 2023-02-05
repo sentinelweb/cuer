@@ -9,6 +9,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
@@ -60,12 +61,12 @@ class PlaylistsMviStoreFactory(
         data class Load(
             val playlists: List<PlaylistDomain>,
             val playlistStats: List<PlaylistStatDomain>,
-            val currentPlayingPlaylistId: OrchestratorContract.Identifier<Long>,
+            val currentPlayingPlaylistId: Identifier<GUID>,
             val appLists: Map<PlaylistDomain, PlaylistStatDomain>,
-            val buildRecentSelectionList: List<OrchestratorContract.Identifier<Long>>,
-            val pinnedPlaylistId: Long?,
+            val buildRecentSelectionList: List<Identifier<GUID>>,
+            val pinnedPlaylistId: GUID?,
             val treeRoot: PlaylistTreeDomain,
-            val treeLookup: Map<Long, PlaylistTreeDomain>
+            val treeLookup: Map<Identifier<GUID>, PlaylistTreeDomain>
         ) : Result()
 
         data class SetDeletedItem(val item: Domain?) : Result()
@@ -134,11 +135,11 @@ class PlaylistsMviStoreFactory(
 
         private fun openPlaylist(intent: Intent.OpenPlaylist) {
             if (intent.item is PlaylistsItemMviContract.Model.Item) {
-                recentLocalPlaylists.addRecentId(intent.item.id)
+                recentLocalPlaylists.addRecentId(intent.item.id.id)
                 prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
                     Navigate(
-                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)),
+                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value)),
                         intent.view
                     )
                 )
@@ -147,13 +148,10 @@ class PlaylistsMviStoreFactory(
 
         private fun openEdit(intent: Intent.Edit) {
             if (intent.item is PlaylistsItemMviContract.Model.Item) {
-                recentLocalPlaylists.addRecentId(intent.item.id)
+                recentLocalPlaylists.addRecentId(intent.item.id.id)
                 publish(
                     Navigate(
-                        NavigationModel(
-                            PLAYLIST_EDIT,
-                            mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)
-                        ),
+                        NavigationModel(PLAYLIST_EDIT, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value)),
                         intent.view
                     )
                 )
@@ -165,17 +163,11 @@ class PlaylistsMviStoreFactory(
         private fun play(intent: Intent.Play, state: State) {
             if (!intent.external) {
                 if (intent.item is PlaylistsItemMviContract.Model.Item) {
-                    recentLocalPlaylists.addRecentId(intent.item.id)
+                    recentLocalPlaylists.addRecentId(intent.item.id.id)
                     prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                     publish(
                         Navigate(
-                            NavigationModel(
-                                PLAYLIST, mapOf(
-                                    SOURCE to intent.item.source,
-                                    PLAYLIST_ID to intent.item.id,
-                                    PLAY_NOW to true
-                                )
-                            ),
+                            NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value, PLAY_NOW to true)),
                             intent.view
                         )
                     )
@@ -193,7 +185,7 @@ class PlaylistsMviStoreFactory(
         private fun star(intent: Intent.Star, state: State) {
             scope.launch {
                 state.findPlaylist(intent.item)
-                    ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 }
+                    ?.takeIf { it.id?.let { it.source == LOCAL } ?: false }
                     ?.let { it.copy(starred = !it.starred) }
                     ?.also { playlistOrchestrator.save(it, LOCAL.flatOptions()) }
             }
@@ -201,10 +193,10 @@ class PlaylistsMviStoreFactory(
 
         private fun share(intent: Intent.Share, state: State) {
             state.findPlaylist(intent.item)
-                ?.takeIf { (it.id != null) && (it.id ?: 0) > 0 && it.type != PlaylistDomain.PlaylistTypeDomain.APP }
+                ?.takeIf { it.id?.let { it.source == LOCAL } ?: false && it.type != PlaylistDomain.PlaylistTypeDomain.APP }
                 ?.let { itemDomain ->
                     scope.launch {
-                        playlistOrchestrator.loadById(itemDomain.id!!, LOCAL.deepOptions())
+                        playlistOrchestrator.loadById(itemDomain.id!!.id, LOCAL.deepOptions())
                             ?.also { shareWrapper.share(it) }
                             ?: publish(Label.Error(strings.playlists_error_cant_load))
                     }
@@ -260,7 +252,7 @@ class PlaylistsMviStoreFactory(
                                 publish(Label.Error(strings.playlists_error_delete_default))
                             } else {
                                 playlist.id
-                                    ?.let { playlistOrchestrator.loadById(it, LOCAL.deepOptions()) }
+                                    ?.let { playlistOrchestrator.loadById(it.id, LOCAL.deepOptions()) }
                                     ?.apply {
                                         playlistOrchestrator.delete(playlist, LOCAL.flatOptions())
                                         publish(Label.ItemRemoved(intent.item))
@@ -275,8 +267,8 @@ class PlaylistsMviStoreFactory(
                                     }
 
                             }
-                        } else if (playlist.id == LocalSearch.id || playlist.id == YoutubeSearch.id) {
-                            val isLocal = playlist.id == LocalSearch.id
+                        } else if (playlist.id?.id == LocalSearch.id || playlist.id?.id == YoutubeSearch.id) {
+                            val isLocal = playlist.id?.id == LocalSearch.id
                             val type = if (isLocal) strings.search_local else strings.search_youtube
                             if (isLocal) {
                                 dispatch(Result.SetDeletedItem(prefsWrapper.lastLocalSearch))
@@ -379,7 +371,7 @@ class PlaylistsMviStoreFactory(
                     .sort(compareBy { it.node?.title?.lowercase() })
                 val treeLookup = treeRoot.buildLookup()
 
-                val ids = playlists.mapNotNull { if (it.type != PlaylistDomain.PlaylistTypeDomain.APP) it.id else null }
+                val ids = playlists.mapNotNull { if (it.type != PlaylistDomain.PlaylistTypeDomain.APP) it.id?.id else null }
                 val playlistStats = playlistStatsOrchestrator
                     .loadList(OrchestratorContract.Filter.IdListFilter(ids), LOCAL.flatOptions())
                     .toMutableList()

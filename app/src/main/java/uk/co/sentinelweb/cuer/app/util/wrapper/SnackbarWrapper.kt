@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.style.ImageSpan
 import android.view.View
+import android.widget.FrameLayout
 import com.google.android.material.snackbar.BaseTransientBottomBar.LENGTH_LONG
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.snackbar.Snackbar.LENGTH_SHORT
@@ -65,4 +66,12 @@ class AndroidSnackbarWrapper constructor(
             .setActionTextColor(res.getColor(R.color.white))
             .apply { if (actionText != null) setAction(actionText, action) }
     }
+}
+
+fun Snackbar.positionAbovePlayer(): Snackbar {
+    val params = getView().getLayoutParams() as FrameLayout.LayoutParams
+    //params.gravity = Gravity.TOP
+    params.bottomMargin = getView().resources.getDimensionPixelSize(R.dimen.snackbar_main_bottom_padding)
+    view.setLayoutParams(params)
+    return this
 }

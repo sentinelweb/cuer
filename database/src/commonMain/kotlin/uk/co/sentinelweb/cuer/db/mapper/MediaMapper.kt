@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.db.mapper
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -13,11 +15,12 @@ import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 import uk.co.sentinelweb.cuer.domain.ext.makeFlags
 
 class MediaMapper(
-    private val imageMapper: ImageMapper
+    private val imageMapper: ImageMapper,
+    private val source: Source
 ) {
     fun map(entity: Media, channelDomain: ChannelDomain, thumbEntity: Image?, imageEntity: Image?): MediaDomain =
         MediaDomain(
-            id = entity.id,
+            id = entity.id.toGuidIdentifier(source),
             url = entity.url,
             platformId = entity.platform_id,
             mediaType = entity.type,
@@ -39,7 +42,7 @@ class MediaMapper(
         )
 
     fun map(domain: MediaDomain): Media = Media(
-        id = domain.id ?: 0,
+        id = domain.id?.id?.value ?: throw IllegalArgumentException("No id"),
         url = domain.url,
         platform_id = domain.platformId,
         type = domain.mediaType,
@@ -50,9 +53,9 @@ class MediaMapper(
         date_last_played = domain.dateLastPlayed,
         description = domain.description,
         published = domain.published,
-        channel_id = domain.channelData.id,
-        thumb_id = domain.thumbNail?.id,
-        image_id = domain.image?.id,
+        channel_id = domain.channelData.id!!.id.value,
+        thumb_id = domain.thumbNail?.id?.id?.value,
+        image_id = domain.image?.id?.id?.value,
         flags = mapFlags(domain)
     )
 

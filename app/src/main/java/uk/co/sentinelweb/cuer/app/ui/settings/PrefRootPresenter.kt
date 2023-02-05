@@ -56,7 +56,6 @@ class PrefRootPresenter constructor(
     }
 
     override fun onFeedback() {
-
         view.sendEmail(emailUseCase.makeFeedbackEmail())
     }
 

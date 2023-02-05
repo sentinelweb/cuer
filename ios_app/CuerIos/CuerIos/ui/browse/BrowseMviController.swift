@@ -92,13 +92,13 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
             
             addPlaylist(cat: addLabel.cat, parentId: addLabel.parentId)
         case let openPlaylist as BrowseContractMviStoreLabel.OpenLocalPlaylist:
-            self.dependencies.mainCoordinator.navigate(route: .playlist(plId: Int(openPlaylist.id)))
+            self.dependencies.mainCoordinator.navigate(route: .playlist(plId: openPlaylist.id))
             
         default: debugPrint(label)
         }
     }
     
-    func addPlaylist(cat: DomainCategoryDomain, parentId: KotlinLong?) {
+    func addPlaylist(cat: DomainCategoryDomain, parentId: DomainOrchestratorContractIdentifier<DomainGUID>?) {
         loading = true
         /*let task = */Task {
             do {

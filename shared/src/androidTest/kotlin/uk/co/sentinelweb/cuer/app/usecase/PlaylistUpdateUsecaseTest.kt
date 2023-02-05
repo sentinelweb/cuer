@@ -22,16 +22,18 @@ import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECOND
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import kotlin.time.Duration.Companion.seconds
 
 class PlaylistUpdateUsecaseTest {
     private val fixture = kotlinFixture {
         nullabilityStrategy(NeverNullStrategy)
         repeatCount { 6 }
+        factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
         // repeatCount(PlaylistDomain::items) { 7 }
     }
 
@@ -88,7 +90,7 @@ class PlaylistUpdateUsecaseTest {
 
     @Test
     fun update_must_be_platform() = runTest {
-        val playlist = generatePlaylist().copy(type = USER)
+        val playlist = generatePlaylist(fixture).copy(type = USER)
 
         val actual = sut.update(playlist)
 
@@ -100,9 +102,9 @@ class PlaylistUpdateUsecaseTest {
         val platformId = "update_platformId"
         val tz = TimeZone.UTC
         val localtime = timeProviderTest.localDateTime()
-        val existingPlaylist = generatePlaylist().let { pl ->
+        val existingPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
-                id = 1,
+                //id = 1,
                 type = PLATFORM,
                 platform = PlatformDomain.YOUTUBE,
                 platformId = platformId,
@@ -117,7 +119,7 @@ class PlaylistUpdateUsecaseTest {
             )
         }
         //log.d("existingPlaylist: ${existingPlaylist.items.size}")
-        val updatedPlatformPlaylist = generatePlaylist().let { pl ->
+        val updatedPlatformPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
                 id = null,
                 type = PLATFORM,
@@ -162,9 +164,9 @@ class PlaylistUpdateUsecaseTest {
         val platformId = "update_platformId"
         val tz = TimeZone.UTC
         val localtime = timeProviderTest.localDateTime()
-        val existingPlaylist = generatePlaylist().let { pl ->
+        val existingPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
-                id = 1,
+                //id = 1,
                 type = PLATFORM,
                 platform = PlatformDomain.YOUTUBE,
                 platformId = platformId,
@@ -178,7 +180,7 @@ class PlaylistUpdateUsecaseTest {
             )
         }
         //log.d("existingPlaylist: ${existingPlaylist.items.size}")
-        val updatedPlatformPlaylist = generatePlaylist().let { pl ->
+        val updatedPlatformPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
                 id = null,
                 type = PLATFORM,
@@ -218,10 +220,4 @@ class PlaylistUpdateUsecaseTest {
         }
     }
 
-    // sometimes items is empty - which messes up the test
-    private fun generatePlaylist(): PlaylistDomain {
-        var fixPlaylist = fixture<PlaylistDomain>()
-        while (fixPlaylist.items.size == 0) fixPlaylist = fixture()
-        return fixPlaylist
-    }
 }

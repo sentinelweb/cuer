@@ -1,7 +1,7 @@
 PRAGMA foreign_keys = 'ON';
 
 CREATE TABLE image(
-  id INTEGER NOT NULL PRIMARY KEY ,
+  id TEXT NOT NULL PRIMARY KEY ,
   url TEXT UNIQUE NOT NULL,
   width INTEGER,
   height INTEGER
@@ -10,11 +10,11 @@ CREATE TABLE image(
 CREATE UNIQUE INDEX image_url ON image(url);
 
 create:
-INSERT INTO image ( url, width, height )
+INSERT INTO image (id, url, width, height )
 VALUES ?;
 
-getInsertId:
-SELECT last_insert_rowid() FROM image LIMIT 1;
+-- getInsertId:
+-- SELECT last_insert_rowid() FROM image LIMIT 1;
 
 update:
 REPLACE INTO image (id,  url, width, height )

@@ -13,6 +13,10 @@ val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_mockk: String by project
 val ver_jvm: String by project
+//val ver_jfixture: String by project
+val ver_truth: String by project
+val ver_turbine: String by project
+val ver_kotlin_fixture: String by project
 
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
@@ -63,17 +67,23 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test:$ver_koin")
-                implementation("io.mockk:mockk:$ver_mockk")
             }
         }
 
         val androidMain by getting {
             dependencies {
 //                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
+//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+                implementation("app.cash.turbine:turbine:$ver_turbine")
             }
         }
         val androidTest by getting {
             dependencies {
+                implementation("io.mockk:mockk:$ver_mockk")
+                implementation("com.google.truth:truth:$ver_truth")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+
             }
         }
         val jvmMain by getting {

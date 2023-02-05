@@ -7,15 +7,20 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightPlaylistItemDatabaseRepository(
@@ -24,6 +29,8 @@ class SqldelightPlaylistItemDatabaseRepository(
     private val playlistItemMapper: PlaylistItemMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
+    private val guidCreator: GuidCreator,
+    private val source: OrchestratorContract.Source,
 ) : PlaylistItemDatabaseRepository {
 
     init {
@@ -54,33 +61,36 @@ class SqldelightPlaylistItemDatabaseRepository(
                         item.copy(media = saved)
                     } else item
                 }
-                .let { item ->
-                    item to playlistItemMapper.map(item)
-                }
-                .let { (domain, itemEntity) ->
+//                .let { item ->
+//                    item to playlistItemMapper.map(item)
+//                }
+                .let { itemDomain ->
                     with(database.playlistItemEntityQueries) {
                         val platformCheck = try {
                             loadItemsByMediaIdAndPlaylistId(
-                                mediaId = itemEntity.media_id, playlistId = itemEntity.playlist_id
+                                mediaId = itemDomain.media.id!!.id.value, playlistId = itemDomain.playlistId!!.id.value
                             ).executeAsOne()
                         } catch (n: NullPointerException) {
                             null
                         }
-                        domain to if (domain.id != null) {
-                            if (platformCheck != null && platformCheck.id != itemEntity.id) {
+                        itemDomain to if (itemDomain.id != null) {
+                            if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
                                 throw ConflictException(
-                                    "conflicting playlistitem id for ${itemEntity.media_id}_${itemEntity.playlist_id}" +
-                                            " existing: ${platformCheck.id}  thisid:${itemEntity.id} "
+                                    "conflicting playlistitem id for ${itemDomain.media.id}_${itemDomain.playlistId!!.id}" +
+                                            " existing: ${platformCheck.id}  thisid: ${itemDomain.id} "
                                 )
                             }
-                            itemEntity.also { update(it) }
-                            load(itemEntity.id).executeAsOne()
+                            update(playlistItemMapper.map(itemDomain))
+                            load(itemDomain.id!!.id.value).executeAsOne()
                         } else {
                             if (platformCheck != null) {
-                                throw ConflictException("playlistitem already exists: ${itemEntity.media_id}_${itemEntity.playlist_id}")
+                                //throw ConflictException("playlistitem already exists: ${itemDomain.media.id}_${itemDomain.playlistId}")
+                                platformCheck
+                            } else {
+                                guidCreator.create().toIdentifier(source)
+                                    .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
+                                    .also { create(it) }
                             }
-                            create(itemEntity)
-                            itemEntity.copy(id = getInsertId().executeAsOne())
                         }
                     }
                 }
@@ -117,12 +127,17 @@ class SqldelightPlaylistItemDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistItemDomain> =
+    override suspend fun load(id: GUID, flat: Boolean): RepoResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
-                database.playlistItemEntityQueries.load(id)
+                database.playlistItemEntityQueries.load(id.value)
                     .executeAsOne()
-                    .let { playlistItemMapper.map(it, mediaDatabaseRepository.load(it.media_id, flat = false).data!!) }
+                    .let {
+                        playlistItemMapper.map(
+                            it,
+                            mediaDatabaseRepository.load(it.media_id.toGUID(), flat = false).data!!
+                        )
+                    }
                     .let { RepoResult.Data(it) }
             } catch (e: Throwable) {
                 val msg = "couldn't load playlist item $id"
@@ -139,9 +154,9 @@ class SqldelightPlaylistItemDatabaseRepository(
             with(database.playlistItemEntityQueries) {
                 when (filter) {
                     is AllFilter -> loadAll()
-                    is IdListFilter -> loadAllByIds(filter.ids)
-                    is PlaylistIdLFilter -> loadPlaylist(filter.id)
-                    is MediaIdListFilter -> loadItemsByMediaId(filter.ids)
+                    is IdListFilter -> loadAllByIds(filter.ids.map { it.value })
+                    is PlaylistIdLFilter -> loadPlaylist(filter.id.value)
+                    is MediaIdListFilter -> loadItemsByMediaId(filter.ids.map { it.value })
                     is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(filter.limit.toLong())
                     is RecentMediaFilter -> loadAllPlaylistItemsRecent(filter.limit.toLong())
                     is StarredMediaFilter -> loadAllPlaylistItemsStarred(filter.limit.toLong())
@@ -158,7 +173,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                         if (playlistIds.isNullOrEmpty()) {
                             search(filter.text.lowercase(), 200)
                         } else {
-                            searchPlaylists(filter.text.lowercase(), playlistIds, 200)
+                            searchPlaylists(filter.text.lowercase(), playlistIds.map { it.value }, 200)
                         }
                     }
 
@@ -167,7 +182,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                     .map {
                         playlistItemMapper.map(
                             it,
-                            mediaDatabaseRepository.load(it.media_id, false).data!!
+                            mediaDatabaseRepository.load(it.media_id.toGUID(), false).data!!
                         )
                     }
                     .let { RepoResult.Data(it) }
@@ -261,31 +276,34 @@ class SqldelightPlaylistItemDatabaseRepository(
                     }
                     ?: itemDomains
             }
-            .let { itemDomains -> itemDomains to itemDomains.map { playlistItemMapper.map(it) } }
-            .let { (domains, entities) ->
+            //.let { itemDomains -> itemDomains to itemDomains.map { playlistItemMapper.map(it) } }
+            .let { itemDomains ->
                 with(database.playlistItemEntityQueries) {
-                    domains to entities.map { itemEntity ->
+                    itemDomains to itemDomains.map { itemDomain ->
                         val platformCheck = try {
                             loadItemsByMediaIdAndPlaylistId(
-                                mediaId = itemEntity.media_id, playlistId = itemEntity.playlist_id
+                                mediaId = itemDomain.media.id!!.id.value, playlistId = itemDomain.playlistId!!.id.value
                             ).executeAsOne()
                         } catch (n: NullPointerException) {
                             null
                         }
-                        if (itemEntity.id > 0L) {
-                            if (platformCheck != null && platformCheck.id != itemEntity.id) {
+                        if (itemDomain.id != null) {
+                            if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
                                 throw ConflictException(
-                                    "conflicting playlistitem id for ${itemEntity.media_id}_${itemEntity.playlist_id}" +
-                                            " existing: ${platformCheck.id}  thisid:${itemEntity.id} "
+                                    "conflicting playlistitem id for ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}" +
+                                            " existing: ${platformCheck.id}  thisid:${itemDomain.id}"
                                 )
                             }
-                            itemEntity.also { update(it) }
+                            playlistItemMapper.map(itemDomain).also { update(it) }
                         } else {
                             if (platformCheck != null) {
-                                throw ConflictException("playlistitem already exists: ${itemEntity.media_id}_${itemEntity.playlist_id}")
+                                //throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}")
+                                platformCheck
+                            } else {
+                                guidCreator.create().toIdentifier(source)
+                                    .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
+                                    .also { create(it) }
                             }
-                            create(itemEntity)
-                            itemEntity.copy(id = getInsertId().executeAsOne())
                         }
                     }
                 }
@@ -294,7 +312,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 entities.map { savedItem ->
                     playlistItemMapper.map(
                         savedItem,
-                        domains.find { it.media.id == savedItem.media_id }
+                        domains.find { it.media.id!!.id.value == savedItem.media_id }
                             ?.media
                             ?: throw IllegalStateException("Media id saved incorrectly")
                     )
@@ -304,14 +322,14 @@ class SqldelightPlaylistItemDatabaseRepository(
     }
 
     internal fun loadPlaylistItemsInternal(
-        playlistId: Long
+        playlistId: GUID
     ): List<PlaylistItemDomain> =
         database.playlistItemEntityQueries
-            .loadPlaylist(playlistId)
+            .loadPlaylist(playlistId.value)
             .executeAsList()
             .mapNotNull { itemEntity ->
                 mediaDatabaseRepository
-                    .loadMediaInternal(itemEntity.media_id).data
+                    .loadMediaInternal(itemEntity.media_id.toGUID()).data
                     ?.let { mediaDomain -> playlistItemMapper.map(itemEntity, mediaDomain) }
                     ?: let { log.e("failed to load Media:id ${itemEntity.media_id}"); null }
             }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory
 
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.domain.GUID
 
 interface MemoryRepository<Domain> {
     val updates: Flow<Pair<Operation, Domain>>
@@ -10,7 +11,7 @@ interface MemoryRepository<Domain> {
 
     fun load(domain: Domain, options: Options): Domain?
 
-    suspend fun load(id: Long, options: Options): Domain?
+    suspend fun load(id: GUID, options: Options): Domain?
 
     fun loadList(filter: Filter, options: Options): List<Domain>
 

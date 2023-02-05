@@ -48,9 +48,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
 class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeComponent {
@@ -97,8 +95,8 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         SOURCE.getEnum<Source>(arguments) ?: Source.LOCAL
     }
 
-    private val parentArg: Long? by lazy {
-        PLAYLIST_PARENT.getLong(arguments)
+    private val parentArg: GUID? by lazy {
+        PLAYLIST_PARENT.getString(arguments)?.toGUID().also { log.d("parentArg:$it") }
     }
 
     private val allowPlayArg: Boolean by lazy {
@@ -106,7 +104,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     }
 
     private val isOnSharePlaylist: Boolean by lazy {
-        itemArg?.playlistId == Shared.id
+        itemArg?.playlistId?.id == Shared.id
     }
 
     private val isInShare: Boolean by lazy {
@@ -147,6 +145,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        log.d("onViewCreated:" + arguments.toString())
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }

@@ -32,7 +32,7 @@ class AddLinkUsecase constructor(
                                 ?.takeIf { it.id != null }
                                 ?.let {
                                     playlistItemOrchestrator
-                                        .loadList(MediaIdListFilter(listOf(it.id!!)), LOCAL.flatOptions())
+                                        .loadList(MediaIdListFilter(listOf(it.id!!.id)), LOCAL.flatOptions())
                                         .takeIf { it.size > 0 }
                                         ?.get(0)
                                 }

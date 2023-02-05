@@ -99,7 +99,7 @@ class PlayDialog constructor(
                 .createPresenter(createView, emptyInteractions)
                 .update(
                     itemModelMapper.mapItem(
-                        modelId = 0,
+                        modelId = item.playlistId ?: throw IllegalStateException("No playlist id"),
                         item = this,
                         index = 0,
                         canEdit = false,

@@ -1,9 +1,6 @@
 package uk.co.sentinelweb.cuer.db.repository
 
 import app.cash.turbine.test
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Ignore
@@ -23,19 +20,17 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
-import uk.co.sentinelweb.cuer.db.util.DataCreation
-import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
-import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
-import uk.co.sentinelweb.cuer.db.util.resetIds
+import uk.co.sentinelweb.cuer.db.util.*
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -76,7 +71,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         sut.updates.test {
             val actual = sut.save(toCreate, flat = true, emit = true)
             assertTrue(actual.isSuccessful)
-            val expected = sut.load(actual.data!!.id!!, flat = true)
+            val expected = sut.load(actual.data!!.id!!.id, flat = true)
             assertEquals(expected.data!!, actual.data!!)
             assertEquals(0, actual.data!!.items.size)
             assertEquals(FLAT to expected.data!!, awaitItem())
@@ -95,7 +90,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         sut.updates.test {
             val actual = sut.save(toUpdate, flat = true, emit = true)
             assertTrue(actual.isSuccessful)
-            val expected = sut.load(actual.data!!.id!!, flat = true)
+            val expected = sut.load(actual.data!!.id!!.id, flat = true)
             assertEquals(expected.data!!, actual.data!!)
 
             assertEquals(FLAT to expected.data!!, awaitItem())
@@ -110,7 +105,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         sut.updates.test {
             val actual = sut.save(toCreate, flat = false, emit = true)
             assertTrue(actual.isSuccessful)
-            val expected = sut.load(actual.data!!.id!!, flat = false)
+            val expected = sut.load(actual.data!!.id!!.id, flat = false)
             assertTrue(expected.isSuccessful)
             assertEquals(expected.data!!, actual.data!!)
             assertEquals(toCreate.items.size, actual.data!!.items.size)
@@ -131,7 +126,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         sut.updates.test {
             val actual = sut.save(toUpdate, flat = false, emit = true)
             assertTrue(actual.isSuccessful)
-            val expected = sut.load(actual.data!!.id!!, flat = false)
+            val expected = sut.load(actual.data!!.id!!.id, flat = false)
             assertTrue(expected.isSuccessful)
             assertEquals(expected.data!!, actual.data!!)
 
@@ -147,7 +142,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
             val actual = sut.save(toCreate, flat = false, emit = true)
             assertTrue(actual.isSuccessful)
             actual.data!!.forEach {
-                val expected = sut.load(it.id!!, flat = false)
+                val expected = sut.load(it.id!!.id, flat = false)
                 assertTrue(expected.isSuccessful)
                 assertEquals(expected.data!!, it)
 
@@ -163,11 +158,11 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         val expectedDomain = playlistMapper.map(
             playlistEntity,
             listOf(),
-            playlistEntity.channel_id?.let { channelRepo.load(it, flat = false).data!! },
-            playlistEntity.thumb_id?.let { imageRepo.loadEntity(it) },
-            playlistEntity.image_id?.let { imageRepo.loadEntity(it) },
+            playlistEntity.channel_id?.let { channelRepo.load(it.toGUID(), flat = false).data!! },
+            playlistEntity.thumb_id?.let { imageRepo.loadEntity(it.toGUID()) },
+            playlistEntity.image_id?.let { imageRepo.loadEntity(it.toGUID()) },
         )
-        val actual = sut.load(playlistEntity.id, flat = true)
+        val actual = sut.load(playlistEntity.id.toGUID(), flat = true)
         assertTrue(actual.isSuccessful)
         assertEquals(expectedDomain, actual.data)
     }
@@ -177,12 +172,12 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         val (playlistEntity, itemEntity) = dataCreation.createPlaylistAndItem()
         val expectedDomain = playlistMapper.map(
             playlistEntity,
-            listOf(itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id, flat = false).data!!)),
-            playlistEntity.channel_id?.let { channelRepo.load(it, flat = false).data!! },
-            playlistEntity.thumb_id?.let { imageRepo.loadEntity(it) },
-            playlistEntity.image_id?.let { imageRepo.loadEntity(it) },
+            listOf(itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id.toGUID(), flat = false).data!!)),
+            playlistEntity.channel_id?.let { channelRepo.load(it.toGUID(), flat = false).data!! },
+            playlistEntity.thumb_id?.let { imageRepo.loadEntity(it.toGUID()) },
+            playlistEntity.image_id?.let { imageRepo.loadEntity(it.toGUID()) },
         )
-        val actual = sut.load(playlistEntity.id, flat = false)
+        val actual = sut.load(playlistEntity.id.toGUID(), flat = false)
         assertTrue(actual.isSuccessful)
         assertEquals(expectedDomain, actual.data)
     }
@@ -192,9 +187,12 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         val toCreate = fixture<List<PlaylistDomain>>().map { it.resetIds() }
         val saved = sut.save(toCreate, flat = false, emit = false)
         assertTrue(saved.isSuccessful)
-        val loaded = sut.loadList(IdListFilter(listOf(1, 2)), flat = false)
+        val ids = saved.data?.map { it.id!!.id }?.take(2)!!
+        val loaded = sut.loadList(IdListFilter(ids), flat = false)
         assertTrue(loaded.isSuccessful)
-        assertEquals(saved.data!!.filter { listOf(1L, 2L).contains(it.id) }, loaded.data!!)
+        val expected = saved.data!!.filter { ids.contains(it.id!!.id) }.sortedBy { it.id!!.id.value }
+        val actual = loaded.data!!.sortedBy { it.id!!.id.value }
+        assertEquals(expected, actual)
     }
 
     @Test
@@ -202,12 +200,14 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
         val toCreate = fixture<List<PlaylistDomain>>().map { it.resetIds() }
         val saved = sut.save(toCreate, flat = false, emit = false)
         assertTrue(saved.isSuccessful)
-        val loaded = sut.loadList(IdListFilter(listOf(1, 2)), flat = true)
+        val ids = saved.data?.map { it.id!!.id }?.take(2)!!
+        val loaded = sut.loadList(IdListFilter(ids), flat = true)
         assertTrue(loaded.isSuccessful)
         val expected = saved.data!!
-            .filter { listOf(1L, 2L).contains(it.id) }
+            .filter { ids.contains(it.id!!.id) }
             .map { it.copy(items = listOf()) }
-        assertEquals(expected, loaded.data!!)
+            .sortedBy { it.id!!.id.value }
+        assertEquals(expected, loaded.data!!.sortedBy { it.id!!.id.value })
         loaded.data!!.forEach { assertEquals(0, it.items.size) }
     }
 
@@ -307,7 +307,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
             assertEquals(DELETE to toDelete, awaitItem())
             expectNoEvents()
         }
-        val check = sut.load(toDelete.id!!, true)
+        val check = sut.load(toDelete.id!!.id, true)
         assertFalse(check.isSuccessful)
     }
 
@@ -340,7 +340,7 @@ class SqldelightPlaylistDatabaseRepositoryTest : KoinTest {
                     emit = true
                 )
             assertTrue(updated.isSuccessful)
-            val expected = sut.load(actual.data!!.id!!, flat = true)
+            val expected = sut.load(actual.data!!.id!!.id, flat = true)
             assertTrue(expected.isSuccessful)
             assertEquals(1000, expected.data!!.currentIndex)
 

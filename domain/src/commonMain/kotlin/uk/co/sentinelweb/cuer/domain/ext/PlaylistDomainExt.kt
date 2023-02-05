@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
 import summarise
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.*
 
 fun PlaylistDomain.currentItem() =
@@ -14,13 +15,13 @@ fun PlaylistDomain.currentItemOrStart() = if (currentIndex > -1 && currentIndex 
     items[0]
 } else null
 
-fun PlaylistDomain.itemWitId(id: Long?) = items.find { it.id == id }
+fun PlaylistDomain.itemWithId(id: Identifier<GUID>?) = items.find { it.id == id }
 
 fun PlaylistDomain.indexOfItem(item: PlaylistItemDomain): Int? {
     return indexOfItemId(item.id)
 }
 
-fun PlaylistDomain.indexOfItemId(id1: Long?): Int? {
+fun PlaylistDomain.indexOfItemId(id1: Identifier<GUID>?): Int? {
     return id1?.let {
         val indexOfFirst = items.indexOfFirst { it.id == id1 }
         return if (indexOfFirst > -1) {
@@ -65,6 +66,9 @@ fun PlaylistDomain.replaceMediaByPlatformId(media: MediaDomain) =
             )
         } ?: this
 
+/**
+ * Replace the item in the playlist with the same platform id
+ */
 fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
     this.items
         .indexOfFirst { matchPlatform(it, item) }
@@ -74,23 +78,26 @@ fun PlaylistDomain.replaceItemByPlatformId(item: PlaylistItemDomain) =
             } else this
         }
 
+/**
+ * Match the platform id and platform
+ */
 private fun matchPlatform(it: PlaylistItemDomain, item: PlaylistItemDomain) =
     it.media.platformId == item.media.platformId && it.media.platform == item.media.platform
 
-fun PlaylistDomain.scanOrder(): StringBuilder {
+fun PlaylistDomain.orderString(): String {
     var lastorder = -1L
-    val orderString = StringBuilder("cur: $currentIndex [")
+    var orderString = "cur: $currentIndex ["
     items.forEachIndexed { i, item ->
-        orderString.append("$i: ${item.id}-${item.order}")
+        orderString.plus("$i: ${item.id}-${item.order}")
         if (lastorder > -1 && lastorder >= item.order) {
-            orderString.append("*")
+            orderString = orderString.plus("*")
         }
         lastorder = item.order
-        orderString.append(",")
+        orderString = orderString.plus(",")
     }
-    orderString
+    orderString = orderString
         //.deleteCharAt(orderString.length - 1)
-        .append("]")
+        .plus("]")
     return orderString
 }
 
@@ -101,7 +108,7 @@ fun PlaylistDomain.isAllWatched() = this.items
     .let { if (it.first && !it.second) false else if (!it.first && it.second) true else null }
 
 fun List<PlaylistDomain>.buildTree(): PlaylistTreeDomain {
-    val treeLookup = mutableMapOf<Long?, MutablePlaylistTreeDomain>()
+    val treeLookup = mutableMapOf<Identifier<GUID>?, MutablePlaylistTreeDomain>()
     val root = MutablePlaylistTreeDomain(null, null)
     forEach { pl ->
         val node = MutablePlaylistTreeDomain(pl, null)
@@ -142,7 +149,7 @@ fun PlaylistTreeDomain.depth(): Int = (this.parent?.depth()?.inc() ?: 0)
 fun PlaylistTreeDomain.descendents(): Int =
     this.chidren.size + this.chidren.sumOf { it.descendents() }
 
-fun PlaylistTreeDomain.buildLookup(): Map<Long, PlaylistTreeDomain> =
+fun PlaylistTreeDomain.buildLookup(): Map<Identifier<GUID>, PlaylistTreeDomain> =
     this.chidren.associateBy { it.node?.id!! }.toMutableMap()
         .also { map -> this.chidren.forEach { map.putAll(it.buildLookup()) } }
 
@@ -186,7 +193,7 @@ fun PlaylistTreeDomain.isDescendent(check: PlaylistTreeDomain): Boolean {
 }
 
 fun PlaylistDomain.summarise(): String = """
-    id: $id, platform: $platform - $platformId, type: $type, title: $title, 
+    PLAYLIST: id: $id, platform: $platform - $platformId, type: $type, title: $title, 
     items:${items.map { it.summarise() }.joinToString("\n")}
 """.trimIndent()
 

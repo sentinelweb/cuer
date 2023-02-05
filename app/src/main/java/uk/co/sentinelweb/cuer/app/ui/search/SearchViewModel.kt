@@ -18,6 +18,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -30,6 +32,7 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class SearchViewModel(
     private val state: SearchContract.State,
@@ -155,11 +158,11 @@ class SearchViewModel(
         }
 
         _navigateLiveData.value = NavigationModel(
-            NavigationModel.Target.PLAYLIST,
+            Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id else YoutubeSearch.id,
-                NavigationModel.Param.PLAY_NOW to false,
-                NavigationModel.Param.SOURCE to MEMORY
+                PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id.value else YoutubeSearch.id.value,
+                PLAY_NOW to false,
+                SOURCE to MEMORY
             )
         )
     }
@@ -179,7 +182,7 @@ class SearchViewModel(
                 )
         } else if (chipModel.type == PLAYLIST) {
             state.local.playlists
-                .removeIf { it.id == chipModel.value?.toLong() }
+                .removeIf { it.id?.id == chipModel.value?.toGUID() }
                 .also { model = mapper.map(state) }
         }
     }

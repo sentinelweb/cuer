@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.db.mapper
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
@@ -14,6 +16,7 @@ import uk.co.sentinelweb.cuer.domain.ext.makeFlags
 
 class PlaylistMapper(
     private val imageMapper: ImageMapper,
+    private val source: Source
 ) {
 
     fun map(
@@ -23,11 +26,11 @@ class PlaylistMapper(
         thumbEntity: Image?,
         imageEntity: Image?
     ) = PlaylistDomain(
-        id = entity.id,
+        id = entity.id.toGuidIdentifier(source),
         title = entity.title,
         items = items,
         currentIndex = entity.currentIndex.toInt(),
-        parentId = entity.parent_id,
+        parentId = entity.parent_id?.toGuidIdentifier(source),
         mode = entity.mode,
         type = entity.type,
         platform = entity.platform,
@@ -43,7 +46,7 @@ class PlaylistMapper(
     )
 
     fun map(domain: PlaylistDomain) = Playlist(
-        id = domain.id ?: 0,
+        id = domain.id?.id?.value ?: throw IllegalArgumentException("No id"),
         flags = mapFlags(domain),
         title = domain.title,
         currentIndex = domain.currentIndex.toLong(),
@@ -51,10 +54,10 @@ class PlaylistMapper(
         type = domain.type,
         platform = domain.platform,
         platform_id = domain.platformId,
-        channel_id = domain.channelData?.id,
-        parent_id = domain.parentId,
-        thumb_id = domain.thumb?.id,
-        image_id = domain.image?.id,
+        channel_id = domain.channelData?.id?.id?.value,
+        parent_id = domain.parentId?.id?.value,
+        thumb_id = domain.thumb?.id?.id?.value,
+        image_id = domain.image?.id?.id?.value,
         config_json = domain.config,
     )
 

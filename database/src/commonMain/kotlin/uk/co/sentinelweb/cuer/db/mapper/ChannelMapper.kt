@@ -1,15 +1,20 @@
 package uk.co.sentinelweb.cuer.db.mapper
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ChannelDomain.Companion.FLAG_STARRED
 import uk.co.sentinelweb.cuer.domain.ext.hasFlag
 
-class ChannelMapper(private val imageMapper: ImageMapper) {
+class ChannelMapper(
+    private val imageMapper: ImageMapper,
+    private val source: OrchestratorContract.Source,
+) {
 
     fun map(entity: Channel, thumbEntity: Image?, imageEntity: Image?): ChannelDomain = ChannelDomain(
-        id = entity.id,
+        id = entity.id.toGuidIdentifier(source),
         platformId = entity.platform_id,
         platform = entity.platform,
         country = entity.country,
@@ -23,7 +28,7 @@ class ChannelMapper(private val imageMapper: ImageMapper) {
     )
 
     fun map(domain: ChannelDomain) = Channel(
-        id = domain.id ?: 0,
+        id = domain.id?.id?.value ?: throw IllegalArgumentException("No id"),
         flags = if (domain.starred) FLAG_STARRED else 0,
         title = domain.title,
         description = domain.description,
@@ -31,8 +36,8 @@ class ChannelMapper(private val imageMapper: ImageMapper) {
         country = domain.country,
         platform = domain.platform,
         platform_id = domain.platformId!!,
-        thumb_id = domain.thumbNail?.id,
-        image_id = domain.image?.id,
+        thumb_id = domain.thumbNail?.id?.id?.value,
+        image_id = domain.image?.id?.id?.value,
         published = domain.published
     )
 }
