@@ -5,9 +5,15 @@ import com.arkivanov.mvikotlin.logging.store.LoggingStoreFactory
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.impl.IosStringDecoder
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.browse.*
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviController
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviItemModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviModelMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviController
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviModelMapper
@@ -98,6 +104,7 @@ object PresentationModule {
         factory<CustomisationResources>(named(MemoryPlaylist.NewItems)) { NewPlaylistCustomisationResources() }
         factory<CustomisationResources>(named(MemoryPlaylist.Starred)) { StarredPlaylistCustomisationResources() }
         factory<CustomisationResources>(named(MemoryPlaylist.Unfinished)) { UnfinishedPlaylistCustomisationResources() }
+        factory<StringDecoder> { IosStringDecoder() }
     }
 
     val playlistsDialogModule = module {
@@ -120,5 +127,66 @@ object PresentationModule {
         factory { PlaylistsMviDialogContract.Strings() }
     }
 
-    val modules = listOf(browserModule, playlistsModule, resourcesModule, playlistsDialogModule)
+    private val playlistModule = module {
+        factory { (lifecycle: Lifecycle) ->
+            PlaylistMviController(
+                modelMapper = get(),
+                log = get(),
+                store = get(),
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                mediaOrchestrator = get(),
+                queue = get(),
+                lifecycle = lifecycle,
+            )
+        }
+        factory {
+            PlaylistMviStoreFactory(
+                storeFactory = get(),
+                coroutines = get(),
+                log = get(),
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                playlistUpdateUsecase = get(),
+                playlistOrDefaultUsecase = get(),
+                prefsWrapper = get(),
+                dbInit = get(),
+                recentLocalPlaylists = get(),
+                queue = get(),
+                appPlaylistInteractors = get(),
+                playlistMutator = get(),
+                util = get(),
+                modelMapper = get(),
+                itemModelMapper = get(),
+                playUseCase = get(),
+                strings = get(),
+                timeProvider = get(),
+                addPlaylistUsecase = get(),
+                multiPrefs = get(),
+                idGenerator = get(),
+            ).create()
+        }
+        factory {
+            PlaylistMviModelMapper(
+                itemModelMapper = get(),
+                iconMapper = get(),
+                strings = get(),
+                appPlaylistInteractors = get(),
+                util = get(),
+                multiPlatformPreferences = get(),
+                log = get(),
+            )
+        }
+        factory {
+            PlaylistMviItemModelMapper(
+                timeSinceFormatter = get(),
+                timeFormatter = get(),
+                durationTextColorMapper = get(),
+                stringDecoder = get(),
+                log = get(),
+            )
+        }
+    }
+
+    val modules = listOf(browserModule, playlistsModule, resourcesModule, playlistsDialogModule, playlistModule)
 }
