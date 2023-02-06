@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMOR
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.Header
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ROOT_LEVEL_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
@@ -61,7 +62,7 @@ class PlaylistsModelMapper constructor(
         pinnedId: GUID?,
         depth: Int
     ) = Model.Item(
-        pl.id ?: throw IllegalStateException("Playlist must have an id"),
+        pl.id ?: ROOT_LEVEL_PLAYLIST_ID,// ?: throw IllegalStateException("Playlist must have an id"),
         pl.title,
         false,
         (pl.thumb ?: pl.image)?.url,

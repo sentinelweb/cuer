@@ -81,7 +81,7 @@ data class PlaylistDomain constructor(
             thumb = null
         )
 
-        fun createDummy(title: String) = PlaylistDomain(
+        fun createDummy(id: Identifier<GUID>? = null, title: String) = PlaylistDomain(
             id = null,
             config = PlaylistConfigDomain(),
             type = PlaylistTypeDomain.APP,

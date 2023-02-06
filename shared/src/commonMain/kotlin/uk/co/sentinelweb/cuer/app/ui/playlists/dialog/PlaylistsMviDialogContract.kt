@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.dialog
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviContract
 import uk.co.sentinelweb.cuer.domain.*
@@ -49,7 +50,9 @@ interface PlaylistsMviDialogContract {
     }
 
     companion object {
-        val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Add Playlist")
-        val ROOT_PLAYLIST_DUMMY = PlaylistDomain.createDummy("Top level")
+        val ADD_PLAYLIST_DUMMY = PlaylistDomain.createDummy(title = "Add Playlist")
+
+        val ROOT_LEVEL_PLAYLIST_ID = Identifier("root-level".toGUID(), MEMORY)
+        val ROOT_PLAYLIST_DUMMY = PlaylistDomain.createDummy(id = ROOT_LEVEL_PLAYLIST_ID, title = "Top level")
     }
 }

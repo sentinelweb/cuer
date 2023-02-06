@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ROOT_LEVEL_PLAYLIST_ID
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ROOT_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Label.Dismiss
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -58,8 +59,9 @@ class PlaylistsDialogViewModel(
     }
 
     fun onItemClicked(item: PlaylistsItemMviContract.Model) {
-        val findId = item.id.takeIf { it.source == LOCAL }?.id// null finds top level node
+        val findId = item.id.takeIf { it.source == LOCAL }?.id
         findId
+            ?.takeIf { item.id != ROOT_LEVEL_PLAYLIST_ID }
             ?.let { state.playlists.find { it.id?.id == findId } }
             ?.apply { if (state.pinWhenSelected) prefsWrapper.pinnedPlaylistId = id!!.id }
             ?.apply { state.config.itemClick(this, true) }
