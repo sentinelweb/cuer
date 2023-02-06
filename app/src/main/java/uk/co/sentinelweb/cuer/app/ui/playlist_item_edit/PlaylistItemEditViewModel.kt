@@ -44,6 +44,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
 
 
@@ -345,15 +346,15 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onRemovePlaylist(chipModel: ChipModel) {
         state.isPlaylistsChanged = true
-        val plId = chipModel.value!!.toGUID()
+        val plId = deserialiseGuidIdentifier(chipModel.value!!)
         state.selectedPlaylists
-            .find { it.id?.id == plId }
+            .find { it.id == plId }
             ?.also {
                 state.selectedPlaylists.remove(it)
                 state.deletedPlayLists.add(it)
             }
         prefsWrapper.pinnedPlaylistId
-            ?.takeIf { it == plId }
+            ?.takeIf { it == plId.id }
             ?.apply {
                 _uiLiveData.value = UiEvent(UNPIN, null)
             }

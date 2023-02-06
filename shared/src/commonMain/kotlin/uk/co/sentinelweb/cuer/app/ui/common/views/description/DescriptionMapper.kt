@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class DescriptionMapper constructor(
     private val dateTimeFormater: DateTimeFormatter
@@ -42,7 +43,7 @@ class DescriptionMapper constructor(
     private fun chipModel(playlist: PlaylistDomain, editablePlaylists: Boolean) = ChipModel(
         ChipModel.Type.PLAYLIST,
         playlist.title,
-        playlist.id.toString(),
+        playlist.id!!.serialise(),
         playlist.thumb ?: playlist.image,
         editablePlaylists
     )
