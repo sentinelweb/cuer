@@ -42,14 +42,6 @@ actual class TimeFormatter {
         Format.SECS -> timeStampFormatterSecs
     }
 
-    private fun String.strip00() = this.let {
-        var formatted = it
-        while (formatted.startsWith("00:")) {
-            formatted = formatted.substring(3)
-        }
-        formatted
-    }
-
     companion object {
         // 00:00:36.150
         private const val TIME_PATTERN_MILLIS = "HH:mm:ss.SSS"

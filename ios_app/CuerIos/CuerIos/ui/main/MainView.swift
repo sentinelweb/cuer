@@ -10,9 +10,6 @@ import SwiftUI
 struct MainView: View {
     
     @StateObject private var coordinator: MainCoordinator
-    // updated from onReceive at bottom of view
-    //      @State private var screen: Screen = Screen.launch
-    @State private var playlistViewModel: PlaylistViewModel?
 
     init(mainCoordinator: MainCoordinator) {
         self._coordinator = StateObject(wrappedValue: mainCoordinator)
@@ -34,8 +31,8 @@ struct MainView: View {
                         .tabItem { TabLabelView(text: "Playlists", systemImage: "list.bullet.indent") }
                         .tag(MainTab.playlists)
                     
-                    if (playlistViewModel != nil) {
-                        PlaylistView(viewModel: playlistViewModel!)
+                    if (coordinator.playlistController != nil) {
+                        PlaylistView(holder: coordinator.playlistController!)
                             .tabItem { TabLabelView(text: "Playlist", systemImage: "music.note.list") }
                             .tag(MainTab.playlist)
                     }
@@ -64,8 +61,7 @@ struct MainView: View {
                 ShareSheet(activityItems: [$0])
                     .edgesIgnoringSafeArea(.all)
             }
-            .onReceive(coordinator.$playlistViewModel, perform: {vm in playlistViewModel=vm})
-            
+
         default:
             Text("Unsupported")
         }

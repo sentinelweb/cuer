@@ -216,8 +216,8 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onPlaylistChipClick(chipModel: ChipModel) {
         if (!state.isInShare) {
-            val plId = chipModel.value?.toLong()
-            _navigateLiveData.value = NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId, SOURCE to LOCAL))
+            val plId = deserialiseGuidIdentifier(chipModel.value!!)
+            _navigateLiveData.value = NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId.id.value, SOURCE to plId.source))
             _navigateLiveData.value = NavigationModel(NAV_NONE)
         }
     }

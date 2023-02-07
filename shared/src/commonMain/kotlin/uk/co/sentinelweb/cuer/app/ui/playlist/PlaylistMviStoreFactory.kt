@@ -44,6 +44,8 @@ import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -73,7 +75,9 @@ class PlaylistMviStoreFactory(
     private val timeProvider: TimeProvider,
     private val addPlaylistUsecase: AddPlaylistUsecase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val shareWrapper: ShareWrapper,
+    private val platformLauncher: PlatformLaunchWrapper,
 ) {
     init {
         log.tag(this)
@@ -182,43 +186,46 @@ class PlaylistMviStoreFactory(
                 Init -> Unit // refresh(getState())
             }
 
-        override fun executeIntent(intent: Intent, getState: () -> State) =
-            when (intent) {
-                is Intent.Refresh -> refresh(getState())
-                is Intent.SetPlaylistData -> setPlaylistData(intent, getState)
-                is Intent.CheckToSave -> checkToSave(intent, getState())
-                is Intent.CheckToSaveConfirm -> checkToSaveConfirm(intent, getState)
-                is Intent.Commit -> commit(intent, getState)
-                is Intent.DeleteItem -> delete(intent, getState())
-                is Intent.Edit -> edit(intent, getState())
-                is Intent.GotoPlaylist -> gotoPlaylist(intent, getState())
-                is Intent.Help -> help(intent, getState())
-                is Intent.Launch -> launch(intent, getState())
-                is Intent.Move -> moveItem(intent, getState())
-                is Intent.MoveSwipe -> performMove(intent, getState)
-                is Intent.CommitMove -> commitMove(intent, getState())
-                is Intent.Pause -> pause(intent, getState())
-                is Intent.Play -> play(intent, getState())
-                is Intent.PlayItem -> playItem(intent, getState())
-                is Intent.PlayModeChange -> playModeChange(intent, getState())
-                is Intent.PlaylistSelected -> playlistSelected(intent, getState())
-                is Intent.RelatedItem -> relatedItems(intent, getState())
-                is Intent.Resume -> resume(intent, getState())
-                is Intent.Share -> share(intent, getState())
-                is Intent.ShareItem -> shareItem(intent, getState())
-                is Intent.ShowCards -> showCards(intent, getState())
-                is Intent.ShowChannel -> showChannel(intent, getState())
-                is Intent.ShowItem -> showItem(intent, getState())
-                is Intent.Star -> star(intent, getState())
-                is Intent.StarItem -> starItem(intent, getState())
-                is Intent.Undo -> undo(intent, getState())
-                is Intent.Update -> update(intent, getState())
-                is Intent.UpdatesMedia -> flowUpdatesMedia(intent, getState())
-                is Intent.UpdatesPlaylist -> flowUpdatesPlaylist(intent, getState())
-                is Intent.UpdatesPlaylistItem -> flowUpdatesPlaylistItem(intent, getState())
-                is Intent.QueueItemFlow -> flowQueueItem(intent, getState())
-                is Intent.QueuePlaylistFlow -> flowQueuePlaylist(intent, getState())
-                Intent.Headless -> headless(intent, getState())
+        override fun executeIntent(intent: Intent, getState: () -> State) = intent
+            .also { log.d(it.toString()) }
+            .let {
+                when (intent) {
+                    is Intent.Refresh -> refresh(getState())
+                    is Intent.SetPlaylistData -> setPlaylistData(intent, getState)
+                    is Intent.CheckToSave -> checkToSave(intent, getState())
+                    is Intent.CheckToSaveConfirm -> checkToSaveConfirm(intent, getState)
+                    is Intent.Commit -> commit(intent, getState)
+                    is Intent.DeleteItem -> delete(intent, getState())
+                    is Intent.Edit -> edit(intent, getState())
+                    is Intent.GotoPlaylist -> gotoPlaylist(intent, getState())
+                    is Intent.Help -> help(intent, getState())
+                    is Intent.Launch -> launch(intent, getState())
+                    is Intent.Move -> moveItem(intent, getState())
+                    is Intent.MoveSwipe -> performMove(intent, getState)
+                    is Intent.CommitMove -> commitMove(intent, getState())
+                    is Intent.Pause -> pause(intent, getState())
+                    is Intent.Play -> play(intent, getState())
+                    is Intent.PlayItem -> playItem(intent, getState())
+                    is Intent.PlayModeChange -> playModeChange(intent, getState())
+                    is Intent.PlaylistSelected -> playlistSelected(intent, getState())
+                    is Intent.RelatedItem -> relatedItems(intent, getState())
+                    is Intent.Resume -> resume(intent, getState())
+                    is Intent.Share -> share(intent, getState())
+                    is Intent.ShareItem -> shareItem(intent, getState())
+                    is Intent.ShowCards -> showCards(intent, getState())
+                    is Intent.ShowChannel -> showChannel(intent, getState())
+                    is Intent.ShowItem -> showItem(intent, getState())
+                    is Intent.Star -> star(intent, getState())
+                    is Intent.StarItem -> starItem(intent, getState())
+                    is Intent.Undo -> undo(intent, getState())
+                    is Intent.Update -> update(intent, getState())
+                    is Intent.UpdatesMedia -> flowUpdatesMedia(intent, getState())
+                    is Intent.UpdatesPlaylist -> flowUpdatesPlaylist(intent, getState())
+                    is Intent.UpdatesPlaylistItem -> flowUpdatesPlaylistItem(intent, getState())
+                    is Intent.QueueItemFlow -> flowQueueItem(intent, getState())
+                    is Intent.QueuePlaylistFlow -> flowQueuePlaylist(intent, getState())
+                    Intent.Headless -> headless(intent, getState())
+                }
             }
 
         private fun headless(intent: Intent, state: State) {
@@ -262,19 +269,13 @@ class PlaylistMviStoreFactory(
                 scope.launch {
                     addPlaylistUsecase
                         .addPlaylist(state.playlist!!, state.addPlaylistParent)
-//                    .also {
-//                        state.playlistIdentifier =
-//                            it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
-//                    }
-//                    .also { states.playlist = it }
                         .also {
                             val newIdentifier =
                                 it.id ?: throw IllegalStateException("Save failure")
                             dispatch(SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
+                            //log.d("call executeRefresh: commit: no params")
                             executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
-                        //.also { updateView(getState()) }
-                        //.also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST, listOf(it)) }
                         .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent?.afterCommit)) }
                 }
             } else {
@@ -305,7 +306,7 @@ class PlaylistMviStoreFactory(
         private fun launch(intent: Intent.Launch, state: State) {
             state.playlist
                 ?.platformId
-                ?.also { publish(Label.LaunchPlaylist(it)) }
+                ?.also { platformLauncher.launchPlaylist(it) }
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
@@ -319,7 +320,6 @@ class PlaylistMviStoreFactory(
                     thisState.playlist?.apply {
                         if (config.editableItems.not()) {
                             publish(Message(strings.get(StringResource.playlist_error_please_add)))
-                            // updateView(state = thisState)
                         } else {
                             dispatch(SelectedPlaylistItem(itemDomain))
                             publish(
@@ -434,7 +434,6 @@ class PlaylistMviStoreFactory(
                     if (state.isHeadless) {
                         publish(Label.PlayItem(playlistItem = itemDomain, start = intent.start))
                     } else if (!canPlayPlaylistItem(itemDomain)) {
-                        //view.showError()
                         publish(Message(strings.get(StringResource.playlist_error_please_add)))
                     } else {
                         playUseCase.playLogic(itemDomain, state.playlist, intent.start)
@@ -478,12 +477,12 @@ class PlaylistMviStoreFactory(
 
         private fun share(intent: Intent.Share, state: State) {
             state.playlist
-                ?.also { publish(Label.Share(it)) }
+                ?.also { shareWrapper.share(it) }
         }
 
         private fun shareItem(intent: Intent.ShareItem, state: State) {
             state.playlistItemDomain(intent.item)
-                ?.also { publish(Label.ShareItem(it)) }
+                ?.also { shareWrapper.share(it.media) }
         }
 
         private fun showCards(intent: Intent.ShowCards, state: State) {
@@ -496,7 +495,7 @@ class PlaylistMviStoreFactory(
         private fun showChannel(intent: Intent.ShowChannel, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.takeIf { it.media.channelData.platformId != null }
-                ?.also { publish(Label.LaunchChannel(it.media.channelData.platformId!!)) }
+                ?.also { platformLauncher.launchChannel(it.media.channelData.platformId!!) }
         }
 
         private fun showItem(intent: Intent.ShowItem, state: State) {
@@ -550,7 +549,10 @@ class PlaylistMviStoreFactory(
                             }
                         }
                         ?.also { publish(Label.Loaded) }
-                        ?: executeRefresh(state = state)
+                        ?: run {
+                            //log.d("call executeRefresh: update: no params")
+                            executeRefresh(state = state)
+                        }
                 } catch (e: Exception) {
                     log.e("Caught Error updating playlist", e)
                     publish(Label.Loaded)
@@ -708,6 +710,7 @@ class PlaylistMviStoreFactory(
                             && (appPlaylistInteractor?.hasCustomDeleteAction ?: false)
                         ) {
                             appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
+                            //log.d("call executeRefresh: delete: no params")
                             executeRefresh(state = state)
                         } else {
                             log.d("deleting item: ${intent.item.id}")
@@ -745,31 +748,11 @@ class PlaylistMviStoreFactory(
                         }
             }
         }
-
-        // region open
-//        private fun openCreatePlaylist() { // Intent.CreatePlaylist
-//            publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL)), null))
-//        }
-//
-//        private fun openPlaylist(intent: Intent.OpenPlaylist) {
-//            if (intent.item is PlaylistsItemMviContract.Model.Item) {
-//                recentLocalPlaylists.addRecentId(intent.item.id)
-//                prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
-//                publish(
-//                    Navigate(
-//                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)),
-//                        intent.view
-//                    )
-//                )
-//            } else Unit
-//        }
-
         // endregion
 
         // region utils
         private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = itemsIdMap.get(itemModel.id)
         private fun State.canPlayPlaylist() = playlist?.id?.source == LOCAL
-
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
             itemDomain.playlistId?.source == LOCAL
         // endregion utils
@@ -793,6 +776,7 @@ class PlaylistMviStoreFactory(
                     ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
                     ?: run {
                         if (dbInit.isInitialized()) {
+                            //log.d("call executeRefresh: setPlaylistData.default: id = ${prefsWrapper.lastViewedPlaylistId}")
                             executeRefresh(state = getState(), scrollToCurrent = true, id = prefsWrapper.lastViewedPlaylistId)
                         } else {
                             dbInit.addListener { success: Boolean ->
@@ -809,6 +793,7 @@ class PlaylistMviStoreFactory(
             val notLoaded = state.playlist == null
             log.d("refresh: notLoaded: $notLoaded")
             scope.launch {
+                //log.d("call executeRefresh: refresh: id = ${prefsWrapper.lastViewedPlaylistId}")
                 executeRefresh(state = state, scrollToCurrent = notLoaded, id = prefsWrapper.lastViewedPlaylistId)
             }
         }
@@ -822,6 +807,7 @@ class PlaylistMviStoreFactory(
                         ?: state.playlistIdentifier.takeIf { it != NO_PLAYLIST }
                         ?: prefsWrapper.lastViewedPlaylistId.takeIf { it != NO_PLAYLIST }
                         ?: prefsWrapper.currentPlayingPlaylistId
+
                 log.d("executeRefresh: loadId: $loadId")
                 val playlistOrDefault = playlistOrDefaultUsecase.getPlaylistOrDefault(loadId)
                 val playlistsTree = playlistOrchestrator
@@ -844,6 +830,7 @@ class PlaylistMviStoreFactory(
                     ?.also { publish(Label.ScrollToItem(it)) }
                     ?.also { dispatch(SetFocusIndex(null)) }
                 prefsWrapper.lastViewedPlaylistId = loadId
+                //log.d("loaded:lastViewedPlaylistId: ${prefsWrapper.lastViewedPlaylistId}")
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

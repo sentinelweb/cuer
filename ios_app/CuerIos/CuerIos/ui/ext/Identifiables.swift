@@ -13,6 +13,8 @@ extension BrowseContractViewCategoryModel: Identifiable{}
 
 extension PlaylistsItemMviContract.Model: Identifiable{}
 
+extension PlaylistItemMviContract.Model: Identifiable{}
+
 extension URL: Identifiable {
     
     public var id: String {

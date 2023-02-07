@@ -18,3 +18,11 @@ expect class DateTimeFormatter() {
     fun formatDate(d: LocalDate): String
     fun formatDateTimeNullable(dateTime: LocalDateTime?): String
 }
+
+fun String.strip00() = this.let {
+    var formatted = it
+    while (formatted.startsWith("00:")) {
+        formatted = formatted.substring(3)
+    }
+    formatted
+}

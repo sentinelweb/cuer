@@ -51,7 +51,9 @@ class IosPlatformLauncher: PlatformLaunchWrapper {
     }
     
     func launchVideoSystem(platformId: String) -> Bool {
-        debugPrint("launchVideoSystem: \(platformId)")
+        //debugPrint("launchVideoSystem: \(platformId)")
+        //mainCoordnator.openVideo(URL.init(string: YoutubeUrl.companion.videoUrl(platformId:  platformId))!)
+        mainCoordnator.open(URL.init(string: YoutubeUrl.companion.videoUrl(platformId:  platformId))!)
         return true
     }
     

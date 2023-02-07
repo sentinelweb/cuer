@@ -82,7 +82,6 @@ import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
-import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
@@ -168,7 +167,6 @@ object Modules {
         }
         factory { MediaMetadataMapper(get(), get()) }
         factory { PlaybackStateMapper() }
-        factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
         factory<IBackupManager> {
             BackupFileManager(
