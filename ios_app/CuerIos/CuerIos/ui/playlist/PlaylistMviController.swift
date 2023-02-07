@@ -70,7 +70,7 @@ class PlaylistMviControllerHolder : ObservableObject {
 class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, PlaylistMviContractViewEvent>, PlaylistMviContractView, ObservableObject {
     
     @Published var model: PlaylistMviContractViewModel
-    @Published var showSnackbar = false
+    @Published var showSnackbar :PlaylistMviContractMviStoreLabel.ShowUndo? = nil
     
     private let dependencies: PlaylistMviControllerHolder.Dependencies
     
@@ -82,6 +82,13 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
     
     override func render(model: PlaylistMviContractViewModel) {
         self.model = model
+    }
+    
+    fileprivate func showSnackbar(_ model: PlaylistMviContractMviStoreLabel.ShowUndo) {
+        showSnackbar = model
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.showSnackbar = nil
+        }
     }
     
     func processLabel(label_: PlaylistMviContractMviStoreLabel) {
@@ -97,7 +104,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
             dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
             
         case let model as PlaylistMviContractMviStoreLabel.ShowUndo:
-            showSnackbar = true
+            showSnackbar(model)
         // todo launch in mvi
 //        case let platformId as PlaylistMviContractMviStoreLabel.LaunchPlaylist:
 //            MainCoordinator.
@@ -105,6 +112,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
         default: debugPrint(label_)
         }
     }
+
     
     func launchVideo() {
         self.dependencies.mainCoordinator.openVideo(URL.init(string: "https://www.youtube.com/watch?v=lNoHWs9KKNs")!)

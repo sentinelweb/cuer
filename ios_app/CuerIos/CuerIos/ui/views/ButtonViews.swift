@@ -23,6 +23,7 @@ struct PillButton: View {
                     .frame(width: 30, height: 30, alignment: .center)
                 
                 Text(text)
+                    .font(buttonTypeface)
                     .padding(.leading, 8)
                     .padding(.trailing, 16)
                     .padding(.vertical, 12)

@@ -10,14 +10,18 @@ import SwiftUI
 struct SnackbarView: View {
     let message: String
     let bgColor: Color = Color.ui.colorDelete
+    var undoAction: (() -> Void)? = nil
+    
     var body: some View {
         HStack {
             Text(message)
-                .font(.body)
+                .font(snackbarTypeface)
                 .foregroundColor(.white)
                 .padding()
             Spacer()
-            PillButtonInvert(text: "Undo", icon: "arrow.uturn.backward") {}
+            if let action = undoAction {
+                PillButtonInvert(text: "Undo", icon: "arrow.uturn.backward", action: action)
+            }
         }
         .background(bgColor)
         .cornerRadius(10)

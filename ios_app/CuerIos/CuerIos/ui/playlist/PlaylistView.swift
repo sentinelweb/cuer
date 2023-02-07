@@ -49,8 +49,9 @@ struct PlaylistView: View {
                     .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
                     //.onAppear { holder.controller.onRefresh()}
                     .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
-                if view.showSnackbar {
-                    SnackbarView(message: "Item deleted")
+                
+                if let undo = view.showSnackbar {
+                    SnackbarView(message: undo.message, undoAction: {view.dispatch(event: PlaylistMviContractViewEvent.OnUndo(undoType: undo.undoType))})
                 }
             }
         }
