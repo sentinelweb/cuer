@@ -9,6 +9,31 @@ import SwiftUI
 import shared
 import Kingfisher
 
+struct PlaylistsHeaderView: View {
+    let model: PlaylistsMviContractViewModel
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            KFImage(URL(string: model.imageUrl))
+                .fade(duration: 0.3)
+                .forceTransition()
+                .resizable()
+                .aspectRatio(contentMode: .fill)
+                .frame(width: UIScreen.main.bounds.width, height: 150)
+                .clipped()
+                //.onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnRefresh())}
+            
+            Text(String(model.items.count))
+                .font(headerInfoTypeface)
+                .padding(.leading, Dimension.spacing.leadingHeader)
+            
+            Text(model.title)
+                .font(headerTypeface)
+                .padding(.leading, Dimension.spacing.leadingHeader)
+        }
+    }
+}
+
 struct PlaylistsHeaderItemView: View {
     let item: PlaylistsItemMviContract.ModelHeader
     var body: some View {

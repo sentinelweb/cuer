@@ -28,24 +28,9 @@ struct PlaylistsView: View {
     
     var body: some View {
         List {
-            KFImage(URL(string: view.model.imageUrl))
-                .fade(duration: 0.3)
-                .forceTransition()
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width, height: 150)
-                .clipped()
-                .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnRefresh())}
+            PlaylistsHeaderView(model: view.model)
                 .listRowInsets(EdgeInsets())
-            
-            Text(String(view.model.items.count))
-                .font(headerInfoTypeface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
-            
-            Text(view.model.title)
-                .font(headerTypeface)
-                .listRowInsets(EdgeInsets(top: 0, leading: 8, bottom: 0, trailing: 0))
-            
+
             ForEach(view.model.items) { item in
                 switch(item) {
                     

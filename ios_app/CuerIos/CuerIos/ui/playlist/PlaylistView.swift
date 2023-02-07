@@ -27,19 +27,13 @@ struct PlaylistView: View {
     
     var body: some View {
         List {
-            KFImage(URL(string: view.model.header.imageUrl))
-                .fade(duration: 0.3)
-                .forceTransition()
-                .resizable()
-                .aspectRatio(contentMode: .fill)
-                .frame(width: UIScreen.main.bounds.width, height: 150)
-                .clipped()
-                .onTapGesture {view.dispatch(event: PlaylistMviContractViewEvent.OnRefresh())}
+            PlaylistHeaderView(header: view.model.header)
                 .listRowInsets(EdgeInsets())
             
             ForEach(view.model.items ?? []) { item in
-                Text(item.title)
+                PlaylistItemRowView(item: item)
             }.listRowInsets(EdgeInsets())
+            
         }.listStyle(PlainListStyle())
             .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
             .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }

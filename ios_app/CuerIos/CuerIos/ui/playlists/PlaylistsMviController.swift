@@ -60,7 +60,7 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
         model = PlaylistsMviContractViewModel(
             title:"initial",
             imageUrl:"https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
-            currentPlaylistId: nil,//DomainOrchestratorContractIdentifier.init(id: 1 as AnyObject, source: .local),
+            currentPlaylistId: nil, //DomainOrchestratorContractIdentifier.init(id: 1 as AnyObject, source: .local),
             items:[]
         )
         self.dependencies = dependencies

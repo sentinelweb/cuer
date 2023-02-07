@@ -168,7 +168,6 @@ class PlaylistMviContract {
             val itemsText: String
         )
 
-
         sealed class Event {
             object OnRefresh : Event()
             object OnUpdate : Event()

@@ -49,7 +49,7 @@ class PlaylistMviModelMapper constructor(
         domain: PlaylistDomain,
         isPlaying: Boolean,
         isMapItems: Boolean = true,
-        id: Identifier<*>,
+        id: Identifier<GUID>,
         pinned: Boolean,
         playlists: Map<Identifier<GUID>, PlaylistTreeDomain>?,
         appPlaylist: AppPlaylistInteractor?,
