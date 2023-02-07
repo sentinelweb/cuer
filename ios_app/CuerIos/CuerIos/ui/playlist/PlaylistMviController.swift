@@ -142,17 +142,16 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
             view.dispatch(event: PlaylistMviContractViewEvent.OnMoveSwipe(item: item))
         }
 
-//        func editAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnEdit(item: item, view: nil))
-//        }
+        func editAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnShowItem(item: item))
+        }
 
-        func playAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+        func launchAction(item: PlaylistItemMviContract.ModelItem) -> Void {
             view.dispatch(event: PlaylistMviContractViewEvent.OnPlayItem(item: item, start: false, external:true))
         }
 
         func playInAppAction(item: PlaylistItemMviContract.ModelItem) -> Void {
             view.dispatch(event: PlaylistMviContractViewEvent.OnPlayItem(item: item, start: false, external:false))
         }
-        
     }
 }

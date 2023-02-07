@@ -30,7 +30,7 @@ struct PlaylistHeaderView: View {
                     if (header.canPlay) {
                         PillButton(text: "Play", icon: "play.fill") {action(PlaylistMviContractViewEvent.OnPlay())}
                     }
-                    PillButton(text: "Edit", icon: "pencil") {action(PlaylistMviContractViewEvent.OnEdit())}
+                    // PillButton(text: "Edit", icon: "pencil") {action(PlaylistMviContractViewEvent.OnEdit())}
                     if (header.canUpdate) {
                         PillButton(text: "Update", icon: "arrow.clockwise") {action(PlaylistMviContractViewEvent.OnUpdate())}
                     }
@@ -75,97 +75,89 @@ struct PlaylistItemRowView: View {
                 .aspectRatio(contentMode: .fill)
                 .frame(width: 100, height: 60)
                 .clipped()
+                .onTapGesture { actions?.playInAppAction(item: item) }
             
             Text(item.title)
                 .font(itemRowTitleTypeface)
+                .onTapGesture { actions?.playInAppAction(item: item) }
+                //.onTapGesture { actions?.editAction(item: item) }
             Spacer()
         }
-        .onTapGesture { actions?.playAction(item: item) }
+        //
         .frame(maxWidth: .infinity)
         .padding(.bottom, 2)
     }
 }
 
-//struct PlaylistItemRowViewActions: View {
-//
-//    let item: PlaylistItemMviContract.ModelItem
-//    let actions: PlaylistMviViewProxy.Actions
-//
-//    init(item: PlaylistItemMviContract.ModelItem, actions: PlaylistMviViewProxy.Actions) {
-//        self.item = item
-//        self.actions = actions
-//    }
-//
-//    var body: some View {
-//        PlaylistItemRowView(item: item)
-//            //.background(Color(.green))
-//            .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
-//            .swipeActions(edge: .leading) {
-//                Button {
-//                    actions.moveAction(item: item)
-//                } label: {
-//                    Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
-//                }
-//                .tint(Color.ui.colorMove)
-//            }
-//            .swipeActions(edge: .trailing) {
-//                Button {
-//                    actions.deleteAction(item: item)
-//                } label: {
-//                    Label("Delete", systemImage: "trash")
-//                }
-//                .tint(Color.ui.colorDelete)
-//            }
-//    }
-//}
-//
-//@ViewBuilder
-//private func contextMenuOverlay(
-//    item: PlaylistItemMviContract.ModelItem,
-//    actions: PlaylistMviViewProxy.Actions
-//) -> some View {
-//    Image(systemName: "ellipsis")
-//        .foregroundColor(Color.ui.light_color_on_surface)
-//        .padding(.horizontal, 4)
-//        .padding(.vertical, 4)
-//        .frame(width: 30, height: 30, alignment: .center)
-//        .contextMenu {
-//            Button() {actions.playInAppAction(item: item)} label: {
-//                Label("Play", systemImage: "play.fill")
-//            }
-//            Button {actions.shareAction(item: item)} label: {
-//                Label("Share", systemImage: "square.and.arrow.up")
-//            }
-//            Button() {actions.playAction(item: item)} label: {
-//                Label("Launch", systemImage: "arrow.up.right.video.fill")
-//            }
-//
-//            Divider()
-//
-//            Button {actions.starAction(item: item)} label: {
-//                if (item.starred) {
-//                    Label("Unstar", systemImage: "star")
-//                } else {
-//                    Label("Star", systemImage: "star.fill")
-//                }
-//            }
-//            Button() {actions.moveAction(item: item)} label: {
-//                Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
-//            }
-//            Button() {actions.editAction(item: item)} label: {
-//                Label("Edit", systemImage: "pencil")
-//            }
-//            Button() {actions.mergeAction(item: item)} label: {
-//                Label("Merge", systemImage: "arrow.triangle.merge")
-//            }
-//
-//            Divider()
-//
-//            Button(role: .destructive) {actions.deleteAction(item: item)} label: {
-//                Label("Delete", systemImage: "trash")
-//            }
-//        }
-//}
+struct PlaylistItemRowViewActions: View {
+
+    let item: PlaylistItemMviContract.ModelItem
+    let actions: PlaylistMviViewProxy.Actions
+
+    init(item: PlaylistItemMviContract.ModelItem, actions: PlaylistMviViewProxy.Actions) {
+        self.item = item
+        self.actions = actions
+    }
+
+    var body: some View {
+        PlaylistItemRowView(item: item, actions: actions)
+            .overlay(contextMenuOverlay(item: item, actions: actions), alignment: .trailing)
+            .swipeActions(edge: .leading) {
+                Button {
+                    actions.moveAction(item: item)
+                } label: {
+                    Label("Move", systemImage: "arrow.up.and.down.and.arrow.left.and.right")
+                }
+                .tint(Color.ui.colorMove)
+            }
+            .swipeActions(edge: .trailing) {
+                Button {
+                    actions.deleteAction(item: item)
+                } label: {
+                    Label("Delete", systemImage: "trash")
+                }
+                .tint(Color.ui.colorDelete)
+            }
+    }
+}
+
+@ViewBuilder
+private func contextMenuOverlay(
+    item: PlaylistItemMviContract.ModelItem,
+    actions: PlaylistMviViewProxy.Actions
+) -> some View {
+    Image(systemName: "ellipsis")
+        .foregroundColor(Color.ui.light_color_on_surface)
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
+        .frame(width: 30, height: 30, alignment: .center)
+        .contextMenu {
+            Button() {actions.playInAppAction(item: item)} label: {
+                Label("Play", systemImage: "play.fill")
+            }
+            Button {actions.shareAction(item: item)} label: {
+                Label("Share", systemImage: "square.and.arrow.up")
+            }
+            Button() {actions.launchAction(item: item)} label: {
+                Label("Launch", systemImage: "arrow.up.right.video.fill")
+            }
+
+            Divider()
+
+            Button {actions.starAction(item: item)} label: {
+                if (item.isStarred) {
+                    Label("Unstar", systemImage: "star")
+                } else {
+                    Label("Star", systemImage: "star.fill")
+                }
+            }
+            Divider()
+
+            Button(role: .destructive) {actions.deleteAction(item: item)} label: {
+                Label("Delete", systemImage: "trash")
+            }
+        }
+}
 
 struct PlaylistViews_Previews: PreviewProvider {
     static var previews: some View {
@@ -221,7 +213,7 @@ struct PlaylistViews_Previews: PreviewProvider {
                 canReorder: true,
                 showOverflow: true,
                 deleteResources: nil
-            ), actions:  nil)
+            ), actions: nil)
             Spacer()
         }
     }

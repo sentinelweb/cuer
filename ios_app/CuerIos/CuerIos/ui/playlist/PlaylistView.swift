@@ -32,11 +32,14 @@ struct PlaylistView: View {
             
             // PillButton(text: "test",icon: "play.fill") {holder.launchVideo()}
             
-            ForEach(view.model.items ?? []) { item in
-                PlaylistItemRowView(item: item, actions: view.actions())
-//                PlaylistsItemRowViewActions(item: item, actions: view.actions())
-//                    .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
-            }.listRowInsets(EdgeInsets())
+            if let items = view.model.items {
+                ForEach(items) { item in
+    //                PlaylistItemRowView(item: item, actions: view.actions())
+                    PlaylistItemRowViewActions(item: item, actions: view.actions())
+                        //.onTapGesture {view.dispatch(event: PlaylistMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
+                }.listRowInsets(EdgeInsets())
+            }
+            
             
         }.listStyle(PlainListStyle())
             .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
