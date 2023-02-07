@@ -14,6 +14,8 @@
 		551322A9292BD71000212FF5 /* montserrat_light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A7292BD71000212FF5 /* montserrat_light.ttf */; };
 		551322AA292BD71000212FF5 /* didactgothic_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 551322A8292BD71000212FF5 /* didactgothic_regular.ttf */; };
 		551322AC292BD9A000212FF5 /* TabViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 551322AB292BD9A000212FF5 /* TabViews.swift */; };
+		5536355729918BD200E2148B /* PlaylistMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5536355629918BD200E2148B /* PlaylistMviController.swift */; };
+		5536355829918BD200E2148B /* PlaylistMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5536355629918BD200E2148B /* PlaylistMviController.swift */; };
 		5549C7972989C0CC00D8C035 /* DateParseTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5549C7962989C0CC00D8C035 /* DateParseTest.swift */; };
 		5549C7982989C12500D8C035 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBD2922212B0004AEF4 /* MainCoordinator.swift */; };
 		5549C7992989C13700D8C035 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
@@ -134,6 +136,7 @@
 		551322A7292BD71000212FF5 /* montserrat_light.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = montserrat_light.ttf; path = ../../../../../../app/src/main/res/font/montserrat_light.ttf; sourceTree = "<group>"; };
 		551322A8292BD71000212FF5 /* didactgothic_regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = didactgothic_regular.ttf; path = ../../../../../../app/src/main/res/font/didactgothic_regular.ttf; sourceTree = "<group>"; };
 		551322AB292BD9A000212FF5 /* TabViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabViews.swift; sourceTree = "<group>"; };
+		5536355629918BD200E2148B /* PlaylistMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistMviController.swift; sourceTree = "<group>"; };
 		5549C7962989C0CC00D8C035 /* DateParseTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateParseTest.swift; sourceTree = "<group>"; };
 		55540C072928010800086F37 /* Identifiables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Identifiables.swift; sourceTree = "<group>"; };
 		55724FAF292E659A0014B547 /* IosShareWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IosShareWrapper.swift; sourceTree = "<group>"; };
@@ -371,6 +374,7 @@
 				BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */,
 				BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */,
 				BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */,
+				5536355629918BD200E2148B /* PlaylistMviController.swift */,
 			);
 			path = playlist;
 			sourceTree = "<group>";
@@ -651,6 +655,7 @@
 				BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */,
 				55B862342930ED7F00972AD6 /* TitleNavView.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
+				5536355729918BD200E2148B /* PlaylistMviController.swift in Sources */,
 				551322A0292BB44500212FF5 /* Typeface.swift in Sources */,
 				55724FB7292EBCEC0014B547 /* PlaylistsViews.swift in Sources */,
 				BDBEDF8F29221FD20004AEF4 /* CuerIosApp.swift in Sources */,
@@ -677,6 +682,7 @@
 				5549C79A2989C19D00D8C035 /* IosShareWrapper.swift in Sources */,
 				5549C7B02989C1FF00D8C035 /* PlaylistViewModel.swift in Sources */,
 				5549C7982989C12500D8C035 /* MainCoordinator.swift in Sources */,
+				5536355829918BD200E2148B /* PlaylistMviController.swift in Sources */,
 				5549C7A92989C1DF00D8C035 /* FirstAppearModifier.swift in Sources */,
 				5549C7B42989C20C00D8C035 /* PlaylistsViews.swift in Sources */,
 				5549C7A82989C1DA00D8C035 /* Const.swift in Sources */,

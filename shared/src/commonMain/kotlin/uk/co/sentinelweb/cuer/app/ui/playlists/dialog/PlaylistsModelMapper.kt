@@ -62,7 +62,7 @@ class PlaylistsModelMapper constructor(
         pinnedId: GUID?,
         depth: Int
     ) = Model.Item(
-        pl.id ?: ROOT_LEVEL_PLAYLIST_ID,// ?: throw IllegalStateException("Playlist must have an id"),
+        pl.id ?: ROOT_LEVEL_PLAYLIST_ID,
         pl.title,
         false,
         (pl.thumb ?: pl.image)?.url,

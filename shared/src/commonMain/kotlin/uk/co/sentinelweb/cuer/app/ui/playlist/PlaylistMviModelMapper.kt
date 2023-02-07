@@ -43,36 +43,7 @@ class PlaylistMviModelMapper constructor(
                 itemsIdMapReversed = state.itemsIdMapReversed,
                 blockItem = state.deletedPlaylistItem ?: state.movedPlaylistItem
             )
-        } ?: PlaylistMviContract.View.Model(
-            header = Header(
-                title = "",
-                imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
-                loopModeIndex = 0,
-                loopModeIcon = Icon.ic_playmode_straight,
-                loopModeText = strings.get(StringResource.menu_playlist_mode_single),
-                playIcon = Icon.ic_playlist_play,
-                playText = strings.get(StringResource.stop),
-                starredIcon = Icon.ic_starred_off,
-                starredText = "",
-                isStarred = false,
-                isDefault = false,
-                isSaved = false,
-                isPlayFromStart = false,
-                isPinned = false,
-                canPlay = false,
-                canEdit = false,
-                canDelete = false,
-                canEditItems = false,
-                canDeleteItems = false,
-                hasChildren = 0,
-                canUpdate = false,
-                itemsText = "-/-"
-            ),
-            items = null,
-            isCards = false,
-            identifier = null,
-            playingIndex = null
-        )
+        } ?: DEFAULT_PLAYLIST_VIEW_MODEL
 
     fun map(
         domain: PlaylistDomain,
@@ -181,4 +152,37 @@ class PlaylistMviModelMapper constructor(
             confirm = AlertDialogModel.Button(StringResource.dialog_button_save) {},
             cancel = AlertDialogModel.Button(StringResource.dialog_button_dont_save) {},
         )
+
+    companion object {
+        val DEFAULT_PLAYLIST_VIEW_MODEL = PlaylistMviContract.View.Model(
+            header = Header(
+                title = "",
+                imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
+                loopModeIndex = 0,
+                loopModeIcon = Icon.ic_playmode_straight,
+                loopModeText = "Single",
+                playIcon = Icon.ic_playlist_play,
+                playText = "Play",
+                starredIcon = Icon.ic_starred_off,
+                starredText = "",
+                isStarred = false,
+                isDefault = false,
+                isSaved = false,
+                isPlayFromStart = false,
+                isPinned = false,
+                canPlay = false,
+                canEdit = false,
+                canDelete = false,
+                canEditItems = false,
+                canDeleteItems = false,
+                hasChildren = 0,
+                canUpdate = false,
+                itemsText = "-/-"
+            ),
+            items = null,
+            isCards = false,
+            identifier = null,
+            playingIndex = null
+        )
+    }
 }

@@ -52,7 +52,7 @@ class MainCoordinator: ObservableObject {
     @Published var currentRoute: Route = Route.none
     @Published var currentTab: MainTab = MainTab.browse
     @Published var currentPlaylistId: DomainOrchestratorContractIdentifier<DomainGUID>? = nil
-    @Published var playlistViewModel: PlaylistViewModel! = nil
+    @Published var playlistController: PlaylistMviControllerHolder! = nil
     @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
@@ -65,7 +65,7 @@ class MainCoordinator: ObservableObject {
         hideDialogs()
         switch(route){
         case .main:
-            self.playlistViewModel = createPlaylistViewModel()
+            self.playlistController = createPlaylistController()
             self.playlistsController = createPlaylistsController()
             self.browseController = dependencies.createBrowseHolder()
             self.screen = Parent.main
@@ -108,11 +108,11 @@ class MainCoordinator: ObservableObject {
         return self.playlistsController!
     }
     
-    private func createPlaylistViewModel() -> PlaylistViewModel{
-        if (self.playlistViewModel == nil) {
-            self.playlistViewModel = dependencies.createPlaylistViewModel(plId: -1)
+    private func createPlaylistController() -> PlaylistMviControllerHolder{
+        if (self.playlistController == nil) {
+            self.playlistController = dependencies.createPlaylistHolder()
         }
-        return self.playlistViewModel!
+        return self.playlistController!
     }
     
     private func hideDialogs() {

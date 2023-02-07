@@ -39,10 +39,12 @@ class AppDependencies:
 & BrowseControllerDependency
 & PlaylistViewModelDependency
 & PlaylistsControllerDependency
+& PlaylistControllerDependency
 & SharedDependency
 & SharedFactoriesDependency
 & PlaylistsDialogDependency
 {
+    
     
 #if DEBUG
     private let isDebug = true
@@ -85,6 +87,14 @@ class AppDependencies:
     
     func createPlaylistsHolder() -> PlaylistsMviControllerHolder {
         PlaylistsMviControllerHolder(dependencies: PlaylistsControllerProvider(
+            mainCoordinator: mainCoordinator,
+            sharedFactories: sharedFactories
+        ))
+    }
+
+    
+    func createPlaylistHolder() -> PlaylistMviControllerHolder {
+        PlaylistMviControllerHolder(dependencies: PlaylistControllerProvider(
             mainCoordinator: mainCoordinator,
             sharedFactories: sharedFactories
         ))
