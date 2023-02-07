@@ -43,7 +43,7 @@ struct PlaylistView: View {
         }.listStyle(PlainListStyle())
             .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
             .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
-            .onAppear { holder.controller.onRefresh()}
+            //.onAppear { holder.controller.onRefresh()}
             .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
     }
 }

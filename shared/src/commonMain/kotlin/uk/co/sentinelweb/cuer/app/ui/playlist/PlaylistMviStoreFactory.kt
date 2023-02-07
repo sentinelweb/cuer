@@ -274,6 +274,7 @@ class PlaylistMviStoreFactory(
                             val newIdentifier =
                                 it.id ?: throw IllegalStateException("Save failure")
                             dispatch(SetPlaylist(playlist = it, playlistIdentifier = newIdentifier))
+                            //log.d("call executeRefresh: commit: no params")
                             executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
                         //.also { updateView(getState()) }
@@ -553,7 +554,10 @@ class PlaylistMviStoreFactory(
                             }
                         }
                         ?.also { publish(Label.Loaded) }
-                        ?: executeRefresh(state = state)
+                        ?: run {
+                            //log.d("call executeRefresh: update: no params")
+                            executeRefresh(state = state)
+                        }
                 } catch (e: Exception) {
                     log.e("Caught Error updating playlist", e)
                     publish(Label.Loaded)
@@ -711,6 +715,7 @@ class PlaylistMviStoreFactory(
                             && (appPlaylistInteractor?.hasCustomDeleteAction ?: false)
                         ) {
                             appPlaylistInteractor?.performCustomDeleteAction(deleteItem)
+                            //log.d("call executeRefresh: delete: no params")
                             executeRefresh(state = state)
                         } else {
                             log.d("deleting item: ${intent.item.id}")
@@ -796,6 +801,7 @@ class PlaylistMviStoreFactory(
                     ?.apply { recentLocalPlaylists.addRecentId(intent.plId) }
                     ?: run {
                         if (dbInit.isInitialized()) {
+                            //log.d("call executeRefresh: setPlaylistData.default: id = ${prefsWrapper.lastViewedPlaylistId}")
                             executeRefresh(state = getState(), scrollToCurrent = true, id = prefsWrapper.lastViewedPlaylistId)
                         } else {
                             dbInit.addListener { success: Boolean ->
@@ -812,6 +818,7 @@ class PlaylistMviStoreFactory(
             val notLoaded = state.playlist == null
             log.d("refresh: notLoaded: $notLoaded")
             scope.launch {
+                //log.d("call executeRefresh: refresh: id = ${prefsWrapper.lastViewedPlaylistId}")
                 executeRefresh(state = state, scrollToCurrent = notLoaded, id = prefsWrapper.lastViewedPlaylistId)
             }
         }
@@ -819,15 +826,13 @@ class PlaylistMviStoreFactory(
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State, id: Identifier<GUID>? = null) {
             publish(Label.Loading)
             try {
-                log.e(
-                    "executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id",
-                    Exception("Debug st")
-                )
+                log.d("executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id")
                 val loadId =
                     id
                         ?: state.playlistIdentifier.takeIf { it != NO_PLAYLIST }
                         ?: prefsWrapper.lastViewedPlaylistId.takeIf { it != NO_PLAYLIST }
                         ?: prefsWrapper.currentPlayingPlaylistId
+
                 log.d("executeRefresh: loadId: $loadId")
                 val playlistOrDefault = playlistOrDefaultUsecase.getPlaylistOrDefault(loadId)
                 val playlistsTree = playlistOrchestrator
@@ -850,6 +855,7 @@ class PlaylistMviStoreFactory(
                     ?.also { publish(Label.ScrollToItem(it)) }
                     ?.also { dispatch(SetFocusIndex(null)) }
                 prefsWrapper.lastViewedPlaylistId = loadId
+                //log.d("loaded:lastViewedPlaylistId: ${prefsWrapper.lastViewedPlaylistId}")
             } catch (e: Throwable) {
                 log.e("Error loading playlist", e)
                 publish(Error("Load failed: ${e::class.simpleName}"))

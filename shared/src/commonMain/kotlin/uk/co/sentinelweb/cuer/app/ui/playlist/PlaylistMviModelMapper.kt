@@ -56,7 +56,7 @@ class PlaylistMviModelMapper constructor(
         itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
         blockItem: PlaylistItemDomain?
     ): PlaylistMviContract.View.Model {
-        log.d("map")
+        // log.d("map")
         val items = if (isMapItems) {
             mapItems(domain, itemsIdMapReversed, playlists, appPlaylist, blockItem)
         } else null
