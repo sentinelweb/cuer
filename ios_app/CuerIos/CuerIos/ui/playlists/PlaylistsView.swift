@@ -27,32 +27,38 @@ struct PlaylistsView: View {
     }
     
     var body: some View {
-        List {
-            PlaylistsHeaderView(model: view.model)
-                .listRowInsets(EdgeInsets())
+        ZStack(alignment: .bottom) {
+            List {
+                PlaylistsHeaderView(model: view.model)
+                    .listRowInsets(EdgeInsets())
 
-            ForEach(view.model.items) { item in
-                switch(item) {
-                    
-                case let header as PlaylistsItemMviContract.ModelHeader:
-                    PlaylistsHeaderItemView(item: header)
-                    
-                case let itemRow as PlaylistsItemMviContract.ModelItem:
-                    PlaylistsItemRowViewActions(item: itemRow, actions: view.actions())
-                        .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
-                    
-                case let list as PlaylistsItemMviContract.ModelList:
-                    PlaylistsListItemView(list: list, actions: view.actions())
-                    
-                default:
-                    Text("Unknown Type!")
-                }
-            }.listRowInsets(EdgeInsets())
-        }.listStyle(PlainListStyle())
-            .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
-            .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
-            .onAppear { holder.controller.onRefresh()}
-            .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
+                ForEach(view.model.items) { item in
+                    switch(item) {
+                        
+                    case let header as PlaylistsItemMviContract.ModelHeader:
+                        PlaylistsHeaderItemView(item: header)
+                        
+                    case let itemRow as PlaylistsItemMviContract.ModelItem:
+                        PlaylistsItemRowViewActions(item: itemRow, actions: view.actions())
+                            .onTapGesture {view.dispatch(event: PlaylistsMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
+                        
+                    case let list as PlaylistsItemMviContract.ModelList:
+                        PlaylistsListItemView(list: list, actions: view.actions())
+                        
+                    default:
+                        Text("Unknown Type!")
+                    }
+                }.listRowInsets(EdgeInsets())
+            }.listStyle(PlainListStyle())
+                .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
+                .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
+                .onAppear { holder.controller.onRefresh()}
+                .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
+            
+            if let undo = view.showSnackbar {
+                SnackbarView(message: undo.message, undoAction: {view.dispatch(event: PlaylistsMviContractViewEvent.OnUndo(undoType: undo.undoType))})
+            }
+        }
     }
 }
 

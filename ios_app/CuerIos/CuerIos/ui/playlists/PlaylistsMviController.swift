@@ -51,8 +51,8 @@ class PlaylistsStrings: PlaylistsMviContract.Strings {
 }
 
 class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, PlaylistsMviContractViewEvent>, PlaylistsMviContractView, ObservableObject {
-    @Published
-    var model: PlaylistsMviContractViewModel
+    @Published var model: PlaylistsMviContractViewModel
+    @Published var showSnackbar: PlaylistsMviContractMviStoreLabel.ShowUndo? = nil
     
     private let dependencies: PlaylistsMviControllerHolder.Dependencies
     
@@ -83,6 +83,9 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
         case let selectorConfig as PlaylistsMviContractMviStoreLabel.ShowPlaylistsSelector:
             dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
         
+        case let model as PlaylistsMviContractMviStoreLabel.ShowUndo:
+            showSnackbar(model)
+            
         default: debugPrint(label__)
         }
     }
@@ -134,5 +137,12 @@ class PlaylistsMviViewProxy : UtilsUBaseView<PlaylistsMviContractViewModel, Play
             view.dispatch(event: PlaylistsMviContractViewEvent.OnPlay(item: item, external:false, view: nil))
         }
         
+    }
+    
+    fileprivate func showSnackbar(_ model: PlaylistsMviContractMviStoreLabel.ShowUndo) {
+        showSnackbar = model
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.showSnackbar = nil
+        }
     }
 }

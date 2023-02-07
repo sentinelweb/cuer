@@ -70,7 +70,7 @@ class PlaylistMviControllerHolder : ObservableObject {
 class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, PlaylistMviContractViewEvent>, PlaylistMviContractView, ObservableObject {
     
     @Published var model: PlaylistMviContractViewModel
-    @Published var showSnackbar :PlaylistMviContractMviStoreLabel.ShowUndo? = nil
+    @Published var showSnackbar: PlaylistMviContractMviStoreLabel.ShowUndo? = nil
     
     private let dependencies: PlaylistMviControllerHolder.Dependencies
     
@@ -82,13 +82,6 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
     
     override func render(model: PlaylistMviContractViewModel) {
         self.model = model
-    }
-    
-    fileprivate func showSnackbar(_ model: PlaylistMviContractMviStoreLabel.ShowUndo) {
-        showSnackbar = model
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.showSnackbar = nil
-        }
     }
     
     func processLabel(label_: PlaylistMviContractMviStoreLabel) {
@@ -105,9 +98,6 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
             
         case let model as PlaylistMviContractMviStoreLabel.ShowUndo:
             showSnackbar(model)
-        // todo launch in mvi
-//        case let platformId as PlaylistMviContractMviStoreLabel.LaunchPlaylist:
-//            MainCoordinator.
             
         default: debugPrint(label_)
         }
@@ -163,6 +153,13 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
 
         func playInAppAction(item: PlaylistItemMviContract.ModelItem) -> Void {
             view.dispatch(event: PlaylistMviContractViewEvent.OnPlayItem(item: item, start: false, external:false))
+        }
+    }
+    
+    fileprivate func showSnackbar(_ model: PlaylistMviContractMviStoreLabel.ShowUndo) {
+        showSnackbar = model
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.showSnackbar = nil
         }
     }
 }
