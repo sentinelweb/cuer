@@ -69,8 +69,8 @@ class PlaylistMviControllerHolder : ObservableObject {
 
 class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, PlaylistMviContractViewEvent>, PlaylistMviContractView, ObservableObject {
     
-    @Published
-    var model: PlaylistMviContractViewModel
+    @Published var model: PlaylistMviContractViewModel
+    @Published var showSnackbar = false
     
     private let dependencies: PlaylistMviControllerHolder.Dependencies
     
@@ -95,6 +95,9 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
 //
         case let selectorConfig as PlaylistMviContractMviStoreLabel.ShowPlaylistsSelector:
             dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
+            
+        case let model as PlaylistMviContractMviStoreLabel.ShowUndo:
+            showSnackbar = true
         // todo launch in mvi
 //        case let platformId as PlaylistMviContractMviStoreLabel.LaunchPlaylist:
 //            MainCoordinator.

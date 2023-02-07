@@ -10,6 +10,7 @@ import shared
 import Kingfisher
 
 struct PlaylistView: View {
+
     @StateObject
     private var view : PlaylistMviViewProxy
     
@@ -26,26 +27,34 @@ struct PlaylistView: View {
     }
     
     var body: some View {
-        List {
-            PlaylistHeaderView(header: view.model.header, action: { e in view.dispatch(event: e)})
-                .listRowInsets(EdgeInsets())
-            
-            // PillButton(text: "test",icon: "play.fill") {holder.launchVideo()}
-            
-            if let items = view.model.items {
-                ForEach(items) { item in
-    //                PlaylistItemRowView(item: item, actions: view.actions())
-                    PlaylistItemRowViewActions(item: item, actions: view.actions())
-                        //.onTapGesture {view.dispatch(event: PlaylistMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
-                }.listRowInsets(EdgeInsets())
+        GeometryReader { geometry in
+            ZStack(alignment: .bottom) {
+                List {
+                    PlaylistHeaderView(header: view.model.header, action: { e in view.dispatch(event: e)})
+                        .listRowInsets(EdgeInsets())
+                    
+                    // PillButton(text: "test",icon: "play.fill") {holder.launchVideo()}
+                    
+                    if let items = view.model.items {
+                        ForEach(items) { item in
+            //                PlaylistItemRowView(item: item, actions: view.actions())
+                            PlaylistItemRowViewActions(item: item, actions: view.actions())
+                                //.onTapGesture {view.dispatch(event: PlaylistMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))}
+                        }.listRowInsets(EdgeInsets())
+                    }
+                    
+                    
+                }.listStyle(PlainListStyle())
+                    .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
+                    .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
+                    //.onAppear { holder.controller.onRefresh()}
+                    .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
+                if view.showSnackbar {
+                    SnackbarView(message: "Item deleted")
+                }
             }
-            
-            
-        }.listStyle(PlainListStyle())
-            .onFirstAppear { holder.controller.onViewCreated(views: [view], viewLifecycle: holder.lifecycle) }
-            .onAppear { holder.lifecycle.onStart();holder.lifecycle.onResume() }
-            //.onAppear { holder.controller.onRefresh()}
-            .onDisappear { holder.lifecycle.onPause();holder.lifecycle.onStop(); }
+        }
+        .edgesIgnoringSafeArea(.bottom)
     }
 }
 
