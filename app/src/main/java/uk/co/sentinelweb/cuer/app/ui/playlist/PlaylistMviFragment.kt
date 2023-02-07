@@ -107,7 +107,7 @@ class PlaylistMviFragment : Fragment(),
     private val res: ResourceWrapper by inject()
     private val playlistHelpConfig: PlaylistHelpConfig by inject()
     private val prefsWrapper: MultiPlatformPreferencesWrapper by inject()
-    private val ytJavaApi: PlatformLaunchWrapper by inject()
+    //private val ytJavaApi: PlatformLaunchWrapper by inject()
 //    private val shareWrapper: ShareWrapper by inject()
     private val queueCastConnectionListener: QueueCastConnectionListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
@@ -285,8 +285,8 @@ class PlaylistMviFragment : Fragment(),
                 is Label.Help -> showHelp()
                 is Label.ResetItemState -> resetItemsState()
                 is Label.ShowPlaylistsCreator -> showPlaylistCreateDialog()
-                is Label.LaunchPlaylist -> ytJavaApi.launchPlaylist(label.platformId)
-                is Label.LaunchChannel -> ytJavaApi.launchChannel(label.platformId)
+//                is Label.LaunchPlaylist -> ytJavaApi.launchPlaylist(label.platformId)
+//                is Label.LaunchChannel -> ytJavaApi.launchChannel(label.platformId)
 //                is Label.Share -> shareWrapper.share(playlist = label.playlist)
 //                is Label.ShareItem -> shareWrapper.share(media = label.playlistItem.media)
                 is Label.CheckSaveShowDialog -> showAlertDialog(addSaveConfirmActionToDialogModel(label))
@@ -815,7 +815,8 @@ class PlaylistMviFragment : Fragment(),
                         addPlaylistUsecase = get(),
                         multiPrefs = get(),
                         idGenerator = get(),
-                        shareWrapper = get()
+                        shareWrapper = get(),
+                        platformLauncher = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

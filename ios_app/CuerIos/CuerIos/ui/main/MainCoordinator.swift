@@ -56,6 +56,7 @@ class MainCoordinator: ObservableObject {
     @Published var playlistsController: PlaylistsMviControllerHolder! = nil
     @Published var browseController: BrowseControllerHolder! = nil
     @Published var openedURL: URL?
+    @Published var videoURL: URL?
     @Published var shareData: String?
     @Published var playlistSelectDialog: PlaylistsDialogViewModelHolder? = nil
     
@@ -119,6 +120,10 @@ class MainCoordinator: ObservableObject {
     
     func open(_ url: URL) {
         self.openedURL = url
+    }
+    
+    func openVideo(_ url: URL) {
+        self.videoURL = url
     }
     
     func share(_ text: String) {

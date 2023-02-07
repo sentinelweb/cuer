@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationRe
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -170,7 +171,8 @@ object PresentationModule {
                 addPlaylistUsecase = get(),
                 multiPrefs = get(),
                 idGenerator = get(),
-                shareWrapper = get()
+                shareWrapper = get(),
+                platformLauncher = get()
             ).create()
         }
         factory {
@@ -213,7 +215,8 @@ object PresentationModule {
         }
         factory<PlayUseCase.Dialog> {
             object : PlayUseCase.Dialog {
-                val log: LogWrapper = get()
+                private val log: LogWrapper = get()
+                private val platformLauncher: PlatformLaunchWrapper = get()
 
                 init {
                     log.tag(this)
@@ -225,6 +228,9 @@ object PresentationModule {
 
                 override fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
                     log.d("showPlayDialog: title: $playlistTitle item: ${item?.summarise()}")
+                    item?.media?.platformId
+                        ?.also { platformLauncher.launchVideoSystem(it) }
+                        ?: log.d("showPlayDialog: cannot launch")
                 }
 
                 override fun showDialog(model: AlertDialogModel) {

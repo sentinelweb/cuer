@@ -44,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -75,7 +76,8 @@ class PlaylistMviStoreFactory(
     private val addPlaylistUsecase: AddPlaylistUsecase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
     private val idGenerator: IdGenerator,
-    private val shareWrapper: ShareWrapper
+    private val shareWrapper: ShareWrapper,
+    private val platformLauncher: PlatformLaunchWrapper,
 ) {
     init {
         log.tag(this)
@@ -311,7 +313,8 @@ class PlaylistMviStoreFactory(
         private fun launch(intent: Intent.Launch, state: State) {
             state.playlist
                 ?.platformId
-                ?.also { publish(Label.LaunchPlaylist(it)) }
+                //?.also { publish(Label.LaunchPlaylist(it)) }
+                ?.also { platformLauncher.launchPlaylist(it) }
         }
 
         private fun moveItem(intent: Intent.Move, state: State) {
@@ -504,7 +507,8 @@ class PlaylistMviStoreFactory(
         private fun showChannel(intent: Intent.ShowChannel, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.takeIf { it.media.channelData.platformId != null }
-                ?.also { publish(Label.LaunchChannel(it.media.channelData.platformId!!)) }
+                //?.also { publish(Label.LaunchChannel(it.media.channelData.platformId!!)) }
+                ?.also { platformLauncher.launchChannel(it.media.channelData.platformId!!) }
         }
 
         private fun showItem(intent: Intent.ShowItem, state: State) {

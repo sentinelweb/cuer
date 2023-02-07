@@ -62,6 +62,7 @@
 		55724FB9292EC0E40014B547 /* Const.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB8292EC0E40014B547 /* Const.swift */; };
 		55724FBB292EC43F0014B547 /* default-dbinit.json in Resources */ = {isa = PBXBuildFile; fileRef = 55724FBA292EC43F0014B547 /* default-dbinit.json */; };
 		55724FBE29301DD50014B547 /* Colors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FBD29301DD50014B547 /* Colors.swift */; };
+		55B09FEE2992E087009D88C9 /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 55B09FED2992E087009D88C9 /* AVKit.framework */; };
 		55B8622F29303A2300972AD6 /* PlaylistsDialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8622E29303A2300972AD6 /* PlaylistsDialogView.swift */; };
 		55B8623129303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B8623029303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift */; };
 		55B862342930ED7F00972AD6 /* TitleNavView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B862332930ED7F00972AD6 /* TitleNavView.swift */; };
@@ -151,6 +152,7 @@
 		55724FB8292EC0E40014B547 /* Const.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Const.swift; sourceTree = "<group>"; };
 		55724FBA292EC43F0014B547 /* default-dbinit.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = "default-dbinit.json"; path = "../../app/src/main/assets/default-dbinit.json"; sourceTree = "<group>"; };
 		55724FBD29301DD50014B547 /* Colors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Colors.swift; sourceTree = "<group>"; };
+		55B09FED2992E087009D88C9 /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		55B8622E29303A2300972AD6 /* PlaylistsDialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsDialogView.swift; sourceTree = "<group>"; };
 		55B8623029303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsDialogViewModelHolder.swift; sourceTree = "<group>"; };
 		55B862332930ED7F00972AD6 /* TitleNavView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TitleNavView.swift; sourceTree = "<group>"; };
@@ -199,6 +201,7 @@
 				BDBEE0042923D3F40004AEF4 /* KMPNativeCoroutinesCombine in Frameworks */,
 				BDBEE0022923D3F40004AEF4 /* KMPNativeCoroutinesAsync in Frameworks */,
 				BDBEDFED2923B3890004AEF4 /* libsqlite3.0.tbd in Frameworks */,
+				55B09FEE2992E087009D88C9 /* AVKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -432,6 +435,7 @@
 		BDBEDFDC2922DA2E0004AEF4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				55B09FED2992E087009D88C9 /* AVKit.framework */,
 				BDBEDFEF2923B4290004AEF4 /* CoreData.framework */,
 				BDBEDFE32922DC9A0004AEF4 /* shared.framework */,
 				BDBEDFDF2922DAC90004AEF4 /* shared.xcframework */,

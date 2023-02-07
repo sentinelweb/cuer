@@ -45,6 +45,47 @@ struct PlaylistsHeaderItemView: View {
     }
 }
 
+struct PlaylistsListItemView: View {
+    
+    let list: PlaylistsItemMviContract.ModelList
+    let actions: PlaylistsMviViewProxy.Actions
+    
+    let layout = [GridItem(.fixed(100))]
+    
+    var body: some View {
+        ScrollView(.horizontal){
+            LazyHGrid(rows: layout, spacing: 1) {
+                ForEach(list.items) { item in
+                    KFImage(URL(string: item.thumbNailUrl ?? DEFAULT_IMAGE))
+                        .fade(duration: 0.3)
+                        .forceTransition()
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                        .frame(width: 100, height: 100)
+                        .clipped()
+                        .overlay(titleOverlay(item: item), alignment: .bottom)
+                        // this doesnt work with List
+                        //.overlay(contextMenuOverlay(item: item, actions: actions), alignment: .topTrailing)
+                        .onTapGesture {actions.tapAction(item: item)}
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func titleOverlay(item: PlaylistsItemMviContract.ModelItem) -> some View {
+        HStack {
+            Text(item.title)
+            Spacer()
+        }
+        .foregroundColor(Color(.label))
+        .padding(.horizontal, 4)
+        .padding(.vertical, 4)
+        .background(Color(.systemBackground).opacity(0.75))
+        .font(itemTileTypeface)
+    }
+}
+
 struct PlaylistsItemRowView: View {
     
     let item: PlaylistsItemMviContract.ModelItem
@@ -99,47 +140,6 @@ struct PlaylistsItemRowViewActions: View {
                 }
                 .tint(Color.ui.colorDelete)
             }
-    }
-}
-
-struct PlaylistsListItemView: View {
-    
-    let list: PlaylistsItemMviContract.ModelList
-    let actions: PlaylistsMviViewProxy.Actions
-    
-    let layout = [GridItem(.fixed(100))]
-    
-    var body: some View {
-        ScrollView(.horizontal){
-            LazyHGrid(rows: layout, spacing: 1) {
-                ForEach(list.items) { item in
-                    KFImage(URL(string: item.thumbNailUrl ?? DEFAULT_IMAGE))
-                        .fade(duration: 0.3)
-                        .forceTransition()
-                        .resizable()
-                        .aspectRatio(contentMode: .fill)
-                        .frame(width: 100, height: 100)
-                        .clipped()
-                        .overlay(titleOverlay(item: item), alignment: .bottom)
-                        // this doesnt work with List
-                        //.overlay(contextMenuOverlay(item: item, actions: actions), alignment: .topTrailing)
-                        .onTapGesture {actions.tapAction(item: item)}
-                }
-            }
-        }
-    }
-    
-    @ViewBuilder
-    private func titleOverlay(item: PlaylistsItemMviContract.ModelItem) -> some View {
-        HStack {
-            Text(item.title)
-            Spacer()
-        }
-        .foregroundColor(Color(.label))
-        .padding(.horizontal, 4)
-        .padding(.vertical, 4)
-        .background(Color(.systemBackground).opacity(0.75))
-        .font(itemTileTypeface)
     }
 }
 

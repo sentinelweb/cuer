@@ -112,11 +112,11 @@ class PlaylistMviContract {
                 val afterCommit: ShareCommitter.AfterCommit?
             ) : Label()
 
-            data class LaunchPlaylist(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
-                Label()
-
-            data class LaunchChannel(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
-                Label()
+//            data class LaunchPlaylist(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
+//                Label()
+//
+//            data class LaunchChannel(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
+//                Label()
 
             data class ShowItem(
                 val modelId: Identifier<GUID>,

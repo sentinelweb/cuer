@@ -37,14 +37,14 @@ class PlaylistMviControllerHolder : ObservableObject {
     /*@Published*/ var playlistId: DomainOrchestratorContractIdentifier<DomainGUID>? = nil
     
     init(dependencies: Dependencies) {
-        debugPrint("---- init:PlaylistMviControllerHolder")
+        // debugPrint("---- init:PlaylistMviControllerHolder")
         
         self.dependencies = dependencies
         lifecycle = dependencies.sharedFactories.orchestratorFactory.utils.lifecycleRegistry()
         controller = dependencies.sharedFactories.presentationFactory.playlistController(lifecycle: lifecycle)
         lifecycle.onCreate()
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{playlistIdentifier in
-            debugPrint("---- playlistIdentifier:", playlistIdentifier)
+            // debugPrint("---- playlistIdentifier:", playlistIdentifier)
             if (self.playlistId != playlistIdentifier) {
                 self.playlistId = playlistIdentifier
                 if (playlistIdentifier != nil) {
@@ -85,7 +85,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
     }
     
     func processLabel(label_: PlaylistMviContractMviStoreLabel) {
-        let _ = debugPrint("playlist label received", label_)
+        //let _ = debugPrint("playlist label received", label_)
         switch(label_) {
 //        case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:
 //            debugPrint("Message: \(messageLabel.message))")
@@ -93,11 +93,18 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
 //        case let navModel as PlaylistsMviContractMviStoreLabel.Navigate:
 //            dependencies.mainCoordinator.navigateModel(model: navModel.model)
 //
-//        case let selectorConfig as PlaylistsMviContractMviStoreLabel.ShowPlaylistsSelector:
-//            dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
-        
+        case let selectorConfig as PlaylistMviContractMviStoreLabel.ShowPlaylistsSelector:
+            dependencies.mainCoordinator.showPlaylistSelector(config: selectorConfig.config)
+        // todo launch in mvi
+//        case let platformId as PlaylistMviContractMviStoreLabel.LaunchPlaylist:
+//            MainCoordinator.
+            
         default: debugPrint(label_)
         }
+    }
+    
+    func launchVideo() {
+        self.dependencies.mainCoordinator.openVideo(URL.init(string: "https://www.youtube.com/watch?v=lNoHWs9KKNs")!)
     }
     
     func actions() -> Actions {
