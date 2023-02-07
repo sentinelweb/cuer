@@ -68,6 +68,7 @@ Using
 ### Playlist
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlist-2023-02-07.png" width="400">
 
 ### Playlists
 
