@@ -124,8 +124,8 @@ class PlaylistMviContract {
             ) :
                 Label()
 
-            data class Share(val playlist: PlaylistDomain) : Label()
-            data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
+            // data class Share(val playlist: PlaylistDomain) : Label()
+            // data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
             data class PlayItem(val playlistItem: PlaylistItemDomain, val start: Boolean = false) : Label()
             data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()
         }

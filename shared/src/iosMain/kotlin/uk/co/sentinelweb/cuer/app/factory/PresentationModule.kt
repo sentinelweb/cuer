@@ -170,6 +170,7 @@ object PresentationModule {
                 addPlaylistUsecase = get(),
                 multiPrefs = get(),
                 idGenerator = get(),
+                shareWrapper = get()
             ).create()
         }
         factory {

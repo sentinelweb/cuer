@@ -44,6 +44,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -73,7 +74,8 @@ class PlaylistMviStoreFactory(
     private val timeProvider: TimeProvider,
     private val addPlaylistUsecase: AddPlaylistUsecase,
     private val multiPrefs: MultiPlatformPreferencesWrapper,
-    private val idGenerator: IdGenerator
+    private val idGenerator: IdGenerator,
+    private val shareWrapper: ShareWrapper
 ) {
     init {
         log.tag(this)
@@ -482,12 +484,14 @@ class PlaylistMviStoreFactory(
 
         private fun share(intent: Intent.Share, state: State) {
             state.playlist
-                ?.also { publish(Label.Share(it)) }
+                //?.also { publish(Label.Share(it)) }
+                ?.also { shareWrapper.share(it) }
         }
 
         private fun shareItem(intent: Intent.ShareItem, state: State) {
             state.playlistItemDomain(intent.item)
-                ?.also { publish(Label.ShareItem(it)) }
+                //?.also { publish(Label.ShareItem(it)) }
+                ?.also { shareWrapper.share(it.media) }
         }
 
         private fun showCards(intent: Intent.ShowCards, state: State) {

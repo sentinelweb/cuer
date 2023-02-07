@@ -12,6 +12,7 @@ import Kingfisher
 struct PlaylistHeaderView: View {
     
     let header: PlaylistMviContractViewHeader
+    let action: (PlaylistMviContractViewEvent) -> Void
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -26,16 +27,24 @@ struct PlaylistHeaderView: View {
                 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack{
-                    PillButton(text: "Play", icon: "play.fill") {debugPrint("play")}
-                    PillButton(text: "Edit", icon: "pencil") {debugPrint("edit")}
-                    PillButton(text: "Update", icon: "arrow.clockwise") {debugPrint("update")}
-                    PillButton(text: "Star", icon: "star") {debugPrint("star")}
-                    switch(header.loopModeIndex) {
-                        case 0: PillButton(text: "Straight", icon: "arrow.forward") {debugPrint("straight")}
-                        case 1: PillButton(text: "Shuffle", icon: "shuffle") {debugPrint("shuffle")}
-                        default: PillButton(text: "Loop", icon: "repeat") {debugPrint("loop")}
+                    if (header.canPlay) {
+                        PillButton(text: "Play", icon: "play.fill") {action(PlaylistMviContractViewEvent.OnPlay())}
                     }
-                    PillButton(text: "Share", icon: "square.and.arrow.up") {debugPrint("share")}
+                    PillButton(text: "Edit", icon: "pencil") {action(PlaylistMviContractViewEvent.OnEdit())}
+                    if (header.canUpdate) {
+                        PillButton(text: "Update", icon: "arrow.clockwise") {action(PlaylistMviContractViewEvent.OnUpdate())}
+                    }
+                    if (header.isStarred) {
+                        PillButton(text: "Unstar", icon: "star.fill") {action(PlaylistMviContractViewEvent.OnStar())}
+                    } else {
+                        PillButton(text: "Star", icon: "star") {action(PlaylistMviContractViewEvent.OnStar())}
+                    }
+                    switch(header.loopModeIndex) {
+                        case 0: PillButton(text: "Straight", icon: "arrow.forward") {action(PlaylistMviContractViewEvent.OnPlayModeChange())}
+                        case 1: PillButton(text: "Shuffle", icon: "shuffle") {action(PlaylistMviContractViewEvent.OnPlayModeChange())}
+                        default: PillButton(text: "Loop", icon: "repeat") {action(PlaylistMviContractViewEvent.OnPlayModeChange())}
+                    }
+                    PillButton(text: "Share", icon: "square.and.arrow.up") {action(PlaylistMviContractViewEvent.OnShare())}
                 }
             }.padding(.leading, Dimension.spacing.leadingHeader)
                 
@@ -100,7 +109,7 @@ struct PlaylistViews_Previews: PreviewProvider {
                 canDeleteItems: true,
                 hasChildren: 0,
                 itemsText: "3/30"
-            ))
+            ), action: {x in })
             
             PlaylistItemRowView(item:  PlaylistItemMviContract.ModelItem(
                 id: DomainOrchestratorContractIdentifier(id: DomainGUID(value:"test-guid"), source: .memory),

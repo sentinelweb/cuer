@@ -34,7 +34,7 @@ struct PillButton: View {
         .overlay(
             RoundedRectangle(cornerRadius: Dimension.buttons.pillRadius)
                 .stroke(Color.ui.pillOutline, lineWidth: Dimension.buttons.pillLineWidth)
-        )
+        ).padding(2)
     }
 }
 

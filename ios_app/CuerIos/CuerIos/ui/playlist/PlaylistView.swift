@@ -27,7 +27,7 @@ struct PlaylistView: View {
     
     var body: some View {
         List {
-            PlaylistHeaderView(header: view.model.header)
+            PlaylistHeaderView(header: view.model.header, action: { e in view.dispatch(event: e)})
                 .listRowInsets(EdgeInsets())
             
             ForEach(view.model.items ?? []) { item in

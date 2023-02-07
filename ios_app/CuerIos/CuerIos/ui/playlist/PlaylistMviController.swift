@@ -111,41 +111,41 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
             self.view = view
         }
         
-//        func tapAction(item: PlaylistItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistMviContractViewEvent.OnOpenPlaylist(item: item, view: nil))
+        func tapAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnShowItem(item: item))
+        }
+
+        func shareAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnShareItem(item: item))
+        }
+
+        func deleteAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnDeleteItem(item: item))
+        }
+
+        func starAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnStarItem(item: item))
+        }
+
+//        func mergeAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+//            view.dispatch(event: PlaylistMviContractViewEvent.OnMerge(item: item))
 //        }
-//
-//        func shareAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnShare(item: item))
-//        }
-//
-//        func deleteAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnDelete(item: item))
-//        }
-//
-//        func starAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnStar(item: item))
-//        }
-//
-//        func mergeAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnMerge(item: item))
-//        }
-//
-//        func moveAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnMoveSwipe(item: item))
-//        }
-//
+
+        func moveAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnMoveSwipe(item: item))
+        }
+
 //        func editAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
 //            view.dispatch(event: PlaylistsMviContractViewEvent.OnEdit(item: item, view: nil))
 //        }
-//
-//        func playAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnPlay(item: item, external:true, view: nil))
-//        }
-//
-//        func playInAppAction(item: PlaylistsItemMviContract.ModelItem) -> Void {
-//            view.dispatch(event: PlaylistsMviContractViewEvent.OnPlay(item: item, external:false, view: nil))
-//        }
+
+        func playAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnPlayItem(item: item, start: false, external:true))
+        }
+
+        func playInAppAction(item: PlaylistItemMviContract.ModelItem) -> Void {
+            view.dispatch(event: PlaylistMviContractViewEvent.OnPlayItem(item: item, start: false, external:false))
+        }
         
     }
 }
