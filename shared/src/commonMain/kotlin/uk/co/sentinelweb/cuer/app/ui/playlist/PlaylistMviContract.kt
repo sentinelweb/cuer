@@ -112,20 +112,12 @@ class PlaylistMviContract {
                 val afterCommit: ShareCommitter.AfterCommit?
             ) : Label()
 
-//            data class LaunchPlaylist(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
-//                Label()
-//
-//            data class LaunchChannel(val platformId: String, val platform: PlatformDomain = PlatformDomain.YOUTUBE) :
-//                Label()
-
             data class ShowItem(
                 val modelId: Identifier<GUID>,
                 val item: PlaylistItemDomain
             ) :
                 Label()
 
-            // data class Share(val playlist: PlaylistDomain) : Label()
-            // data class ShareItem(val playlistItem: PlaylistItemDomain) : Label()
             data class PlayItem(val playlistItem: PlaylistItemDomain, val start: Boolean = false) : Label()
             data class CheckSaveShowDialog(val dialogModel: AlertDialogModel) : Label()
         }

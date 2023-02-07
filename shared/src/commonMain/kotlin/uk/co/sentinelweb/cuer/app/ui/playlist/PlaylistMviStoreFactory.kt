@@ -269,11 +269,6 @@ class PlaylistMviStoreFactory(
                 scope.launch {
                     addPlaylistUsecase
                         .addPlaylist(state.playlist!!, state.addPlaylistParent)
-//                    .also {
-//                        state.playlistIdentifier =
-//                            it.id?.toIdentifier(LOCAL) ?: throw IllegalStateException("Save failure")
-//                    }
-//                    .also { states.playlist = it }
                         .also {
                             val newIdentifier =
                                 it.id ?: throw IllegalStateException("Save failure")
@@ -281,8 +276,6 @@ class PlaylistMviStoreFactory(
                             //log.d("call executeRefresh: commit: no params")
                             executeRefresh(state = getState()) // hmmm will this work after dispatch
                         }
-                        //.also { updateView(getState()) }
-                        //.also { onCommit?.onCommit(ObjectTypeDomain.PLAYLIST, listOf(it)) }
                         .also { publish(Label.AfterCommit(ObjectTypeDomain.PLAYLIST, listOf(it), intent?.afterCommit)) }
                 }
             } else {
@@ -313,7 +306,6 @@ class PlaylistMviStoreFactory(
         private fun launch(intent: Intent.Launch, state: State) {
             state.playlist
                 ?.platformId
-                //?.also { publish(Label.LaunchPlaylist(it)) }
                 ?.also { platformLauncher.launchPlaylist(it) }
         }
 
@@ -328,7 +320,6 @@ class PlaylistMviStoreFactory(
                     thisState.playlist?.apply {
                         if (config.editableItems.not()) {
                             publish(Message(strings.get(StringResource.playlist_error_please_add)))
-                            // updateView(state = thisState)
                         } else {
                             dispatch(SelectedPlaylistItem(itemDomain))
                             publish(
@@ -443,7 +434,6 @@ class PlaylistMviStoreFactory(
                     if (state.isHeadless) {
                         publish(Label.PlayItem(playlistItem = itemDomain, start = intent.start))
                     } else if (!canPlayPlaylistItem(itemDomain)) {
-                        //view.showError()
                         publish(Message(strings.get(StringResource.playlist_error_please_add)))
                     } else {
                         playUseCase.playLogic(itemDomain, state.playlist, intent.start)
@@ -487,13 +477,11 @@ class PlaylistMviStoreFactory(
 
         private fun share(intent: Intent.Share, state: State) {
             state.playlist
-                //?.also { publish(Label.Share(it)) }
                 ?.also { shareWrapper.share(it) }
         }
 
         private fun shareItem(intent: Intent.ShareItem, state: State) {
             state.playlistItemDomain(intent.item)
-                //?.also { publish(Label.ShareItem(it)) }
                 ?.also { shareWrapper.share(it.media) }
         }
 
@@ -507,7 +495,6 @@ class PlaylistMviStoreFactory(
         private fun showChannel(intent: Intent.ShowChannel, state: State) {
             state.playlistItemDomain(intent.item)
                 ?.takeIf { it.media.channelData.platformId != null }
-                //?.also { publish(Label.LaunchChannel(it.media.channelData.platformId!!)) }
                 ?.also { platformLauncher.launchChannel(it.media.channelData.platformId!!) }
         }
 
@@ -761,31 +748,11 @@ class PlaylistMviStoreFactory(
                         }
             }
         }
-
-        // region open
-//        private fun openCreatePlaylist() { // Intent.CreatePlaylist
-//            publish(Navigate(NavigationModel(PLAYLIST_CREATE, mapOf(SOURCE to LOCAL)), null))
-//        }
-//
-//        private fun openPlaylist(intent: Intent.OpenPlaylist) {
-//            if (intent.item is PlaylistsItemMviContract.Model.Item) {
-//                recentLocalPlaylists.addRecentId(intent.item.id)
-//                prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
-//                publish(
-//                    Navigate(
-//                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id)),
-//                        intent.view
-//                    )
-//                )
-//            } else Unit
-//        }
-
         // endregion
 
         // region utils
         private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = itemsIdMap.get(itemModel.id)
         private fun State.canPlayPlaylist() = playlist?.id?.source == LOCAL
-
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
             itemDomain.playlistId?.source == LOCAL
         // endregion utils
