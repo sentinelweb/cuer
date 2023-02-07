@@ -37,15 +37,17 @@ class PlaylistMviControllerHolder : ObservableObject {
     /*@Published*/ var playlistId: DomainOrchestratorContractIdentifier<DomainGUID>? = nil
     
     init(dependencies: Dependencies) {
+        debugPrint("---- init:PlaylistMviControllerHolder")
+        
         self.dependencies = dependencies
         lifecycle = dependencies.sharedFactories.orchestratorFactory.utils.lifecycleRegistry()
         controller = dependencies.sharedFactories.presentationFactory.playlistController(lifecycle: lifecycle)
         lifecycle.onCreate()
         playlistIdSubscription = dependencies.mainCoordinator.$currentPlaylistId.sink(receiveValue:{playlistIdentifier in
+            debugPrint("---- playlistIdentifier:", playlistIdentifier)
             if (self.playlistId != playlistIdentifier) {
                 self.playlistId = playlistIdentifier
                 if (playlistIdentifier != nil) {
-                    //self.loadPlaylist(plId: plId!)
                     self.controller.onSetPlayListData(intent: PlaylistMviContractMviStoreIntent.SetPlaylistData(
                         plId: playlistIdentifier?.id,
                         plItemId: nil,
@@ -83,7 +85,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
     }
     
     func processLabel(label_: PlaylistMviContractMviStoreLabel) {
-        let _ = debugPrint("playlists label received", label_)
+        let _ = debugPrint("playlist label received", label_)
         switch(label_) {
 //        case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:
 //            debugPrint("Message: \(messageLabel.message))")

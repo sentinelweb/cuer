@@ -816,7 +816,10 @@ class PlaylistMviStoreFactory(
         private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State, id: Identifier<GUID>? = null) {
             publish(Label.Loading)
             try {
-                log.d("executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id")
+                log.e(
+                    "executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id",
+                    Exception("Debug st")
+                )
                 val loadId =
                     id
                         ?: state.playlistIdentifier.takeIf { it != NO_PLAYLIST }

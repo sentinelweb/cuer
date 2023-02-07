@@ -40,7 +40,6 @@
 		5549C7AD2989C1F000D8C035 /* BrowseViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55132295292B9EAC00212FF5 /* BrowseViews.swift */; };
 		5549C7AE2989C1F400D8C035 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
 		5549C7AF2989C1FB00D8C035 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */; };
-		5549C7B02989C1FF00D8C035 /* PlaylistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */; };
 		5549C7B12989C20100D8C035 /* PlaylistContract.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */; };
 		5549C7B22989C20500D8C035 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */; };
 		5549C7B32989C20900D8C035 /* PlaylistsMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55724FB4292E6AE30014B547 /* PlaylistsMviController.swift */; };
@@ -82,7 +81,6 @@
 		BDBEDFC02922213B0004AEF4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFBF2922213B0004AEF4 /* MainView.swift */; };
 		BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */; };
 		BDBEDFC729228D5F0004AEF4 /* PlaylistView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */; };
-		BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */; };
 		BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCA29228D940004AEF4 /* BrowseView.swift */; };
 		BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */; };
 		BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDBEDFD4292295F70004AEF4 /* SafariView.swift */; };
@@ -169,7 +167,6 @@
 		BDBEDFBF2922213B0004AEF4 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		BDBEDFC229228D260004AEF4 /* PlaylistsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistsView.swift; sourceTree = "<group>"; };
 		BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistView.swift; sourceTree = "<group>"; };
-		BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistViewModel.swift; sourceTree = "<group>"; };
 		BDBEDFCA29228D940004AEF4 /* BrowseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseView.swift; sourceTree = "<group>"; };
 		BDBEDFCF292291EE0004AEF4 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		BDBEDFD4292295F70004AEF4 /* SafariView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariView.swift; sourceTree = "<group>"; };
@@ -372,7 +369,6 @@
 			isa = PBXGroup;
 			children = (
 				BDBEDFC629228D5F0004AEF4 /* PlaylistView.swift */,
-				BDBEDFC829228D700004AEF4 /* PlaylistViewModel.swift */,
 				BDBEE0142924312C0004AEF4 /* PlaylistContract.swift */,
 				5536355629918BD200E2148B /* PlaylistMviController.swift */,
 			);
@@ -640,7 +636,6 @@
 				BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */,
 				BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */,
-				BDBEDFC929228D700004AEF4 /* PlaylistViewModel.swift in Sources */,
 				55B8623129303C9300972AD6 /* PlaylistsDialogViewModelHolder.swift in Sources */,
 				BDBEDFCB29228D940004AEF4 /* BrowseView.swift in Sources */,
 				BDBEDFC329228D260004AEF4 /* PlaylistsView.swift in Sources */,
@@ -680,7 +675,6 @@
 				5549C7AB2989C1E800D8C035 /* SettingsView.swift in Sources */,
 				5549C7B72989C21800D8C035 /* MainView.swift in Sources */,
 				5549C79A2989C19D00D8C035 /* IosShareWrapper.swift in Sources */,
-				5549C7B02989C1FF00D8C035 /* PlaylistViewModel.swift in Sources */,
 				5549C7982989C12500D8C035 /* MainCoordinator.swift in Sources */,
 				5536355829918BD200E2148B /* PlaylistMviController.swift in Sources */,
 				5549C7A92989C1DF00D8C035 /* FirstAppearModifier.swift in Sources */,
