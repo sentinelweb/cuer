@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_navigation"
-    app:startDestination="@id/navigation_browse"
+    app:startDestination="@id/navigation_onboarding"
 >
     <!-- There's is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
@@ -251,6 +251,12 @@
         android:id="@+id/navigation_settings_player"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerFragment"
         android:label="@string/prefs_root_player_title"
+    />
+
+    <fragment
+        android:id="@+id/navigation_onboarding"
+        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+        android:label="@string/onboarding_title"
     />
 
 </navigation>

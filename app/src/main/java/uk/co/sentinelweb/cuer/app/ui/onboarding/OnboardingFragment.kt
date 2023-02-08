@@ -48,7 +48,6 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
         binding.composeView.setContent {
             OnboardingComposables.OnboardingUi(viewModel)
         }
-
     }
 
     private fun observeLabel(label: OnboardingContract.Label) = when (label) {
@@ -88,6 +87,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
                         .arguments
                         ?.getString(ONBOARD_CONFIG.toString())
                         ?.let { deserialiseOnboarding(it) }
+                        ?: AppInstallHelpConfig(get()).build()
                         ?: throw IllegalArgumentException("Could not load onboarding config")
                 }
                 scoped { OnboardingMapper() }

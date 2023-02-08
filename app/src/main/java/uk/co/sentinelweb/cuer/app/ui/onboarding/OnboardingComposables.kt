@@ -5,16 +5,23 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 
 object OnboardingComposables {
     var isTransitioning = false
+
     @Composable
     fun OnboardingUi(view: OnboardingViewModel) {
         OnboardingView(view.model.collectAsState().value, view)
@@ -40,10 +48,28 @@ object OnboardingComposables {
         CuerTheme {
             Surface {
                 val scope = rememberCoroutineScope()
+
                 Box(
                     modifier = Modifier
                         .height(512.dp)
+                        .background(color = colorResource(id = model.screen.backgroundColor ?: R.color.color_on_surface))
                 ) {
+                    model.screen.backgroundUrl?.also {
+                        Image(
+                            painter = rememberGlidePainter(
+                                request = it,
+                                fadeIn = true
+                            ),
+                            colorFilter = ColorFilter.tint(Color(0x88000000), blendMode = BlendMode.Multiply),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .wrapContentHeight(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                    }
                     val states = mutableListOf<MutableTransitionState<Boolean>>()
                     Column(
                         modifier = Modifier
@@ -191,7 +217,7 @@ object OnboardingComposables {
     private fun LineText(color: Color, it: String, modifier: Modifier = Modifier) {
         Text(
             modifier = modifier,
-            style = MaterialTheme.typography.body1,
+            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
             color = color,
             text = it
         )

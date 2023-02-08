@@ -13,6 +13,7 @@ import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
@@ -20,6 +21,8 @@ import androidx.navigation.navOptions
 import androidx.navigation.ui.setupWithNavController
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -70,6 +73,8 @@ class MainActivity :
     private lateinit var navController: NavController
 
     private var _binding: ActivityMainBinding? = null
+
+    private val onboarding = true
     private val binding: ActivityMainBinding
         get() = _binding ?: throw IllegalStateException("ActivityMainBinding not bound")
 
@@ -120,26 +125,29 @@ class MainActivity :
 
         restoreBottomNavTab(savedInstanceState != null)
         presenter.initialise()
+
     }
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
-        when (result) {
-            SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
-            SETUP -> snackBarWrapper.make(
-                msg = getString(R.string.backup_setup_message),
-                actionText = getString(R.string.backup_setup_action)
-            ) {
-                navController.navigate(
-                    R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
-                )
-            }.positionAbovePlayer().show()
+        if (!onboarding) {
+            when (result) {
+                SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
+                SETUP -> snackBarWrapper.make(
+                    msg = getString(R.string.backup_setup_message),
+                    actionText = getString(R.string.backup_setup_action)
+                ) {
+                    navController.navigate(
+                        R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
+                    )
+                }.positionAbovePlayer().show()
 
-            FAIL -> snackBarWrapper.makeError(
-                msg = getString(R.string.backup_fix_message),
-                actionText = getString(R.string.backup_fix_action)
-            ) {
-                navController.navigate(R.id.navigation_settings_backup)
-            }.show()
+                FAIL -> snackBarWrapper.makeError(
+                    msg = getString(R.string.backup_fix_message),
+                    actionText = getString(R.string.backup_fix_action)
+                ) {
+                    navController.navigate(R.id.navigation_settings_backup)
+                }.show()
+            }
         }
     }
 
@@ -215,6 +223,12 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
+        if (onboarding) {
+            lifecycleScope.launch {
+                delay(50)
+                hidePlayer()
+            }
+        }
     }
 
     override fun onStop() {
@@ -305,7 +319,7 @@ class MainActivity :
         if (!isConfigChange) {
             prefs.lastBottomTab
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
-                .takeIf { it > 0 }
+                .takeIf { it > 0 && false }
                 ?.also {
                     when (MainCommonContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {

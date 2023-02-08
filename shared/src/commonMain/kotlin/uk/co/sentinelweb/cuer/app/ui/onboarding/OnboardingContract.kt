@@ -12,7 +12,10 @@ class OnboardingContract {
         @Serializable
         data class Screen(
             val title: ActionResources,
+            val subtitle: String? = null,
             val lines: List<ActionResources>,
+            val backgroundUrl: String? = null,
+            val backgroundColor: Int? = null
         )
     }
 
