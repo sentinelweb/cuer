@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Label.Finished
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Label.Skip
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -45,7 +46,7 @@ class OnboardingViewModel(
 
     override fun onSkip() {
         coroutines.mainScope.launch {
-            _label.emit(Finished)
+            _label.emit(Skip)
         }
     }
 }

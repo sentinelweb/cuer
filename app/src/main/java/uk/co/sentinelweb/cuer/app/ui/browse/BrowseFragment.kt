@@ -141,7 +141,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                         }
 
                         ActionHelp -> {
-                            OnboardingFragment.show(requireActivity(), browseHelpConfig)
+                            OnboardingFragment.show(this@BrowseFragment, browseHelpConfig)
                         }
 
                         is AddPlaylist -> {

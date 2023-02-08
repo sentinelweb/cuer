@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config.Screen
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
-class OnboardingTestConfigBuilder(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {
+class OnboardingTestConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {
 
     override fun build() = OnboardingContract.Config(
         screens = listOf(

@@ -206,7 +206,7 @@ class PlaylistsMviFragment :
             true
         }
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(requireActivity(), playlistsHelpConfig)
+            OnboardingFragment.show(this, playlistsHelpConfig)
             true
         }
         binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)

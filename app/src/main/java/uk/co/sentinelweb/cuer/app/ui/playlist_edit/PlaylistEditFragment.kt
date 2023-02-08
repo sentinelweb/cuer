@@ -226,7 +226,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(requireActivity(), playlistEditHelpConfig)
+            OnboardingFragment.show(this, playlistEditHelpConfig)
             true
         }
         binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)

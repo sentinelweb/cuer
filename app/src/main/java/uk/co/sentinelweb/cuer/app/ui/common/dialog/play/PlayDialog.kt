@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
@@ -57,6 +58,7 @@ class PlayDialog constructor(
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
             item?.apply { playUseCase.setQueueItem(this) }
                 ?: throw IllegalStateException("No item to play")
+            (f.requireActivity() as? MainActivity)?.showPlayer()
             dialog.dismiss()
         }
         binding.dpPortrait.setOnClickListener {
@@ -87,6 +89,7 @@ class PlayDialog constructor(
                 playUseCase.attachControls(
                     (f.requireActivity() as? MainContract.View)?.playerControls
                 )
+                (f.requireActivity() as? MainActivity)?.showPlayer()
                 dialog.dismiss()
             } else {
                 floatingService.requestPermission(f.requireActivity())

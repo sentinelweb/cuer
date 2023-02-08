@@ -66,6 +66,13 @@ class MultiPlatformPreferencesWrapperImpl : MultiPlatformPreferencesWrapper {
         prefs.putBoolean(field.fname, value)
     }
 
+    override fun getBoolean(field: MultiPlatformPreferences, ext: String, def: Boolean): Boolean =
+        prefs.getBoolean(field.fname + ext, def)
+
+    override fun putBoolean(field: MultiPlatformPreferences, ext: String, value: Boolean) {
+        prefs.putBoolean(field.fname + ext, value)
+    }
+
     override fun remove(field: MultiPlatformPreferences) {
         prefs.remove(field.fname)
         prefs.remove(field.fname + PAIR_FIRST)

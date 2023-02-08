@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.FragmentActivity
+import androidx.fragment.app.Fragment
 import kotlinx.coroutines.cancel
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -19,8 +19,12 @@ import uk.co.sentinelweb.cuer.app.ext.deserialiseOnboarding
 import uk.co.sentinelweb.cuer.app.ext.serialise
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.ONBOARD_CONFIG
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.ONBOARD_KEY
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.ONBOARDED_PREFIX
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -30,9 +34,16 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     private val viewModel: OnboardingViewModel by inject()
     private val log: LogWrapper by inject()
     private val contextProvider: CoroutineContextProvider by inject()
+    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
+
+    private val shownPrefKey: String
+        get() = arguments?.getString(ONBOARD_KEY.toString())
+        // this is a hack to get the key for the main activity (launched by default from nav graph so no args)
+            ?: MainActivity::class.simpleName
+            ?: throw IllegalArgumentException("No key")
 
     init {
         log.tag(this)
@@ -51,7 +62,16 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     private fun observeLabel(label: OnboardingContract.Label) = when (label) {
-        OnboardingContract.Label.Finished -> dismiss()
+        OnboardingContract.Label.Finished -> closeDismiss()
+        OnboardingContract.Label.Skip -> closeDismiss()
+    }
+
+    private fun closeDismiss() {
+        multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, shownPrefKey, true)
+        dismiss()
+        if (shownPrefKey == MainActivity::class.simpleName) {
+            (requireActivity() as? MainActivity)?.finishedOnboarding()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -72,10 +92,15 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     companion object {
         const val TAG = "OnboardingFragment"
 
-        fun show(a: FragmentActivity, config: OnboardingContract.ConfigBuilder) {
+        fun show(f: Fragment, config: OnboardingContract.ConfigBuilder) {
             OnboardingFragment()
-                .apply { arguments = bundleOf(ONBOARD_CONFIG.toString() to config.build().serialise()) }
-                .show(a.supportFragmentManager, TAG)
+                .apply {
+                    arguments = bundleOf(
+                        ONBOARD_CONFIG.toString() to config.build().serialise(),
+                        ONBOARD_KEY.toString() to f::class.simpleName!!
+                    )
+                }
+                .show(f.requireActivity().supportFragmentManager, TAG)
         }
 
         val fragmentModule = module {
@@ -83,12 +108,11 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { OnboardingViewModel(get(), get(), get(), get(), get()) }
                 scoped { OnboardingContract.State(config = get()) }
                 scoped {
-                    get<OnboardingFragment>()
-                        .arguments
+                    val arguments = get<OnboardingFragment>().arguments
+                    arguments
                         ?.getString(ONBOARD_CONFIG.toString())
                         ?.let { deserialiseOnboarding(it) }
                         ?: AppInstallHelpConfig(get()).build()
-                        ?: throw IllegalArgumentException("Could not load onboarding config")
                 }
                 scoped { OnboardingMapper() }
                 scoped { CoroutineContextProvider() }//todo wtf why

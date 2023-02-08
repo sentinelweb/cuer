@@ -40,5 +40,5 @@ class OnboardingContract {
         fun build(): Config
     }
 
-    enum class Label { Finished }
+    enum class Label { Skip, Finished }
 }

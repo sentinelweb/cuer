@@ -260,7 +260,7 @@ class PlaylistMviFragment : Fragment(),
     }
 
     fun showHelp() {
-        OnboardingFragment.show(requireActivity(), playlistHelpConfig)
+        OnboardingFragment.show(this, playlistHelpConfig)
     }
 
     inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),

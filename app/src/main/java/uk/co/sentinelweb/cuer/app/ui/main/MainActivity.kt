@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.ONBOARDED_PREFIX
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -69,12 +70,15 @@ class MainActivity :
     private val res: ResourceWrapper by inject()
     private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var navController: NavController
 
     private var _binding: ActivityMainBinding? = null
 
-    private val onboarding = true
+    private val idOnboarding: Boolean
+        get() = multiPlatformPreferences.getBoolean(ONBOARDED_PREFIX, this::class.simpleName!!, false).not()
+
     private val binding: ActivityMainBinding
         get() = _binding ?: throw IllegalStateException("ActivityMainBinding not bound")
 
@@ -123,13 +127,14 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        restoreBottomNavTab(savedInstanceState != null)
+        if (!idOnboarding) {
+            restoreBottomNavTab(savedInstanceState != null)
+        }
         presenter.initialise()
-
     }
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
-        if (!onboarding) {
+        if (!idOnboarding) {
             when (result) {
                 SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
                 SETUP -> snackBarWrapper.make(
@@ -223,9 +228,9 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
-        if (onboarding) {
+        if (idOnboarding) {
             lifecycleScope.launch {
-                delay(50)
+                delay(500)
                 hidePlayer()
             }
         }
@@ -319,7 +324,7 @@ class MainActivity :
         if (!isConfigChange) {
             prefs.lastBottomTab
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
-                .takeIf { it > 0 && false }
+                .takeIf { it > 0 && !idOnboarding }
                 ?.also {
                     when (MainCommonContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
@@ -353,6 +358,10 @@ class MainActivity :
             },
             navigatorExtras = null
         )
+    }
+
+    fun finishedOnboarding() {
+        navigateToBottomTab(R.id.navigation_browse)
     }
 
     companion object {
