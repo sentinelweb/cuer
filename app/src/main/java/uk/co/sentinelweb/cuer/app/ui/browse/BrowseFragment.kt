@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
@@ -138,6 +139,10 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                         ActionSearch -> {
                             SearchBottomSheetFragment()
                                 .show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
+                        }
+
+                        ActionPasteAdd -> {
+                            (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
                         }
 
                         ActionHelp -> {

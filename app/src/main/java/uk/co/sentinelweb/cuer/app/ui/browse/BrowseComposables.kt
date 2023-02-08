@@ -64,11 +64,9 @@ object BrowseComposables {
                                     { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
                                 )
                             },
-                            Action(
-                                CuerMenuItem.Search,
-                                { view.dispatch(Event.OnActionSearchClicked) }),
-                            Action(CuerMenuItem.Settings,
-                                { view.dispatch(Event.OnActionSettingsClicked) }),
+                            Action(CuerMenuItem.Search, { view.dispatch(Event.OnActionSearchClicked) }),
+                            Action(CuerMenuItem.PasteAdd, { view.dispatch(Event.OnActionPasteAdd) }),
+                            Action(CuerMenuItem.Settings, { view.dispatch(Event.OnActionSettingsClicked) }),
                         )
                     )
                     Column(

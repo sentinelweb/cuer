@@ -177,13 +177,13 @@ class MainActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_paste_add -> checkIntentAndGotoShare()
+            R.id.menu_paste_add -> checkIntentAndPasteAdd()
             R.id.menu_settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun checkIntentAndGotoShare() {
+    fun checkIntentAndPasteAdd() {
         // check clipboard data
         clipboard.getPrimaryClip()
             ?.getItemAt(0)
