@@ -25,7 +25,7 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "Browse the collection of philosophers",
-                        icon = R.drawable.ic_nav_browse_black,
+                        icon = R.drawable.ic_nav_browse,
                         color = R.color.white
                     ),
                     ActionResources(

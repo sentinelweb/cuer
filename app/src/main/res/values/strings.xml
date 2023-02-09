@@ -360,7 +360,7 @@
     <string name="help_pe_title">Playlist Edit</string>
     <string name="help_pe_save">Save / Create</string>
     <string name="help_pe_star">Star</string>
-    <string name="help_pe_pin">Pin</string>
+    <string name="help_pe_pin">Pin - raise playlist for selection</string>
     <string name="help_pe_title_text">Change the title text</string>
     <string name="help_pe_parent">Select the parent playlist</string>
     <string name="help_pe_title_options">Playlist options</string>

@@ -4,7 +4,7 @@
 
     <item
         android:id="@id/navigation_browse"
-        android:icon="@drawable/ic_nav_browse_black"
+        android:icon="@drawable/ic_nav_browse"
         android:title="@string/bottomnav_title_browse"
         />
 

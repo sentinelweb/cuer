@@ -6,7 +6,7 @@
 
     <item
         android:id="@+id/menu_settings"
-        android:icon="@drawable/ic_menu_settings_black"
+        android:icon="@drawable/ic_menu_settings"
         android:title="@string/menu_settings"
         app:iconTint="?colorOnSurface"
         app:showAsAction="always"

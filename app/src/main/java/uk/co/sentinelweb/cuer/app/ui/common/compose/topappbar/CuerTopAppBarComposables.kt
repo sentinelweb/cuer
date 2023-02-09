@@ -73,7 +73,7 @@ sealed class CuerMenuItem constructor(
     @StringRes val label: Int,
     @DrawableRes val icon: Int,
 ) {
-    object Settings : CuerMenuItem(R.string.menu_settings, R.drawable.ic_menu_settings_black)
+    object Settings : CuerMenuItem(R.string.menu_settings, R.drawable.ic_menu_settings)
     object SortAlpha : CuerMenuItem(R.string.menu_sort_alpha, R.drawable.ic_sort_by_alpha)
     object SortCategory : CuerMenuItem(R.string.menu_sort_category, R.drawable.ic_category)
     object Search : CuerMenuItem(R.string.menu_search, R.drawable.ic_search)

@@ -13,63 +13,52 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_plie_title_1),
-                    icon = R.drawable.ic_playlist_item,
-                    color = R.color.color_on_surface
+                    icon = R.drawable.ic_playlist_item
                 ),
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_plie_play),
-                        icon = R.drawable.ic_play_black,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_play_black
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_select_playlist),
-                        icon = R.drawable.ic_playlist,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_playlist
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_star),
-                        icon = R.drawable.ic_starred,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_starred
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_support),
-                        icon = R.drawable.ic_support,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_support
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_edit),
-                        icon = R.drawable.ic_edit_24,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_edit_24
                     )
                 )
             ),
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_plie_title_2),
-                    icon = R.drawable.ic_playlist_item,
-                    color = R.color.color_on_surface
+                    icon = R.drawable.ic_playlist_item
                 ),
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_plie_share),
-                        icon = R.drawable.ic_share_black,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_share_black
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_like),
-                        icon = R.drawable.ic_like_24,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_like_24
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_comment),
-                        icon = R.drawable.ic_comment_24,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_comment_24
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_launch),
-                        icon = R.drawable.ic_launch_black,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_launch_black
                     ),
                 )
             ),
