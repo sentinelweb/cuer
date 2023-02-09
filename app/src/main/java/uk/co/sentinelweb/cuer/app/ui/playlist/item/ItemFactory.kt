@@ -3,13 +3,13 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 class ItemFactory constructor(
     private val res: ResourceWrapper,
-    private val iconMapper: IconMapper,
+    private val iconMapper: AndroidIconMapper,
     private val ytContext: ChromecastYouTubePlayerContextHolder
 ) {
 
@@ -34,7 +34,8 @@ class ItemFactory constructor(
             interactions,
             ItemContract.State(),
             ItemTextMapper(res, iconMapper),
-            ytContext
+            ytContext,
+            res
         )
         view.setPresenter(itemPresenter)
         return itemPresenter

@@ -76,7 +76,7 @@ interface AytLandContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get()) }
+                scoped { AlertDialogCreator(get(), get()) }
                 scoped { LocalPlayerCastListener(get(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }

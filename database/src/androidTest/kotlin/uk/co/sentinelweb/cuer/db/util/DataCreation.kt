@@ -1,15 +1,36 @@
 package uk.co.sentinelweb.cuer.db.util
 
 import com.appmattus.kotlinfixture.Fixture
+import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
+import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
+import com.appmattus.kotlinfixture.decorator.optional.NeverOptionalStrategy
+import com.appmattus.kotlinfixture.decorator.optional.optionalStrategy
+import com.appmattus.kotlinfixture.kotlinFixture
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.database.entity.Channel
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.database.entity.Playlist_item
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.*
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+
+val kotlinFixtureDefaultConfig = kotlinFixture {
+    nullabilityStrategy(NeverNullStrategy)
+    repeatCount { 5 }
+    factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
+    optionalStrategy(NeverOptionalStrategy) {
+        propertyOverride(PlaylistDomain::id, NeverOptionalStrategy)
+        propertyOverride(PlaylistItemDomain::id, NeverOptionalStrategy)
+        propertyOverride(MediaDomain::id, NeverOptionalStrategy)
+        propertyOverride(ImageDomain::id, NeverOptionalStrategy)
+        propertyOverride(ChannelDomain::id, NeverOptionalStrategy)
+    }
+}
 
 class DataCreation(private val database: Database, private val fixture: Fixture, val timeProvider: TimeProvider) {
+    private val guidCreator = GuidCreator()
     fun createPlaylistAndItem(): Pair<Playlist, Playlist_item> {
         val playlist = createPlaylist()
         val item = createPlaylistItem(playlist.id)
@@ -17,29 +38,49 @@ class DataCreation(private val database: Database, private val fixture: Fixture,
     }
 
     fun createPlaylist(): Playlist {
+        val guid = guidCreator.create()
         val playlistInitial =
-            fixture<Playlist>().copy(id = 0, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
+            fixture<Playlist>().copy(id = guid.value, parent_id = null, channel_id = null, image_id = null, thumb_id = null)
         database.playlistEntityQueries.create(playlistInitial)
-        val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
-        return playlistInitial.copy(id = playlistId)
+        return playlistInitial
+//        val playlistId = database.playlistEntityQueries.getInsertId().executeAsOne()
+//        return playlistInitial.copy(id = playlistId)
     }
 
-    fun createPlaylistItem(playlistId: Long): Playlist_item {
-        val channel = fixture<Channel>().copy(id = 0, image_id = null, thumb_id = null)
+    fun createPlaylistItem(playlistId: String): Playlist_item {
+        val guidChannel = guidCreator.create()
+        val channel = fixture<Channel>().copy(id = guidChannel.value, image_id = null, thumb_id = null)
         database.channelEntityQueries.create(channel)
-        val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
-        val media = fixture<Media>().copy(id = 0, channel_id = channelId, image_id = null, thumb_id = null)
+        //val channelId = database.channelEntityQueries.getInsertId().executeAsOne()
+
+        val guidMedia = guidCreator.create()
+        val media = fixture<Media>().copy(id = guidMedia.value, channel_id = guidChannel.value, image_id = null, thumb_id = null)
         database.mediaEntityQueries.create(media)
-        val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
-        val initial = fixture<Playlist_item>().copy(
-            id = 0,
-            media_id = mediaId,
+        // val mediaId = database.mediaEntityQueries.getInsertId().executeAsOne()
+
+        val guidItem = guidCreator.create()
+        val item = fixture<Playlist_item>().copy(
+            id = guidItem.value,
+            media_id = guidMedia.value,
             playlist_id = playlistId,
             date_added = timeProvider.instant()
         )
-        database.playlistItemEntityQueries.create(initial)
-        val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
-        return initial.copy(id = insertId)
+        database.playlistItemEntityQueries.create(item)
+        //val insertId = database.playlistItemEntityQueries.getInsertId().executeAsOne()
+        //return initial.copy(id = insertId)
+        return item
+    }
+
+    fun generatePlaylist(fixture: Fixture): PlaylistDomain {
+        var fixPlaylist = fixture<PlaylistDomain>()
+        while (fixPlaylist.items.size == 0) fixPlaylist = fixture()
+        return fixPlaylist
+    }
+
+    fun fixturePlaylistItemList(): List<PlaylistItemDomain> {
+        var list = fixture<List<PlaylistItemDomain>>()
+        while (list.size == 0) list = fixture()
+        return list
     }
 }
 

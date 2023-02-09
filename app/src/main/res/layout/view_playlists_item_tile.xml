@@ -33,7 +33,6 @@
         <View
             android:id="@+id/listitem_overflow_click"
             style="@style/ItemTile.OverflowButtonClick"
-            android:layout_height="48dp"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:contentDescription="@string/cd_overflow"

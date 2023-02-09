@@ -1,105 +1,124 @@
 package uk.co.sentinelweb.cuer.app.util.share.scan
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.common.truth.Truth.assertThat
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.domain.*
+import kotlin.test.assertEquals
 
 @RunWith(AndroidJUnit4::class)
 class AndroidLinkScannerTest {
-    val sut = AndroidLinkScanner(log = AndroidLogWrapper(), mappers = urlMediaMappers)
+    val sut = AndroidLinkScanner(
+        log = AndroidLogWrapper(BuildConfigDomain(true, 50, "version")),
+        mappers = urlMediaMappers
+    )
 
     @Test
     fun shorts_url() {
-        val expectedLink = "https://www.youtube.com/shorts/lq9hzALa4Po?feature=share"
+        val testLink = "https://www.youtube.com/shorts/lq9hzALa4Po?feature=share"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "lq9hzALa4Po")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedMedia)
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "lq9hzALa4Po")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
     }
 
     @Test
     fun shorts_url_with_c() {
-        val expectedLink = "https://youtube.com/shorts/WsciBZQACk4?feature=share"
+        val testLink = "https://youtube.com/shorts/WsciBZQACk4?feature=share"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "WsciBZQACk4")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedMedia)
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "WsciBZQACk4")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
     }
 
     @Test
     fun channel_url_with_c() {
-        val expectedLink = "https://www.youtube.com/c/MattGreenComedy"
+        val testLink = "https://www.youtube.com/c/MattGreenComedy"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedChannel = ChannelDomain.createYoutubeCustomUrl("/c/MattGreenComedy")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.CHANNEL)
-        assertThat(actual?.second).isEqualTo(expectedChannel)
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.CHANNEL)
+        assertEquals(actual?.second, expectedChannel)
         val actualChannel = actual!!.second as ChannelDomain
-        assertThat(actualChannel.platformId).isEqualTo(NO_PLATFORM_ID)
-        assertThat(actualChannel.customUrl).isEqualTo("MattGreenComedy")
+        assertEquals(actualChannel.platformId, NO_PLATFORM_ID)
+        assertEquals(actualChannel.customUrl, "MattGreenComedy")
     }
 
     @Test
     fun channel_url_with_id() {
-        val expectedLink = "https://www.youtube.com/channel/UCM191aISRy5AQ51wCXOGiEg"
+        val testLink = "https://www.youtube.com/channel/UCM191aISRy5AQ51wCXOGiEg"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedChannel = ChannelDomain.createYoutube("/channel/UCM191aISRy5AQ51wCXOGiEg")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.CHANNEL)
-        assertThat(actual?.second).isEqualTo(expectedChannel)
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.CHANNEL)
+        assertEquals(actual?.second, expectedChannel)
         val actualChannel = actual!!.second as ChannelDomain
-        assertThat(actualChannel.platformId).isEqualTo("UCM191aISRy5AQ51wCXOGiEg")
-        assertThat(actualChannel.customUrl).isNull()
+        assertEquals(actualChannel.platformId, "UCM191aISRy5AQ51wCXOGiEg")
+        assertNull(actualChannel.customUrl)
     }
 
     @Test
     fun media_watch_url() {
-        val expectedLink = "https://www.youtube.com/watch?v=JqsQ_JjiFmg"
+        val testLink = "https://www.youtube.com/watch?v=JqsQ_JjiFmg"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "JqsQ_JjiFmg")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedMedia)
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "JqsQ_JjiFmg")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
         val actualMedia = actual!!.second as MediaDomain
-        assertThat(actualMedia.platformId).isEqualTo("JqsQ_JjiFmg")
+        assertEquals(actualMedia.platformId, "JqsQ_JjiFmg")
     }
 
     @Test
     fun media_short_url() {
-        val expectedLink = "https://youtu.be/JqsQ_JjiFmg"
+        val testLink = "https://youtu.be/JqsQ_JjiFmg"
 
-        val actual = sut.scan(expectedLink)
-        val expectedMedia = MediaDomain.createYoutube(expectedLink, "JqsQ_JjiFmg")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedMedia)
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "JqsQ_JjiFmg")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
         val actualMedia = actual!!.second as MediaDomain
-        assertThat(actualMedia.platformId).isEqualTo("JqsQ_JjiFmg")
+        assertEquals(actualMedia.platformId, "JqsQ_JjiFmg")
     }
 
     @Test
     fun playlist_url() {
-        val expectedLink =
+        val testLink =
             "https://www.youtube.com/playlist?list=PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe"
 
-        val actual = sut.scan(expectedLink)
+        val actual = sut.scan(testLink)
         val expectedPlaylist =
-            PlaylistDomain.createYoutube(expectedLink, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.PLAYLIST)
-        assertThat(actual?.second).isEqualTo(expectedPlaylist)
+            PlaylistDomain.createYoutube(testLink, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.PLAYLIST)
+        assertEquals(actual?.second, expectedPlaylist)
         val actualPlaylist = actual!!.second as PlaylistDomain
-        assertThat(actualPlaylist.platformId).isEqualTo("PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+        assertEquals(actualPlaylist.platformId, "PLmmblQQ1XpT_qMQYyTERHsJ_KZqOIAoEe")
+    }
+
+    @Test
+    fun live_url() {
+        val testLink =
+            "https://www.youtube.com/live/nBkfPrWj3xQ?feature=share"
+
+        val actual = sut.scan(testLink)
+        val expectedMedia = MediaDomain.createYoutube(testLink, "nBkfPrWj3xQ")
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
+        val actualMedia = actual!!.second as MediaDomain
+        assertEquals(actualMedia.platformId, "nBkfPrWj3xQ")
     }
 
     @Test
@@ -109,10 +128,10 @@ class AndroidLinkScannerTest {
 
         val actual = sut.scan(testLink)
         val expectedMedia = MediaDomain.createYoutube("https://m.youtube.com/watch?v=88YCkY8U2NU", "88YCkY8U2NU")
-        assertThat(actual).isNotNull()
-        assertThat(actual?.first).isEqualTo(ObjectTypeDomain.MEDIA)
-        assertThat(actual?.second).isEqualTo(expectedMedia)
+        assertNotNull(actual)
+        assertEquals(actual?.first, ObjectTypeDomain.MEDIA)
+        assertEquals(actual?.second, expectedMedia)
         val actualMedia = actual!!.second as MediaDomain
-        assertThat(actualMedia.platformId).isEqualTo("88YCkY8U2NU")
+        assertEquals(actualMedia.platformId, "88YCkY8U2NU")
     }
 }

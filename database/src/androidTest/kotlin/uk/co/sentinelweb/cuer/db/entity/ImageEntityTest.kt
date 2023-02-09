@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.entity
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -16,10 +13,12 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import kotlin.test.assertEquals
 
 class ImageEntityTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -38,6 +37,7 @@ class ImageEntityTest : KoinTest {
     }
 
     val database: Database by inject()
+    private val guidCreator = GuidCreator()
 
     @Before
     fun before() {
@@ -46,27 +46,29 @@ class ImageEntityTest : KoinTest {
 
     @Test
     fun createLoadEntity() {
-        val initial = fixture<Image>().copy(id = 0)
+        val guid = guidCreator.create()
+        val initial = fixture<Image>().copy(id = guid.value)
         database.imageEntityQueries.create(initial)
-        val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
-        val actual = database.imageEntityQueries.load(1).executeAsOne()
-        assertEquals(initial.copy(id = insertId), actual)
+        //val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
+        val actual = database.imageEntityQueries.load(guid.value).executeAsOne()
+        assertEquals(initial, actual)
     }
 
     @Test
     fun update() {
-        val initial = fixture<Image>().copy(id = 0)
+        val guid = guidCreator.create()
+        val initial = fixture<Image>().copy(id = guid.value)
         database.imageEntityQueries.create(initial)
-        val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
-        val update = fixture<Image>().copy(id = insertId)
+        //val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
+        val update = fixture<Image>().copy(id = guid.value)
         database.imageEntityQueries.update(update)
-        val actual = database.imageEntityQueries.load(insertId).executeAsOne()
+        val actual = database.imageEntityQueries.load(guid.value).executeAsOne()
         assertEquals(update, actual)
     }
 
     @Test
     fun deleteAll() {
-        val initial = fixture<List<Image>>().map { it.copy(id = 0) }
+        val initial = fixture<List<Image>>().map { it.copy(id = guidCreator.create().value) }
         database.imageEntityQueries.transaction {
             initial.forEach {
                 database.imageEntityQueries.create(it)
@@ -80,12 +82,13 @@ class ImageEntityTest : KoinTest {
 
     @Test
     fun createDeleteEntity() {
-        val initial = fixture<Image>().copy(id = 0)
+        val guid = guidCreator.create()
+        val initial = fixture<Image>().copy(id = guid.value)
         database.imageEntityQueries.create(initial)
-        val insertId = database.imageEntityQueries
-            .getInsertId()
-            .executeAsOne()
-        database.imageEntityQueries.delete(insertId)
+//        val insertId = database.imageEntityQueries
+//            .getInsertId()
+//            .executeAsOne()
+        database.imageEntityQueries.delete(guid.value)
         val actual = database.imageEntityQueries
             .count()
             .executeAsOne()
@@ -94,15 +97,16 @@ class ImageEntityTest : KoinTest {
 
     @Test
     fun loadByUrl() {
-        val initial = fixture<Image>().copy(id = 0)
+        val guid = guidCreator.create()
+        val initial = fixture<Image>().copy(id = guid.value)
         database.imageEntityQueries.create(initial)
-        val insertId = database.imageEntityQueries
-            .getInsertId()
-            .executeAsOne()
+//        val insertId = database.imageEntityQueries
+//            .getInsertId()
+//            .executeAsOne()
 
         val actual = database.imageEntityQueries
             .loadByUrl(initial.url)
             .executeAsOne()
-        assertEquals(insertId, actual.id)
+        assertEquals(guid.value, actual.id)
     }
 }

@@ -17,3 +17,6 @@ fun cuerOutlineButtonColors() = buttonColors(
 
 @Composable
 fun cuerOutlineButtonStroke() = BorderStroke(1.dp, MaterialTheme.colors.onSurface)
+
+@Composable
+fun cuerNoOutlineButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.onSurface)

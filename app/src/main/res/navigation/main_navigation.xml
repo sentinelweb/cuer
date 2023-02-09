@@ -6,7 +6,7 @@
     android:id="@+id/bottom_navigation"
     app:startDestination="@id/navigation_browse"
 >
-    <!--    Theres is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
+    <!-- There's is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
     <fragment
         android:id="@+id/navigation_browse"
@@ -15,8 +15,14 @@
     />
 
     <fragment
+        android:id="@+id/navigation_onboard"
+        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+        android:label="@string/nav_title_onboard"
+    />
+
+    <fragment
         android:id="@+id/navigation_playlists"
-        android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsFragment"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment"
         android:label="@string/bottomnav_title_playlists"
         tools:layout="@layout/fragment_playlists"
     >
@@ -24,37 +30,35 @@
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
             app:launchSingleTop="true"
-            app:popUpTo="@id/navigation_playlist"
+            app:popUpTo="@id/navigation_playlists"
             app:popUpToInclusive="true"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
         />
 
+        <!--            app:enterAnim="@anim/slide_in_right"-->
+        <!--            app:exitAnim="@anim/slide_out_left"-->
+        <!--            app:popEnterAnim="@anim/slide_in_left"-->
+        <!--            app:popExitAnim="@anim/slide_out_right"-->
         <action
             android:id="@+id/action_edit_playlist"
             app:destination="@id/navigation_playlist_edit"
             app:launchSingleTop="true"
             app:popUpTo="@id/navigation_playlist_edit"
             app:popUpToInclusive="true"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right"
         />
     </fragment>
 
+    <!-- todo check params: compare with share and fragment -->
     <fragment
         android:id="@+id/navigation_playlist"
-        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment"
         android:label="@string/bottomnav_title_playlist"
         tools:layout="@layout/fragment_playlist"
     >
         <argument
             android:name="PLAYLIST_ID"
-            android:defaultValue="-1L"
-            app:argType="long"
+            app:argType="string"
             app:nullable="false"/>
 
         <argument
@@ -97,6 +101,58 @@
 
     </fragment>
 
+    <!--    <fragment-->
+    <!--        android:id="@+id/navigation_playlist_old"-->
+    <!--        android:name="uk.co.sentinelweb.cuer.app.ui.playlist.old.PlaylistFragment"-->
+    <!--        android:label="@string/bottomnav_title_playlist"-->
+    <!--        tools:layout="@layout/fragment_playlist"-->
+    <!--    >-->
+    <!--        <argument-->
+    <!--            android:name="PLAYLIST_ID"-->
+    <!--            android:defaultValue="-1L"-->
+    <!--            app:argType="long"-->
+    <!--            app:nullable="false"/>-->
+
+    <!--        <argument-->
+    <!--            android:name="PLAY_NOW"-->
+    <!--            android:defaultValue="false"-->
+    <!--            app:argType="boolean"/>-->
+
+    <!--        <argument-->
+    <!--            android:name="SOURCE"-->
+    <!--            app:argType="string"-->
+    <!--            app:nullable="false"/>-->
+
+    <!--        <argument-->
+    <!--            android:name="IMAGE_URL"-->
+    <!--            app:argType="string"-->
+    <!--            app:nullable="true"/>-->
+
+    <!--        <action-->
+    <!--            android:id="@+id/action_goto_playlist_item"-->
+    <!--            app:destination="@id/navigation_playlist_item_edit"-->
+    <!--            app:launchSingleTop="true"-->
+    <!--            app:popUpTo="@id/navigation_playlist_item_edit"-->
+    <!--            app:popUpToInclusive="true"-->
+    <!--            app:enterAnim="@anim/slide_in_right"-->
+    <!--            app:exitAnim="@anim/slide_out_left"-->
+    <!--            app:popEnterAnim="@anim/slide_in_left"-->
+    <!--            app:popExitAnim="@anim/slide_out_right"/>-->
+
+    <!--        <action-->
+    <!--            android:id="@+id/action_goto_edit_playlist"-->
+    <!--            app:destination="@id/navigation_playlist_edit"-->
+    <!--            app:launchSingleTop="true"-->
+    <!--            app:popUpTo="@id/navigation_playlist_edit"-->
+    <!--            app:popUpToInclusive="true"-->
+    <!--            app:enterAnim="@anim/slide_in_right"-->
+    <!--            app:exitAnim="@anim/slide_out_left"-->
+    <!--            app:popEnterAnim="@anim/slide_in_left"-->
+    <!--            app:popExitAnim="@anim/slide_out_right"-->
+    <!--        />-->
+
+    <!--    </fragment>-->
+
     <fragment
         android:id="@+id/navigation_playlist_edit"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment"
@@ -104,8 +160,7 @@
         tools:layout="@layout/fragment_playlist_edit">
         <argument
             android:name="PLAYLIST_ID"
-            android:defaultValue="-1L"
-            app:argType="long"
+            app:argType="string"
             app:nullable="false"/>
 
         <argument
@@ -139,9 +194,8 @@
 
         <argument
             android:name="PLAYLIST_PARENT"
-            android:defaultValue="-1L"
-            app:argType="long"
-            app:nullable="false"
+            app:argType="string"
+            app:nullable="true"
         />
 
         <argument
@@ -192,6 +246,12 @@
         android:id="@+id/navigation_settings_player"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerFragment"
         android:label="@string/prefs_root_player_title"
+    />
+
+    <fragment
+        android:id="@+id/navigation_onboarding"
+        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+        android:label="@string/onboarding_title"
     />
 
 </navigation>

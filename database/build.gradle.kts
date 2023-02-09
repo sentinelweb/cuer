@@ -6,6 +6,7 @@ plugins {
     kotlin("plugin.serialization")
 }
 
+group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
 val ver_coroutines: String by project
@@ -19,21 +20,26 @@ val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
 
+val ver_swift_tools: String by project
+val ver_ios_deploy_target: String by project
+
 kotlin {
+    jvm()
     android()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-    js {
+    js(IR) {
         browser()
     }
     cocoapods {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = "14.1"
+        ios.deploymentTarget = ver_ios_deploy_target
         version = "1"
         framework {
             baseName = "database"
+            isStatic = true //or false
         }
     }
 
@@ -45,7 +51,7 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":domain"))
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
@@ -56,7 +62,7 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":domain"))
                 implementation(kotlin("test"))
                 implementation("io.insert-koin:koin-test:$ver_koin")
 //                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
@@ -75,7 +81,7 @@ kotlin {
         }
         val androidTest by getting {
             dependencies {
-                implementation(project(":shared"))
+                implementation(project(":domain"))
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
@@ -129,6 +135,6 @@ sqldelight {
         sourceFolders = listOf("sqldelight")
         schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/app/database")
         verifyMigrations = true
-        dialect = "sqlite:3.24"
+        // dialect = "sqlite:3.24"
     }
 }

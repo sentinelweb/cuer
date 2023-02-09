@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,51 +41,63 @@ object BrowseComposables {
 //    }
 
     @Composable
-    fun BrowseUi(view: BrowseMviView) {
-        BrowseView(view.observableModel, view)
+    fun BrowseUi(view: BrowseMviViewProxy) {
+        BrowseView(view.observableModel, view.observableLoading, view)
     }
 
     @Composable
-    fun BrowseView(model: Model, view: BaseMviView<Model, Event>) {
+    fun BrowseView(model: Model, loading: Boolean, view: BaseMviView<Model, Event>) {
         CuerBrowseTheme {
             Surface {
-                Column {
-                    CuerTopAppBarComposables.CuerAppBar(
-                        text = model.title,
-                        onUp = { view.dispatch(Event.OnUpClicked) },
-                        actions = listOf(
-                            when (model.order) {
-                                CATEGORIES -> Action(CuerMenuItem.SortAlpha,
-                                    { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
-                                )
+                Box(contentAlignment = Alignment.Center) {
+                    Column {
+                        CuerTopAppBarComposables.CuerAppBar(
+                            text = model.title,
+                            onUp = { view.dispatch(Event.OnUpClicked) },
+                            actions = listOf(
+                                Action(CuerMenuItem.Help,
+                                    { view.dispatch(Event.OnActionHelpClicked) }),
+                                when (model.order) {
+                                    CATEGORIES -> Action(CuerMenuItem.SortAlpha,
+                                        { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
+                                    )
 
-                                A_TO_Z -> Action(CuerMenuItem.SortCategory,
-                                    { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
-                                )
-                            },
-                            Action(CuerMenuItem.Search,
-                                { view.dispatch(Event.OnActionSearchClicked) }),
-                            Action(CuerMenuItem.Settings,
-                                { view.dispatch(Event.OnActionSettingsClicked) }),
+                                    A_TO_Z -> Action(CuerMenuItem.SortCategory,
+                                        { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
+                                    )
+                                },
+                                Action(CuerMenuItem.Search, { view.dispatch(Event.OnActionSearchClicked) }),
+                                Action(CuerMenuItem.PasteAdd, { view.dispatch(Event.OnActionPasteAdd) }),
+                                Action(CuerMenuItem.Settings, { view.dispatch(Event.OnActionSettingsClicked) }),
+                            )
                         )
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colors.secondaryVariant)
-                            .verticalScroll(rememberScrollState())
-                            .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
-                    ) {
-                        if (model.isRoot) {
-                            if (model.recent != null) {
-                                CategoryWithTitle(model.recent!!, view, 1)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colors.secondaryVariant)
+                                .verticalScroll(rememberScrollState())
+                                .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
+                        ) {
+                            if (model.isRoot) {
+                                if (model.recent != null) {
+                                    CategoryWithTitle(model.recent!!, view, 1)
+                                }
+                                model.categories.forEach {
+                                    CategoryWithTitle(it, view, 3)
+                                }
+                            } else {
+                                CategoryGrid(8, model.categories, view)
                             }
-                            model.categories.forEach {
-                                CategoryWithTitle(it, view, 3)
-                            }
-                        } else {
-                            CategoryGrid(8, model.categories, view)
                         }
+                    }
+                    if (loading) {
+                        CircularProgressIndicator(
+                            color = colorResource(R.color.primary),
+                            strokeWidth = 8.dp,
+                            modifier = Modifier
+                                .width(64.dp)
+                                .height(64.dp)
+                        )
                     }
                 }
             }
@@ -98,7 +111,7 @@ object BrowseComposables {
         rows: Int
     ) {
         val visible = remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
+        LaunchedEffect(model) {
             delay(100)
             visible.value = true
         }
@@ -166,7 +179,7 @@ object BrowseComposables {
     ) {
         // cos compose is old cant use by
         val visible = remember { mutableStateOf(false) }
-        LaunchedEffect(Unit) {
+        LaunchedEffect(category) {
             delay(seq * 25L)
             visible.value = true
         }
@@ -229,7 +242,7 @@ object BrowseComposables {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 if (category.subCount > 0) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_tree_24),
+                                        painter = painterResource(R.drawable.ic_tree),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .padding(start = 16.dp)
@@ -242,7 +255,7 @@ object BrowseComposables {
                                     )
                                 } else if (category.isPlaylist) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_playlist_black),
+                                        painter = painterResource(R.drawable.ic_playlist),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .padding(start = 16.dp)
@@ -257,7 +270,7 @@ object BrowseComposables {
                                             modifier = Modifier.padding(end = 8.dp)
                                         )
                                         Icon(
-                                            painter = painterResource(R.drawable.ic_visibility_24),
+                                            painter = painterResource(R.drawable.ic_visibility),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .padding(end = 4.dp)
@@ -351,6 +364,26 @@ private fun BrowsePreview() {
     val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.previewState),
+        false,
         view
     )
+}
+
+@Preview(name = "chip")
+@Composable
+@ExperimentalAnimationApi
+private fun ChipPreview() {
+    val model = CategoryModel(
+        id = 1,
+        title = "title",
+        description = "null",
+        thumbNailUrl = "https://cuer-275020.web.app/images/headers/Socrates.jpg",
+        existingPlaylist = null,
+        forceItem = false,
+        isPlaylist = false,
+        subCategories = emptyList(),
+        subCount = 4
+    )
+    val view = object : BaseMviView<Model, Event>() {}
+    BrowseComposables.CatChip(model, 1, view)
 }

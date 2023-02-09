@@ -1,7 +1,9 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
-import uk.co.sentinelweb.cuer.app.orchestrator.util.PlaylistMediaLookupOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaLookupUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
@@ -10,7 +12,7 @@ import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 class YoutubeSearchPlayistInteractor constructor(
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val ytInteractor: YoutubeInteractor,
-    private val playlistMediaLookupOrchestrator: PlaylistMediaLookupOrchestrator,
+    private val playlistMediaLookupUsecase: PlaylistMediaLookupUsecase,
     private val state: State
 ) : AppPlaylistInteractor {
 
@@ -26,7 +28,7 @@ class YoutubeSearchPlayistInteractor constructor(
 
     override suspend fun getPlaylist(): PlaylistDomain? =
         cachedOrSearch()
-            ?.let { playlistMediaLookupOrchestrator.lookupPlaylistItemsAndReplace(it) }
+            ?.let { playlistMediaLookupUsecase.lookupPlaylistItemsAndReplace(it) }
             ?.items
             ?.let {
                 makeHeader()
@@ -52,12 +54,12 @@ class YoutubeSearchPlayistInteractor constructor(
             }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = YoutubeSearch.id,
+        id = YoutubeSearch.id.toIdentifier(MEMORY),
         title = mapTitle(),
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/telescope-122960_640.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/telescope-122960_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false,
@@ -74,7 +76,7 @@ class YoutubeSearchPlayistInteractor constructor(
     } ?: "No Remote - shouldn't see this"
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = YoutubeSearch.id,
+        playlistId = YoutubeSearch.id.toIdentifier(MEMORY),
         itemCount = -1,
         watchedItemCount = -1
     )

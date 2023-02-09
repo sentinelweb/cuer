@@ -10,7 +10,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
@@ -18,7 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemRowView
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
@@ -31,8 +33,8 @@ class PlayDialog constructor(
     private val floatingService: FloatingPlayerServiceManager,
     private val log: LogWrapper,
     private val alertDialogCreator: AlertDialogCreator,
-    private val youtubeApi: YoutubeJavaApiWrapper,
-) {
+    private val youtubeApi: PlatformLaunchWrapper,
+) : PlayUseCase.Dialog {
     init {
         log.tag(this)
     }
@@ -41,11 +43,11 @@ class PlayDialog constructor(
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
 
-    lateinit var playUseCase: PlayUseCase
+    override lateinit var playUseCase: PlayUseCase
 
     private lateinit var dialog: AlertDialog
 
-    fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
+    override fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
 
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
         binding.dpLaunchYoutube.setOnClickListener {
@@ -56,6 +58,7 @@ class PlayDialog constructor(
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
             item?.apply { playUseCase.setQueueItem(this) }
                 ?: throw IllegalStateException("No item to play")
+            (f.requireActivity() as? MainActivity)?.showPlayer()
             dialog.dismiss()
         }
         binding.dpPortrait.setOnClickListener {
@@ -86,6 +89,7 @@ class PlayDialog constructor(
                 playUseCase.attachControls(
                     (f.requireActivity() as? MainContract.View)?.playerControls
                 )
+                (f.requireActivity() as? MainActivity)?.showPlayer()
                 dialog.dismiss()
             } else {
                 floatingService.requestPermission(f.requireActivity())
@@ -98,7 +102,7 @@ class PlayDialog constructor(
                 .createPresenter(createView, emptyInteractions)
                 .update(
                     itemModelMapper.mapItem(
-                        modelId = 0,
+                        modelId = item.playlistId ?: throw IllegalStateException("No playlist id"),
                         item = this,
                         index = 0,
                         canEdit = false,
@@ -113,27 +117,27 @@ class PlayDialog constructor(
         }
         dialog = MaterialAlertDialogBuilder(f.requireContext())
             .setTitle(f.getString(R.string.play_dialog_title))
-            .setIcon(R.drawable.ic_play_black)
+            .setIcon(R.drawable.ic_play)
             .setView(binding.root)
             .create()
         dialog.show()
     }
 
-    fun showDialog(model: AlertDialogModel) {
+    override fun showDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()
     }
 
     private val emptyInteractions = object : ItemContract.Interactions {
-        override fun onClick(item: ItemContract.Model) {}
-        override fun onRightSwipe(item: ItemContract.Model) {}
-        override fun onLeftSwipe(item: ItemContract.Model) {}
-        override fun onPlay(item: ItemContract.Model, external: Boolean) {}
-        override fun onShowChannel(item: ItemContract.Model) {}
-        override fun onStar(item: ItemContract.Model) {}
-        override fun onRelated(item: ItemContract.Model) {}
-        override fun onShare(item: ItemContract.Model) {}
-        override fun onItemIconClick(item: ItemContract.Model) {}
-        override fun onPlayStartClick(item: ItemContract.Model) {}
-        override fun onGotoPlaylist(item: ItemContract.Model) {}
+        override fun onClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onRightSwipe(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onLeftSwipe(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onPlay(item: PlaylistItemMviContract.Model.Item, external: Boolean) {}
+        override fun onShowChannel(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onStar(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onRelated(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onShare(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onItemIconClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onPlayStartClick(item: PlaylistItemMviContract.Model.Item) {}
+        override fun onGotoPlaylist(item: PlaylistItemMviContract.Model.Item) {}
     }
 }

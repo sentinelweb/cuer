@@ -1,11 +1,9 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.StarredMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Starred
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -41,12 +39,12 @@ class StarredItemsPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = Starred.id,
-        title = "Starred items",
+        id = Starred.id.toIdentifier(MEMORY),
+        title = "Starred",
         type = APP,
         currentIndex = -1,
         starred = true,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false,
@@ -56,7 +54,7 @@ class StarredItemsPlayistInteractor constructor(
 
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = Starred.id,
+        playlistId = Starred.id.toIdentifier(MEMORY),
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
     )

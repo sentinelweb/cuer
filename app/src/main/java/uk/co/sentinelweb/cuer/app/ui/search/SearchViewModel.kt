@@ -7,7 +7,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import kotlinx.datetime.toJavaLocalDateTime
-import kotlinx.datetime.toKotlinLocalDateTime
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LocalSearch
@@ -19,10 +18,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DateRangePickerDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -30,7 +32,7 @@ import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.LOCAL
 import uk.co.sentinelweb.cuer.domain.SearchTypeDomain.REMOTE
-import uk.co.sentinelweb.cuer.net.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class SearchViewModel(
     private val state: SearchContract.State,
@@ -120,8 +122,8 @@ class SearchViewModel(
 
     fun onDatesSelected(start: Long, end: Long) {
         state.remote = state.remote.copy(
-            fromDate = timeStampMapper.toLocalDateTimeNano(start).toKotlinLocalDateTime(),
-            toDate = timeStampMapper.toLocalDateTimeNano(end).toKotlinLocalDateTime()
+            fromDate = timeStampMapper.nanosToLocalDateTime(start),
+            toDate = timeStampMapper.nanosToLocalDateTime(end)
         )
         model = mapper.map(state)
     }
@@ -156,11 +158,11 @@ class SearchViewModel(
         }
 
         _navigateLiveData.value = NavigationModel(
-            NavigationModel.Target.PLAYLIST,
+            Target.PLAYLIST,
             mapOf(
-                NavigationModel.Param.PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id else YoutubeSearch.id,
-                NavigationModel.Param.PLAY_NOW to false,
-                NavigationModel.Param.SOURCE to MEMORY
+                PLAYLIST_ID to if (state.searchType == LOCAL) LocalSearch.id.value else YoutubeSearch.id.value,
+                PLAY_NOW to false,
+                SOURCE to MEMORY
             )
         )
     }
@@ -168,7 +170,7 @@ class SearchViewModel(
     fun onPlaylistSelect(chipModel: ChipModel) {
         if (chipModel.type == PLAYLIST_SELECT) {
             _dialogModelLiveData.value =
-                PlaylistsDialogContract.Config(
+                PlaylistsMviDialogContract.Config(
                     res.getString(R.string.playlist_dialog_title),
                     state.local.playlists,
                     true,
@@ -180,7 +182,7 @@ class SearchViewModel(
                 )
         } else if (chipModel.type == PLAYLIST) {
             state.local.playlists
-                .removeIf { it.id == chipModel.value?.toLong() }
+                .removeIf { it.id?.id == chipModel.value?.toGUID() }
                 .also { model = mapper.map(state) }
         }
     }

@@ -9,18 +9,19 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.text.toSpannable
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.ItemType.ROW
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
 // todo ditch this and just add the icons to the views
 class ItemModelMapper constructor(
     private val res: ResourceWrapper,
-    private val iconMapper: IconMapper
+    private val iconMapper: AndroidIconMapper
 ) {
 
     private fun playDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_player_play_black, color, R.dimen.list_item_top_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_player_play, color, R.dimen.list_item_top_text_size, SCALING)
 
     private fun starDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
         res.getDrawable(R.drawable.ic_starred, color, R.dimen.list_item_bottom_text_size, SCALING)
@@ -35,11 +36,11 @@ class ItemModelMapper constructor(
         )
 
     private val unwatchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility_off, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private fun pinDrawable(@ColorRes color: Int = R.color.text_primary): Drawable =
@@ -76,7 +77,11 @@ class ItemModelMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model.ItemModel, playing: Boolean, type:ItemContract.ItemType): Spannable {
+    fun mapTopText(
+        model: PlaylistsItemMviContract.Model.Item,
+        playing: Boolean,
+        type: ItemContract.ItemType
+    ): Spannable {
         val builder = SpannableStringBuilder(model.title)
         if (type == ItemContract.ItemType.TILE) {
             if (model.pinned) {
@@ -98,7 +103,7 @@ class ItemModelMapper constructor(
         builder.insert(0, str)
     }
 
-    fun mapBottomText(model: ItemContract.Model.ItemModel): Spannable {
+    fun mapBottomText(model: PlaylistsItemMviContract.Model.Item): Spannable {
         val countText = if (model.count > 0) model.run { "$newItems / $count " } else ""
         val base = SpannableString("          $countText").let {
             res.replaceSpannableIcon(

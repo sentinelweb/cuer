@@ -1,9 +1,13 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
+// build swift: ./gradlew shared:updatePackageSwift
+val ver_native_coroutines: String by project
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
+    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
+    kotlin("native.cocoapods")
+    id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
 }
 
 val ver_coroutines: String by project
@@ -25,36 +29,52 @@ val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
 val ver_kotlin_fixture: String by project
+val ver_swift_tools: String by project
+val ver_ios_deploy_target: String by project
 
+group = "uk.co.sentinelweb.cuer"
 version = "1.0"
-
-android {
-    compileSdk = app_compileSdkVersion.toInt()
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    defaultConfig {
-        minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
-    }
-    // remove when upgrading to kotlin 1.5
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
 
 kotlin {
     jvm()
-    js {
+    js(IR) {
         browser()
     }
     android()
     iosX64()
     iosArm64()
     iosSimulatorArm64()
+//
+//    targets
+//        .filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
+//        .filter { it.konanTarget.family == org.jetbrains.kotlin.konan.target.Family.IOS }
+//        .forEach { target ->
+//            target.binaries.framework {
+//                export("com.arkivanov.essenty:lifecycle:0.6.0")
+//                export("com.arkivanov.essenty:instance-keeper:0.6.0")
+//                export("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
+//                export("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
+////                export(project(":mvikotlin-timetravel"))
+//            }
+//        }
+
+    cocoapods {
+        framework {
+            isStatic = true //or false
+            baseName = "shared"
+        }
+//        name = "shared"
+        summary = "shared"
+        homepage = "https://sentinelweb.co.uk"
+        ios.deploymentTarget = ver_ios_deploy_target
+    }
+
+//    targets.withType(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget::class.java) {
+//        binaries.all {
+//            binaryOptions["memoryModel"] = "experimental"
+//            //freeCompilerArgs += "-Xruntime-logs=gc=info -Xobjc-generics"
+//        }
+//    }
 
     sourceSets {
         all {
@@ -65,14 +85,24 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
+                implementation(project(":domain"))
+                implementation(project(":database"))
+
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+
                 implementation("io.insert-koin:koin-core:$ver_koin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
-                implementation("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
+
+                api("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
+                api("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
+                api("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
+                api("com.arkivanov.essenty:lifecycle:0.6.0")
+                api("com.arkivanov.essenty:instance-keeper:0.6.0")
+                // for debugging only remove
+                implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
+
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
@@ -84,15 +114,15 @@ kotlin {
                 implementation("io.mockk:mockk:$ver_mockk")
             }
         }
-        val jvmMain by getting {
-            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
+        val androidMain by getting {
             dependencies {
-                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation("io.insert-koin:koin-android:$ver_koin")
+
             }
         }
-        val jvmTest by getting {
+        val androidTest by getting {
             dependencies {
-                // Koin for JUnit 4
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
@@ -101,16 +131,6 @@ kotlin {
                 implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation("org.mock-server:mockserver-netty:$ver_mockserver")
                 implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
-            }
-        }
-        val androidMain by getting {
-            kotlin.srcDir("src/jvmAndroidSharedMain/kotlin")
-            dependencies {
-                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
-            }
-        }
-        val androidTest by getting {
-            dependencies {
             }
         }
         val jsMain by getting {
@@ -127,6 +147,8 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
+                implementation(project(":netKmm"))
+//                implementation("com.arkivanov.essenty:lifecycle:0.6.0")
             }
 
         }
@@ -142,13 +164,34 @@ kotlin {
     }
 }
 
-//https://stackoverflow.com/questions/55456176/unresolved-reference-compilekotlin-in-build-gradle-kts
-//tasks.withType<KotlinCompile> {
-//    kotlinOptions {
-//        jvmTarget = ver_jvm
-//        freeCompilerArgs = listOf("-Xopt-in=kotlin.time.ExperimentalTime")
-//    }
-//}
+android {
+    compileSdk = app_compileSdkVersion.toInt()
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
+    }
+    packagingOptions {
+        exclude("META-INF/ASL-2.0.txt")
+        exclude("draftv4/schema")
+        exclude("META-INF/DEPENDENCIES")
+        exclude("META-INF/LICENSE.md")
+        exclude("META-INF/NOTICE.md")
+        exclude("META-INF/io.netty.versions.properties")
+        exclude("META-INF/LGPL-3.0.txt")
+        exclude("draftv3/schema")
+        exclude("META-INF/INDEX.LIST")
+    }
+}
+
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.time.ExperimentalTime"
+}
+
+kmmbridge {
+    githubReleaseArtifacts()
+    githubReleaseVersions()
+    spm()
+    //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
+    versionPrefix.set("0.6")//fixme do i need this?
 }

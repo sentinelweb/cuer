@@ -6,19 +6,20 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Playlist
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistMapper
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.Companion.FLAG_WATCHED
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.summarise
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -31,6 +32,8 @@ class SqldelightPlaylistDatabaseRepository(
     private val playlistMapper: PlaylistMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
+    private val guidCreator: GuidCreator,
+    private val source: OrchestratorContract.Source,
 ) : PlaylistDatabaseRepository {
 
     init {
@@ -90,7 +93,7 @@ class SqldelightPlaylistDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
+    override suspend fun load(id: GUID, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
 
     override suspend fun loadList(
         filter: Filter,
@@ -100,7 +103,7 @@ class SqldelightPlaylistDatabaseRepository(
             try {
                 with(database.playlistEntityQueries) {
                     when (filter) {
-                        is IdListFilter -> loadAllByIds(filter.ids)
+                        is IdListFilter -> loadAllByIds(filter.ids.map { it.value })
                         is DefaultFilter -> loadAllByFlags(PlaylistDomain.FLAG_DEFAULT)
                         is AllFilter -> loadAll()
                         is PlatformIdListFilter -> loadAllByPlatformIds(filter.ids, filter.platform)
@@ -113,7 +116,7 @@ class SqldelightPlaylistDatabaseRepository(
                         fillAndMapEntity(
                             entity,
                             if (flat) listOf()
-                            else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id)
+                            else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id.toGUID())
                         )
                     }
                     .let { RepoResult.Data(it) }
@@ -134,11 +137,11 @@ class SqldelightPlaylistDatabaseRepository(
                             RepoResult.Data(
                                 filter.ids.map {
                                     PlaylistStatDomain(
-                                        playlistId = it,
+                                        playlistId = it.toIdentifier(source),
                                         itemCount = database.playlistItemEntityQueries
-                                            .countItemsInPlaylist(it).executeAsOne().toInt(),
+                                            .countItemsInPlaylist(it.value).executeAsOne().toInt(),
                                         watchedItemCount = database.playlistItemEntityQueries
-                                            .countMediaFlags(it, FLAG_WATCHED).executeAsOne().toInt()
+                                            .countMediaFlags(it.value, FLAG_WATCHED).executeAsOne().toInt()
                                     )
                                 })
 
@@ -220,9 +223,9 @@ class SqldelightPlaylistDatabaseRepository(
             update.id
                 .let {
                     database.playlistEntityQueries
-                        .updateIndex(update.currentIndex.toLong(), it); it
+                        .updateIndex(update.currentIndex.toLong(), it.id.value); it
                 }
-                .let { load(it, flat = true) }
+                .let { load(it.id, flat = true) }
                 .also {
                     if (emit) {
                         _updatesFlow.emit(FLAT to it.data!!)
@@ -235,21 +238,21 @@ class SqldelightPlaylistDatabaseRepository(
         }
     }
 
-    private suspend fun loadPlaylist(id: Long, flat: Boolean): RepoResult<PlaylistDomain> =
+    private suspend fun loadPlaylist(id: GUID, flat: Boolean): RepoResult<PlaylistDomain> =
         withContext(coProvider.IO) {
             loadPlaylistInternal(id, flat)
         }
 
-    private fun loadPlaylistInternal(id: Long, flat: Boolean) =
+    private fun loadPlaylistInternal(id: GUID, flat: Boolean) =
         try {
             database.playlistEntityQueries
-                .load(id)
+                .load(id.value)
                 .executeAsOneOrNull()!!
                 .let { entity: Playlist ->
                     fillAndMapEntity(
                         entity,
                         if (flat) listOf()
-                        else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id)
+                        else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id.toGUID())
                     )
                 }
                 .let { domain: PlaylistDomain -> RepoResult.Data(domain) }
@@ -266,12 +269,12 @@ class SqldelightPlaylistDatabaseRepository(
     ): PlaylistDomain = playlistMapper.map(
         playlist,
         items,
-        playlist.channel_id?.let { channelDatabaseRepository.loadChannelInternal(it).data!! },
-        imageDatabaseRepository.loadEntity(playlist.thumb_id),
-        imageDatabaseRepository.loadEntity(playlist.image_id),
+        playlist.channel_id?.let { channelDatabaseRepository.loadChannelInternal(it.toGUID()).data!! },
+        imageDatabaseRepository.loadEntity(playlist.thumb_id?.toGUID()),
+        imageDatabaseRepository.loadEntity(playlist.image_id?.toGUID()),
     )
 
-    private fun saveInternal(domain: PlaylistDomain, flat: Boolean): Long =
+    private fun saveInternal(domain: PlaylistDomain, flat: Boolean): GUID =
         domain
             .let {
                 it.copy(channelData = it.channelData
@@ -283,21 +286,26 @@ class SqldelightPlaylistDatabaseRepository(
             .let {
                 it.copy(image = it.image?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
-            .let {
-                val playlistEntity = playlistMapper.map(it)
+            .let { toSaveDomain ->
+                //val playlistEntity = playlistMapper.map(it)
                 with(database.playlistEntityQueries) {
-                    if (playlistEntity.id > 0) {
+                    if (toSaveDomain.id != null) {
+                        val playlistEntity = playlistMapper.map(toSaveDomain)
                         update(playlistEntity)
-                        domain.id!!
+                        toSaveDomain.id!!.id
                     } else {
-                        create(playlistEntity)
-                        getInsertId().executeAsOne()
+                        guidCreator.create().toIdentifier(source)
+                            .let { playlistMapper.map(toSaveDomain.copy(id = it)) }
+                            .also { create(it) }
+                            .id.toGUID()
+//                        create(playlistEntity)
+//                        getInsertId().executeAsOne()
                     }
                 }
             }.also { playlistId ->
                 if (!flat) {
                     itemDatabaseRepository.saveListInternal(
-                        domain.items.map { it.copy(playlistId = playlistId) },
+                        domain.items.map { it.copy(playlistId = playlistId.toIdentifier(source)) },
                         true
                     )
                 }

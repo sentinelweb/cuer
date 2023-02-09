@@ -21,12 +21,14 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewPlaylistCardBinding
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_IMAGE
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment.Companion.TRANS_TITLE
-import uk.co.sentinelweb.cuer.app.ui.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 
 
 class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : FrameLayout(c, a, def),
@@ -57,7 +59,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
     override val leftSwipeView: View
         get() = binding.swipeLabelLeft
 
-    override fun isViewForId(id: Long): Boolean = presenter.isViewForId(id)
+    override fun isViewForId(id: Identifier<GUID>): Boolean = presenter.isViewForId(id)
 
     override fun onFinishInflate() {
         super.onFinishInflate()
@@ -105,7 +107,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
             }
         })
         popup.menu.findItem(R.id.playlist_context_star).setIcon(
-            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred
         )
         popup.menu.findItem(R.id.playlist_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star
@@ -209,7 +211,7 @@ class ItemCardView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fra
         binding.swipeLabelLeft.setText(deleteResources?.label ?: context.getString(R.string.pl_item_delete))
         binding.swipeLabelLeft.setCompoundDrawablesWithIntrinsicBounds(
             null, null,
-            res.getDrawable(deleteResources?.icon ?: R.drawable.ic_delete_white),
+            res.getDrawable(deleteResources?.icon ?: R.drawable.ic_delete_item),
             null
         )
         binding.swipeLabelLeft.setBackgroundColor(

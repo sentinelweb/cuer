@@ -1,11 +1,9 @@
 package uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor
 
-import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.NewMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.NewItems
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -42,12 +40,12 @@ class NewMediaPlayistInteractor constructor(
         }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
-        id = NewItems.id,
+        id = NewItems.id.toIdentifier(MEMORY),
         title = "New",
         type = APP,
         currentIndex = -1,
         starred = false,
-        image = ImageDomain(url = "gs://cuer-275020.appspot.com/playlist_header/pexels-pixabay-40663-600.jpg"),
+        image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pexels-pixabay-40663-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
             playable = false,
             editable = false,
@@ -57,7 +55,7 @@ class NewMediaPlayistInteractor constructor(
     )
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = NewItems.id,
+        playlistId = NewItems.id.toIdentifier(MEMORY),
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = 0 // todo log in a background process and save to pref
     )

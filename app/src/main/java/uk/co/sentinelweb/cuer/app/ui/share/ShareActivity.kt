@@ -21,8 +21,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ActivityShareBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -30,20 +29,23 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseCategory
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import java.io.File
 
@@ -56,12 +58,13 @@ class ShareActivity : AppCompatActivity(),
 
     override val scope: Scope by activityScopeWithSource<ShareActivity>()
     private val presenter: ShareContract.Presenter by inject()
-    private val shareWrapper: ShareWrapper by inject()
+    private val shareWrapper: AndroidShareWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
+    private val log: LogWrapper by inject()
 
     private lateinit var navController: NavController
     private val clipboard by lazy { getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager }
@@ -76,14 +79,14 @@ class ShareActivity : AppCompatActivity(),
             ?.run { (getChildFragmentManager().getFragments().get(0) as? ScanContract.View) }
             ?: throw IllegalStateException("Not a scan fragment")
 
-    private val commitFragment: ShareContract.Committer
+    private val commitFragment: ShareCommitter
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareContract.Committer) }
+            ?.run { (getChildFragmentManager().getFragments().get(0) as? ShareCommitter) }
             ?: throw IllegalStateException("Not a commit fragment")
 
     private val isOnPlaylist: Boolean
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistFragment) }
+            ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistMviFragment) }
             ?: false
 
     private val isOnPlaylistItem: Boolean
@@ -95,6 +98,10 @@ class ShareActivity : AppCompatActivity(),
         get() = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
             ?.run { (getChildFragmentManager().getFragments().get(0) is PlaylistEditFragment) }
             ?: false
+
+    init {
+        log.tag(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -185,11 +192,12 @@ class ShareActivity : AppCompatActivity(),
     }
 
     private fun checkIntentParams() {
-        presenter.setPlaylistParent(
-            intent.getStringExtra(CATEGORY.toString())
-                ?.let { deserialiseCategory(it) },
-            intent.getLongExtra(PLAYLIST_PARENT.toString(), -1)
-        )
+        intent.getStringExtra(PLAYLIST_PARENT.toString())
+            ?.let { deserialiseGuidIdentifier(it) }
+            ?.also {
+                val cat = intent.getStringExtra(CATEGORY.toString())?.let { deserialiseCategory(it) }
+                presenter.setPlaylistParent(cat, it)
+            }
     }
 
     override fun onStop() {
@@ -197,8 +205,8 @@ class ShareActivity : AppCompatActivity(),
         presenter.onStop()
     }
 
-    override fun gotoMain(plId: Long, plItemId: Long?, source: Source, play: Boolean) {
-        MainActivity.start(this, plId, plItemId, source, play)
+    override fun gotoMain(plId: Identifier<GUID>, plItemId: Identifier<GUID>?, play: Boolean) {
+        MainActivity.start(this, plId, plItemId, play)
     }
 
     override fun setData(model: ShareContract.Model) {
@@ -216,25 +224,22 @@ class ShareActivity : AppCompatActivity(),
         setEnabled(model.enabled)
     }
 
-    override fun showMedia(
-        itemDomain: PlaylistItemDomain,
-        source: Source,
-        playlistParentId: Long?
-    ) {
+    // todo serialize identifiers
+    override fun showMedia(itemDomain: PlaylistItemDomain, playlistParentId: Identifier<GUID>?) {
         ScanFragmentDirections.actionGotoPlaylistItem(
             itemDomain.serialise(),
-            source.toString(),
-            playlistParentId ?: -1,
+            itemDomain.id?.source.toString(),
+            playlistParentId?.id?.value,
             false
         ).apply { navController.navigate(this) }
         //  navOptions { launchSingleTop = true; popUpTo(R.id.navigation_playlist_item_edit, { inclusive = true }) }
     }
 
-    override fun showPlaylist(id: OrchestratorContract.Identifier<Long>, playlistParentId: Long?) {
+    override fun showPlaylist(id: Identifier<GUID>, playlistParentId: Identifier<GUID>?) {
         ScanFragmentDirections.actionGotoPlaylist(
+            id.id.value,
             id.source.toString(),
-            id.id,
-            playlistParentId ?: -1,
+            playlistParentId?.id?.value,
             false
         ).apply { navController.navigate(this) }
     }
@@ -243,8 +248,8 @@ class ShareActivity : AppCompatActivity(),
         presenter.scanResult(result)
     }
 
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) =
-        commitFragment.commit(onCommit)
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) =
+        commitFragment.commit(afterCommit)
 
     override fun canCommit(type: ObjectTypeDomain?): Boolean =
         when (type) {
@@ -265,12 +270,12 @@ class ShareActivity : AppCompatActivity(),
         snackbar = snackbarWrapper.make("ERROR: $msg").apply { show() }
     }
 
-    override fun warning(msg: String) = with (binding.shareWarning) {
+    override fun warning(msg: String) = with(binding.shareWarning) {
         text = msg
         isVisible = true
     }
 
-    override fun hideWarning() = with (binding.shareWarning) {
+    override fun hideWarning() = with(binding.shareWarning) {
         isVisible = false
     }
 
@@ -293,6 +298,7 @@ class ShareActivity : AppCompatActivity(),
 
     // CommitHost
     override fun isReady(ready: Boolean) {
+        log.d("commit host isReady: $ready")
         presenter.onReady(ready)
     }
 
@@ -314,31 +320,31 @@ class ShareActivity : AppCompatActivity(),
             paste: Boolean = false,
             parentId: Long? = null
         ) = Intent(c, ShareActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
-                if (paste) {
-                    putExtra(PASTE.toString(), true)
-                }
-                if (parentId != null) {
-                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
-                }
+            action = Intent.ACTION_VIEW
+            if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
+            if (paste) {
+                putExtra(PASTE.toString(), true)
             }
+            if (parentId != null) {
+                this.putExtra(PLAYLIST_PARENT.toString(), parentId)
+            }
+        }
 
         fun urlIntent(
             c: Context,
             url: String,
-            parentId: Long? = null,
+            parentId: Identifier<GUID>? = null,
             fromCategory: CategoryDomain? = null
         ) = Intent(c, ShareActivity::class.java).apply {
-                action = Intent.ACTION_VIEW
-                if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
-                data = Uri.parse(url)
-                if (fromCategory != null) {
-                    this.putExtra(CATEGORY.toString(), fromCategory.serialise())
-                }
-                if (parentId != null) {
-                    this.putExtra(PLAYLIST_PARENT.toString(), parentId)
-                }
+            action = Intent.ACTION_VIEW
+            if (c is Application) addFlags(FLAG_ACTIVITY_NEW_TASK)
+            data = Uri.parse(url)
+            if (fromCategory != null) {
+                this.putExtra(CATEGORY.toString(), fromCategory.serialise())
             }
+            if (parentId != null) {
+                this.putExtra(PLAYLIST_PARENT.toString(), parentId.serialise())
+            }
+        }
     }
 }

@@ -6,18 +6,19 @@ import android.text.SpannableString
 import android.text.style.ImageSpan
 import androidx.annotation.DrawableRes
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 
 class ItemTextMapper constructor(
     private val res: ResourceWrapper,
-    private val iconMapper: IconMapper
+    private val iconMapper: AndroidIconMapper
 ) {
 
     private val playDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_player_play_black,
+            R.drawable.ic_player_play,
             R.color.text_primary,
             R.dimen.list_item_top_text_size,
             SCALING
@@ -44,7 +45,7 @@ class ItemTextMapper constructor(
 
     private val unwatchDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_visibility_off_24,
+            R.drawable.ic_visibility_off,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING
@@ -53,7 +54,7 @@ class ItemTextMapper constructor(
 
     private val watchDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_visibility_24,
+            R.drawable.ic_visibility,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING
@@ -72,7 +73,7 @@ class ItemTextMapper constructor(
         }
     }
 
-    fun mapTopText(model: ItemContract.Model, playing: Boolean): SpannableString {
+    fun mapTopText(model: PlaylistItemMviContract.Model.Item, playing: Boolean): SpannableString {
         return if (!playing) {
             SpannableString(model.title)
         } else {
@@ -86,7 +87,7 @@ class ItemTextMapper constructor(
         }
     }
 
-    fun mapBottomText(model: ItemContract.Model): SpannableString {
+    fun mapBottomText(model: PlaylistItemMviContract.Model.Item): SpannableString {
         val posText = model.positon
         val watchedText = model.watchedSince
         val publishedText = model.published

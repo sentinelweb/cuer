@@ -8,11 +8,15 @@ import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Image
 import uk.co.sentinelweb.cuer.db.mapper.ImageMapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class SqldelightImageDatabaseRepository(
@@ -20,6 +24,8 @@ class SqldelightImageDatabaseRepository(
     private val imageMapper: ImageMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
+    private val guidCreator: GuidCreator,
+    private val source: OrchestratorContract.Source,
 ) : ImageDatabaseRepository {
     init {
         log.tag(this)
@@ -32,20 +38,27 @@ class SqldelightImageDatabaseRepository(
 
     override suspend fun save(domain: ImageDomain, flat: Boolean, emit: Boolean): RepoResult<ImageDomain> =
         withContext(coProvider.IO) {
-            try {
-                val entity = imageMapper.map(domain)
-                if (domain.id != null) {
-                    database.imageEntityQueries.update(entity)
-                    RepoResult.Data(imageMapper.map(entity))
-                } else {
-                    database.imageEntityQueries.create(entity)
-                    val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
-                    RepoResult.Data(imageMapper.map(entity.copy(id = insertId)))
+            with(database.imageEntityQueries) {
+                try {
+
+                    if (domain.id != null) {
+                        val entity = imageMapper.map(domain)
+                        update(entity)
+                        RepoResult.Data(imageMapper.map(entity))
+                    } else {
+                        guidCreator.create().toIdentifier(source)
+                            .let { domain.copy(id = it) }
+                            .also { create(imageMapper.map(it)) }
+                            .let { RepoResult.Data(it) }
+                        //create(entity)
+                        //val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
+                        //RepoResult.Data(imageMapper.map(entity.copy(id = insertId)))
+                    }
+                } catch (e: Exception) {
+                    val msg = "couldn't save image"
+                    log.e(msg, e)
+                    RepoResult.Error<ImageDomain>(e, msg)
                 }
-            } catch (e: Exception) {
-                val msg = "couldn't save image"
-                log.e(msg, e)
-                RepoResult.Error<ImageDomain>(e, msg)
             }
         }
 
@@ -65,11 +78,11 @@ class SqldelightImageDatabaseRepository(
             }
         }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<ImageDomain> =
+    override suspend fun load(id: GUID, flat: Boolean): RepoResult<ImageDomain> =
         withContext(coProvider.IO) {
             try {
                 database.imageEntityQueries
-                    .load(id)
+                    .load(id.value)
                     .executeAsOneOrNull()!!
                     .let { image: Image -> imageMapper.map(image) }
                     .let { image: ImageDomain -> RepoResult.Data(image) }
@@ -132,38 +145,41 @@ class SqldelightImageDatabaseRepository(
         throw NotImplementedError("Not used")
     }
 
-    internal fun loadEntity(id: Long?): Image? =
+    internal fun loadEntity(id: GUID?): Image? =
         id?.let {
             database.imageEntityQueries
-                .load(it)
+                .load(it.value)
                 .executeAsOneOrNull()
         }
 
     internal fun checkToSaveImage(domain: ImageDomain): ImageDomain =
-        domain
-            .let { imageMapper.map(it) }
-            .let { imageEntity ->
-                if (imageEntity.id > 0) {
-                    database.imageEntityQueries.update(imageEntity)
-                    imageEntity
-                } else {
-                    database.imageEntityQueries
-                        .loadByUrl(imageEntity.url)
-                        .executeAsOneOrNull()
-                        ?.let { imageEntity.copy(id = it.id) }
-                        ?.also { database.imageEntityQueries.update(it) }
-                        ?: let {
-                            database.imageEntityQueries
-                                .create(imageEntity)
-                                .let { imageEntity.copy(id = database.imageEntityQueries.getInsertId().executeAsOne()) }
-                        }
-                }
-            }.let { imageMapper.map(it) }
+        if (domain.id != null) {
+            imageMapper.map(domain).apply {
+                database.imageEntityQueries.update(this)
+            }
+        } else {
+            with(database.imageEntityQueries) {
+                loadByUrl(domain.url)
+                    .executeAsOneOrNull()
+//                ?.let { imageEntity.copy(id = it.id) }
+                    ?.let { imageMapper.map(domain.copy(id = it.id.toGuidIdentifier(source))) }
+                    ?.also { database.imageEntityQueries.update(it) }
+                    ?: let {
+                        guidCreator.create().toIdentifier(source)
+                            .let { imageMapper.map(domain.copy(id = it)) }
+                            .also { create(it) }
 
-    internal suspend fun delete(id: Long?): RepoResult<Boolean> = withContext(coProvider.IO) {
+//                    database.imageEntityQueries
+//                        .create(imageEntity)
+//                        .let { imageEntity.copy(id = database.imageEntityQueries.getInsertId().executeAsOne()) }
+                    }
+            }
+        }.let { imageMapper.map(it) }
+
+    internal suspend fun delete(id: GUID?): RepoResult<Boolean> = withContext(coProvider.IO) {
         id?.let {
             try {
-                database.imageEntityQueries.delete(it)
+                database.imageEntityQueries.delete(id.value)
                 RepoResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete image: $id"

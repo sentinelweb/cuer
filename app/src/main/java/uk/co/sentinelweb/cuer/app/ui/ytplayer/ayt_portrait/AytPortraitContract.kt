@@ -10,8 +10,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.EmptyActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.EmptyNavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
@@ -24,12 +22,12 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 
 interface AytPortraitContract {
     companion object {
@@ -75,7 +73,7 @@ interface AytPortraitContract {
                 scoped {
                     (get<AytPortraitActivity>()
                         .supportFragmentManager
-                        .findFragmentById(R.id.portrait_player_playlist) as PlaylistFragment)
+                        .findFragmentById(R.id.portrait_player_playlist) as PlaylistMviFragment)
                 }
                 scoped { navigationRouter(false, get<AytPortraitActivity>(), withNavHost = false) }
                 scoped<SkipContract.External> {
@@ -97,11 +95,10 @@ interface AytPortraitContract {
                 scoped { LocalPlayerCastListener(get<AytPortraitActivity>(), get()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped { AlertDialogCreator(get<AytPortraitActivity>()) }
-                scoped { ShareWrapper(get<AytPortraitActivity>()) }
+                scoped { AlertDialogCreator(get<AytPortraitActivity>(), get()) }
+                scoped { AndroidShareWrapper(get<AytPortraitActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }
-                scoped<ActionBarModifier> { EmptyActionBarModifier() }
             }
         }
     }

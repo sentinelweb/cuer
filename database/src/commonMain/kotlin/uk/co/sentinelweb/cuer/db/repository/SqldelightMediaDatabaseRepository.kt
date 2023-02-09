@@ -7,19 +7,21 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.database.entity.Media
 import uk.co.sentinelweb.cuer.db.mapper.MediaMapper
 import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
-import uk.co.sentinelweb.cuer.domain.ext.summarise
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.MediaUpdateDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -32,6 +34,8 @@ class SqldelightMediaDatabaseRepository(
     private val mediaUpdateMapper: MediaUpdateMapper,
     private val coProvider: CoroutineContextProvider,
     private val log: LogWrapper,
+    private val guidCreator: GuidCreator,
+    private val source: Source,
 ) : MediaDatabaseRepository {
 
     init {
@@ -82,7 +86,7 @@ class SqldelightMediaDatabaseRepository(
             }
         }
 
-    override suspend fun load(id: Long, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
+    override suspend fun load(id: GUID, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
 
     override suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
@@ -94,7 +98,7 @@ class SqldelightMediaDatabaseRepository(
                                 loadAll().executeAsList()
 
                             is IdListFilter ->
-                                loadAllByIds(filter.ids).executeAsList()
+                                loadAllByIds(filter.ids.map { it.value }).executeAsList()
 
                             is PlatformIdListFilter ->
                                 filter.ids
@@ -139,7 +143,7 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> = withContext(coProvider.IO) {
         try {
             domain.id
-                ?.let { database.mediaEntityQueries.delete(it) }
+                ?.let { database.mediaEntityQueries.delete(it.id.value) }
                 ?.let { RepoResult.Data(true) }
                 ?.also { if (emit) _updatesFlow.emit(Operation.DELETE to domain) }
                 ?: let { RepoResult.Data(false) }
@@ -175,11 +179,11 @@ class SqldelightMediaDatabaseRepository(
             when (update as? MediaUpdateDomain) {
                 is MediaPositionUpdateDomain ->
                     (update as MediaPositionUpdateDomain)
-                        .let { it to database.mediaEntityQueries.loadFlags(it.id).executeAsOne() }
+                        .let { it to database.mediaEntityQueries.loadFlags(it.id.id.value).executeAsOne() }
                         .let { mediaUpdateMapper.map(it.first, it.second) }
                         .also {
                             database.mediaEntityQueries.updatePosition(
-                                id = it.id,
+                                id = it.id.value,
                                 dateLastPlayed = it.dateLastPlayed,
                                 position = it.positon,
                                 duration = it.duration,
@@ -198,14 +202,14 @@ class SqldelightMediaDatabaseRepository(
         }
     }
 
-    private suspend fun loadMedia(id: Long): RepoResult<MediaDomain> =
+    private suspend fun loadMedia(id: GUID): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             loadMediaInternal(id)
         }
 
-    internal fun loadMediaInternal(id: Long) = try {
+    internal fun loadMediaInternal(id: GUID) = try {
         database.mediaEntityQueries
-            .loadById(id)
+            .loadById(id.value)
             .executeAsOne()
             .let { media: Media -> fillAndMapEntity(media) }
             .let { media: MediaDomain -> RepoResult.Data(media) }
@@ -217,21 +221,20 @@ class SqldelightMediaDatabaseRepository(
 
     private fun fillAndMapEntity(media: Media): MediaDomain = mediaMapper.map(
         media,
-        channelDatabaseRepository.loadChannelInternal(media.channel_id!!).data!!,
-        imageDatabaseRepository.loadEntity(media.thumb_id),
-        imageDatabaseRepository.loadEntity(media.image_id),
+        channelDatabaseRepository.loadChannelInternal(media.channel_id!!.toGUID()).data!!,
+        imageDatabaseRepository.loadEntity(media.thumb_id?.toGUID()),
+        imageDatabaseRepository.loadEntity(media.image_id?.toGUID()),
     )
 
     internal fun saveMediasInternal(
         domains: List<MediaDomain>,
         flat: Boolean
     ) = domains
-        .map { log.i("save id: ${it.summarise()}"); saveInternal(it, flat) }
-        .map { log.i("saved id: $it"); it }
+        .map { saveInternal(it, flat) }
         .map { loadMediaInternal(it).data!! }
 
-    private fun saveInternal(mediaDomain: MediaDomain, flat: Boolean): Long =
-        mediaDomain
+    private fun saveInternal(input: MediaDomain, flat: Boolean): GUID =
+        input
             .let {
                 if (!flat) it.copy(
                     channelData = channelDatabaseRepository.checkToSaveChannelInternal(it.channelData)
@@ -246,28 +249,34 @@ class SqldelightMediaDatabaseRepository(
                 it.copy(image = it.image
                     ?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
-            .let {
-                val mediaEntity = mediaMapper.map(it)
+            .let { toSaveDomain ->
                 with(database.mediaEntityQueries) {
-                    if (mediaEntity.id > 0) {
+                    val platformCheck = try {
+                        loadByPlatformId(toSaveDomain.platformId, toSaveDomain.platform).executeAsOne()
+                    } catch (n: NullPointerException) {
+                        null
+                    }
+                    if (toSaveDomain.id != null) {
+                        val mediaEntity = mediaMapper.map(toSaveDomain)
                         // manual check for platform-platformId duplication
                         // throw ConflictException if id is different for same platform-platformId
-                        val platformCheck = try {
-                            loadByPlatformId(mediaEntity.platform_id, mediaEntity.platform).executeAsOne()
-                        } catch (n: NullPointerException) {
-                            null
-                        }
                         if (platformCheck != null && platformCheck.id != mediaEntity.id) {
                             throw ConflictException(
-                                "conflicting id for ${mediaEntity.platform}-${mediaEntity.platform_id}" +
-                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id} "
+                                "conflicting media id for ${mediaEntity.platform}_${mediaEntity.platform_id}" +
+                                        " existing: ${platformCheck.id}  thisid:${mediaEntity.id}"
                             )
                         }
                         update(mediaEntity)
-                        loadById(mediaDomain.id!!).executeAsOne().id
+                        loadById(toSaveDomain.id!!.id.value).executeAsOne().id.toGUID()
                     } else {
-                        create(mediaEntity)
-                        getInsertId().executeAsOne()
+                        if (platformCheck != null) {
+                            //throw ConflictException("media already exists: ${toSaveDomain.platform}_${toSaveDomain.platformId}")
+                            return platformCheck.id.toGUID()
+                        } else {
+                            guidCreator.create().toIdentifier(source)
+                                .apply { create(mediaMapper.map(toSaveDomain.copy(id = this))) }
+                                .id
+                        }
                     }
                 }
             }

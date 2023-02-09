@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.repository
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -16,15 +13,21 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -43,6 +46,8 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     }
 
     val database: Database by inject()
+    private val guidCreator: GuidCreator by inject()
+
     val sut: ImageDatabaseRepository by inject()
 
     @Before
@@ -55,7 +60,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         val initial = fixture<ImageDomain>().copy(id = null)
         with(sut.save(initial, flat = false, emit = false)) {
             assertTrue(isSuccessful)
-            assertEquals(1L, data?.id)
+            assertNotNull(data?.id)
             assertEquals(initial.url, data?.url)
             assertEquals(initial.width, data?.width)
             assertEquals(initial.height, data?.height)
@@ -64,7 +69,8 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
     @Test
     fun updateImage() = runTest {
-        val initial = fixture<ImageDomain>().copy(id = 10001)
+        val guid = guidCreator.create()
+        val initial = fixture<ImageDomain>().copy(id = guid.toIdentifier(LOCAL))
         val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
 
@@ -72,7 +78,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         val repoResultUpdate = sut.save(update, flat = false, emit = false)
         assertTrue(repoResultUpdate.isSuccessful)
 
-        with(sut.load(initial.id!!, flat = false)) {
+        with(sut.load(initial.id!!.id, flat = false)) {
             assertEquals(initial.id, data?.id)
             assertEquals(update.url, data?.url)
             assertEquals(update.width, data?.width)
@@ -88,7 +94,8 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         repoResult.data!!.forEachIndexed { i, imageDomain ->
-            assertEquals((i + 1).toLong(), imageDomain.id)
+            //assertEquals((i + 1).toLong(), imageDomain.id)
+            assertNotNull(imageDomain.id)
         }
     }
 
@@ -99,7 +106,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
-        with(sut.load(saved.id!!, flat = false)) {
+        with(sut.load(saved.id!!.id, flat = false)) {
             assertEquals(saved.id, data?.id)
             assertEquals(saved.url, data?.url)
             assertEquals(saved.width, data?.width)
@@ -121,15 +128,15 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `loadEntity$Cuer_database_commonMain`() = runTest {
+    fun loadEntity() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
         val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
         val saved = repoResult.data!!
 
         val sutImpl = sut as SqldelightImageDatabaseRepository
-        with(sutImpl.loadEntity(saved.id!!)!!) {
-            assertEquals(saved.id, id)
+        with(sutImpl.loadEntity(saved.id!!.id)!!) {
+            assertEquals(saved.id, id.toGuidIdentifier(LOCAL))
             assertEquals(saved.url, url)
             assertEquals(saved.width?.toLong(), width)
             assertEquals(saved.height?.toLong(), height)
@@ -137,11 +144,11 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `checkToSaveImage$Cuer_database_commonMain_create`() = runTest {
+    fun checkToSaveImage_create() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
         val sutImpl = sut as SqldelightImageDatabaseRepository
-        with (sutImpl.checkToSaveImage(initial)) {
-            assertEquals(1L, id)
+        with(sutImpl.checkToSaveImage(initial)) {
+            assertNotNull(id)
             assertEquals(initial.url, url)
             assertEquals(initial.width, width)
             assertEquals(initial.height, height)
@@ -149,7 +156,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `checkToSaveImage$Cuer_database_commonMain_update_no_id_url`() = runTest {
+    fun checkToSaveImage_update_no_id_url() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
         val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)
@@ -157,7 +164,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
 
         val update = fixture<ImageDomain>().copy(id = null, url = initial.url)
         val sutImpl = sut as SqldelightImageDatabaseRepository
-        with (sutImpl.checkToSaveImage(update)) {
+        with(sutImpl.checkToSaveImage(update)) {
             assertEquals(saved.id, id)
             assertEquals(initial.url, url)
             assertEquals(update.width, width)
@@ -166,7 +173,7 @@ class SqldelightImageDatabaseRepositoryTest : KoinTest {
     }
 
     @Test
-    fun `checkToSaveImage$Cuer_database_commonMain_update_id`() = runTest {
+    fun checkToSaveImage_update_id() = runTest {
         val initial = fixture<ImageDomain>().copy(id = null)
         val repoResult = sut.save(initial, flat = false, emit = false)
         assertTrue(repoResult.isSuccessful)

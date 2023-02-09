@@ -2,20 +2,21 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item
 
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract.Model.ItemModel
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract.Model.Item
+import uk.co.sentinelweb.cuer.domain.GUID
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     val modelMapper: ItemModelMapper
-) : ItemContract.Presenter, ItemContract.External<ItemModel> {
+) : ItemContract.Presenter, ItemContract.External<Item> {
 
-    override var parentId: Long? = null
+    override var parentId: OrchestratorContract.Identifier<GUID>? = null
 
     override fun update(
-        item: ItemModel,
-        current: OrchestratorContract.Identifier<*>?
+        item: Item,
+        current: OrchestratorContract.Identifier<GUID>?
     ) {
         view.setTransitionData(
             "${item.id}_${view.type}_${parentId}_HEADER",
@@ -23,12 +24,12 @@ class ItemPresenter(
         )
         view.setVisible(true)
         if (state.item == item) return
-        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id, view.type))
+        view.setTopText(modelMapper.mapTopText(item, current?.id == item.id.id, view.type))
         view.setBottomText(modelMapper.mapBottomText(item))
         view.setCheckedVisible(item.checkIcon)
         item.thumbNailUrl
             ?.apply { view.setIconUrl(this) }
-            ?: R.drawable.ic_playlist_black
+            ?: R.drawable.ic_playlist
                 .apply { view.setIconResource(this) }
         state.item = item
         view.showOverflow(item.showOverflow && (canPlay() || canLaunch() || canEdit() || canShare()))

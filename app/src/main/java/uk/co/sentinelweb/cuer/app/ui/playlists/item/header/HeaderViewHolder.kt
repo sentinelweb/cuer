@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlists.item.header
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import uk.co.sentinelweb.cuer.app.ui.common.item.ItemBaseContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsItemMviContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 
 class HeaderViewHolder(
@@ -19,8 +20,8 @@ class HeaderViewHolder(
     override val leftSwipeView: View?
         get() = null
 
-    fun update(headerModel: ItemContract.Model.HeaderModel) {
-        headerView.setTitle(headerModel.title)
+    fun update(header: PlaylistsItemMviContract.Model.Header) {
+        headerView.setTitle(header.title)
     }
 
     override fun onItemSwiped(left: Boolean) {}

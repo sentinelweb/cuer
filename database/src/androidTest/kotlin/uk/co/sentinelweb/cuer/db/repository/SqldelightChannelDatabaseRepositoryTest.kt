@@ -1,8 +1,5 @@
 package uk.co.sentinelweb.cuer.db.repository
 
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -16,8 +13,10 @@ import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -25,7 +24,8 @@ import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class SqldelightChannelDatabaseRepositoryTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+
+    private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -43,9 +43,9 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         )
     }
 
-    val database: Database by inject()
-    val sut: ChannelDatabaseRepository by inject()
+    private val database: Database by inject()
 
+    private val sut: ChannelDatabaseRepository by inject()
     @Before
     fun before() {
         Database.Schema.create(get())
@@ -62,7 +62,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         }
         with(sut.save(initial, flat = false, emit = false)) {
             assertTrue(isSuccessful)
-            assertEquals(1L, data?.id)
+            //assertEquals(1L, data?.id)
             assertEquals(initial.platform, data?.platform)
             assertEquals(initial.platformId, data?.platformId)
             assertEquals(initial.country, data?.country)
@@ -102,7 +102,7 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
             assertTrue(isSuccessful)
             assertNotNull(data)
             data!!.forEachIndexed { i, savedChannel ->
-                assertEquals((i + 1).toLong(), savedChannel.id)
+                //assertEquals((i + 1).toLong(), savedChannel.id)
                 assertEquals(initial[i].platform, savedChannel.platform)
                 assertEquals(initial[i].platformId, savedChannel.platformId)
                 assertEquals(initial[i].country, savedChannel.country)
@@ -141,12 +141,12 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
         }
         val saved = sut.save(initial, flat = false, emit = false).data
         assertNotNull(saved)
-        val actual = sut.load(saved.id!!, flat = false)
+        val actual = sut.load(saved.id!!.id, flat = false)
         assertEquals(saved, actual.data)
     }
 
     @Test
-    fun `checkToSaveChannel$Cuer_database_commonMain platformId exists`() = runTest {
+    fun `checkToSaveChannel platformId exists`() = runTest {
         val initial = fixture<ChannelDomain>().run {
             copy(
                 id = null,
@@ -168,12 +168,12 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved.id!!, flat = false).data
+        val expected = sutImpl.load(saved.id!!.id, flat = false).data
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `checkToSaveChannel$Cuer_database_commonMain platformId exists new images`() = runTest {
+    fun `checkToSaveChannel platformId exists new images`() = runTest {
         val initial = fixture<ChannelDomain>().run {
             copy(
                 id = null,
@@ -193,12 +193,12 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(updated)
-        val expected = sutImpl.load(saved.id!!, flat = false).data
+        val expected = sutImpl.load(saved.id!!.id, flat = false).data
         assertEquals(expected, actual)
     }
 
     @Test
-    fun `checkToSaveChannel$Cuer_database_commonMain does not exist`() = runTest {
+    fun `checkToSaveChannel does not exist`() = runTest {
         val initial = fixture<ChannelDomain>().run {
             copy(
                 id = null,
@@ -209,12 +209,22 @@ class SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
         val sutImpl = sut as SqldelightChannelDatabaseRepository
         val actual = sutImpl.checkToSaveChannel(initial)
-        val expected = initial.copy(
-            id = database.channelEntityQueries.getInsertId().executeAsOne(),
-            thumbNail = initial.thumbNail?.copy(id = 1L),
-            image = initial.image?.copy(id = initial.thumbNail?.let { 2L } ?: 1L),
-        )
-        assertEquals(expected, actual)
+
+        assertNotNull(actual.id)
+        assertEquals(LOCAL, actual.id!!.source)
+        assertNotNull(actual.id!!.id.value)
+
+        initial.thumbNail?.apply {
+            assertNotNull(actual.thumbNail!!.id)
+            assertEquals(LOCAL, actual.thumbNail!!.id!!.source)
+            assertNotNull(actual.thumbNail!!.id!!.id.value)
+        }
+
+        initial.image?.apply {
+            assertNotNull(actual.image!!.id)
+            assertEquals(LOCAL, actual.image!!.id!!.source)
+            assertNotNull(actual.image!!.id!!.id.value)
+        }
     }
 
     @Test

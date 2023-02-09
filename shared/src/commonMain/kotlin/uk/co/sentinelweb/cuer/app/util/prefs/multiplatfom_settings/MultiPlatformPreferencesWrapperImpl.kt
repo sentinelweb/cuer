@@ -2,8 +2,7 @@ package uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings
 
 import com.russhwolf.settings.Settings
 
-class MultiPlatformPreferencesWrapperImpl constructor(
-) : MultiPlatformPreferencesWrapper {
+class MultiPlatformPreferencesWrapperImpl : MultiPlatformPreferencesWrapper {
 
     private val prefs: Settings by lazy {
         Settings()
@@ -65,6 +64,13 @@ class MultiPlatformPreferencesWrapperImpl constructor(
 
     override fun putBoolean(field: MultiPlatformPreferences, value: Boolean) {
         prefs.putBoolean(field.fname, value)
+    }
+
+    override fun getBoolean(field: MultiPlatformPreferences, ext: String, def: Boolean): Boolean =
+        prefs.getBoolean(field.fname + ext, def)
+
+    override fun putBoolean(field: MultiPlatformPreferences, ext: String, value: Boolean) {
+        prefs.putBoolean(field.fname + ext, value)
     }
 
     override fun remove(field: MultiPlatformPreferences) {

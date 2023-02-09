@@ -42,7 +42,7 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/portrait_player_playlist"
-            android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment"
+            android:name="uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="visible"

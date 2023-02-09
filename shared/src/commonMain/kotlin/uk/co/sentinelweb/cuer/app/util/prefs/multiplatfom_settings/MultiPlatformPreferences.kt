@@ -11,16 +11,12 @@ import uk.co.sentinelweb.cuer.app.util.prefs.PrefWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.RESTART_AFTER_UNLOCK_DEFAULT
-import uk.co.sentinelweb.cuer.domain.SearchLocalDomain
-import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
-import uk.co.sentinelweb.cuer.domain.SearchTypeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchRemote
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-enum class MultiPlatformPreferences constructor(
-    override val fname: String,
-) : Field {
+enum class MultiPlatformPreferences constructor(override val fname: String) : Field {
     BROWSE_CAT_TITLE("browseNodeId"),
     BROWSE_RECENT_TITLES("browseRecent"),
     RECENT_PLAYLISTS("recentPlaylists"),
@@ -41,6 +37,7 @@ enum class MultiPlatformPreferences constructor(
     LAST_SEARCH_TYPE("lastSearchType"),
     DB_INITIALISED("dbInitialised"),
     LAST_BOTTOM_TAB("lastBottomNavTab"),
+    ONBOARDED_PREFIX("onboarded_"),
     ;
 
     companion object {
@@ -81,43 +78,43 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
             ?.let { putString(BACKUP_LAST_LOCATION, it) }
             ?: let { remove(BACKUP_LAST_LOCATION) }
 
-    var currentPlayingPlaylistId: OrchestratorContract.Identifier<Long>
+    var currentPlayingPlaylistId: OrchestratorContract.Identifier<GUID>
         get() = if (has(CURRENT_PLAYING_PLAYLIST_ID) && has(CURRENT_PLAYING_PLAYLIST_ID)) {
-            (getLong(CURRENT_PLAYING_PLAYLIST_ID)!!
+            (getString(CURRENT_PLAYING_PLAYLIST_ID, null)!!.toGUID()
                     to Source.valueOf(getString(CURRENT_PLAYING_PLAYLIST_SOURCE, null)!!)
                     ).toIdentifier()
         } else NO_PLAYLIST.toPair().toIdentifier()
         set(value) = value
             .let {
-                putLong(CURRENT_PLAYING_PLAYLIST_ID, it.id)
+                putString(CURRENT_PLAYING_PLAYLIST_ID, it.id.value)
                 putString(CURRENT_PLAYING_PLAYLIST_SOURCE, it.source.toString())
             }
 
-    var lastViewedPlaylistId: OrchestratorContract.Identifier<Long>
+    var lastViewedPlaylistId: OrchestratorContract.Identifier<GUID>
         get() = if (has(LAST_PLAYLIST_VIEWED_ID) && has(LAST_PLAYLIST_VIEWED_ID)) {
-            (getLong(LAST_PLAYLIST_VIEWED_ID)!!
+            (getString(LAST_PLAYLIST_VIEWED_ID, null)!!.toGUID()
                     to Source.valueOf(getString(LAST_PLAYLIST_VIEWED_SOURCE, null)!!)
                     ).toIdentifier()
         } else NO_PLAYLIST.toPair().toIdentifier()
         set(value) = value
             .let {
-                putLong(LAST_PLAYLIST_VIEWED_ID, it.id)
+                putString(LAST_PLAYLIST_VIEWED_ID, it.id.value)
                 putString(LAST_PLAYLIST_VIEWED_SOURCE, it.source.toString())
             }
 //        get() = getPair(LAST_PLAYLIST_VIEWED, NO_PLAYLIST.toPair()).toIdentifier()
 //        set(value) = value
 //            .let { putPair(LAST_PLAYLIST_VIEWED, it.toPair()) }
 
-    var lastAddedPlaylistId: Long?
-        get() = getLong(LAST_PLAYLIST_ADDED_TO)
+    var lastAddedPlaylistId: GUID?
+        get() = getString(LAST_PLAYLIST_ADDED_TO, null)?.toGUID()
         set(value) = value
-            ?.let { putLong(LAST_PLAYLIST_ADDED_TO, it) }
+            ?.let { putString(LAST_PLAYLIST_ADDED_TO, it.value) }
             ?: let { remove(LAST_PLAYLIST_ADDED_TO) }
 
-    var pinnedPlaylistId: Long?
-        get() = getLong(PINNED_PLAYLIST)
+    var pinnedPlaylistId: GUID?
+        get() = getString(PINNED_PLAYLIST, null)?.toGUID()
         set(value) = value
-            ?.let { putLong(PINNED_PLAYLIST, it) }
+            ?.let { putString(PINNED_PLAYLIST, it.value) }
             ?: let { remove(PINNED_PLAYLIST) }
 
     var lastLocalSearch: SearchLocalDomain?
@@ -154,5 +151,8 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
         get() = getInt(LAST_BOTTOM_TAB) ?: 0
         set(value) = value
             .let { putInt(LAST_BOTTOM_TAB, it) }
+
+    fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
+    fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)
 
 }

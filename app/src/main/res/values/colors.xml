@@ -8,6 +8,7 @@
     <color name="secondary_variant">@color/dark_indigo</color>
     <!--    color_on_surface should be the same as text_primary-->
     <color name="color_on_surface">@color/grey_800</color>
+    <color name="light_color_on_surface">@color/grey_400</color>
     <color name="text_primary">@color/grey_800</color>
     <color name="text_secondary">@color/grey_600</color>
     <color name="surface">@color/grey_50</color>

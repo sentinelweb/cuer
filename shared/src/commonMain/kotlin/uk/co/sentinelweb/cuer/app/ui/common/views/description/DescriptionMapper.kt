@@ -5,7 +5,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.core.mappers.DateTimeFormatter
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class DescriptionMapper constructor(
     private val dateTimeFormater: DateTimeFormatter
@@ -30,13 +32,18 @@ class DescriptionMapper constructor(
                     }
             },
         pubDate = dateTimeFormater.formatDateTimeNullable(domain.published),
-        ribbonActions = ribbonActions
+        ribbonActions = ribbonActions,
+        info = DescriptionModel.Info(
+            platform = domain.platform,
+            platformId = domain.platformId,
+            dbId = domain.id
+        )
     )
 
     private fun chipModel(playlist: PlaylistDomain, editablePlaylists: Boolean) = ChipModel(
         ChipModel.Type.PLAYLIST,
         playlist.title,
-        playlist.id.toString(),
+        playlist.id!!.serialise(),
         playlist.thumb ?: playlist.image,
         editablePlaylists
     )
@@ -49,6 +56,10 @@ class DescriptionMapper constructor(
         channelTitle = null,
         channelThumbUrl = null,
         channelDescription = null,
-        ribbonActions = listOf()
+        ribbonActions = listOf(),
+        info = DescriptionModel.Info(
+            platform = PlatformDomain.OTHER,
+            platformId = "???"
+        )
     )
 }

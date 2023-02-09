@@ -15,9 +15,11 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemTextMapper
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -52,7 +54,7 @@ interface PlaylistItemEditContract {
         var isMediaChanged: Boolean = false,
         var isSaved: Boolean = false,
         val editSettings: Edit = Edit(),
-        var parentPlaylistId: Long = -1,
+        var parentPlaylistId: OrchestratorContract.Identifier<GUID>? = null,
         var allowPlay: Boolean = false,
         val deletedPlayLists: MutableSet<PlaylistDomain> = mutableSetOf(),
         var isOnSharePlaylist: Boolean = false,
@@ -98,8 +100,8 @@ interface PlaylistItemEditContract {
                 scoped { SelectDialogCreator(this.getFragmentActivity()) }
                 scoped { this.getFragmentActivity() }
                 scoped { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
-                scoped { ShareWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped { AndroidShareWrapper(this.getFragmentActivity()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped {
                     PlayUseCase(
                         queue = get(),
@@ -108,10 +110,10 @@ interface PlaylistItemEditContract {
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        res = get()
+                        strings = get()
                     )
                 }
-                scoped {
+                scoped<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistItemEditFragment>(),
                         itemFactory = get(),
@@ -127,6 +129,7 @@ interface PlaylistItemEditContract {
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped { ItemModelMapper(get(), get(), get(), get()) }
                 scoped { ItemTextMapper(get(), get()) }
+                scoped { PlaylistItemEditHelpConfig(get()) }
             }
         }
 

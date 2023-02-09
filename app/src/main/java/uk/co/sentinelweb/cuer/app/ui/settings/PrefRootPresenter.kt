@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
@@ -56,11 +57,15 @@ class PrefRootPresenter constructor(
     }
 
     override fun onFeedback() {
-
         view.sendEmail(emailUseCase.makeFeedbackEmail())
     }
 
     override fun onShare() {
         view.launchShare(shareUseCase.shareApp())
+    }
+
+    override fun resetOnboarding() {
+        OnboardingFragment.setOnboardingState(isShown = false)
+//        System.exit(0)
     }
 }

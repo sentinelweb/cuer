@@ -9,9 +9,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.domain.Domain
-import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 interface ScanContract {
 
@@ -36,7 +34,6 @@ interface ScanContract {
 
     ) : ViewModel()
 
-
     @Serializable
     data class Result constructor(
         val url: String,
@@ -44,7 +41,14 @@ interface ScanContract {
         val isOnPlaylist: Boolean,
         val type: ObjectTypeDomain,
         val result: Domain
-    )
+    ) {
+        val platform: Pair<PlatformDomain, String> = when (result) {
+            is MediaDomain -> result.platform to result.platformId
+            is PlaylistDomain -> result.platform!! to result.platformId!!
+            is PlaylistItemDomain -> result.media.platform to result.media.platformId
+            else -> throw IllegalStateException("unknown result")
+        }
+    }
 
     data class Model constructor(
         val url: String,

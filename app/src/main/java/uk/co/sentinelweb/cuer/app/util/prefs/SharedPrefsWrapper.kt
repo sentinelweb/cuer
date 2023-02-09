@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.prefs
 import android.annotation.SuppressLint
 import android.app.Application
 import android.content.SharedPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class SharedPrefsWrapper constructor(
@@ -55,10 +56,17 @@ class SharedPrefsWrapper constructor(
     override fun getBoolean(field: GeneralPreferences, def: Boolean): Boolean =
         prefs.getBoolean(field.fname, def)
 
+    override fun getBoolean(field: MultiPlatformPreferences, ext: String, def: Boolean): Boolean =
+        prefs.getBoolean(field.fname + ext, def)
+
     override fun putBoolean(field: GeneralPreferences, value: Boolean) {
         prefs.edit()
             .putBoolean(field.fname, value)
             .apply()
+    }
+
+    override fun putBoolean(field: MultiPlatformPreferences, ext: String, value: Boolean) {
+        prefs.edit().putBoolean(field.fname + ext, value).apply()
     }
 
     override fun remove(field: GeneralPreferences) {

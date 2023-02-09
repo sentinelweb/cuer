@@ -9,25 +9,19 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 
 interface MainContract {
-
-    enum class LastTab {
-        BROWSE, PLAYLISTS, PLAYLIST
-    }
 
     interface Presenter {
         fun initialise()
@@ -85,13 +79,12 @@ interface MainContract {
                 scoped { navigationRouter(false, get<MainActivity>()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
-                scoped<PlaylistContract.Interactions?> { null }
+                // scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
-                scoped { AlertDialogCreator(get<MainActivity>()) }
+                scoped { AlertDialogCreator(get<MainActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
-                scoped<ActionBarModifier> { get<MainActivity>() }
                 scoped { EmailWrapper(get<MainActivity>()) }
-                scoped { ShareWrapper(get<MainActivity>()) }
+                scoped { AndroidShareWrapper(get<MainActivity>()) }
 
                 // ALL SHARE HACKS
                 scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }

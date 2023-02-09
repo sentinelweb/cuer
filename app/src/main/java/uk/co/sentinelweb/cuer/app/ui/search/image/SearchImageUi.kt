@@ -63,7 +63,7 @@ fun SearchImageParametersUi(
                     )
                     Row(modifier = Modifier.align(Alignment.TopEnd)) {
                         Icon(
-                            painterResource(id = R.drawable.ic_photo_library_24),
+                            painterResource(id = R.drawable.ic_photo_library),
                             contentDescription = stringResource(id = R.string.clear),
                             modifier = Modifier
                                 .width(48.dp)

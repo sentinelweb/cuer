@@ -7,6 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ui.main.MainActivity"
+    android:background="?colorSurface"
 >
 
     <com.google.android.material.appbar.AppBarLayout
@@ -19,9 +20,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:collapsedTitleTextAppearance="@style/TextAppearance.ActionBar.Collapsed"
-            app:expandedTitleMarginBottom="28dp"
-            app:expandedTitleMarginEnd="16dp"
-            app:expandedTitleMarginStart="16dp"
+            app:expandedTitleMarginBottom="16dp"
+            app:expandedTitleMarginEnd="0dp"
+            app:expandedTitleMarginStart="@dimen/app_bar_header_margin_start"
             app:expandedTitleTextAppearance="@style/TextAppearance.ActionBar.Expanded"
             app:layout_scrollFlags="scroll|exitUntilCollapsed|enterAlways"
             app:statusBarScrim="?colorSurface"
@@ -55,7 +56,7 @@
                     android:layout_height="wrap_content"
                     app:layout_constraintTop_toBottomOf="@id/playlist_header_image"
                     app:layout_constraintLeft_toLeftOf="parent"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="@dimen/app_bar_header_margin_start"
                     android:scrollbars="none"
                 >
                     <LinearLayout
@@ -65,7 +66,7 @@
                     >
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/playlist_fab_play"
-                            style="@style/Header.Button"
+                            style="@style/Header.Button.Solid"
                             android:contentDescription="@string/menu_play"
                             android:text="@string/menu_play"
                             android:visibility="gone"
@@ -78,7 +79,7 @@
                             android:contentDescription="@string/menu_edit"
                             android:text="@string/menu_edit"
                             android:visibility="gone"
-                            app:icon="@drawable/ic_edit_24"
+                            app:icon="@drawable/ic_edit"
                         />
 
                         <com.google.android.material.button.MaterialButton
@@ -107,6 +108,24 @@
                             android:visibility="gone"
                             app:icon="@drawable/ic_playmode_shuffle"
                         />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_launch_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_launch"
+                            android:text="@string/menu_launch"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_launch"
+                        />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/playlist_share_button"
+                            style="@style/Header.Button"
+                            android:contentDescription="@string/menu_share"
+                            android:text="@string/menu_share"
+                            android:visibility="gone"
+                            app:icon="@drawable/ic_share"
+                        />
                     </LinearLayout>
                 </HorizontalScrollView>
 
@@ -116,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="16dp"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="@dimen/app_bar_header_margin_start"
                     android:orientation="horizontal"
                     tools:text="800"
                     app:layout_constraintTop_toBottomOf="@id/playlist_buttons"
@@ -165,8 +184,53 @@
                         android:id="@+id/playlist_flag_children"
                         style="@style/Header.InfoText"
                         android:visibility="gone"
-                        app:drawableStartCompat="@drawable/ic_tree_flag_20"
+                        app:drawableStartCompat="@drawable/ic_tree_flag"
                         tools:text="3"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_playable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_playable"
+                        android:src="@drawable/ic_play"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_deletable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_deletable"
+                        android:src="@drawable/ic_delete"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_editable"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_editable"
+                        android:src="@drawable/ic_edit"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_deletable_items"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_deletable_items"
+                        android:src="@drawable/ic_delete_item"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
+                    />
+
+                    <ImageView
+                        android:id="@+id/playlist_flag_editable_items"
+                        style="@style/Header.InfoIcon"
+                        android:contentDescription="@string/help_pe_editabe_items"
+                        android:src="@drawable/ic_editable_items"
+                        android:visibility="visible"
+                        app:tint="@color/light_color_on_surface"
                     />
                 </LinearLayout>
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -197,72 +261,23 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="LinearLayoutManager"
-            tools:context=".ui.playlist.PlaylistFragment"
+            tools:context=".ui.playlist.old.PlaylistFragment"
             tools:listitem="@layout/view_playlist_row"
             android:scrollbars="vertical"
-            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"/>
+            android:scrollbarThumbVertical="@drawable/scrollbar_thumb"
+            android:visibility="visible"/>
 
     </uk.co.sentinelweb.cuer.app.ui.common.views.swiperefresh.SwipeRefreshLayout>
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/playlist_empty"
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="match_parent"
+        android:paddingTop="200dp"
         android:gravity="center"
         android:text="@string/playlist_empty"
         android:textAppearance="@style/TextAppearance.App.Headline2"
         android:textColor="@color/grey_500"
         android:visibility="gone"
     />
-
-    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-    <!--        android:id="@+id/playlist_fab_up"-->
-    <!--        style="@style/FabButton.Secondary"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="top|end"-->
-    <!--        android:layout_margin="16dp"-->
-    <!--        android:contentDescription="@string/playlist_fab_up_contentdesc"-->
-    <!--        app:fabSize="mini"-->
-    <!--        app:layout_anchor="@+id/playlist_fab_down"-->
-    <!--        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"-->
-    <!--        app:srcCompat="@drawable/ic_button_up_black"-->
-    <!--        android:visibility="gone"-->
-    <!--        android:alpha="@dimen/fab_navigation_alpha"-->
-    <!--    />-->
-
-    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-    <!--        android:id="@+id/playlist_fab_down"-->
-    <!--        style="@style/FabButton.Secondary"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_gravity="top|end"-->
-    <!--        android:layout_margin="16dp"-->
-    <!--        android:contentDescription="@string/playlist_fab_down_contentdesc"-->
-    <!--        app:fabSize="mini"-->
-    <!--        app:layout_anchor="@+id/playlist_fab_refresh"-->
-    <!--        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"-->
-    <!--        app:srcCompat="@drawable/ic_button_down_black"-->
-    <!--        android:visibility="gone"-->
-    <!--        android:alpha="@dimen/fab_navigation_alpha"-->
-    <!--    />-->
-
-    <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
-    <!--        android:id="@+id/playlist_fab_refresh"-->
-    <!--        style="@style/FabButton.Secondary"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:layout_marginLeft="16dp"-->
-    <!--        android:layout_marginRight="16dp"-->
-    <!--        android:layout_marginTop="16dp"-->
-    <!--        android:layout_marginBottom="@dimen/nav_fragment_fab_bottom_offset"-->
-    <!--        android:contentDescription="@string/playlist_fab_refresh_contentdesc"-->
-    <!--        app:fabSize="mini"-->
-    <!--        app:layout_anchor="@+id/playlist_swipe"-->
-    <!--        app:layout_anchorGravity="bottom|right"-->
-    <!--        app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"-->
-    <!--        app:srcCompat="@drawable/ic_refresh"-->
-    <!--        android:visibility="gone"-->
-    <!--        android:alpha="@dimen/fab_navigation_alpha"-->
-    <!--    />-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

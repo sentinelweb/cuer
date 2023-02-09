@@ -12,6 +12,7 @@ val urlMediaMappers = listOf(
     YoutubeChannelUrlUserMapper(),
     YoutubeChannelUrlMapper(),
     YoutubeShortsUrlMapper(),
+    YoutubeLiveUrlMapper(),
     GoogleYoutubeUrlMapper(YoutubeMediaUrlMapper())
 )
 
@@ -71,7 +72,7 @@ private class YoutubeChannelUrlUserMapper : UrlMediaMapper {
         )
 }
 
-// https://youtube.com/channel/<platformId>.
+// https://youtube.com/channel/<platformId>
 private class YoutubeChannelUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
@@ -84,12 +85,30 @@ private class YoutubeChannelUrlMapper : UrlMediaMapper {
         )
 }
 
-// https://www.youtube.com/shorts/lq9hzALa4Po.
+// https://www.youtube.com/shorts/lq9hzALa4Po
 private class YoutubeShortsUrlMapper : UrlMediaMapper {
 
     override fun check(uri: Uri): Boolean =
         uri.host?.contains("youtube.") ?: false
                 && uri.path?.let { it.indexOf("shorts") > 0 } ?: false
+
+    override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
+        uri.path
+            ?.let {
+                MEDIA to MediaDomain.createYoutube(
+                    uri.toString(),
+                    it.substring(it.lastIndexOf('/') + 1)
+                )
+            }
+            ?: throw IllegalArgumentException("Link format error: $uri")
+}
+
+// https://www.youtube.com/live/nBkfPrWj3xQ?feature=share
+private class YoutubeLiveUrlMapper : UrlMediaMapper {
+
+    override fun check(uri: Uri): Boolean =
+        uri.host?.contains("youtube.") ?: false
+                && uri.path?.let { it.indexOf("live") > 0 } ?: false
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
         uri.path

@@ -17,7 +17,7 @@
             app:fragment="uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerFragment"
             app:key="@string/prefs_root_player_key"
             app:title="@string/prefs_root_player_title"
-            app:icon="@drawable/ic_play_black"
+            app:icon="@drawable/ic_play"
             app:summary="@string/prefs_root_player_summary"
         />
     </PreferenceCategory>
@@ -26,7 +26,7 @@
         app:key="@string/prefs_root_remote_service_cat_key"
         app:title="@string/prefs_root_remote_service_title">
         <CheckBoxPreference
-            app:icon="@drawable/ic_remote_service_24"
+            app:icon="@drawable/ic_remote_service"
             app:key="@string/prefs_root_remote_service_key"
             app:title="@string/prefs_root_remote_service_title"
             app:summary="@string/prefs_root_remote_service_not_running"
@@ -35,29 +35,37 @@
 
     <PreferenceCategory app:title="@string/prefs_root_info_cat_title">
         <Preference
-            app:icon="@drawable/ic_comment_24"
-            app:key="@string/prefs_root_feedback_key"
-            app:title="@string/prefs_root_feedback_title"
-        />
-        <Preference
-            app:icon="@drawable/ic_share_black"
-            app:key="@string/prefs_root_share_key"
-            app:title="@string/prefs_root_share_title"
-        />
-        <Preference
             app:icon="@drawable/ic_info"
             app:key="@string/prefs_root_version_key"
             app:title="@string/prefs_root_version_title"
             app:summary="@string/prefs_root_version_summary"
         />
     </PreferenceCategory>
+    <PreferenceCategory app:title="@string/prefs_root_info_cat_contact">
+        <Preference
+            app:icon="@drawable/ic_comment"
+            app:key="@string/prefs_root_feedback_key"
+            app:title="@string/prefs_root_feedback_title"
+        />
+        <Preference
+            app:icon="@drawable/ic_share"
+            app:key="@string/prefs_root_share_key"
+            app:title="@string/prefs_root_share_title"
+        />
+    </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title">
+    <PreferenceCategory app:title="@string/prefs_root_debug_cat_title" app:key="@string/prefs_root_debug_cat_key">
         <Preference
             app:icon="@drawable/ic_bug_report"
             app:key="@string/prefs_root_debug_send_reports_key"
             app:title="@string/prefs_root_debug_send_reports_title"
             app:summary="@string/prefs_root_debug_send_reports_summary"
+        />
+        <Preference
+            app:icon="@drawable/ic_refresh"
+            app:key="@string/prefs_root_onboard_key"
+            app:title="@string/prefs_root_onboard_title"
+            app:summary="@string/prefs_root_onboard_summary"
         />
     </PreferenceCategory>
 

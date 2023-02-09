@@ -2,8 +2,10 @@ package uk.co.sentinelweb.cuer.app.ui.browse
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.CategoryDomain.Companion.EMPTY_CATEGORY
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 
@@ -17,7 +19,9 @@ class BrowseContract {
             data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
+            object ActionPasteAdd : Intent()
             object ActionSearch : Intent()
+            object ActionHelp : Intent()
             data class SetOrder(val order: Order) : Intent()
         }
 
@@ -27,13 +31,15 @@ class BrowseContract {
             object TopReached : Label()
             object ActionSettings : Label()
             object ActionSearch : Label()
+            object ActionHelp : Label()
+            object ActionPasteAdd : Label()
 
             data class AddPlaylist(
                 val cat: CategoryDomain,
-                val parentId: Long? = null,
+                val parentId: OrchestratorContract.Identifier<GUID>? = null,
             ) : Label()
 
-            data class OpenLocalPlaylist(val id: Long, val play: Boolean = false) : Label()
+            data class OpenLocalPlaylist(val id: OrchestratorContract.Identifier<GUID>, val play: Boolean = false) : Label()
         }
 
         data class State(
@@ -49,7 +55,7 @@ class BrowseContract {
 
     interface View : MviView<View.Model, View.Event> {
 
-        suspend fun processLabel(label: MviStore.Label)
+        fun processLabel(label: MviStore.Label)
 
         data class Model(
             val title: String,
@@ -75,7 +81,9 @@ class BrowseContract {
             object OnResume : Event()
             object OnUpClicked : Event()
             object OnActionSettingsClicked : Event()
+            object OnActionPasteAdd : Event()
             object OnActionSearchClicked : Event()
+            object OnActionHelpClicked : Event()
             data class OnCategoryClicked(val model: CategoryModel) : Event()
             data class OnSetOrder(val order: Order) : Event()
         }

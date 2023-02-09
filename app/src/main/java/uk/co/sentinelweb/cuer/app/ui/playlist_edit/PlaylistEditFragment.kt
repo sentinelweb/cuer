@@ -23,20 +23,26 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistEditBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipCreator
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.scaleDrawableLeftSize
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getEnum
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.Flag.*
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -44,10 +50,13 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
@@ -63,6 +72,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val commitHost: CommitHost by inject()
+    private val res: ResourceWrapper by inject()
+    private val playlistEditHelpConfig: PlaylistEditHelpConfig by inject()
 
     internal var listener: Listener? = null
 
@@ -71,8 +82,11 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     private var dialogFragment: DialogFragment? = null
 
-    private val playlistIdArg: Long? by lazy {
-        PLAYLIST_ID.getLong(arguments)?.takeIf { it > 0 || it < -1 }
+    private val helpMenuItem: MenuItem
+        get() = binding.peToolbar.menu.findItem(R.id.pe_help)
+
+    private val playlistIdArg: GUID? by lazy {
+        PLAYLIST_ID.getString(arguments)?.toGUID()
     }
 
     private val imageUrlArg: String? by lazy {
@@ -109,6 +123,28 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         return binding.root
     }
 
+    private val onOffsetChangedListener = object : AppBarLayout.OnOffsetChangedListener {
+
+        var isShow = false
+        var scrollRange = -1
+
+        override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
+            if (scrollRange == -1) {
+                scrollRange = appBarLayout.getTotalScrollRange()
+            }
+            if (scrollRange + verticalOffset == 0) {
+                isShow = true
+                // only show the menu items for the non-empty state
+                binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            } else if (isShow) {
+                isShow = false
+                binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+            }
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -118,6 +154,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         viewModel.setIsDialog(isDialog)
         binding.peClickPrompt.isVisible = !isDialog
         binding.peToolbar.title = ""
+        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
         binding.peImage.setOnTouchListener { iv, e ->
             when (e.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
@@ -146,26 +183,17 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         binding.peDeletableItems.setOnCheckedChangeListener { v, b ->
             viewModel.onFlagChanged(b, DELETE_ITEMS)
         }
-        binding.peTitleEdit.doAfterTextChanged { text -> viewModel.onTitleChanged(text.toString()) }
-        binding.peAppbar.addOnOffsetChangedListener(object : AppBarLayout.OnOffsetChangedListener {
 
-            var isShow = false
-            var scrollRange = -1
+        binding.pePlayable.scaleDrawableLeftSize(1f)
+        binding.peDeletable.scaleDrawableLeftSize(0.8f)
+        binding.pePlayable.scaleDrawableLeftSize(0.8f)
+        binding.peEditableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDeletableItems.scaleDrawableLeftSize(0.7f)
+        binding.peDefault.scaleDrawableLeftSize(0.8f)
+        binding.pePlayStart.scaleDrawableLeftSize(0.8f)
+        binding.peParentLabel.scaleDrawableLeftSize(0.7f)
 
-            override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
-                if (scrollRange == -1) {
-                    scrollRange = appBarLayout.getTotalScrollRange()
-                }
-                if (scrollRange + verticalOffset == 0) {
-                    isShow = true
-                    // only show the menu items for the non-empty state
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                } else if (isShow) {
-                    isShow = false
-                    edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                }
-            }
-        })
+        binding.peAppbar.addOnOffsetChangedListener(onOffsetChangedListener)
         binding.peInfo.setMovementMethod(object : LinkMovementMethod() {
             override fun handleMovementKey(
                 widget: TextView?,
@@ -187,7 +215,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
         imageUrlArg?.also { setImage(it) }
         (playlistIdArg to (SOURCE.getEnum(arguments) ?: Source.LOCAL))
-            .apply { viewModel.setData(first, second) }
+            .apply { viewModel.setData(first?.toIdentifier(second)) } // todo check for create
     }
 
     override fun onAttach(context: Context) {
@@ -195,8 +223,18 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         linkScopeToActivity()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        helpMenuItem.setOnMenuItemClickListener {
+            OnboardingFragment.showHelp(this, playlistEditHelpConfig)
+            true
+        }
+        binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+    }
+
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistEditHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -213,6 +251,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     override fun onDestroyView() {
+        binding.peAppbar.removeOnOffsetChangedListener(onOffsetChangedListener)
         _binding = null
         super.onDestroyView()
     }
@@ -309,7 +348,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         //dialog?.dismiss() // removed 278
         hideDialogFragment()
         when (model) {
-            is PlaylistsDialogContract.Config -> {
+            is PlaylistsMviDialogContract.Config -> {
                 dialogFragment =
                     PlaylistsDialogFragment.newInstance(model)
                 dialogFragment?.show(childFragmentManager, PLAYLIST_FULL.toString())

@@ -11,7 +11,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -24,23 +23,22 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
-import uk.co.sentinelweb.cuer.app.ui.common.interfaces.ActionBarModifier
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindObserver
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.DoneNavigation
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.setMenuItemsColor
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_DONE
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.STAR
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel.Type.UNSTAR
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewModel.UiEvent.Type.*
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
+import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -49,12 +47,10 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 
-class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidScopeComponent {
+class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<PlaylistItemEditFragment>()
     private val viewModel: PlaylistItemEditViewModel by inject()
@@ -71,14 +67,16 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
-    private val actionBarModifier: ActionBarModifier by inject()
+    private val playlistItemEditHelpConfig: PlaylistItemEditHelpConfig by inject()
 
     private val binding: FragmentPlaylistItemEditBinding
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
     private var _binding: FragmentPlaylistItemEditBinding? = null
 
-//    private val playMenuItem: MenuItem
+    //    private val playMenuItem: MenuItem
 //        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
+    private val helpMenuItem: MenuItem
+        get() = binding.plieToolbar.menu.findItem(R.id.plie_help)
 
     private var dialog: AppCompatDialog? = null
     private var dialogFragment: DialogFragment? = null
@@ -96,8 +94,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         SOURCE.getEnum<Source>(arguments) ?: Source.LOCAL
     }
 
-    private val parentArg: Long? by lazy {
-        PLAYLIST_PARENT.getLong(arguments)
+    private val parentArg: GUID? by lazy {
+        PLAYLIST_PARENT.getString(arguments)?.toGUID().also { log.d("parentArg:$it") }
     }
 
     private val allowPlayArg: Boolean by lazy {
@@ -105,7 +103,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     }
 
     private val isOnSharePlaylist: Boolean by lazy {
-        itemArg?.playlistId == Shared.id
+        itemArg?.playlistId?.id == Shared.id
     }
 
     private val isInShare: Boolean by lazy {
@@ -146,6 +144,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        log.d("onViewCreated:" + arguments.toString())
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
@@ -177,11 +176,12 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_collapsed_csl)
+                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
+                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
@@ -216,7 +216,11 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
-        actionBarModifier.setMenuItemColor(R.color.actionbar_icon_expanded_csl)
+        helpMenuItem.setOnMenuItemClickListener {
+            OnboardingFragment.showHelp(this, playlistItemEditHelpConfig)
+            true
+        }
+        binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
     }
 
     override fun onAttach(context: Context) {
@@ -228,6 +232,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistItemEditHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -307,7 +312,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
     private fun setImage(imageUrl: String?) {
         Glide.with(requireContext())
             .load(imageUrl)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            //.transition(DrawableTransitionOptions.withCrossFade()) // messes up transition
             .into(binding.plieImage)
     }
 
@@ -325,7 +330,7 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         when (model.type) {
             DialogModel.Type.PLAYLIST_FULL -> {
                 dialogFragment =
-                    PlaylistsDialogFragment.newInstance(model as PlaylistsDialogContract.Config)
+                    PlaylistsDialogFragment.newInstance(model as PlaylistsMviDialogContract.Config)
                 dialogFragment?.show(childFragmentManager, SELECT_PLAYLIST_TAG)
             }
 
@@ -381,8 +386,8 @@ class PlaylistItemEditFragment : Fragment(), ShareContract.Committer, AndroidSco
         dialogFragment = null
     }
 
-    override suspend fun commit(onCommit: ShareContract.Committer.OnCommit) {
-        viewModel.commitPlaylistItems(onCommit)
+    override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
+        viewModel.commitPlaylistItems(afterCommit)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

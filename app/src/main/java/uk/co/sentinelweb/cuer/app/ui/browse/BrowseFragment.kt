@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.delay
@@ -27,11 +28,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
-import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
+import uk.co.sentinelweb.cuer.app.usecase.AddBrowsePlaylistUsecase
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -40,23 +43,25 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.playlistUrl
 
-class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
+class BrowseFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<BrowseFragment>()
     private val controller: BrowseController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
-    private val browseMviView: BrowseMviView by inject()
+    private val browseMviView: BrowseMviViewProxy by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val res: ResourceWrapper by inject()
+    private val browseHelpConfig: BrowseHelpConfig by inject()
+    private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject()
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding!!
+    private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
 
     init {
         log.tag(this)
@@ -72,6 +77,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+        // todo make a factory to create the controller here move this to onViewCreated see playlistsMviFrag
         controller.onViewCreated(listOf(browseMviView), lifecycle.asEssentyLifecycle())
     }
 
@@ -104,6 +110,7 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this@BrowseFragment, browseHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -135,25 +142,41 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                             SearchBottomSheetFragment()
                                 .show(childFragmentManager, SEARCH_BOTTOMSHEET_TAG)
                         }
-                        is AddPlaylist -> {
-                            startActivity(
-                                ShareActivity.urlIntent(
-                                    requireContext(),
-                                    playlistUrl(
-                                        label.cat.platformId
-                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
-                                    ),
-                                    label.parentId,
-                                    label.cat
-                                )
-                            )
+
+                        ActionPasteAdd -> {
+                            (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
                         }
+
+                        ActionHelp -> {
+                            OnboardingFragment.showHelp(this@BrowseFragment, browseHelpConfig)
+                        }
+
+                        is AddPlaylist -> {
+                            lifecycleScope.launch {
+                                browseMviView.loading(true)
+                                addBrowsePlaylistUsecase.execute(label.cat, label.parentId)
+                                    ?.id
+                                    ?.apply { navRouter.navigate(PlaylistMviFragment.makeNav(this.id, play = true, source = this.source)) }
+                                    ?: snackbarWrapper.makeError(res.getString(R.string.browse_add_error, label.cat.title)).show()
+                                browseMviView.loading(false)
+                            }
+//                            startActivity(
+//                                ShareActivity.urlIntent(
+//                                    requireContext(),
+//                                    playlistUrl(
+//                                        label.cat.platformId
+//                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
+//                                    ),
+//                                    label.parentId,
+//                                    label.cat
+//                                )
+//                            )
+                        }
+
                         is OpenLocalPlaylist -> navRouter.navigate(
-                            PlaylistContract.makeNav(
-                                label.id,
-                                play = label.play
-                            )
+                            PlaylistMviFragment.makeNav(label.id.id, play = label.play, source = label.id.source)
                         )
+
                         None -> Unit
                     }
                 }
@@ -196,10 +219,11 @@ class BrowseFragment constructor() : Fragment(), AndroidScopeComponent {
                     )
                 }
                 scoped<BrowseContract.Strings> { BrowseStrings(get()) }
-                scoped { BrowseRepository(BrowseJsonLoader(get())) }
+                scoped { BrowseRepository(BrowseRepositoryJsonLoader(get()), "browse_categories.json") }
                 scoped { BrowseModelMapper(get(), get()) }
-                scoped { BrowseMviView(get(), get()) }
+                scoped { BrowseMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped { BrowseHelpConfig(get()) }
             }
         }
     }

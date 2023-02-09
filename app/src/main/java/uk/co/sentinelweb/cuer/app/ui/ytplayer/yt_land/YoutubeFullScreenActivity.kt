@@ -46,7 +46,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType
+import uk.co.sentinelweb.cuer.net.client.ServiceType
 import android.R as RA
 
 /**
@@ -234,6 +234,8 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
                         updatePlayingIcon(false)
                         binding.controls.controlsPlayFab.showProgress(false)
                     }
+
+                    else -> Unit
                 }
             })
             diff(get = Model::texts, set = { texts ->
@@ -290,9 +292,16 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
                 is FullScreenPlayerOpen -> toast.show("Already in Fullscreen mode - shouldnt get here")
                 is PipPlayerOpen -> toast.show("PIP Open")
                 is PortraitPlayerOpen -> label.also {
-                    navRouter.navigate(NavigationModel(NavigationModel.Target.LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
+                    navRouter.navigate(
+                        NavigationModel(
+                            NavigationModel.Target.LOCAL_PLAYER,
+                            mapOf(PLAYLIST_ITEM to it.item)
+                        )
+                    )
                     finish()
                 }
+
+                else -> Unit
             }
         }
 

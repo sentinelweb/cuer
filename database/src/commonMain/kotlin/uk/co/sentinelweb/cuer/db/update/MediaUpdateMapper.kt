@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 class MediaUpdateMapper() {
 
     fun map(updateObject: MediaPositionUpdateDomain, flags: Long) = MediaPositionUpdateEntity(
-        updateObject.id,
+        updateObject.id.id,
         updateObject.duration,
         updateObject.positon,
         updateObject.dateLastPlayed ?: Clock.System.now(),

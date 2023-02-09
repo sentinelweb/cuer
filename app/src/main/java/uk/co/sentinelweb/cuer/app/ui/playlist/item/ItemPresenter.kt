@@ -1,18 +1,23 @@
 package uk.co.sentinelweb.cuer.app.ui.playlist.item
 
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 
 class ItemPresenter(
     val view: ItemContract.View,
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     private val textMapper: ItemTextMapper,
-    private val ytContext: ChromecastYouTubePlayerContextHolder
+    private val ytContext: ChromecastYouTubePlayerContextHolder,
+    private val res: ResourceWrapper
 ) : ItemContract.Presenter, ItemContract.External {
 
     override fun update(
-        item: ItemContract.Model,
+        item: PlaylistItemMviContract.Model.Item,
         highlightPlaying: Boolean
     ) {
         view.setTopText(textMapper.mapTopText(item, highlightPlaying))
@@ -28,7 +33,7 @@ class ItemPresenter(
             ?.apply { view.setChannelImageUrl(this) }
             ?: view.setChannelImageResource(R.drawable.ic_platform_youtube)
         view.setDuration(item.duration)
-        view.setDurationBackground(item.infoTextBackgroundColor)
+        view.setDurationBackground(res.getColorResourceId(item.infoTextBackgroundColor))
         view.showProgress(!item.isLive)
         if (!item.isLive) {
             view.setProgress(item.progress)
@@ -37,7 +42,7 @@ class ItemPresenter(
             if (ytContext.isConnected()) {
                 R.drawable.ic_notif_status_cast_conn_white
             } else {
-                R.drawable.ic_play_black
+                R.drawable.ic_play
             }
         )
         view.dismissMenu()
@@ -76,7 +81,7 @@ class ItemPresenter(
         view.setProgress(state.item?.progress ?: 0f)
     }
 
-    override fun isViewForId(id: Long): Boolean = state.item?.id == id
+    override fun isViewForId(id: OrchestratorContract.Identifier<GUID>): Boolean = state.item?.id == id
 
     override fun doPlay(external: Boolean) {
         interactions.onPlay(state.item!!, external)

@@ -37,18 +37,15 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.Play
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.share.ShareWrapper
+import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.CryptoLauncher
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -65,12 +62,12 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override val scope: Scope by activityScopeWithSource<AytPortraitActivity>()
 
-    private val controller: PlayerController by inject()
+    private val playerController: PlayerController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val playerFragment: CastPlayerMviFragment by inject()
-    private val playlistFragment: PlaylistFragment by inject()
+    private val playlistFragment: PlaylistMviFragment by inject()
     private val navRouter: NavigationRouter by inject()
     private val itemLoader: PlayerContract.PlaylistItemLoader by inject()
     private val toast: ToastWrapper by inject()
@@ -80,10 +77,11 @@ class AytPortraitActivity : AppCompatActivity(),
     private val queueConsumer: QueueMediatorContract.Consumer by inject()
     private val cryptoLauncher: CryptoLauncher by inject()
     private val linkNavigator: LinkNavigator by inject()
-    private val shareWrapper: ShareWrapper by inject()
+    private val shareWrapper: AndroidShareWrapper by inject()
     private val multiPrefs: MultiPlatformPreferencesWrapper by inject()
 
-    private lateinit var mviView: AytPortraitActivity.MviViewImpl
+    private lateinit var playerMviView: AytPortraitActivity.PlayerMviViewImpl
+
     private lateinit var binding: ActivityAytPortraitBinding
 
     private var currentItem: PlaylistItemDomain? = null
@@ -110,10 +108,10 @@ class AytPortraitActivity : AppCompatActivity(),
             )
         }
         // this POS restores the AYT player to the mvi kotlin state after returning from a home press
-        if (this::mviView.isInitialized) {
+        if (this::playerMviView.isInitialized) {
             coroutines.mainScope.launch {
                 delay(50)
-                mviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
+                playerMviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
             }
         }
     }
@@ -138,8 +136,8 @@ class AytPortraitActivity : AppCompatActivity(),
 
     override fun onDestroy() {
         castListener.release()
-        controller.onViewDestroyed()
-        controller.onDestroy(aytViewHolder.willFinish())
+        playerController.onViewDestroyed()
+        playerController.onDestroy(aytViewHolder.willFinish())
         aytViewHolder.cleanupIfNotSwitching()
         super.onDestroy()
     }
@@ -151,21 +149,20 @@ class AytPortraitActivity : AppCompatActivity(),
             floatingService.stop()
         }
         log.d("onPostCreate")
-        mviView = MviViewImpl(aytViewHolder)
+        playerMviView = PlayerMviViewImpl(aytViewHolder)
         playerFragment.initMediaRouteButton()
-        controller.onViewCreated(
-            listOf(mviView, playerFragment.mviView),
+        playerController.onViewCreated(
+            listOf(playerMviView, playerFragment.mviView),
             lifecycle.asEssentyLifecycle()
         )
-
         binding.portraitPlayerDescription.interactions = object : DescriptionContract.Interactions {
 
             override fun onLinkClick(link: LinkDomain.UrlLinkDomain) {
-                mviView.dispatch(LinkClick(link))
+                playerMviView.dispatch(LinkClick(link))
             }
 
             override fun onChannelClick() {
-                mviView.dispatch(ChannelClick)
+                playerMviView.dispatch(ChannelClick)
             }
 
             override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
@@ -173,7 +170,7 @@ class AytPortraitActivity : AppCompatActivity(),
             }
 
             override fun onTimecodeClick(timecode: TimecodeDomain) {
-                mviView.dispatch(OnSeekToPosition(timecode.position))
+                playerMviView.dispatch(OnSeekToPosition(timecode.position))
             }
 
             override fun onSelectPlaylistChipClick(model: ChipModel) = Unit
@@ -181,15 +178,15 @@ class AytPortraitActivity : AppCompatActivity(),
             override fun onRemovePlaylist(chipModel: ChipModel) = Unit
 
             override fun onRibbonItemClick(ribbonItem: RibbonModel) = when (ribbonItem.type) {
-                RibbonModel.Type.STAR -> mviView.dispatch(StarClick)
-                RibbonModel.Type.UNSTAR -> mviView.dispatch(StarClick)
-                RibbonModel.Type.SHARE -> mviView.dispatch(ShareClick)
-                RibbonModel.Type.SUPPORT -> mviView.dispatch(Support)
-                RibbonModel.Type.FULL -> mviView.dispatch(FullScreenClick)
-                RibbonModel.Type.PIP -> mviView.dispatch(PipClick)
-                RibbonModel.Type.LIKE -> mviView.dispatch(OpenClick)
-                RibbonModel.Type.COMMENT -> mviView.dispatch(OpenClick)
-                RibbonModel.Type.LAUNCH -> mviView.dispatch(OpenClick)
+                RibbonModel.Type.STAR -> playerMviView.dispatch(StarClick)
+                RibbonModel.Type.UNSTAR -> playerMviView.dispatch(StarClick)
+                RibbonModel.Type.SHARE -> playerMviView.dispatch(ShareClick)
+                RibbonModel.Type.SUPPORT -> playerMviView.dispatch(Support)
+                RibbonModel.Type.FULL -> playerMviView.dispatch(FullScreenClick)
+                RibbonModel.Type.PIP -> playerMviView.dispatch(PipClick)
+                RibbonModel.Type.LIKE -> playerMviView.dispatch(OpenClick)
+                RibbonModel.Type.COMMENT -> playerMviView.dispatch(OpenClick)
+                RibbonModel.Type.LAUNCH -> playerMviView.dispatch(OpenClick)
                 else -> log.e(
                     "Unsupported ribbon action",
                     IllegalStateException("Unsupported ribbon action: $ribbonItem")
@@ -202,30 +199,31 @@ class AytPortraitActivity : AppCompatActivity(),
         val playlistItem = itemLoader.load()
             ?: queueConsumer.currentItem
             ?: throw IllegalArgumentException("Could not get playlist item")
+
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
             SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
-            PLAYLIST_ID.name to (playlistItem.playlistId),
-            PLAYLIST_ITEM_ID.name to (playlistItem.id),
+            PLAYLIST_ID.name to (playlistItem.playlistId?.id?.value),
+            PLAYLIST_ITEM_ID.name to (playlistItem.id?.id?.value),
         )
-        playlistFragment.external.interactions = playlistInteractions
+        log.d("onPostCreate")
     }
 
     // region MVI view
-    inner class MviViewImpl(aytViewHolder: AytViewHolder) :
-        BaseMviView<Model, Event>(),
+    inner class PlayerMviViewImpl(aytViewHolder: AytViewHolder) :
+        BaseMviView<PlayerContract.View.Model, PlayerContract.View.Event>(),
         PlayerContract.View {
 
         init {
             aytViewHolder.addView(this@AytPortraitActivity, binding.playerContainer, this, false)
         }
 
-        override val renderer: ViewRenderer<Model> = diff {
-            diff(get = Model::description, set = {
+        override val renderer: ViewRenderer<PlayerContract.View.Model> = diff {
+            diff(get = PlayerContract.View.Model::description, set = {
                 log.d("set description")
                 binding.portraitPlayerDescription.setModel(it)
             })
-            diff(get = Model::playlistItem, set = {
+            diff(get = PlayerContract.View.Model::playlistItem, set = {
                 currentItem = it
                 it?.media?.also {
                     binding.portraitPlayerDescription.ribbonItems
@@ -236,7 +234,7 @@ class AytPortraitActivity : AppCompatActivity(),
                         ?.isVisible = it.starred
                 }
             })
-            diff(get = Model::screen, set = {
+            diff(get = PlayerContract.View.Model::screen, set = {
                 when (it) {
                     DESCRIPTION -> {
                         binding.portraitPlayerDescription.isVisible = true
@@ -306,24 +304,8 @@ class AytPortraitActivity : AppCompatActivity(),
         }
     }
 
-    private val playlistInteractions = object : PlaylistContract.Interactions {
-
-        override fun onPlayStartClick(item: PlaylistItemDomain) {
-            mviView.dispatch(TrackClick(item, true))
-        }
-
-        override fun onRelated(item: PlaylistItemDomain) {
-
-        }
-
-        override fun onView(item: PlaylistItemDomain) {
-            mviView.dispatch(TrackClick(item, false))
-        }
-
-        override fun onPlay(item: PlaylistItemDomain) {
-            mviView.dispatch(TrackClick(item, false))
-        }
-
+    fun trackChange(item: PlaylistItemDomain, start: Boolean) {
+        playerMviView.dispatch(TrackClick(item, start))
     }
 
     companion object {

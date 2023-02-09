@@ -40,7 +40,7 @@ class CastVolumeControlView @JvmOverloads constructor(
     private var lastUpdateLong = 0L
 
     @DrawableRes
-    private var lastVolumeDrawable = R.drawable.ic_volume_up_24
+    private var lastVolumeDrawable = R.drawable.ic_volume_up
 
     private val level get() = binding.cvVolume.progress.toDouble() / binding.cvVolume.max
 
@@ -81,11 +81,11 @@ class CastVolumeControlView @JvmOverloads constructor(
 
     fun updateIcon() {
         if (level >= 0.7) {
-            setIconIfNecessary(R.drawable.ic_volume_up_24)
+            setIconIfNecessary(R.drawable.ic_volume_up)
         } else if (level >= 0.2) {
-            setIconIfNecessary(R.drawable.ic_volume_down_24)
+            setIconIfNecessary(R.drawable.ic_volume_down)
         } else {
-            setIconIfNecessary(R.drawable.ic_volume_mute_24)
+            setIconIfNecessary(R.drawable.ic_volume_mute)
         }
     }
 

@@ -103,8 +103,7 @@ class PlayerController constructor(
             // view -> store
             view.events.mapNotNull(eventToIntent) bindTo store
         }
-        playControls.intentFlow
-            .onEach { log.d("playctls: $it") } bindTo store
+        playControls.intentFlow bindTo store
         // queue -> store
         queueConsumer.currentItemFlow
             .filterNotNull()

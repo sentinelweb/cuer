@@ -1,9 +1,6 @@
 package uk.co.sentinelweb.cuer.db.repository
 
 import app.cash.turbine.test
-import com.appmattus.kotlinfixture.decorator.nullability.NeverNullStrategy
-import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
-import com.appmattus.kotlinfixture.kotlinFixture
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -15,19 +12,32 @@ import org.koin.test.KoinTest
 import org.koin.test.KoinTestRule
 import org.koin.test.inject
 import uk.co.sentinelweb.cuer.app.db.Database
+import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.mapper.PlaylistItemMapper
 import uk.co.sentinelweb.cuer.db.util.DataCreation
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
+import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import kotlin.test.*
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.domain.toGUID
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
-    private val fixture = kotlinFixture { nullabilityStrategy(NeverNullStrategy) }
+    private val fixture = kotlinFixtureDefaultConfig
+
+    // todo test NewMediaFilter RecentMediaFilter SearchFilter loadStatsList()
 
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
@@ -47,30 +57,35 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
 
     val database: Database by inject()
     val itemMapper: PlaylistItemMapper by inject()
+    val guidCreator: GuidCreator by inject()
 
     val sut: PlaylistItemDatabaseRepository by inject()
     val mediaRepo: MediaDatabaseRepository by inject()
 
+    val log: LogWrapper by inject()
+
     lateinit var dataCreation: DataCreation
+    private val source = LOCAL
 
     @Before
     fun before() {
         Database.Schema.create(get())
         dataCreation = DataCreation(database, fixture, get())
+        log.tag(this)
     }
 
     @Test
     fun loadFlat() = runTest {
         val (_, itemEntity) = dataCreation.createPlaylistAndItem()
-        val expectedDomain = itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id, flat = false).data!!)
-        val actual = sut.load(itemEntity.id, flat = false)
+        val expectedDomain = itemMapper.map(itemEntity, mediaRepo.load(itemEntity.media_id.toGUID(), flat = false).data!!)
+        val actual = sut.load(itemEntity.id.toGUID(), flat = false)
         assertTrue(actual.isSuccessful)
         assertEquals(expectedDomain, actual.data)
     }
 
     @Test
     fun loadDoesntExist() = runTest {
-        val actual = sut.load(42, flat = false)
+        val actual = sut.load(guidCreator.create(), flat = false)
         assertFalse(actual.isSuccessful)
     }
 
@@ -79,12 +94,12 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val playlistEntity = dataCreation.createPlaylist()
         val toCreate =
             fixture<PlaylistItemDomain>()
-                .run { copy(playlistId = playlistEntity.id, media = media.copy(id = null)) }
+                .run { copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = media.copy(id = null)) }
         sut.updates.test {
             val actual = sut.save(toCreate, flat = true, emit = true)
             assertTrue(actual.isSuccessful)
             assertNotNull(actual.data)
-            val expectedLoaded = sut.load(actual.data!!.id!!, flat = false)
+            val expectedLoaded = sut.load(actual.data!!.id!!.id, flat = false)
             assertNotNull(expectedLoaded.data)
             assertEquals(expectedLoaded.data!!, actual.data!!)
 
@@ -98,7 +113,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val playlistEntity = dataCreation.createPlaylist()
         val toCreate =
             fixture<PlaylistItemDomain>()
-                .run { copy(playlistId = playlistEntity.id, media = media.copy(id = null)) }
+                .run { copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = media.copy(id = null)) }
         val created = sut.save(toCreate, flat = true, emit = true)
         assertTrue(created.isSuccessful)
         assertNotNull(created.data)
@@ -107,7 +122,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             .run {
                 copy(
                     id = created.data!!.id!!,
-                    playlistId = playlistEntity.id,
+                    playlistId = playlistEntity.id.toGuidIdentifier(source),
                     media = created.data!!.media
                 )
             }
@@ -116,7 +131,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             val updated = sut.save(toUpdate, flat = true, emit = true)
             assertTrue(updated.isSuccessful)
             assertNotNull(updated.data)
-            val expectedLoaded = sut.load(created.data!!.id!!, flat = false)
+            val expectedLoaded = sut.load(created.data!!.id!!.id, flat = false)
             assertNotNull(expectedLoaded.data)
             assertEquals(expectedLoaded.data!!, updated.data!!)
 
@@ -125,12 +140,13 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         }
     }
 
+
     @Test
     fun saveFull() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val toCreate =
             fixture<PlaylistItemDomain>()
-                .run { copy(playlistId = playlistEntity.id, media = media.copy(id = null)) }
+                .run { copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = media.copy(id = null)) }
         val created = sut.save(toCreate, flat = true, emit = false)
         assertTrue(created.isSuccessful)
         assertNotNull(created.data)
@@ -139,7 +155,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             .run {
                 copy(
                     id = created.data!!.id!!,
-                    playlistId = playlistEntity.id,
+                    playlistId = playlistEntity.id.toGuidIdentifier(source),
                     media = media.copy(
                         id = created.data!!.media.id,
                         platformId = created.data!!.media.platformId,
@@ -152,7 +168,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             val updated = sut.save(toUpdate, flat = false, emit = true)
             assertTrue(updated.isSuccessful)
             assertNotNull(updated.data)
-            val expectedLoaded = sut.load(created.data!!.id!!, flat = false)
+            val expectedLoaded = sut.load(created.data!!.id!!.id, flat = false)
             assertNotNull(expectedLoaded.data)
             assertEquals(expectedLoaded.data!!, updated.data!!)
 
@@ -165,14 +181,14 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     fun saveList() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val toCreate =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null)) }
+            dataCreation.fixturePlaylistItemList()
+                .map { it.copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = it.media.copy(id = null)) }
         sut.updates.test {
             val created = sut.save(toCreate, flat = true, emit = true)
             assertTrue(created.isSuccessful)
             assertNotNull(created.data)
             val actual = created.data!!
-            val expected = actual.map { sut.load(it.id!!, flat = false).data!! }
+            val expected = actual.map { sut.load(it.id!!.id, flat = false).data!! }
             assertEquals(expected, actual)
 
             expected.forEach {
@@ -186,36 +202,40 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     fun loadListByIds() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val list =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null)) }
+            dataCreation.fixturePlaylistItemList()
+                .map { it.copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = it.media.copy(id = null)) }
         val saved = sut.save(list, true, false).data!!
-        val actual = sut.loadList(IdListFilter(listOf(1, 3)), flat = false).data!!
-        assertEquals(saved.filter { it.id == 1L || it.id == 3L }, actual)
+        val ids = listOf(list[0].id!!.id, list[2].id!!.id)
+        val actual = sut.loadList(IdListFilter(ids), flat = false).data!!.sortedBy { it.id!!.id.value }
+        val expected = saved.filter { ids.contains(it.id!!.id) }.sortedBy { it.id!!.id.value }
+        assertEquals(expected, actual)
     }
 
     @Test
     fun loadListByMediaIds() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val list =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null)) }
+            dataCreation.fixturePlaylistItemList()
+                .map { it.copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = it.media.copy(id = null)) }
         val saved = sut.save(list, true, false).data!!
-        val actual = sut.loadList(MediaIdListFilter(listOf(1, 3)), flat = false).data!!
-        assertEquals(saved.filter { it.media.id == 1L || it.media.id == 3L }, actual)
+        val ids = listOf(saved[0].media.id!!.id, saved[2].media.id!!.id)
+        val actual = sut.loadList(MediaIdListFilter(ids), flat = false).data!!.sortedBy { it.id!!.id.value }
+        val expected = saved.filter { ids.contains(it.media.id!!.id) }.sortedBy { it.id!!.id.value }
+        assertEquals(expected, actual)
     }
 
     @Test
     fun loadListByPlatformIds() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
-        val list = fixture<List<PlaylistItemDomain>>()
+        val list = dataCreation.fixturePlaylistItemList()
             .mapIndexed { i, item ->
                 item.copy(
-                    playlistId = playlistEntity.id,
+                    playlistId = playlistEntity.id.toGuidIdentifier(source),
                     media = item.media.copy(id = null, platformId = "platformId_$i")
                 )
             }
         val saved = sut.save(list, true, false).data!!
-        val platformIds = saved.filter { it.id == 1L || it.id == 3L }.map { it.media.platformId }
+        val platformIds = listOf(list[0].media.platformId, list[2].media.platformId)
         val actual = sut.loadList(PlatformIdListFilter(platformIds), flat = false).data!!
         assertEquals(platformIds.size, actual.size)
         assertEquals(saved.filter { platformIds.contains(it.media.platformId) }, actual)
@@ -228,7 +248,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         val (_, itemEntity3) = dataCreation.createPlaylistAndItem()
         val (_, _) = dataCreation.createPlaylistAndItem()
 
-        val itemIds = listOf(itemEntity1.id, itemEntity2.id, itemEntity3.id) // 0, 1, 2
+        val itemIds = listOf(itemEntity1.id.toGUID(), itemEntity2.id.toGUID(), itemEntity3.id.toGUID())
         val listItems = sut
             .loadList(IdListFilter(ids = itemIds), flat = false)
             .data!!
@@ -241,14 +261,12 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
         assertEquals(listItemsModified, actual)
     }
 
-    // todo test NewMediaFilter RecentMediaFilter SearchFilter
-
     @Test
     fun delete() = runTest {
         val playlistEntity = dataCreation.createPlaylist()
         val list =
-            fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(playlistId = playlistEntity.id, media = it.media.copy(id = null)) }
+            dataCreation.fixturePlaylistItemList()
+                .map { it.copy(playlistId = playlistEntity.id.toGuidIdentifier(source), media = it.media.copy(id = null)) }
         val saved = sut.save(list, true, false).data!!
         sut.updates.test {
             val toDelete = saved.get(0)
@@ -256,7 +274,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
             assertTrue(actual.isSuccessful)
             assertEquals(DELETE to toDelete, awaitItem())
             expectNoEvents()
-            val check = sut.load(toDelete.id!!, true)
+            val check = sut.load(toDelete.id!!.id, true)
             assertFalse(check.isSuccessful)
         }
     }
@@ -265,7 +283,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     fun deleteAndUndo() = runTest {
         val (_, i) = dataCreation.createPlaylistAndItem()
 
-        val item = sut.load(i.id, flat = false).data!!
+        val item = sut.load(i.id.toGUID(), flat = false).data!!
         sut.delete(item, false)
         val saved = sut.save(item, true, false).data!!
         assertEquals(item, saved)
@@ -281,93 +299,80 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
     @Test
     fun onConflict_insert() = runTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
-        val itemDomain1 = sut.load(itemEntity1.id, flat = false).data!!
+        val itemDomain1 = sut.load(itemEntity1.id.toGUID(), flat = false).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media.copy(id = null),
+                    media = itemDomain1.media,
                     order = itemDomain1.order
                 )
 
-        // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false).data!!
-        assertEquals(itemDomain1.id, savedConflict.id)
+        // returns the original item
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!!)
     }
 
     @Test
     fun onConflict_list_insert() = runTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
-        val itemDomain1 = sut.load(itemEntity1.id, flat = false).data!!
+        val itemDomain1 = sut.load(itemEntity1.id.toGUID(), flat = false).data!!
         val itemConflict =
             listOf(
                 fixture<PlaylistItemDomain>()
                     .copy(
                         id = null,
                         playlistId = itemDomain1.playlistId,
-                        media = itemDomain1.media.copy(id = null),
+                        media = itemDomain1.media,
                         order = itemDomain1.order
                     )
             )
-        // itemConflict should overwrite the original
-        val savedConflict = sut.save(itemConflict, flat = false, emit = false).data!!
-        assertEquals(itemDomain1.id, savedConflict[0].id)
+        // returns the original item
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!![0])
     }
 
     // if we try to save the same media on same playlist with different ordering then it will be an exception which is ok
     @Test
     fun onConflict_insert_differentOrder() = runTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
-        val itemDomain1 = sut.load(itemEntity1.id, flat = false).data!!
+        val itemDomain1 = sut.load(itemEntity1.id.toGUID(), flat = false).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
                 .copy(
                     id = null,
                     playlistId = itemDomain1.playlistId,
-                    media = itemDomain1.media.copy(id = null)
+                    media = itemDomain1.media,
+                    archived = itemDomain1.archived.not(),
                 )
 
-        val actual = sut.save(itemConflict, flat = false, emit = false)
-        assertFalse(actual.isSuccessful)
+        // returns the original item
+        val savedConflict = sut.save(itemConflict, flat = false, emit = false)
+        assertTrue(savedConflict.isSuccessful)
+        assertEquals(itemDomain1, savedConflict.data!!)
     }
 
     @Test
     fun onConflict_update() = runTest {
         val (_, itemEntity1) = dataCreation.createPlaylistAndItem()
         val (_, itemEntity2) = dataCreation.createPlaylistAndItem()
-        val itemDomain1 = sut.load(itemEntity1.id, flat = false).data!!
-        val itemDomain2 = sut.load(itemEntity2.id, flat = false).data!!
+        val itemDomain1 = sut.load(itemEntity1.id.toGUID(), flat = false).data!!
+        val itemDomain2 = sut.load(itemEntity2.id.toGUID(), flat = false).data!!
         val itemConflict =
             fixture<PlaylistItemDomain>()
                 .copy(
-                    id = 2, // call update on 2nd item
+                    id = itemDomain2.id, // call update on 2nd item
                     playlistId = itemDomain1.playlistId,
                     media = itemDomain1.media,
                     order = itemDomain1.order
                 )
-
-
-        // save is successful but data isn't written REPLACE .. DO NOTHING
-        val saved = sut.save(itemConflict, flat = false, emit = false)
-        assertTrue(saved.isSuccessful) //
-        assertNotEquals(itemConflict, saved.data)
-
-        // the item with the id (2) won't be changed
-        val conflictingItemIdLoad = sut.load(itemEntity2.id, flat = false)
-        assertTrue(conflictingItemIdLoad.isSuccessful)
-        assertEquals(itemDomain2, conflictingItemIdLoad.data)
-
-        // also the item with conflicting data (1) won't be changed
-        val load = sut.load(itemDomain1.id!!, flat = false) // load previous record
-        assertTrue(load.isSuccessful)
-        assertEquals(itemDomain1, load.data)
+        val actual = sut.save(itemConflict, flat = false, emit = false)
+        assertFalse(actual.isSuccessful)
+        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
     }
-
-//    @Test
-//    fun loadStatsList() {
-//    }
-//
 
     @Test
     fun deleteAll() = runTest {

@@ -117,7 +117,8 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
         const val TAG = "SupportDialogFragment"
 
         fun show(a: FragmentActivity, m: MediaDomain) {
-            SupportDialogFragment().apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
+            SupportDialogFragment()
+                .apply { arguments = bundleOf(MEDIA.toString() to m.serialise()) }
                 .show(a.supportFragmentManager, TAG)
         }
 
@@ -139,7 +140,7 @@ class SupportDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped { SupportModelMapper() }
                 scoped { SupportMviView(get(), get()) }
                 scoped { UrlLauncherWrapper(this.getFragmentActivity()) }
-                scoped { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
                 scoped<CryptoLauncher> {
                     AndroidCryptoLauncher(this.getFragmentActivity(), get(), get(), get(), get())
                 }

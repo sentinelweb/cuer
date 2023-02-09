@@ -81,6 +81,7 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
         app:layout_constraintStart_toEndOf="@id/pid_author_image"
         app:layout_constraintTop_toBottomOf="@id/pid_author_title"
+        android:textIsSelectable="true"
         tools:text="23 Aug 2012"
     />
 
@@ -109,12 +110,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textStyle="bold"
-        android:textIsSelectable="true"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pid_author_desc"
         tools:text="Playlist Item Edit Title"
+        android:textIsSelectable="true"
     />
 
     <TextView
@@ -130,6 +131,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pid_title"
         tools:text="Playlist Item http://www.google.com Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description Playlist Item Edit Description Playlist Item Edit DescriptionPlaylist Item Edit Description"
+    />
+
+    <TextView
+        android:id="@+id/pid_info"
+        style="?textAppearanceBody1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textColor="@color/light_color_on_surface"
+        android:textIsSelectable="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pid_desc"
     />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

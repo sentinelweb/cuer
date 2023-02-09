@@ -258,7 +258,7 @@ class CastPlayerPresenter(
             view.navigate(
                 NavigationModel(
                     PLAYLIST,
-                    mapOf(PLAYLIST_ID to it, PLAY_NOW to false, SOURCE to state.source)
+                    mapOf(PLAYLIST_ID to it.id.value, PLAY_NOW to false, SOURCE to it.source)
                 )
             )
         }
@@ -271,8 +271,8 @@ class CastPlayerPresenter(
                     PLAYLIST_ITEM,
                     mapOf(
                         NavigationModel.Param.PLAYLIST_ITEM to it,
-                        FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
-                        SOURCE to state.source
+                        //FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
+                        SOURCE to it.id!!.source
                     )
                 )
             )

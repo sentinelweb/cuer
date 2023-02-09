@@ -39,15 +39,15 @@ android {
     signingConfigs {
         release {
             // for bundleRelease
-            keyAlias "$CUER_UPLOAD_KEY_ALIAS"
-            keyPassword "$CUER_UPLOAD_PASSWORD"
-            storeFile file("$CUER_UPLOAD_KEY_FILE")
-            storePassword "$CUER_UPLOAD_PASSWORD"
+//            keyAlias "$CUER_UPLOAD_KEY_ALIAS"
+//            keyPassword "$CUER_UPLOAD_PASSWORD"
+//            storeFile file("$CUER_UPLOAD_KEY_FILE")
+//            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-//            keyAlias "$CUER_SIGNING_KEY_ALIAS"
-//            keyPassword "$CUER_SIGNING_PASSWORD"
-//            storeFile file("$CUER_SIGNING_KEY_FILE")
-//            storePassword "$CUER_SIGNING_PASSWORD"
+            keyAlias "$CUER_SIGNING_KEY_ALIAS"
+            keyPassword "$CUER_SIGNING_PASSWORD"
+            storeFile file("$CUER_SIGNING_KEY_FILE")
+            storePassword "$CUER_SIGNING_PASSWORD"
         }
     }
 
@@ -72,7 +72,6 @@ android {
 
     kotlinOptions {
         jvmTarget = ver_jvm
-        useIR = true
         freeCompilerArgs += [
                 // bypass compose kotlin version compatability check
                 // https://stackoverflow.com/questions/65545018/where-can-i-put-the-suppresskotlinversioncompatibilitycheck-flag
@@ -96,7 +95,7 @@ android {
     sourceSets {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-        test {
+        testDebug {
             java.srcDir 'src/sharedTest/java'
         }
         androidTest {
@@ -124,9 +123,11 @@ android {
 
 dependencies {
     implementation project(":shared")
-    implementation project(":net")
-    implementation project(":remote")
-    implementation project(":database")
+    implementation project(":netKmm")
+//    implementation project(":remote")
+    implementation project(":database")// todo: remove get through shared
+    implementation project(":domain")
+
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // deps
@@ -242,7 +243,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:$ver_mockito"
     testImplementation "org.mockito:mockito-inline:$ver_mockito_inline"
     testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:$ver_mockito_kotlin"
-    testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"
+    testImplementation "com.flextrade.jfixture:jfixture:$ver_jfixture"// todo remove
+    testImplementation "com.appmattus.fixture:fixture:$ver_kotlin_fixture"
     testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines"
     testImplementation "org.robolectric:robolectric:$ver_robolectric"
     testImplementation "androidx.test.ext:junit:$ver_androidx_test_junit"

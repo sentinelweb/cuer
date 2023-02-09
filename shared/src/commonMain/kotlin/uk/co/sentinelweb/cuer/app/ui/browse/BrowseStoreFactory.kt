@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.domain.ext.allPlatformIds
 import uk.co.sentinelweb.cuer.domain.ext.buildIdLookup
 import uk.co.sentinelweb.cuer.domain.ext.buildParentLookup
 
+// fixme: 'SuspendBootstrapper<Action : Any>' is deprecated. Please use CoroutineBootstrapper
 class BrowseStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val repository: BrowseRepository,
@@ -103,7 +104,7 @@ class BrowseStoreFactory constructor(
 
         override suspend fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                is Intent.ClickCategory -> {
+                is Intent.ClickCategory -> { // todo extract inside closure
                     getState().categoryLookup.get(intent.id)
                         ?.also { cat ->
                             if (cat.subCategories.size > 0) {
@@ -143,7 +144,9 @@ class BrowseStoreFactory constructor(
                 }
 
                 Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
+                Intent.ActionHelp -> publish(Label.ActionHelp)
             }
 
         private suspend fun checkPlatformId(
@@ -204,7 +207,7 @@ class BrowseStoreFactory constructor(
                     it,
                     existingPlaylists = existingPlaylists,
                     existingPlaylistStats = playlistStatsOrchestrator.loadList(
-                        IdListFilter(existingPlaylists.mapNotNull { it.id }),
+                        IdListFilter(existingPlaylists.mapNotNull { it.id?.id }),
                         LOCAL.flatOptions()
                     )
                 )

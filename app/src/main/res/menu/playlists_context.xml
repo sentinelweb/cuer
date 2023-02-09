@@ -6,21 +6,21 @@
 
     <item
         android:id="@+id/playlists_context_play"
-        android:icon="@drawable/ic_play_black"
+        android:icon="@drawable/ic_play"
         android:title="@string/menu_play"
         app:iconTint="?contextMenuItemColor"
         />
 
     <item
         android:id="@+id/playlists_edit"
-        android:icon="@drawable/ic_edit_24"
+        android:icon="@drawable/ic_edit"
         android:title="@string/menu_edit"
         app:iconTint="?contextMenuItemColor"
         />
 
     <item
         android:id="@+id/playlists_context_play_external"
-        android:icon="@drawable/ic_launch_black"
+        android:icon="@drawable/ic_launch"
         android:title="@string/menu_play_yt"
         app:iconTint="?contextMenuItemColor"
         />
@@ -33,15 +33,16 @@
 
     <item
         android:id="@+id/playlists_context_share"
-        android:icon="@drawable/ic_share_black"
+        android:icon="@drawable/ic_share"
         android:title="@string/menu_share"
         app:iconTint="?contextMenuItemColor" />
 
     <item
         android:id="@+id/playlists_context_delete"
-        android:icon="@drawable/ic_delete_white"
+        android:icon="@drawable/ic_delete"
         android:title="@string/menu_delete"
         app:iconTint="?contextMenuItemColor" />
+
     <item
         android:id="@+id/playlists_context_merge"
         android:icon="@drawable/ic_playlist_merge"

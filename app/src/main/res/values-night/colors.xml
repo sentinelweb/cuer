@@ -10,6 +10,7 @@
     <!--    <color name="secondary_dark">@color/dark_indigo</color>-->
     <!--    color_on_surface should be the same as text_primary-->
     <color name="color_on_surface">@color/grey_50</color>
+    <color name="light_color_on_surface">@color/grey_600</color>
     <color name="text_primary">@color/grey_50</color>
     <color name="text_secondary">@color/grey_300</color>
     <color name="surface">#111111</color>

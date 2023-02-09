@@ -4,11 +4,11 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 // todo review all of this as part of
 // https://github.com/sentinelweb/cuer/issues/279
@@ -41,12 +41,12 @@ class MainNavigationProvider(
             ?.let {
                 return when (it) {
                     NavigationModel.Target.PLAYLIST.name ->
-                        PlaylistContract.makeNav(
-                            NavigationModel.Param.PLAYLIST_ID.getLong(intent)
+                        PlaylistMviFragment.makeNav(
+                            PLAYLIST_ID.getString(intent)?.toGUID()
                                 ?: throw IllegalArgumentException("Playlist ID is required"),
-                            NavigationModel.Param.PLAYLIST_ITEM_ID.getLong(intent),
-                            NavigationModel.Param.PLAY_NOW.getBoolean(intent),
-                            NavigationModel.Param.SOURCE.getEnum<OrchestratorContract.Source>(intent)
+                            PLAYLIST_ITEM_ID.getString(intent)?.toGUID(),
+                            PLAY_NOW.getBoolean(intent),
+                            SOURCE.getEnum<OrchestratorContract.Source>(intent)
                         ).apply {
                             log.d("got nav:$this")
                         }

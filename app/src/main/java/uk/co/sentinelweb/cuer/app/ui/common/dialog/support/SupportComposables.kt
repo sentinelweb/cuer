@@ -8,7 +8,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -19,7 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Companion.CATEGORY_ORDER
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.support.SupportContract.View.Model
@@ -27,7 +26,7 @@ import uk.co.sentinelweb.cuer.domain.LinkDomain
 
 object SupportComposables : KoinComponent {
 
-    private val iconMapper: IconMapper by inject()
+    private val iconMapper: AndroidIconMapper by inject()
 
     @Composable
     fun SupportUi(view: SupportMviView) {

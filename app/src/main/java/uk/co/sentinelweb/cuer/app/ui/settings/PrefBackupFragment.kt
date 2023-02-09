@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.appcompat.widget.Toolbar
 import androidx.navigation.fragment.findNavController
@@ -22,6 +23,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -55,13 +57,15 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val onCreateView = super.onCreateView(inflater, container, savedInstanceState)
+        val view = super.onCreateView(inflater, container, savedInstanceState)
+
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
-            (onCreateView as ViewGroup).addView(it, 0)
+            (view as ViewGroup).addView(it, 0)
             //(activity as AppCompatActivity).setSupportActionBar(it)
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
-        return onCreateView
+        view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        return view
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
@@ -140,14 +144,16 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     }
 
     override fun showMessage(msg: String) {
-        snackbarWrapper.make(msg).show()
+        if (!isRemoving) {
+            snackbarWrapper.make(msg).show()
+        }
     }
 
     override fun showBackupError(message: String) {
         AlertDialogModel(
             title = res.getString(R.string.pref_backup_error_title),
             message = message,
-            confirm = AlertDialogModel.Button(R.string.ok)
+            confirm = AlertDialogModel.Button(StringResource.ok)
         ).apply {
             alertDialogCreator.create(this).show()
         }
@@ -179,10 +185,10 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             title = res.getString(R.string.pref_backup_restore_auto_title),
             message = res.getString(R.string.pref_backup_restore_auto_message), // says existing data will be lost
             confirm = AlertDialogModel.Button(
-                label = R.string.pref_backup_restore_auto_confirm,
+                label = StringResource.pref_backup_restore_auto_confirm,
                 action = { presenter.onConfirmRestoreAutoBackup() }
             ),
-            cancel = AlertDialogModel.Button(label = R.string.cancel, action = {})
+            cancel = AlertDialogModel.Button(label = StringResource.cancel, action = {})
         ).apply {
             alertDialogCreator.create(this).show()
         }

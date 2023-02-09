@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
-import uk.co.sentinelweb.cuer.app.db.AppDatabaseModule
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -26,20 +25,21 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
-import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.AndroidIconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
-import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistContract
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsContract
-import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogContract
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -54,7 +54,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitContract
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
@@ -79,17 +79,16 @@ import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
-import uk.co.sentinelweb.cuer.db.di.DatabaseModule
+import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
-import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
-import uk.co.sentinelweb.cuer.net.NetModule
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
-import uk.co.sentinelweb.cuer.net.di.SharedNetModule
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.PIXABAY
-import uk.co.sentinelweb.cuer.net.retrofit.ServiceType.YOUTUBE
-import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
+import uk.co.sentinelweb.cuer.net.client.ServiceType
+import uk.co.sentinelweb.cuer.net.di.DomainNetModule
+import uk.co.sentinelweb.cuer.net.di.NetModule
+
+//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 @ExperimentalCoroutinesApi
 object Modules {
@@ -97,9 +96,10 @@ object Modules {
     val IMAGES_REPO_NAME = "images"
 
     private val scopedModules = listOf(
-        PlaylistContract.fragmentModule,
-        PlaylistsContract.fragmentModule,
-        PlaylistsDialogContract.fragmentModule,
+        //PlaylistContract.fragmentModule,
+        PlaylistMviFragment.fragmentModule,
+        PlaylistsMviFragment.fragmentModule,
+        PlaylistsDialogFragment.fragmentModule,
         MainContract.activityModule,
         CastPlayerContract.viewModule,
         ShareContract.activityModule,
@@ -119,16 +119,16 @@ object Modules {
         CastPlayerMviFragment.fragmentModule,
         DescriptionView.viewModule,
         BrowseFragment.fragmentModule,
-        FloatingPlayerContract.serviceModule,
+        FloatingPlayerService.serviceModule,
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
+        OnboardingFragment.fragmentModule,
     )
 
     private val uiModule = module {
         factory { PlaylistSelectDialogModelCreator(get(), get()) }
         factory { DatePickerCreator() }
-        factory { IconMapper() }
-        factory { DurationTextColorMapper(get()) }
+        factory { AndroidIconMapper(get(), get()) }
         single { AytViewHolder(get(), get()) }
         factory { PlayYangProgress(get()) }
         factory<RibbonCreator> { AndroidRibbonCreator(get()) }
@@ -151,7 +151,7 @@ object Modules {
     }
 
     private val utilModule = module {
-        single { BuildConfigDomain(DEBUG, VERSION_CODE, VERSION_NAME) }
+        single { BuildConfigDomain(DEBUG, cuerRemoteEnabled, VERSION_CODE, VERSION_NAME) }
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 
@@ -167,18 +167,12 @@ object Modules {
         }
         factory { MediaMetadataMapper(get(), get()) }
         factory { PlaybackStateMapper() }
-        factory { PlaylistMutator() }
         factory { SharingShortcutsManager() }
         factory<IBackupManager> {
             BackupFileManager(
-                channelRepository = get(),
-                mediaRepository = get(),
+                backupJsonManager = get(),
                 playlistRepository = get(),
-                playlistItemRepository = get(),
-                imageDatabaseRepository = get(),
                 contextProvider = get(),
-                parserFactory = get(),
-                playlistItemCreator = get(),
                 timeProvider = get(),
                 timeStampMapper = get(),
                 imageFileRepository = get(),
@@ -207,8 +201,8 @@ object Modules {
         factory { StethoWrapper(androidApplication()) }
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
+        factory<StringDecoder> { get<ResourceWrapper>() }
         factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
-        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
         factory { AndroidLogWrapper(get()) }
         factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
@@ -221,9 +215,10 @@ object Modules {
     }
 
     private val appNetModule = module {
-        factory<ApiKeyProvider>(named(YOUTUBE)) { CuerYoutubeApiKeyProvider() }
-        factory<ApiKeyProvider>(named(PIXABAY)) { CuerPixabayApiKeyProvider() }
+        factory<ApiKeyProvider>(named(ServiceType.YOUTUBE)) { CuerYoutubeApiKeyProvider() }
+        factory<ApiKeyProvider>(named(ServiceType.PIXABAY)) { CuerPixabayApiKeyProvider() }
         single { NetModuleConfig(debug = DEBUG) }
+        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
     }
 
     val allModules = listOf(utilModule)
@@ -233,16 +228,16 @@ object Modules {
         .plus(appNetModule)
         .plus(receiverModule)
         .plus(usecaseModule)
-        .plus(DatabaseModule.modules)
-        .plus(AppDatabaseModule.module)
+        .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
-        .plus(NetModule.netModule)
+        .plus(NetModule.modules)
         .plus(SharedCoreModule.objectModule)
         .plus(SharedDomainModule.objectModule)
-        .plus(SharedNetModule.objectModule)
+        .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        .plus(RemoteModule.objectModule)
+//        .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
+        .plus(SharedAppAndroidModule.modules)
 }

@@ -15,10 +15,13 @@ See the app website here: https://cuer.app
 Using
 
 - Kotlin Multiplatform
-  - Shared module: domain model and common app components
-  - Remote module: web / react interface
-  - Website module: kotlin JS module
+  - Shared modules: (**shared**, **domain**, **database**, **netKmm**) shared domain model and common app components
+  - Website module: **website** (kotlin JS module)
+  - Android app module: **app**
+  - iOS App: **ios_app**
+  - Remote module: **remote** (web / react interface)
 - Material Design Libraries & Themes (Day/Night)
+- SwiftUI (iOS)
 - Jetpack Libraries
   - Room
   - Lifecycle
@@ -28,25 +31,25 @@ Using
     - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/search
 - Architecture (I have used few different patterns for practice evaluation)
   - MVI: (using https://arkivanov.github.io/MVIKotlin/) -
-    e.g.https://github.com/sentinelweb/cuer/tree/develop/shared/src/commonMain/kotlin/uk/co/sentinelweb/cuer/app/ui/player
+    e.g. https://github.com/sentinelweb/cuer/tree/develop/shared/src/commonMain/kotlin/uk/co/sentinelweb/cuer/app/ui/player
   - MVVM:
     e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui/playlist_item_edit
   - MVP
-    - https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/ui
+    e.g. https://github.com/sentinelweb/cuer/tree/develop/app/src/main/java/uk/co/sentinelweb/cuer/app/main
 - Kotlin (1.4)
   - Coroutines
   - Serialisation
 - Firebase
   - Storage
   - Crashlytics
-- Chromecast (using https://github.com/PierfrancescoSoffritti/Android-YouTube-Player)
+- Chromecast (using: https://github.com/PierfrancescoSoffritti/Android-YouTube-Player)
 - Koin
 - Glide
 - Test
   - JUnit 4
   - Mockk
   - Hamcrest
-  - JFixture
+  - KotlinFixture
   - Android X Test - enables the same code to be used for robolectric and espresso tests
   - Robolectric
   - Espresso
@@ -60,14 +63,17 @@ Using
 ### Browse
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/browse-lg-2023-02-09.png" width="400">
 
 ### Playlist
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/playlist-lg-2023-02-09.png" width="400">
 
 ### Playlists
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlists_20221031_200615.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/playlists-lg-2023-02-09.png" width="400">
 
 ### Video info
 
@@ -84,3 +90,9 @@ Using
 ### Add via Share
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/share_20221031_201927.png" width="400">
+
+### Onboarding
+
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/onboard1_20230209.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/onboard2_20230209.png" width="400">
+

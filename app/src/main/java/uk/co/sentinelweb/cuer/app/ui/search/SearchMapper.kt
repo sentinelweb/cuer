@@ -19,9 +19,9 @@ class SearchMapper constructor(
         val playlistQuantity = if (state.local.playlists.size > 0) "(${state.local.playlists.size})" else ""
         return SearchContract.Model(
             type = searchTypeText(state.searchType),
-            icon = if (state.searchType == LOCAL) R.drawable.ic_portrait else R.drawable.ic_youtube,
+            icon = if (state.searchType == LOCAL) R.drawable.ic_portrait else R.drawable.ic_platform_youtube,
             otherType = searchTypeText(if (state.searchType == LOCAL) REMOTE else LOCAL),
-            otherIcon = if (state.searchType == LOCAL) R.drawable.ic_youtube else R.drawable.ic_portrait,
+            otherIcon = if (state.searchType == LOCAL) R.drawable.ic_platform_youtube else R.drawable.ic_portrait,
             text = if (state.searchType == LOCAL) state.local.text else state.remote.text ?: "",
             isLocal = state.searchType == LOCAL,
             localParams = state.local.let {
@@ -30,9 +30,10 @@ class SearchMapper constructor(
                     isNew = it.isNew,
                     isLive = it.isLive,
                     playlists = listOf(PLAYLIST_SELECT_MODEL.copy(text = "Playlists $playlistQuantity ..."))
-                        .plus(state.local.playlists
-                            .map { pl -> ChipModel(type = PLAYLIST, text = pl.title, value = pl.id?.toString()) }
-                            .sortedBy { it.text.lowercase() }
+                        .plus(
+                            state.local.playlists
+                                .map { pl -> ChipModel(type = PLAYLIST, text = pl.title, value = pl.id?.toString()) }
+                                .sortedBy { it.text.lowercase() }
                         )
                 )
             },

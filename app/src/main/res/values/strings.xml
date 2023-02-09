@@ -80,6 +80,7 @@
     <string name="pl_item_move">Move</string>
     <string name="playlist_change_dialog_title">Change playlist?</string>
     <string name="playlist_change_dialog_message">This will change the current playlist …</string>
+    <string name="playlist_error_please_add">Please add the playlist first …</string>
     <string name="playlist_item_menu_view">View</string>
     <string name="playlist_item_menu_play">Play</string>
     <string name="playlist_item_menu_play_start">Play from start</string>
@@ -93,8 +94,10 @@
     <string name="playlist_play_items_from_start">Play items from start</string>
     <string name="playlist_error_moveitem_already_exists">Item already exists on this playlist …</string>
     <string name="playlist_item_moved_undo_message">Moved to %1$s</string>
+    <string name="playlist_items_updated">%1$s new items</string>
+    <string name="playlist_error_updating">Error updating: %1$s …</string>
 
-    <!-- playlist edit fragemnt -->
+    <!-- playlist edit fragment -->
     <string name="pe_fragment_title">Edit playlist</string>
     <string name="pe_fragment_title_add">Create playlist</string>
     <string name="pe_title">Title</string>
@@ -120,7 +123,7 @@
     <string name="cd_check">Select item</string>
 
     <!-- prefs -->
-    <string name="prefs_root_backup_item_title">Backup</string>
+    <string name="prefs_root_backup_item_title">Backup/Restore</string>
     <string name="prefs_root_backup_cat_title">Backup/Restore</string>
     <string name="prefs_root_backup_summary">Data backup options</string>
     <string name="prefs_root_debug_cat_title">Debug</string>
@@ -132,6 +135,8 @@
     <string name="prefs_root_player_cat_title">Player section</string>
     <string name="prefs_root_player_summary">Player settings</string>
     <string name="prefs_root_player_title">Player</string>
+    <string name="prefs_root_onboard_summary">Reset intro state (to show)</string>
+    <string name="prefs_root_onboard_title">Onboarding</string>
 
 
     <string name="prefs_backup_manual_cat_title">Manual backup</string>
@@ -183,6 +188,8 @@
     <string name="prefs_root_info_cat_title">App Info</string>
     <string name="prefs_root_version_title">Version</string>
     <string name="prefs_root_version_summary">Version will appear here</string>
+    <string name="prefs_root_info_cat_contact">Contact</string>
+
 
     <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
     <string-array name="prefs_root_share_summary">
@@ -210,6 +217,7 @@
 
     <!-- dialogs -->
     <string name="playlist_dialog_add_playlist">Add playlist …</string>
+    <string name="playlist_dialog_title_move">Move playlist to …</string>
     <string name="select_route_dialog_title">Select Route</string>
     <string name="create_playlist_dialog_title">Create playlist</string>
     <string name="dialog_button_view_info">View info</string>
@@ -237,7 +245,8 @@
     <string name="browse_error_no_playlist">No playlist configured</string>
     <string name="browse_error_no_category">No category with that id = %1$s</string>
     <string name="browse_recent">Recently viewed</string>
-
+    <string name="browse_all_cats_title">All categories</string>
+    
     <!-- player -->
     <string name="player_fab_fullscreen">Fullscreen</string>
     <string name="player_fab_pip">Picture in Picture</string>
@@ -298,6 +307,79 @@
         \n✉️ cuerapp@gmail.com
     </string>
 
+    <!-- help -->
+    <string name="help">Help</string>
+    <string name="help_playlist_title_gestures">Playlist - Gestures</string>
+    <string name="help_playlist_delete">Swipe item LEFT to delete</string>
+    <string name="help_playlist_move">Swipe item RIGHT to move to another playlist</string>
+    <string name="help_playlist_reorder">Drag item UP or DOWN to reorder</string>
+    <string name="help_playlist_play">Play playlist from current position</string>
+    <string name="help_playlist_stop">Stop playlist</string>
+    <string name="help_playlist_title_actions">Playlist - Actions</string>
+    <string name="help_playlist_edit">Edit playlist settings</string>
+    <string name="help_playlist_star">Star playlist</string>
+    <string name="help_playlist_playmode">Toggle playmode: straight / loop / shuffle</string>
+    <string name="help_playlist_title_actions_top">Playlist - Actionbar</string>
+    <string name="help_playlist_viewmode_rows">Toggle rows view</string>
+    <string name="help_playlist_viewmode_cards">Toggle cards view</string>
+    <string name="help_playlist_search">Search</string>
+    <string name="help_playlist_settings">Settings</string>
+    <string name="help_playlist_title_status_icons">Playlist - Status icons</string>
+    <string name="help_playlist_pos">100 / 200 : Playlist position / size</string>
+    <string name="help_playlist_starred">Playlist starred</string>
+    <string name="help_playlist_children">Number of child playlists</string>
+    <string name="help_playlist_default">Default playlist</string>
+    <string name="help_playlist_playstart">Plays items from start</string>
+    <string name="help_playlist_pinned">Pinned</string>
+    <string name="help_playlist_title_props_icons">Playlist Options</string>
+
+    <string name="help_playlist_paste_add">Add video from clipboard</string>
+    <string name="help_playlists_title_app">Playlists - App</string>
+    <string name="help_playlists_app_new">New : Unwatched videos</string>
+    <string name="help_playlists_app_recent">Recent: Recently watched videos</string>
+    <string name="help_playlists_app_starred">Starred: Starred videos</string>
+    <string name="help_playlists_app_unfinished">Unfinished: Videos incomplete</string>
+    <string name="help_playlists_app_local">Local search: Last search on device</string>
+    <string name="help_playlists_app_yt">YouTube search: Last search on YouTube</string>
+    <string name="help_playlists_title_actionbar">Playlists - Actionbar</string>
+    <string name="help_playlists_ab_create">Create playlist</string>
+    <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
+
+    <string name="help_plie_title_1">Details - Actions</string>
+    <string name="help_plie_play">Play</string>
+    <string name="help_plie_select_playlist">Select playlist</string>
+    <string name="help_plie_star">Star</string>
+    <string name="help_plie_support">Support</string>
+    <string name="help_plie_edit">Edit</string>
+<!--    <string name="help_plie_title_2">Details - Actions 2</string>-->
+    <string name="help_plie_share">Share</string>
+    <string name="help_plie_like">Like: on platform</string>
+    <string name="help_plie_comment">Comment: on platform</string>
+    <string name="help_plie_launch">Launch: on platform</string>
+
+    <string name="help_pe_title">Playlist Edit</string>
+    <string name="help_pe_save">Save / Create</string>
+    <string name="help_pe_star">Star</string>
+    <string name="help_pe_pin">Pin - raise playlist for selection</string>
+    <string name="help_pe_title_text">Edit the title text</string>
+    <string name="help_pe_parent">Select the parent playlist</string>
+    <string name="help_pe_title_options">Playlist options</string>
+    <string name="help_pe_default">Default: Used when no playlist selected</string>
+    <string name="help_pe_play_start">Play from start (all items)</string>
+    <string name="help_pe_playable">Playable</string>
+    <string name="help_pe_deletable">Deleteable</string>
+    <string name="help_pe_deletable_items">Deleteable Items</string>
+    <string name="help_pe_editabe_items">Editable (Moveable) items</string>
+    <string name="help_pe_editable">Editable playlist</string>
+
+    <string name="help_browse">Browse</string>
+    <string name="help_browse_desc">Lists all the content in categories</string>
+    <string name="help_browse_az">See all A-Z</string>
+    <string name="help_browse_categories">See categories</string>
+
+    <!-- onboarding -->
+    <string name="onboarding_title">Onboarding</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -318,5 +400,10 @@
     <string name="stop">Stop</string>
     <string name="edit_prefix">"Edit: "</string>
     <string name="menu_update">Update</string>
-
+    <string name="nav_title_onboard">Onboarding</string>
+    <string name="skip">Skip</string>
+    <string name="next">Next</string>
+    <string name="done">Done</string>
+    <string name="finish">Finish</string>
+    <string name="browse_add_error">Could add playlist: %1$s</string>
 </resources>

@@ -21,7 +21,7 @@
         android:layout_marginBottom="4dp"
         android:background="?colorDelete"
         android:text="@string/pl_item_delete"
-        app:drawableRightCompat="@drawable/ic_delete_white"
+        app:drawableRightCompat="@drawable/ic_delete_item"
         tools:ignore="RtlHardcoded,RtlSymmetry"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -37,14 +37,14 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_player_play_black"/>
+            tools:src="@drawable/ic_player_play"/>
 
         <ImageView
             android:id="@+id/listitem_play_icon"
             android:layout_width="24dp"
             android:layout_height="24dp"
             android:padding="4dp"
-            android:src="@drawable/ic_play_black"
+            android:src="@drawable/ic_play"
             app:layout_constraintBottom_toBottomOf="@+id/listitem_icon"
             app:layout_constraintLeft_toLeftOf="@+id/listitem_icon"
             app:tint="@color/white"

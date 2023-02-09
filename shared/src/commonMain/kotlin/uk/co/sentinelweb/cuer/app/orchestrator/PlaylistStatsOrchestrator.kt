@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
@@ -12,15 +13,15 @@ class PlaylistStatsOrchestrator constructor(
     override val updates: Flow<Triple<Operation, Source, PlaylistStatDomain>>
         get() = TODO()
 
-    suspend override fun load(platformId: String, options: Options): PlaylistStatDomain? {
+    suspend override fun loadByPlatformId(platformId: String, options: Options): PlaylistStatDomain? {
         throw NotImplementedException()
     }
 
-    suspend override fun load(domain: PlaylistStatDomain, options: Options): PlaylistStatDomain? {
+    suspend override fun loadByDomain(domain: PlaylistStatDomain, options: Options): PlaylistStatDomain? {
         throw NotImplementedException()
     }
 
-    suspend override fun load(id: Long, options: Options): PlaylistStatDomain? {
+    suspend override fun loadById(id: GUID, options: Options): PlaylistStatDomain? {
         throw NotImplementedException()
     }
 

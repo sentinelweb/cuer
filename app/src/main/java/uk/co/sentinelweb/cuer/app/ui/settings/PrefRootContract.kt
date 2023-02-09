@@ -18,6 +18,7 @@ interface PrefRootContract {
         fun initialisePrefs()
         fun onFeedback()
         fun onShare()
+        fun resetOnboarding()
     }
 
     interface View {

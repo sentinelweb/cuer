@@ -11,6 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.header.HeaderViewHolder
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.list.ListViewHolder
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.row.ItemRowViewHolder
+import uk.co.sentinelweb.cuer.domain.GUID
 
 
 class PlaylistsAdapter constructor(
@@ -23,14 +24,14 @@ class PlaylistsAdapter constructor(
         get() = _recyclerView ?: throw IllegalStateException("PlaylistsAdapter._recyclerView not bound")
 
 
-    private var _data: List<ItemContract.Model> = listOf()
+    private var _data: List<PlaylistsItemMviContract.Model> = listOf()
 
-    val data: List<ItemContract.Model>
+    val data: List<PlaylistsItemMviContract.Model>
         get() = _data
 
-    var currentPlaylistId: OrchestratorContract.Identifier<*>? = null
+    var currentPlaylistId: OrchestratorContract.Identifier<GUID>? = null
 
-    fun setData(data: List<ItemContract.Model>, animate: Boolean = true) {
+    fun setData(data: List<PlaylistsItemMviContract.Model>, animate: Boolean = true) {
         // todo something in diffutil fails here deleting a parent playlist shog the child after it fails
         if (animate) {
             DiffUtil.calculateDiff(
@@ -71,30 +72,22 @@ class PlaylistsAdapter constructor(
 
     override fun getItemViewType(position: Int): Int =
         when (data[position]) {
-            is ItemContract.Model.ItemModel -> ROW.ordinal
-            is ItemContract.Model.HeaderModel -> HEADER.ordinal
-            is ItemContract.Model.ListModel -> LIST.ordinal
+            is PlaylistsItemMviContract.Model.Item -> ROW.ordinal
+            is PlaylistsItemMviContract.Model.Header -> HEADER.ordinal
+            is PlaylistsItemMviContract.Model.List -> LIST.ordinal
         }
 
     @Override
     override fun onBindViewHolder(holderRow: RecyclerView.ViewHolder, position: Int) {
         when (holderRow) {
             is ItemRowViewHolder -> _data[position].apply {
-                holderRow.itemPresenter.update(
-                    this as ItemContract.Model.ItemModel,
-                    currentPlaylistId
-                )
+                holderRow.itemPresenter.update(this as PlaylistsItemMviContract.Model.Item, currentPlaylistId)
             }
             is HeaderViewHolder -> _data[position].apply {
-                holderRow.update(
-                    this as ItemContract.Model.HeaderModel
-                )
+                holderRow.update(this as PlaylistsItemMviContract.Model.Header)
             }
             is ListViewHolder -> _data[position].apply {
-                holderRow.listPresenter.update(
-                    this as ItemContract.Model.ListModel,
-                    currentPlaylistId
-                )
+                holderRow.listPresenter.update(this as PlaylistsItemMviContract.Model.List, currentPlaylistId)
             }
         }
     }
