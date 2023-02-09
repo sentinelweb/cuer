@@ -139,7 +139,13 @@ class PlaylistsMviStoreFactory(
                 prefsWrapper.lastBottomTab = MainCommonContract.LastTab.PLAYLIST.ordinal
                 publish(
                     Navigate(
-                        NavigationModel(PLAYLIST, mapOf(SOURCE to intent.item.source, PLAYLIST_ID to intent.item.id.id.value)),
+                        NavigationModel(
+                            PLAYLIST, mapOf(
+                                SOURCE to intent.item.source,
+                                PLAYLIST_ID to intent.item.id.id.value,
+                                IMAGE_URL to intent.item.thumbNailUrl
+                            )
+                        ),
                         intent.view
                     )
                 )

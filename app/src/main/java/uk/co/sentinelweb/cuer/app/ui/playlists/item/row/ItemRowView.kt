@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.annotation.SuppressLint
-import android.content.Context.WINDOW_SERVICE
 import android.text.Spannable
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -25,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
 class ItemRowView() :
@@ -34,7 +37,11 @@ class ItemRowView() :
     private lateinit var presenter: ItemContract.Presenter
     private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
-    private lateinit var wm: WindowManager
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this)
+    }
 
     val root: View
         get() = _binding.root
@@ -54,7 +61,6 @@ class ItemRowView() :
         _binding.listitem.setOnClickListener { presenter.doClick() }
         _binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
-        wm = parent.context.getSystemService(WINDOW_SERVICE) as WindowManager
     }
 
     @SuppressLint("RestrictedApi")

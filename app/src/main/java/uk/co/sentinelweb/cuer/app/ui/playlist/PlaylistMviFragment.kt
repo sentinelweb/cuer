@@ -22,7 +22,6 @@ import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
@@ -477,7 +476,7 @@ class PlaylistMviFragment : Fragment(),
 
     // region PlaylistContract.View
     private fun setHeaderModel(model: PlaylistMviContract.View.Header) {
-        setImage(model.imageUrl)
+        model.imageUrl?.apply { setImage(this) }
         binding.playlistCollapsingToolbar.title = model.title
         binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))
         binding.playlistFabPlay.text = model.playText
@@ -563,7 +562,7 @@ class PlaylistMviFragment : Fragment(),
     private fun setImage(url: String) {
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(url, imageProvider)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            //.transition(DrawableTransitionOptions.withCrossFade())
             .into(binding.playlistHeaderImage)
     }
 

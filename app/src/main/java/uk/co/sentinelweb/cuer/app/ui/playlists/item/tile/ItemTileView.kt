@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class ItemTileView() :
     ItemContract.View, KoinComponent {
@@ -30,6 +31,11 @@ class ItemTileView() :
     private lateinit var _binding: ViewPlaylistsItemTileBinding
     private lateinit var presenter: ItemContract.Presenter
     private val imageProvider: ImageProvider by inject()
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this)
+    }
 
     val root: View
         get() = _binding.root

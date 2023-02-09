@@ -11,7 +11,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -313,7 +312,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private fun setImage(imageUrl: String?) {
         Glide.with(requireContext())
             .load(imageUrl)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            //.transition(DrawableTransitionOptions.withCrossFade()) // messes up transition
             .into(binding.plieImage)
     }
 
