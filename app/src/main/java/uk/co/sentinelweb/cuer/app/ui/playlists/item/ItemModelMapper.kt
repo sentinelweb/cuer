@@ -21,7 +21,7 @@ class ItemModelMapper constructor(
 ) {
 
     private fun playDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
-        res.getDrawable(R.drawable.ic_player_play_black, color, R.dimen.list_item_top_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_player_play, color, R.dimen.list_item_top_text_size, SCALING)
 
     private fun starDrawable(@ColorRes color:Int = R.color.text_primary): Drawable =
         res.getDrawable(R.drawable.ic_starred, color, R.dimen.list_item_bottom_text_size, SCALING)
@@ -36,11 +36,11 @@ class ItemModelMapper constructor(
         )
 
     private val unwatchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_off_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility_off, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private val watchDrawable: Drawable by lazy {
-        res.getDrawable(R.drawable.ic_visibility_24, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
+        res.getDrawable(R.drawable.ic_visibility, R.color.text_secondary, R.dimen.list_item_bottom_text_size, SCALING)
     }
 
     private fun pinDrawable(@ColorRes color: Int = R.color.text_primary): Drawable =

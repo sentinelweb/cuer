@@ -34,7 +34,7 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_parent),
-                        icon = R.drawable.ic_tree_24
+                        icon = R.drawable.ic_tree
                     )
                 )
             ),

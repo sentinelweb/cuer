@@ -91,7 +91,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/plie_play_fab"
-                    style="@style/Header.Button"
+                    style="@style/Header.Button.Solid"
                     android:contentDescription="@string/menu_play"
                     android:text="@string/menu_play"
                     app:icon="@drawable/ic_play_black"

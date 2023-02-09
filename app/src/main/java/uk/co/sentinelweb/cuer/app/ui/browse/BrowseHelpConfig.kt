@@ -34,7 +34,7 @@ class BrowseHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                         ),
                         ActionResources(
                             label = res.getString(R.string.help_playlist_paste_add),
-                            icon = R.drawable.ic_menu_paste_add_black
+                            icon = R.drawable.ic_menu_paste_add
                         ),
                         ActionResources(
                             label = res.getString(R.string.help_playlist_settings),

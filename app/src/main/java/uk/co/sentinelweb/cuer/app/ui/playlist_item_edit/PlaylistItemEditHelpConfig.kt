@@ -46,7 +46,7 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_plie_share),
-                        icon = R.drawable.ic_share_black
+                        icon = R.drawable.ic_share
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_like),
@@ -54,7 +54,7 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_comment),
-                        icon = R.drawable.ic_comment_24
+                        icon = R.drawable.ic_comment
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_launch),

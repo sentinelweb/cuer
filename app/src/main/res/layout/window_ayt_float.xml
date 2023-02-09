@@ -83,7 +83,7 @@
             android:paddingTop="@dimen/floating_player_button_inner_padding"
             android:paddingEnd="@dimen/floating_player_button_inner_padding"
             android:paddingBottom="@dimen/floating_player_button_outer_padding"
-            android:src="@drawable/ic_resize_24"
+            android:src="@drawable/ic_resize"
             app:tint="@color/white"
             tools:ignore="HardcodedText"
         />

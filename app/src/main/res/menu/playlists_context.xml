@@ -33,7 +33,7 @@
 
     <item
         android:id="@+id/playlists_context_share"
-        android:icon="@drawable/ic_share_black"
+        android:icon="@drawable/ic_share"
         android:title="@string/menu_share"
         app:iconTint="?contextMenuItemColor" />
 

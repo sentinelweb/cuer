@@ -50,7 +50,7 @@ class RemoteNotification constructor(
             appState.remoteNotificationChannelId!!
         )
             .setDefaults(Notification.DEFAULT_ALL)
-            .setSmallIcon(R.drawable.ic_remote_service_24)
+            .setSmallIcon(R.drawable.ic_remote_service)
             .setContentTitle(res.getString(R.string.prefs_root_remote_service_title))
             .setContentText(address)
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

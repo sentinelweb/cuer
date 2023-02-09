@@ -339,8 +339,8 @@
     <string name="help_playlists_app_recent">Recent: Recently watched videos</string>
     <string name="help_playlists_app_starred">Starred: Starred videos</string>
     <string name="help_playlists_app_unfinished">Unfinished: Videos incomplete</string>
-    <string name="help_playlists_app_local">Local search: last search on device</string>
-    <string name="help_playlists_app_yt">Youtube search: last search on youtube</string>
+    <string name="help_playlists_app_local">Local search: Last search on device</string>
+    <string name="help_playlists_app_yt">YouTube search: Last search on YouTube</string>
     <string name="help_playlists_title_actionbar">Playlists - Actionbar</string>
     <string name="help_playlists_ab_create">Create playlist</string>
     <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>

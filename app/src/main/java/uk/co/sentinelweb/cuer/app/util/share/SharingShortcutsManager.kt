@@ -7,7 +7,6 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import java.util.*
 
 /**
  * RM: This adds icon menu items: possible items are:
@@ -56,7 +55,7 @@ class SharingShortcutsManager {
                 .setIcon(
                     IconCompat.createWithResource(
                         context,
-                        R.drawable.ic_menu_paste_add_black
+                        R.drawable.ic_menu_paste_add
                     )
                 )
                 .setIntent(

@@ -4,13 +4,13 @@
 
     <item
         android:id="@+id/play"
-        android:drawable="@drawable/ic_player_play_black"
+        android:drawable="@drawable/ic_player_play"
         android:state_checked="false"
         />
 
     <item
         android:id="@+id/paused"
-        android:drawable="@drawable/ic_player_pause_black"
+        android:drawable="@drawable/ic_player_pause"
         android:state_checked="true"
         />
 

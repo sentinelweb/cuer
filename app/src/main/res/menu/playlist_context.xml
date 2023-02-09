@@ -5,7 +5,7 @@
     >
     <item
         android:id="@+id/playlist_context_view"
-        android:icon="@drawable/ic_menu_info_black"
+        android:icon="@drawable/ic_menu_info"
         android:title="@string/playlist_item_menu_view"
         app:iconTint="?contextMenuItemColor"
         />
@@ -35,7 +35,7 @@
 
     <item
         android:id="@+id/playlist_context_channel_external"
-        android:icon="@drawable/ic_menu_subscriptions_black"
+        android:icon="@drawable/ic_menu_subscriptions"
         android:title="@string/playlist_item_menu_channel_yt"
         app:iconTint="?contextMenuItemColor"
         />
@@ -49,7 +49,7 @@
 
     <item
         android:id="@+id/playlist_context_share"
-        android:icon="@drawable/ic_share_black"
+        android:icon="@drawable/ic_share"
         android:title="@string/playlist_item_menu_share"
         app:iconTint="?contextMenuItemColor"
         />

@@ -124,7 +124,7 @@
                             android:contentDescription="@string/menu_share"
                             android:text="@string/menu_share"
                             android:visibility="gone"
-                            app:icon="@drawable/ic_share_black"
+                            app:icon="@drawable/ic_share"
                         />
                     </LinearLayout>
                 </HorizontalScrollView>
@@ -184,7 +184,7 @@
                         android:id="@+id/playlist_flag_children"
                         style="@style/Header.InfoText"
                         android:visibility="gone"
-                        app:drawableStartCompat="@drawable/ic_tree_flag_20"
+                        app:drawableStartCompat="@drawable/ic_tree_flag"
                         tools:text="3"
                     />
 

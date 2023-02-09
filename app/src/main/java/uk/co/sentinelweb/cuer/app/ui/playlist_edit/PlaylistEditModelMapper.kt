@@ -31,7 +31,7 @@ class PlaylistEditModelMapper constructor(
                 ?: ChipModel.PLAYLIST_SELECT_MODEL,
             validation = validator.validate(this),
             watchAllText = if (!showAllWatched) R.string.pe_mark_all_watched else R.string.pe_mark_all_unwatched,
-            watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility_24 else R.drawable.ic_visibility_off_24,
+            watchAllIIcon = if (!showAllWatched) R.drawable.ic_visibility else R.drawable.ic_visibility_off,
             info = buildInfo(this),
             config = config,
             showDefault = !state.defaultInitial,

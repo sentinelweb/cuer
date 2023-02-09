@@ -78,7 +78,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_paste_add),
-                        icon = R.drawable.ic_menu_paste_add_black
+                        icon = R.drawable.ic_menu_paste_add
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_settings),
@@ -102,7 +102,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_children),
-                        icon = R.drawable.ic_tree_24
+                        icon = R.drawable.ic_tree
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_default),

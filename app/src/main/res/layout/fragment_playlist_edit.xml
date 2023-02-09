@@ -263,7 +263,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="@id/pe_parent_chip"
                 android:contentDescription="@string/help_pe_parent"
-                android:drawableLeft="@drawable/ic_tree_24"
+                android:drawableLeft="@drawable/ic_tree"
                 android:drawableTint="@color/light_color_on_surface"
                 android:drawablePadding="4dp"
             />
@@ -305,7 +305,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/pe_mark_all_watched"
-                app:icon="@drawable/ic_visibility_24"
+                app:icon="@drawable/ic_visibility"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_other_actions_title"
             />

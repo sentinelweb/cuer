@@ -53,7 +53,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                 lines = listOf(
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -63,7 +63,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_comment_24,
+                        icon = R.drawable.ic_comment,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(

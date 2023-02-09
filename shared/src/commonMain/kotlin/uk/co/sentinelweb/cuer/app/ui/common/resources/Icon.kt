@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.resources
 
+// fixme this will crash at runtime if a resource is renamed
 enum class Icon {
     ic_playlist_close,
     ic_playlist_play,
@@ -7,14 +8,14 @@ enum class Icon {
     ic_button_repeat_24,
     ic_playmode_shuffle,
     ic_person,
-    ic_menu_settings_black,
+    ic_menu_settings,
     ic_starred,
     ic_starred_off,
 
     // platform
     ic_platform_youtube,
     ic_platfrom_web,
-    ic_platform_vimeo_24_black,
+    ic_platform_vimeo,
     ic_platform_podcast,
 
     // support
@@ -33,7 +34,7 @@ enum class Icon {
     ic_ko_fi,
     ic_facebook,
     ic_instagram,
-    ic_platform_twitter_24_black,
+    ic_platform_twitter,
     ic_discord,
     ic_vimeo,
     ic_soundcloud,

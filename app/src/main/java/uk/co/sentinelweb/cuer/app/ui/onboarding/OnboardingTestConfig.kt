@@ -12,7 +12,7 @@ class OnboardingTestConfig(val res: ResourceWrapper) : OnboardingContract.Config
             Screen(
                 title = ActionResources(
                     label = "TODO",
-                    icon = R.drawable.ic_share_black,
+                    icon = R.drawable.ic_share,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -23,7 +23,7 @@ class OnboardingTestConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "Share a video or playlist with Cuer",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     )
                 )
@@ -42,7 +42,7 @@ class OnboardingTestConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "Recent",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     )
                 )

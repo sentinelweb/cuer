@@ -69,7 +69,7 @@ class ItemTileView() :
         popup.menu.findItem(R.id.playlists_context_play_external).isVisible = presenter.canLaunch()
         popup.menu.findItem(R.id.playlists_context_star).isVisible = presenter.canEdit()
         popup.menu.findItem(R.id.playlists_context_star).setIcon(
-            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred
         )
         popup.menu.findItem(R.id.playlists_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star

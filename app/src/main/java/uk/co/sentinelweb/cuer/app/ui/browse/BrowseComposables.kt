@@ -230,7 +230,7 @@ object BrowseComposables {
                             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
                                 if (category.subCount > 0) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_tree_24),
+                                        painter = painterResource(R.drawable.ic_tree),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .padding(start = 16.dp)
@@ -258,7 +258,7 @@ object BrowseComposables {
                                             modifier = Modifier.padding(end = 8.dp)
                                         )
                                         Icon(
-                                            painter = painterResource(R.drawable.ic_visibility_24),
+                                            painter = painterResource(R.drawable.ic_visibility),
                                             contentDescription = null,
                                             modifier = Modifier
                                                 .padding(end = 4.dp)

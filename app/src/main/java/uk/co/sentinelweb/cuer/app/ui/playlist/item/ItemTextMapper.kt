@@ -18,7 +18,7 @@ class ItemTextMapper constructor(
 
     private val playDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_player_play_black,
+            R.drawable.ic_player_play,
             R.color.text_primary,
             R.dimen.list_item_top_text_size,
             SCALING
@@ -45,7 +45,7 @@ class ItemTextMapper constructor(
 
     private val unwatchDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_visibility_off_24,
+            R.drawable.ic_visibility_off,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING
@@ -54,7 +54,7 @@ class ItemTextMapper constructor(
 
     private val watchDrawable: Drawable by lazy {
         res.getDrawable(
-            R.drawable.ic_visibility_24,
+            R.drawable.ic_visibility,
             R.color.text_secondary,
             R.dimen.list_item_bottom_text_size,
             SCALING

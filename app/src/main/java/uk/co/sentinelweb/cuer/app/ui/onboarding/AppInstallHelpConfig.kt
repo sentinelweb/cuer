@@ -60,12 +60,12 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "Share playlists or videos with Cuer",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.white
                     ),
                     ActionResources(
                         label = "Or copy links from apps or search and use the paste/add action",
-                        icon = R.drawable.ic_menu_paste_add_black,
+                        icon = R.drawable.ic_menu_paste_add,
                         color = R.color.white
                     ),
                     ActionResources(

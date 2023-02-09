@@ -37,7 +37,7 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:ignore="ContentDescription"
-            tools:src="@drawable/ic_player_play_black"/>
+            tools:src="@drawable/ic_player_play"/>
 
         <ImageView
             android:id="@+id/listitem_play_icon"

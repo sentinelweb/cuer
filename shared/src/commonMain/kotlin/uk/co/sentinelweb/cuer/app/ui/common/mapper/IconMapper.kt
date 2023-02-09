@@ -12,7 +12,7 @@ class IconMapper {
     fun map(platform: PlatformDomain?): Icon = when (platform) {
         PlatformDomain.YOUTUBE -> Icon.ic_platform_youtube
         PlatformDomain.WEB -> Icon.ic_platfrom_web
-        PlatformDomain.VIMEO -> Icon.ic_platform_vimeo_24_black
+        PlatformDomain.VIMEO -> Icon.ic_platform_vimeo
         PlatformDomain.PODCAST -> Icon.ic_platform_podcast
         else -> Icon.ic_platfrom_web
     }
@@ -30,7 +30,7 @@ class IconMapper {
         when (type) {
             PlaylistDomain.PlaylistTypeDomain.USER -> Icon.ic_person
             PlaylistDomain.PlaylistTypeDomain.PLATFORM -> map(platform)
-            PlaylistDomain.PlaylistTypeDomain.APP -> Icon.ic_menu_settings_black
+            PlaylistDomain.PlaylistTypeDomain.APP -> Icon.ic_menu_settings
         }
 
     //@DrawableRes
@@ -58,7 +58,7 @@ class IconMapper {
             KO_FI -> Icon.ic_ko_fi
             FACEBOOK -> Icon.ic_facebook
             INSTAGRAM -> Icon.ic_instagram
-            TWITTER -> Icon.ic_platform_twitter_24_black
+            TWITTER -> Icon.ic_platform_twitter
             DISCORD -> Icon.ic_discord
             YOUTUBE -> Icon.ic_platform_youtube
             VIMEO -> Icon.ic_vimeo

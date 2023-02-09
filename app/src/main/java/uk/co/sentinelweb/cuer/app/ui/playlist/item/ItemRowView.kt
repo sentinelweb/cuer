@@ -102,7 +102,7 @@ class ItemRowView constructor(c: Context, a: AttributeSet?, def: Int = 0) : Fram
             }
         })
         popup.menu.findItem(R.id.playlist_context_star).setIcon(
-            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred
         )
         popup.menu.findItem(R.id.playlist_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star

@@ -30,10 +30,10 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
                     ),
                     ActionResources(
                         label = "Swipe RIGHT to change parent",
-                        icon = R.drawable.ic_tree_24
+                        icon = R.drawable.ic_tree
                     ),
                     ActionResources(
-                        label = "Swipe Left to delete",
+                        label = "Swipe LEFT to delete",
                         icon = R.drawable.ic_delete
                     )
                 )
@@ -76,7 +76,7 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlists_ab_pasteadd),
-                        icon = R.drawable.ic_menu_paste_add_black
+                        icon = R.drawable.ic_menu_paste_add
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_search),
