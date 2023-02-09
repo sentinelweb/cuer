@@ -11,16 +11,24 @@ import androidx.fragment.app.Fragment
 import kotlinx.coroutines.cancel
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.context.GlobalContext.get
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ext.deserialiseOnboarding
 import uk.co.sentinelweb.cuer.app.ext.serialise
+import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.ONBOARD_CONFIG
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.ONBOARD_KEY
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Label.Finished
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Label.Skip
+import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
+import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.ONBOARDED_PREFIX
@@ -62,15 +70,22 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     private fun observeLabel(label: OnboardingContract.Label) = when (label) {
-        OnboardingContract.Label.Finished -> closeDismiss()
-        OnboardingContract.Label.Skip -> closeDismiss()
+        Finished -> closeDismiss(label)
+        Skip -> closeDismiss(label)
     }
 
-    private fun closeDismiss() {
+    private fun closeDismiss(label: OnboardingContract.Label) {
         multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, shownPrefKey, true)
         dismiss()
         if (shownPrefKey == MainActivity::class.simpleName) {
             (requireActivity() as? MainActivity)?.finishedOnboarding()
+            if (label == Skip) {
+                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistMviFragment::class.simpleName!!, true)
+                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistsMviFragment::class.simpleName!!, true)
+                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistEditFragment::class.simpleName!!, true)
+                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistItemEditFragment::class.simpleName!!, true)
+                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, BrowseFragment::class.simpleName!!, true)
+            }
         }
     }
 
@@ -91,8 +106,25 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 
     companion object {
         const val TAG = "OnboardingFragment"
+        fun showIntro(f: Fragment, config: OnboardingContract.ConfigBuilder) {
+            if (shouldShowIntro(f).not()) {
+                OnboardingFragment()
+                    .apply {
+                        arguments = bundleOf(
+                            ONBOARD_CONFIG.toString() to config.build().serialise(),
+                            ONBOARD_KEY.toString() to f::class.simpleName!!
+                        )
+                    }
+                    .show(f.requireActivity().supportFragmentManager, TAG)
+            }
+        }
 
-        fun show(f: Fragment, config: OnboardingContract.ConfigBuilder) {
+        private fun shouldShowIntro(f: Fragment): Boolean {
+            val multiPlatformPreferences: MultiPlatformPreferencesWrapper = get().get()
+            return multiPlatformPreferences.getBoolean(ONBOARDED_PREFIX, f::class.simpleName!!, false)
+        }
+
+        fun showHelp(f: Fragment, config: OnboardingContract.ConfigBuilder) {
             OnboardingFragment()
                 .apply {
                     arguments = bundleOf(
@@ -112,6 +144,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
                     arguments
                         ?.getString(ONBOARD_CONFIG.toString())
                         ?.let { deserialiseOnboarding(it) }
+                    // config for MainActivity (shows by default) - ONBOARD_KEY defaulted by shownPrefKey
                         ?: AppInstallHelpConfig(get()).build()
                 }
                 scoped { OnboardingMapper() }

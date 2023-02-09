@@ -218,7 +218,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(this, playlistItemEditHelpConfig)
+            OnboardingFragment.showHelp(this, playlistItemEditHelpConfig)
             true
         }
         binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
@@ -233,6 +233,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistItemEditHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 

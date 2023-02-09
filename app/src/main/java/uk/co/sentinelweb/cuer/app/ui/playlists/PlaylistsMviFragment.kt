@@ -206,7 +206,7 @@ class PlaylistsMviFragment :
             true
         }
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(this, playlistsHelpConfig)
+            OnboardingFragment.showHelp(this, playlistsHelpConfig)
             true
         }
         binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
@@ -214,6 +214,7 @@ class PlaylistsMviFragment :
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistsHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 

@@ -226,7 +226,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(this, playlistEditHelpConfig)
+            OnboardingFragment.showHelp(this, playlistEditHelpConfig)
             true
         }
         binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
@@ -234,6 +234,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistEditHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.lifecycleScope
 import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.delay
@@ -33,11 +34,10 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.SEARCH_BOTTOMSHEET_TAG
-import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
+import uk.co.sentinelweb.cuer.app.usecase.AddBrowsePlaylistUsecase
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.playlistUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -58,6 +58,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val res: ResourceWrapper by inject()
     private val browseHelpConfig: BrowseHelpConfig by inject()
+    private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -109,6 +110,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this@BrowseFragment, browseHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -146,21 +148,27 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                         }
 
                         ActionHelp -> {
-                            OnboardingFragment.show(this@BrowseFragment, browseHelpConfig)
+                            OnboardingFragment.showHelp(this@BrowseFragment, browseHelpConfig)
                         }
 
                         is AddPlaylist -> {
-                            startActivity(
-                                ShareActivity.urlIntent(
-                                    requireContext(),
-                                    playlistUrl(
-                                        label.cat.platformId
-                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
-                                    ),
-                                    label.parentId,
-                                    label.cat
-                                )
-                            )
+                            lifecycleScope.launch {
+                                addBrowsePlaylistUsecase.execute(label.cat, label.parentId)
+                                    ?.id
+                                    ?.apply { navRouter.navigate(PlaylistMviFragment.makeNav(this.id, play = true, source = this.source)) }
+                                    ?: snackbarWrapper.makeError(res.getString(R.string.browse_add_error, label.cat.title)).show()
+                            }
+//                            startActivity(
+//                                ShareActivity.urlIntent(
+//                                    requireContext(),
+//                                    playlistUrl(
+//                                        label.cat.platformId
+//                                            ?: throw IllegalArgumentException("Category has no platform ID : ${label.cat} ")
+//                                    ),
+//                                    label.parentId,
+//                                    label.cat
+//                                )
+//                            )
                         }
 
                         is OpenLocalPlaylist -> navRouter.navigate(

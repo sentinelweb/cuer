@@ -260,7 +260,7 @@ class PlaylistMviFragment : Fragment(),
     }
 
     fun showHelp() {
-        OnboardingFragment.show(this, playlistHelpConfig)
+        OnboardingFragment.showHelp(this, playlistHelpConfig)
     }
 
     inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),
@@ -416,6 +416,7 @@ class PlaylistMviFragment : Fragment(),
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 

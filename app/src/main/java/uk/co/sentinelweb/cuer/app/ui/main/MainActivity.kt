@@ -76,7 +76,7 @@ class MainActivity :
 
     private var _binding: ActivityMainBinding? = null
 
-    private val idOnboarding: Boolean
+    private val isOnboarding: Boolean
         get() = multiPlatformPreferences.getBoolean(ONBOARDED_PREFIX, this::class.simpleName!!, false).not()
 
     private val binding: ActivityMainBinding
@@ -127,14 +127,14 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        if (!idOnboarding) {
+        if (!isOnboarding) {
             restoreBottomNavTab(savedInstanceState != null)
         }
         presenter.initialise()
     }
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
-        if (!idOnboarding) {
+        if (!isOnboarding) {
             when (result) {
                 SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
                 SETUP -> snackBarWrapper.make(
@@ -228,12 +228,7 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
-        if (idOnboarding) {
-            lifecycleScope.launch {
-                delay(500)
-                hidePlayer()
-            }
-        }
+        hidePlayerIfOnboarding()
     }
 
     override fun onStop() {
@@ -277,6 +272,15 @@ class MainActivity :
             .hide(playerFragment)
             .commitAllowingStateLoss()
         binding.navHostFragment.setPadding(0, 0, 0, 0)
+    }
+
+    private fun hidePlayerIfOnboarding() {
+        if (isOnboarding) {
+            lifecycleScope.launch {
+                delay(500)
+                hidePlayer()
+            }
+        }
     }
 
     var isRaised = true
@@ -324,8 +328,8 @@ class MainActivity :
         if (!isConfigChange) {
             prefs.lastBottomTab
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
-                .takeIf { it > 0 && !idOnboarding }
-                ?.also {
+                //.takeIf { it > 0}
+                .also {
                     when (MainCommonContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                             R.id.navigation_playlists

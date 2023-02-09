@@ -46,6 +46,6 @@ class AddBrowsePlaylistUsecase(
                     )
                 )
             }
-            ?.also { addPlaylistUsecase.addPlaylist(it, null) }
+            ?.let { addPlaylistUsecase.addPlaylist(it, null) }
     }
 }

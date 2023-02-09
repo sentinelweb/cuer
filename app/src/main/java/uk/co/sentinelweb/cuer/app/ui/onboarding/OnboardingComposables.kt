@@ -19,7 +19,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
@@ -52,7 +51,7 @@ object OnboardingComposables {
                 Box(
                     modifier = Modifier
                         .height(512.dp)
-                        .background(color = colorResource(id = model.screen.backgroundColor ?: R.color.color_on_surface))
+                        .background(color = colorResource(id = model.screen.backgroundColor ?: R.color.surface))
                 ) {
                     model.screen.backgroundUrl?.also {
                         Image(
@@ -217,7 +216,7 @@ object OnboardingComposables {
     private fun LineText(color: Color, it: String, modifier: Modifier = Modifier) {
         Text(
             modifier = modifier,
-            style = MaterialTheme.typography.body1.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.body1,
             color = color,
             text = it
         )
