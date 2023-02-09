@@ -24,7 +24,7 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_select_playlist),
-                        icon = R.drawable.ic_playlist_black,
+                        icon = R.drawable.ic_playlist,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(

@@ -13,7 +13,7 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
             Screen(
                 title = ActionResources(
                     label = "Playlists Sections",
-                    icon = R.drawable.ic_playlist_black,
+                    icon = R.drawable.ic_playlist,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -47,7 +47,7 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_playlists_title_app),
-                    icon = R.drawable.ic_playlist_black,
+                    icon = R.drawable.ic_playlist,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -86,7 +86,7 @@ class PlaylistsHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigB
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_playlists_title_actionbar),
-                    icon = R.drawable.ic_playlist_black,
+                    icon = R.drawable.ic_playlist,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(

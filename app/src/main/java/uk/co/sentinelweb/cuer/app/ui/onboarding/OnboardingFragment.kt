@@ -80,11 +80,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
         if (shownPrefKey == MainActivity::class.simpleName) {
             (requireActivity() as? MainActivity)?.finishedOnboarding()
             if (label == Skip) {
-                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistMviFragment::class.simpleName!!, true)
-                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistsMviFragment::class.simpleName!!, true)
-                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistEditFragment::class.simpleName!!, true)
-                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistItemEditFragment::class.simpleName!!, true)
-                multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, BrowseFragment::class.simpleName!!, true)
+                setOnboardingState(isShown = true)
             }
         }
     }
@@ -122,6 +118,17 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
         private fun shouldShowIntro(f: Fragment): Boolean {
             val multiPlatformPreferences: MultiPlatformPreferencesWrapper = get().get()
             return multiPlatformPreferences.getBoolean(ONBOARDED_PREFIX, f::class.simpleName!!, false)
+        }
+
+        fun setOnboardingState(isShown: Boolean) {
+            val multiPlatformPreferences: MultiPlatformPreferencesWrapper = get().get()
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, MainActivity::class.simpleName!!, isShown)
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistMviFragment::class.simpleName!!, isShown)
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistsMviFragment::class.simpleName!!, isShown)
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistEditFragment::class.simpleName!!, isShown)
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, PlaylistItemEditFragment::class.simpleName!!, isShown)
+            multiPlatformPreferences.putBoolean(ONBOARDED_PREFIX, BrowseFragment::class.simpleName!!, isShown)
+
         }
 
         fun showHelp(f: Fragment, config: OnboardingContract.ConfigBuilder) {

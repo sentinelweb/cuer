@@ -24,7 +24,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_playlist_black,
+                        icon = R.drawable.ic_playlist,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(

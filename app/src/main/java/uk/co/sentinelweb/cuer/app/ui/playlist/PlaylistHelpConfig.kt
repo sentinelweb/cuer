@@ -13,7 +13,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_playlist_title_gestures),
-                    icon = R.drawable.ic_playlist_black,
+                    icon = R.drawable.ic_playlist,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(

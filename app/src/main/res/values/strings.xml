@@ -135,6 +135,8 @@
     <string name="prefs_root_player_cat_title">Player section</string>
     <string name="prefs_root_player_summary">Player settings</string>
     <string name="prefs_root_player_title">Player</string>
+    <string name="prefs_root_onboard_summary">Reset intro state (to show)</string>
+    <string name="prefs_root_onboard_title">Onboarding</string>
 
 
     <string name="prefs_backup_manual_cat_title">Manual backup</string>

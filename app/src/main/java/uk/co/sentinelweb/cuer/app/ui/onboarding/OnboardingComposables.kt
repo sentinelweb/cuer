@@ -59,7 +59,7 @@ object OnboardingComposables {
                                 request = it,
                                 fadeIn = true
                             ),
-                            colorFilter = ColorFilter.tint(Color(0x88000000), blendMode = BlendMode.Multiply),
+                            colorFilter = ColorFilter.tint(Color(0xaa000000), blendMode = BlendMode.Multiply),
                             contentDescription = "",
                             modifier = Modifier
                                 .fillMaxWidth()

@@ -243,7 +243,7 @@ object BrowseComposables {
                                     )
                                 } else if (category.isPlaylist) {
                                     Icon(
-                                        painter = painterResource(R.drawable.ic_playlist_black),
+                                        painter = painterResource(R.drawable.ic_playlist),
                                         contentDescription = null,
                                         modifier = Modifier
                                             .padding(start = 16.dp)

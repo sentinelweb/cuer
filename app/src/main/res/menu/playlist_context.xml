@@ -64,7 +64,7 @@
 
     <item
         android:id="@+id/playlist_goto_playlist"
-        android:icon="@drawable/ic_playlist_black"
+        android:icon="@drawable/ic_playlist"
         android:title="@string/playlist_item_menu_goto_playlist"
         app:iconTint="?contextMenuItemColor"
         />
