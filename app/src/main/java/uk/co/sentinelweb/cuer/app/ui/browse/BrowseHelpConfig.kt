@@ -16,10 +16,8 @@ class BrowseHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                         label = res.getString(R.string.help_browse),
                         icon = R.drawable.ic_nav_browse
                     ),
+                    subtitle = res.getString(R.string.help_browse_desc),
                     lines = listOf(
-                        ActionResources(
-                            label = res.getString(R.string.help_browse_desc)
-                        ),
                         ActionResources(
                             label = res.getString(R.string.help_browse_az),
                             icon = R.drawable.ic_sort_by_alpha
@@ -39,6 +37,10 @@ class BrowseHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                         ActionResources(
                             label = res.getString(R.string.help_playlist_settings),
                             icon = R.drawable.ic_menu_settings
+                        ),
+                        ActionResources(
+                            label = "This help",
+                            icon = R.drawable.ic_help
                         ),
                     )
                 )

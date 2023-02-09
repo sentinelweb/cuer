@@ -15,7 +15,15 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     label = res.getString(R.string.help_playlist_title_gestures),
                     icon = R.drawable.ic_playlist
                 ),
+                subtitle = "Play and manage the playlist",
                 lines = listOf(
+                    ActionResources(
+                        label = "Click the thumbnail to play",
+                        icon = R.drawable.ic_play
+                    ),
+                    ActionResources(
+                        label = "Click the text for details"
+                    ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_delete),
                         icon = R.drawable.ic_delete_item
@@ -27,7 +35,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ActionResources(
                         label = res.getString(R.string.help_playlist_reorder),
                         icon = R.drawable.ic_up_down
-                    )
+                    ),
                 )
             ),
             Screen(
@@ -35,6 +43,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     label = res.getString(R.string.help_playlist_title_actions),
                     icon = R.drawable.ic_playlists
                 ),
+                subtitle = "Buttons on the playlist header",
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_playlist_play),
@@ -46,15 +55,36 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_edit),
-                        icon = R.drawable.ic_edit_24
+                        icon = R.drawable.ic_edit
+                    ),
+                    ActionResources(
+                        label = "Update the playlist from the platform",
+                        icon = R.drawable.ic_refresh
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_star),
                         icon = R.drawable.ic_starred
-                    ),
+                    )
+                )
+            ),
+            Screen(
+                title = ActionResources(
+                    label = "Playlist - Actions 2",
+                    icon = R.drawable.ic_playlists
+                ),
+                subtitle = "More buttons on the playlist header",
+                lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_playlist_playmode),
                         icon = R.drawable.ic_playmode_straight
+                    ),
+                    ActionResources(
+                        label = "Launch the playlist on the platform",
+                        icon = R.drawable.ic_launch
+                    ),
+                    ActionResources(
+                        label = "Share the playlist",
+                        icon = R.drawable.ic_share
                     )
                 )
             ),
@@ -63,6 +93,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     label = res.getString(R.string.help_playlist_title_actions_top),
                     icon = R.drawable.ic_playlists
                 ),
+                subtitle = "Buttons on the playlist actionbar",
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_playlist_viewmode_cards),
@@ -84,6 +115,10 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                         label = res.getString(R.string.help_playlist_settings),
                         icon = R.drawable.ic_menu_settings
                     ),
+                    ActionResources(
+                        label = "This help",
+                        icon = R.drawable.ic_help
+                    ),
                 )
             ),
             Screen(
@@ -91,6 +126,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     label = res.getString(R.string.help_playlist_title_status_icons),
                     icon = R.drawable.ic_playlists
                 ),
+                subtitle = "Status item on the playlist header",
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_playlist_pos),

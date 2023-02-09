@@ -13,8 +13,9 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
             Screen(
                 title = ActionResources(
                     label = res.getString(R.string.help_pe_title),
-                    icon = R.drawable.ic_editable_items
+                    icon = R.drawable.ic_edit
                 ),
+                subtitle = "Edit playlist title and properties",
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_pe_save),
@@ -30,20 +31,8 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_title_text),
-                        icon = R.drawable.ic_edit_24
+                        icon = null
                     ),
-                    ActionResources(
-                        label = res.getString(R.string.help_pe_parent),
-                        icon = R.drawable.ic_tree
-                    )
-                )
-            ),
-            Screen(
-                title = ActionResources(
-                    label = res.getString(R.string.help_pe_title_options),
-                    icon = R.drawable.ic_edit_24
-                ),
-                lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_pe_default),
                         icon = R.drawable.ic_playlist_default
@@ -52,9 +41,17 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                         label = res.getString(R.string.help_pe_play_start),
                         icon = R.drawable.ic_play_start_black
                     ),
+                )
+            ),
+            Screen(
+                title = ActionResources(
+                    label = res.getString(R.string.help_pe_title_options),
+                    icon = R.drawable.ic_edit
+                ),
+                lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_pe_playable),
-                        icon = R.drawable.ic_play_black
+                        icon = R.drawable.ic_play
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_deletable),
@@ -67,6 +64,14 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                     ActionResources(
                         label = res.getString(R.string.help_pe_editabe_items),
                         icon = R.drawable.ic_editable_items
+                    ),
+                    ActionResources(
+                        label = res.getString(R.string.help_pe_parent),
+                        icon = R.drawable.ic_tree
+                    ),
+                    ActionResources(
+                        label = "Mark all items as (un)watched",
+                        icon = R.drawable.ic_visibility
                     ),
                 )
             ),

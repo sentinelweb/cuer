@@ -18,7 +18,7 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_plie_play),
-                        icon = R.drawable.ic_play_black
+                        icon = R.drawable.ic_play
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_select_playlist),
@@ -34,16 +34,8 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_edit),
-                        icon = R.drawable.ic_edit_24
-                    )
-                )
-            ),
-            Screen(
-                title = ActionResources(
-                    label = res.getString(R.string.help_plie_title_2),
-                    icon = R.drawable.ic_playlist_item
-                ),
-                lines = listOf(
+                        icon = R.drawable.ic_edit
+                    ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_share),
                         icon = R.drawable.ic_share
@@ -58,10 +50,10 @@ class PlaylistItemEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_plie_launch),
-                        icon = R.drawable.ic_launch_black
+                        icon = R.drawable.ic_launch
                     ),
                 )
-            ),
+            )
         )
     )
 }

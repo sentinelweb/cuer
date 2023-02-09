@@ -17,7 +17,7 @@
             app:fragment="uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerFragment"
             app:key="@string/prefs_root_player_key"
             app:title="@string/prefs_root_player_title"
-            app:icon="@drawable/ic_play_black"
+            app:icon="@drawable/ic_play"
             app:summary="@string/prefs_root_player_summary"
         />
     </PreferenceCategory>

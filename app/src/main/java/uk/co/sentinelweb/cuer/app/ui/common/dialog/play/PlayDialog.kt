@@ -117,7 +117,7 @@ class PlayDialog constructor(
         }
         dialog = MaterialAlertDialogBuilder(f.requireContext())
             .setTitle(f.getString(R.string.play_dialog_title))
-            .setIcon(R.drawable.ic_play_black)
+            .setIcon(R.drawable.ic_play)
             .setView(binding.root)
             .create()
         dialog.show()

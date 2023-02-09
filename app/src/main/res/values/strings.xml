@@ -345,13 +345,13 @@
     <string name="help_playlists_ab_create">Create playlist</string>
     <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
 
-    <string name="help_plie_title_1">Playlist Item - Actions</string>
+    <string name="help_plie_title_1">Details - Actions</string>
     <string name="help_plie_play">Play</string>
     <string name="help_plie_select_playlist">Select playlist</string>
     <string name="help_plie_star">Star</string>
     <string name="help_plie_support">Support</string>
     <string name="help_plie_edit">Edit</string>
-    <string name="help_plie_title_2">Playlist Item - Actions 2</string>
+    <!--    <string name="help_plie_title_2">Details - Actions 2</string>-->
     <string name="help_plie_share">Share</string>
     <string name="help_plie_like">Like: on platform</string>
     <string name="help_plie_comment">Comment: on platform</string>
@@ -361,10 +361,10 @@
     <string name="help_pe_save">Save / Create</string>
     <string name="help_pe_star">Star</string>
     <string name="help_pe_pin">Pin - raise playlist for selection</string>
-    <string name="help_pe_title_text">Change the title text</string>
+    <string name="help_pe_title_text">Edit the title text</string>
     <string name="help_pe_parent">Select the parent playlist</string>
     <string name="help_pe_title_options">Playlist options</string>
-    <string name="help_pe_default">Default: Used when nothing selcted</string>
+    <string name="help_pe_default">Default: Used when no playlist selected</string>
     <string name="help_pe_play_start">Play from start (all items)</string>
     <string name="help_pe_playable">Playable</string>
     <string name="help_pe_deletable">Deleteable</string>

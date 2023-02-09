@@ -54,7 +54,7 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                 ),
                 lines = listOf(
                     ActionResources(
-                        label = "You can also make your own playlists from video sites like YouTube",
+                        label = "You can also make your own playlists from video platforms like YouTube",
                         icon = R.drawable.ic_platform_youtube,
                         color = R.color.white
                     ),

@@ -79,7 +79,7 @@
                             android:contentDescription="@string/menu_edit"
                             android:text="@string/menu_edit"
                             android:visibility="gone"
-                            app:icon="@drawable/ic_edit_24"
+                            app:icon="@drawable/ic_edit"
                         />
 
                         <com.google.android.material.button.MaterialButton
@@ -115,7 +115,7 @@
                             android:contentDescription="@string/menu_launch"
                             android:text="@string/menu_launch"
                             android:visibility="gone"
-                            app:icon="@drawable/ic_launch_black"
+                            app:icon="@drawable/ic_launch"
                         />
 
                         <com.google.android.material.button.MaterialButton
@@ -192,7 +192,7 @@
                         android:id="@+id/playlist_flag_playable"
                         style="@style/Header.InfoIcon"
                         android:contentDescription="@string/help_pe_playable"
-                        android:src="@drawable/ic_play_black"
+                        android:src="@drawable/ic_play"
                         android:visibility="visible"
                         app:tint="@color/light_color_on_surface"
                     />
@@ -210,7 +210,7 @@
                         android:id="@+id/playlist_flag_editable"
                         style="@style/Header.InfoIcon"
                         android:contentDescription="@string/help_pe_editable"
-                        android:src="@drawable/ic_edit_24"
+                        android:src="@drawable/ic_edit"
                         android:visibility="visible"
                         app:tint="@color/light_color_on_surface"
                     />
