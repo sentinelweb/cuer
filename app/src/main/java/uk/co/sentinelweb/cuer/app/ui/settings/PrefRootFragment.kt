@@ -14,7 +14,6 @@ import androidx.preference.PreferenceFragmentCompat
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
-import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
@@ -54,6 +53,12 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val debugPreference
         get() = findPreference(R.string.prefs_root_debug_cat_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_debug_key")
+    private val onboardPreference
+        get() = findPreference(R.string.prefs_root_onboard_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_onboard_key")
+    private val bugReportPreference
+        get() = findPreference(R.string.prefs_root_debug_send_reports_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_debug_send_reports_key")
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = super.onCreateView(inflater, container, savedInstanceState)
@@ -83,9 +88,10 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
-        remoteServiceCategory.isVisible = BuildConfig.cuerRemoteEnabled
-        remoteServicePreference.isVisible = BuildConfig.cuerRemoteEnabled
-        debugPreference.isVisible = buildConfig.isDebug
+        remoteServiceCategory.isVisible = buildConfig.cuerRemoteEnabled
+        remoteServicePreference.isVisible = buildConfig.cuerRemoteEnabled
+        //debugPreference.isVisible = buildConfig.isDebug
+        bugReportPreference.isVisible = buildConfig.isDebug
     }
 
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
@@ -94,6 +100,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
             getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
             getString(R.string.prefs_root_feedback_key) -> presenter.onFeedback()
             getString(R.string.prefs_root_share_key) -> presenter.onShare()
+            getString(R.string.prefs_root_onboard_key) -> presenter.resetOnboarding()
         }
         return super.onPreferenceTreeClick(preference)
     }

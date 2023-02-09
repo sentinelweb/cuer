@@ -25,6 +25,7 @@
     <string name="prefs_root_feedback_key">root_feedback</string>
     <string name="prefs_root_share_key">root_share</string>
     <string name="prefs_root_debug_cat_key">root_debug</string>
+    <string name="prefs_root_onboard_key">root_onboard</string>
     <string name="app_email">cuerapp@gmail.com</string>
     <string name="share_uri">https://cuer.app</string>
     <string name="share_short_uri">cuer.app</string>
