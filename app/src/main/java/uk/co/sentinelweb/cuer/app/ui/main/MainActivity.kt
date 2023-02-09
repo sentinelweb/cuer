@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import kotlinx.coroutines.delay
@@ -30,12 +30,14 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
+import uk.co.sentinelweb.cuer.app.ext.serialise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.*
+import uk.co.sentinelweb.cuer.app.ui.onboarding.AppInstallHelpConfig
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
@@ -127,7 +129,14 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        if (!isOnboarding) {
+        if (isOnboarding) {
+            navController.navigate(
+                R.id.navigation_onboarding, bundleOf(
+                    ONBOARD_CONFIG.name to AppInstallHelpConfig(res).build().serialise(),
+                    ONBOARD_KEY.name to MainActivity::class.simpleName!!
+                )
+            )
+        } else {
             restoreBottomNavTab(savedInstanceState != null)
         }
         presenter.initialise()
@@ -307,7 +316,8 @@ class MainActivity :
     }
 
     private fun setupBottomNav() {
-        binding.bottomNavView.setupWithNavController(navController)
+//        binding.bottomNavView.setupWithNavController(navController)
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController, false)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_browse -> BROWSE

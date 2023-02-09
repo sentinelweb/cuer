@@ -49,8 +49,6 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 
     private val shownPrefKey: String
         get() = arguments?.getString(ONBOARD_KEY.toString())
-        // this is a hack to get the key for the main activity (launched by default from nav graph so no args)
-            ?: MainActivity::class.simpleName
             ?: throw IllegalArgumentException("No key")
 
     init {
@@ -151,8 +149,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
                     arguments
                         ?.getString(ONBOARD_CONFIG.toString())
                         ?.let { deserialiseOnboarding(it) }
-                    // config for MainActivity (shows by default) - ONBOARD_KEY defaulted by shownPrefKey
-                        ?: AppInstallHelpConfig(get()).build()
+                        ?: throw IllegalArgumentException("No onboarding config")
                 }
                 scoped { OnboardingMapper() }
                 scoped { CoroutineContextProvider() }//todo wtf why

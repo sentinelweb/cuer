@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottom_navigation"
-    app:startDestination="@id/navigation_onboarding"
+    app:startDestination="@id/navigation_browse"
 >
     <!-- There's is a bug with app:startDestination that caused the specified fragment to use two instances when navigating -->
 
@@ -30,7 +30,7 @@
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
             app:launchSingleTop="true"
-            app:popUpTo="@id/navigation_playlist"
+            app:popUpTo="@id/navigation_playlists"
             app:popUpToInclusive="true"
             app:popExitAnim="@anim/slide_out_right"
         />
