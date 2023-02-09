@@ -63,17 +63,17 @@ Using
 ### Browse
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-browse-2023-02-04.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/browse-lg-2023-02-09.png" width="400">
 
 ### Playlist
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlist-2023-02-07.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/playlist-lg-2023-02-09.png" width="400">
 
 ### Playlists
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlists_20221031_200615.png" width="400">
-<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlists-2023-02-04.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/playlists-lg-2023-02-09.png" width="400">
 
 ### Video info
 

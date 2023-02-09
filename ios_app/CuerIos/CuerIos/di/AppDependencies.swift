@@ -7,6 +7,7 @@
 
 import Foundation
 import shared
+import SwiftUI
 //
 //protocol xxxExecutorDependency {
 //  var xxxExecutor: UseCaseExecutor { get }
@@ -52,6 +53,7 @@ class AppDependencies:
 #endif
     lazy var buildConfig: DomainBuildConfigDomain = DomainBuildConfigDomain(
         isDebug: isDebug,
+        cuerRemoteEnabled: false,
         versionCode: 1,
         version: "0.77")
     
