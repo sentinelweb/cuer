@@ -16,7 +16,8 @@ struct PlaylistHeaderView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            KFImage(URL(string: header.imageUrl))
+            if let url = header.imageUrl {
+            KFImage(URL(string: url))
                 .fade(duration: 0.3)
                 .forceTransition()
                 .resizable()
@@ -24,7 +25,7 @@ struct PlaylistHeaderView: View {
                 .frame(width: UIScreen.main.bounds.width, height: 150)
                 .clipped()
                 //.onTapGesture {view.dispatch(event: PlaylistMviContractViewEvent.OnRefresh())}
-                
+            }
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack{
                     if (header.canPlay) {
