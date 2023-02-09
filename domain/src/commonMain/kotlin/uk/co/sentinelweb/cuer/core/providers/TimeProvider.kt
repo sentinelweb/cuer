@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.core.providers
 
 import kotlinx.datetime.*
-import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 //import java.time.Instant
 //import java.time.LocalDateTime
@@ -20,7 +20,7 @@ class TimeProvider {
     fun getOffsetTime(millis: Long): LocalDateTime {
         val timeZone = TimeZone.currentSystemDefault()
         val now = localDateTime().toInstant(timeZone)
-        val duration = Duration.Companion.seconds(millis / 1000)
+        val duration = (millis / 1000L).seconds
         return now.minus(duration).toLocalDateTime(timeZone)
     }
 

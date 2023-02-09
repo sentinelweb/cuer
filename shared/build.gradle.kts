@@ -37,7 +37,7 @@ version = "1.0"
 
 kotlin {
     jvm()
-    js {
+    js(IR) {
         browser()
     }
     android()

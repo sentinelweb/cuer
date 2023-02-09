@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,51 +42,62 @@ object BrowseComposables {
 
     @Composable
     fun BrowseUi(view: BrowseMviViewProxy) {
-        BrowseView(view.observableModel, view)
+        BrowseView(view.observableModel, view.observableLoading, view)
     }
 
     @Composable
-    fun BrowseView(model: Model, view: BaseMviView<Model, Event>) {
+    fun BrowseView(model: Model, loading: Boolean, view: BaseMviView<Model, Event>) {
         CuerBrowseTheme {
             Surface {
-                Column {
-                    CuerTopAppBarComposables.CuerAppBar(
-                        text = model.title,
-                        onUp = { view.dispatch(Event.OnUpClicked) },
-                        actions = listOf(
-                            Action(CuerMenuItem.Help,
-                                { view.dispatch(Event.OnActionHelpClicked) }),
-                            when (model.order) {
-                                CATEGORIES -> Action(CuerMenuItem.SortAlpha,
-                                    { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
-                                )
+                Box(contentAlignment = Alignment.Center) {
+                    Column {
+                        CuerTopAppBarComposables.CuerAppBar(
+                            text = model.title,
+                            onUp = { view.dispatch(Event.OnUpClicked) },
+                            actions = listOf(
+                                Action(CuerMenuItem.Help,
+                                    { view.dispatch(Event.OnActionHelpClicked) }),
+                                when (model.order) {
+                                    CATEGORIES -> Action(CuerMenuItem.SortAlpha,
+                                        { view.dispatch(Event.OnSetOrder(A_TO_Z)) }
+                                    )
 
-                                A_TO_Z -> Action(CuerMenuItem.SortCategory,
-                                    { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
-                                )
-                            },
-                            Action(CuerMenuItem.Search, { view.dispatch(Event.OnActionSearchClicked) }),
-                            Action(CuerMenuItem.PasteAdd, { view.dispatch(Event.OnActionPasteAdd) }),
-                            Action(CuerMenuItem.Settings, { view.dispatch(Event.OnActionSettingsClicked) }),
+                                    A_TO_Z -> Action(CuerMenuItem.SortCategory,
+                                        { view.dispatch(Event.OnSetOrder(CATEGORIES)) }
+                                    )
+                                },
+                                Action(CuerMenuItem.Search, { view.dispatch(Event.OnActionSearchClicked) }),
+                                Action(CuerMenuItem.PasteAdd, { view.dispatch(Event.OnActionPasteAdd) }),
+                                Action(CuerMenuItem.Settings, { view.dispatch(Event.OnActionSettingsClicked) }),
+                            )
                         )
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colors.secondaryVariant)
-                            .verticalScroll(rememberScrollState())
-                            .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
-                    ) {
-                        if (model.isRoot) {
-                            if (model.recent != null) {
-                                CategoryWithTitle(model.recent!!, view, 1)
+                        Column(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(MaterialTheme.colors.secondaryVariant)
+                                .verticalScroll(rememberScrollState())
+                                .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
+                        ) {
+                            if (model.isRoot) {
+                                if (model.recent != null) {
+                                    CategoryWithTitle(model.recent!!, view, 1)
+                                }
+                                model.categories.forEach {
+                                    CategoryWithTitle(it, view, 3)
+                                }
+                            } else {
+                                CategoryGrid(8, model.categories, view)
                             }
-                            model.categories.forEach {
-                                CategoryWithTitle(it, view, 3)
-                            }
-                        } else {
-                            CategoryGrid(8, model.categories, view)
                         }
+                    }
+                    if (loading) {
+                        CircularProgressIndicator(
+                            color = colorResource(R.color.primary),
+                            strokeWidth = 8.dp,
+                            modifier = Modifier
+                                .width(64.dp)
+                                .height(64.dp)
+                        )
                     }
                 }
             }
@@ -352,6 +364,7 @@ private fun BrowsePreview() {
     val view = object : BaseMviView<Model, Event>() {}
     BrowseComposables.BrowseView(
         browseModelMapper.map(BrowseTestData.previewState),
+        false,
         view
     )
 }

@@ -2,11 +2,11 @@ package uk.co.sentinelweb.cuer.app.backup.version.v3.domain
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
-import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
-import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
 
 typealias V4PlaylistConfigDomain = uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistConfigDomain
 
@@ -23,9 +23,9 @@ val v3SerializersModule = SerializersModule {
         BackupFileModel::class to BackupFileModel.serializer(),
     )
 }.plus(SerializersModule {
-    contextual(Instant::class, InstantSerializer)
+    contextual(Instant::class, InstantIso8601Serializer)
 }).plus(SerializersModule {
-    contextual(LocalDateTime::class, LocalDateTimeSerializer)
+    contextual(LocalDateTime::class, LocalDateTimeIso8601Serializer)
 })
 
 val v3JsonSerializer = Json {

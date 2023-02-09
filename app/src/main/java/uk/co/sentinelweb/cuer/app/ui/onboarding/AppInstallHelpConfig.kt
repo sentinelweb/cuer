@@ -34,7 +34,7 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                         color = R.color.white
                     ),
                     ActionResources(
-                        label = "You can watch all the playlist via chromecast or on your device",
+                        label = "You can watch playlists via chromecast or on your device",
                         icon = R.drawable.ic_playlist,
                         color = R.color.white
                     ),
