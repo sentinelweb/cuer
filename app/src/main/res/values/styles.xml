@@ -141,7 +141,7 @@
     <style name="Cuer.AppBar" />
 
     <style name="Cuer.AppBar.OverFlow">
-        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:src">@drawable/ic_more_vert</item>
         <item name="android:minWidth">48dp</item>
         <item name="android:tint">@color/grey_500</item>
         <item name="android:elevation">4dp</item>
@@ -352,7 +352,7 @@
     <style name="ItemView.OverflowButton">
         <item name="android:layout_width">16dp</item>
         <item name="tint">@color/grey_300</item>
-        <item name="android:src">@drawable/ic_more_vert_black</item>
+        <item name="android:src">@drawable/ic_more_vert</item>
         <item name="android:scaleType">center</item>
     </style>
 
@@ -534,7 +534,7 @@
 
     <style name="Chip.SelectPlaylist" parent="Widget.MaterialComponents.Chip.Action">
         <item name="android:layout_marginEnd">8dp</item>
-        <item name="chipIcon">@drawable/ic_playlist_black</item>
+        <item name="chipIcon">@drawable/ic_playlist</item>
         <item name="chipIconSize">20dp</item>
         <item name="chipIconTint">@color/chip_icon_tint</item>
     </style>

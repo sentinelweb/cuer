@@ -78,7 +78,7 @@ class PlayerControlsNotificationBasic constructor(
 
         state.bitmap?.apply { builder.setLargeIcon(this) }
 
-        builder.addAction(R.drawable.ic_player_pause_black, "+30s", skipfPendingIntent)
+        builder.addAction(R.drawable.ic_player_pause, "+30s", skipfPendingIntent)
 
         when (state.playState) {
             PLAYING ->
@@ -95,7 +95,7 @@ class PlayerControlsNotificationBasic constructor(
 
             else -> Unit
         }
-        builder.addAction(R.drawable.ic_player_pause_black, "-30s", skipbPendingIntent)
+        builder.addAction(R.drawable.ic_player_pause, "-30s", skipbPendingIntent)
         return builder.build()
     }
 

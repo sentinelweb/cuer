@@ -5,14 +5,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config.Screen
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 
-class OnboardingTestConfigBuilder(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {
+class OnboardingTestConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuilder {
 
     override fun build() = OnboardingContract.Config(
         screens = listOf(
             Screen(
                 title = ActionResources(
                     label = "TODO",
-                    icon = R.drawable.ic_share_black,
+                    icon = R.drawable.ic_share,
                     color = R.color.color_on_surface
                 ),
                 lines = listOf(
@@ -23,7 +23,7 @@ class OnboardingTestConfigBuilder(val res: ResourceWrapper) : OnboardingContract
                     ),
                     ActionResources(
                         label = "Share a video or playlist with Cuer",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     )
                 )
@@ -42,7 +42,7 @@ class OnboardingTestConfigBuilder(val res: ResourceWrapper) : OnboardingContract
                     ),
                     ActionResources(
                         label = "Recent",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     )
                 )

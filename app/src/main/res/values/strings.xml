@@ -135,6 +135,8 @@
     <string name="prefs_root_player_cat_title">Player section</string>
     <string name="prefs_root_player_summary">Player settings</string>
     <string name="prefs_root_player_title">Player</string>
+    <string name="prefs_root_onboard_summary">Reset intro state (to show)</string>
+    <string name="prefs_root_onboard_title">Onboarding</string>
 
 
     <string name="prefs_backup_manual_cat_title">Manual backup</string>
@@ -337,19 +339,19 @@
     <string name="help_playlists_app_recent">Recent: Recently watched videos</string>
     <string name="help_playlists_app_starred">Starred: Starred videos</string>
     <string name="help_playlists_app_unfinished">Unfinished: Videos incomplete</string>
-    <string name="help_playlists_app_local">Local search: last search on device</string>
-    <string name="help_playlists_app_yt">Youtube search: last search on youtube</string>
+    <string name="help_playlists_app_local">Local search: Last search on device</string>
+    <string name="help_playlists_app_yt">YouTube search: Last search on YouTube</string>
     <string name="help_playlists_title_actionbar">Playlists - Actionbar</string>
     <string name="help_playlists_ab_create">Create playlist</string>
     <string name="help_playlists_ab_pasteadd">Add video from clipboard</string>
 
-    <string name="help_plie_title_1">Playlist Item - Actions</string>
+    <string name="help_plie_title_1">Details - Actions</string>
     <string name="help_plie_play">Play</string>
     <string name="help_plie_select_playlist">Select playlist</string>
     <string name="help_plie_star">Star</string>
     <string name="help_plie_support">Support</string>
     <string name="help_plie_edit">Edit</string>
-    <string name="help_plie_title_2">Playlist Item - Actions 2</string>
+<!--    <string name="help_plie_title_2">Details - Actions 2</string>-->
     <string name="help_plie_share">Share</string>
     <string name="help_plie_like">Like: on platform</string>
     <string name="help_plie_comment">Comment: on platform</string>
@@ -358,11 +360,11 @@
     <string name="help_pe_title">Playlist Edit</string>
     <string name="help_pe_save">Save / Create</string>
     <string name="help_pe_star">Star</string>
-    <string name="help_pe_pin">Pin</string>
-    <string name="help_pe_title_text">Change the title text</string>
+    <string name="help_pe_pin">Pin - raise playlist for selection</string>
+    <string name="help_pe_title_text">Edit the title text</string>
     <string name="help_pe_parent">Select the parent playlist</string>
     <string name="help_pe_title_options">Playlist options</string>
-    <string name="help_pe_default">Default: Used when nothing selcted</string>
+    <string name="help_pe_default">Default: Used when no playlist selected</string>
     <string name="help_pe_play_start">Play from start (all items)</string>
     <string name="help_pe_playable">Playable</string>
     <string name="help_pe_deletable">Deleteable</string>
@@ -374,6 +376,10 @@
     <string name="help_browse_desc">Lists all the content in categories</string>
     <string name="help_browse_az">See all A-Z</string>
     <string name="help_browse_categories">See categories</string>
+
+    <!-- onboarding -->
+    <string name="onboarding_title">Onboarding</string>
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -399,6 +405,5 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
-
-
+    <string name="browse_add_error">Could add playlist: %1$s</string>
 </resources>

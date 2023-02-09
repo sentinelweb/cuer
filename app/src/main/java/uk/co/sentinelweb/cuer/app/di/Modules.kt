@@ -151,7 +151,7 @@ object Modules {
     }
 
     private val utilModule = module {
-        single { BuildConfigDomain(DEBUG, VERSION_CODE, VERSION_NAME) }
+        single { BuildConfigDomain(DEBUG, cuerRemoteEnabled, VERSION_CODE, VERSION_NAME) }
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 

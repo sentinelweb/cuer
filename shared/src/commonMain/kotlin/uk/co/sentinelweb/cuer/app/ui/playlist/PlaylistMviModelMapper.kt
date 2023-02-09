@@ -63,8 +63,7 @@ class PlaylistMviModelMapper constructor(
         return PlaylistMviContract.View.Model(
             header = Header(
                 title = domain.title.capitalize(),
-                imageUrl = (domain.image ?: domain.thumb)?.url
-                    ?: "gs://cuer-275020.appspot.com/playlist_header/headphones-2588235_640.jpg",
+                imageUrl = (domain.image ?: domain.thumb)?.url ?: throw IllegalArgumentException("No image for playlist"),
                 loopModeIndex = domain.mode.ordinal,
                 loopModeIcon = iconMapper.map(domain.mode),
                 loopModeText = when (domain.mode) {
@@ -157,7 +156,7 @@ class PlaylistMviModelMapper constructor(
         val DEFAULT_PLAYLIST_VIEW_MODEL = PlaylistMviContract.View.Model(
             header = Header(
                 title = "",
-                imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/headphones-2588235_640.jpg",
+                imageUrl = null,
                 loopModeIndex = 0,
                 loopModeIcon = Icon.ic_playmode_straight,
                 loopModeText = "Single",

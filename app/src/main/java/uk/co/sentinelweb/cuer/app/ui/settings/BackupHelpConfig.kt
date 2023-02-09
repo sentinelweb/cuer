@@ -34,7 +34,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                     ),
                     ActionResources(
                         label = "Change the title text",
-                        icon = R.drawable.ic_edit_24,
+                        icon = R.drawable.ic_edit,
                         color = R.color.color_on_surface
                     )
                 )
@@ -58,7 +58,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                     ),
                     ActionResources(
                         label = "Playable",
-                        icon = R.drawable.ic_play_black,
+                        icon = R.drawable.ic_play,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -68,12 +68,12 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                     ),
                     ActionResources(
                         label = "Deleteable Items",
-                        icon = R.drawable.ic_launch_black,
+                        icon = R.drawable.ic_launch,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
                         label = "Editable items",
-                        icon = R.drawable.ic_launch_black,
+                        icon = R.drawable.ic_launch,
                         color = R.color.color_on_surface
                     ),
                 )

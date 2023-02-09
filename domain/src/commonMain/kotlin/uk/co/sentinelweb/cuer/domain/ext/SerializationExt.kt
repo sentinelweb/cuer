@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.domain.ext
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.modules.SerializersModule
@@ -9,8 +11,6 @@ import kotlinx.serialization.modules.plus
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
-import uk.co.sentinelweb.cuer.domain.serialization.InstantSerializer
-import uk.co.sentinelweb.cuer.domain.serialization.LocalDateTimeSerializer
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 
@@ -142,9 +142,9 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
 }.plus(SerializersModule {
-    contextual(Instant::class, InstantSerializer)
+    contextual(Instant::class, InstantIso8601Serializer)
 }).plus(SerializersModule {
-    contextual(LocalDateTime::class, LocalDateTimeSerializer)
+    contextual(LocalDateTime::class, LocalDateTimeIso8601Serializer)
 })
 
 val domainJsonSerializer = Json {

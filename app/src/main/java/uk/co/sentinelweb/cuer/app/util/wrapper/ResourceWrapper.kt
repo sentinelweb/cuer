@@ -53,16 +53,22 @@ class ResourceWrapper constructor(
     @ColorRes
     fun getColorResourceId(color: Color) =
         resources.getIdentifier(color.name, "color", context.getPackageName())
+            .takeIf { it != 0 }
+            ?: throw IllegalArgumentException("Color doesn't exist : ${color.name}")
 
     // todo check what happen when id isnt found
     @DrawableRes
     fun getDrawableResourceId(icon: Icon) =
         resources.getIdentifier(icon.name, "drawable", context.getPackageName())
+            .takeIf { it != 0 }
+            ?: throw IllegalArgumentException("Drawable doesn't exist : ${icon.name}")
 
     // todo check what happen when id isnt found
     @StringRes
     fun getStringResourceId(stringRes: StringResource) =
         resources.getIdentifier(stringRes.name, "string", context.getPackageName())
+            .takeIf { it != 0 }
+            ?: throw IllegalArgumentException("String doesn't exist : ${stringRes.name}")
 
     override fun get(res: StringResource): String =
         getStringResourceId(res)
@@ -71,11 +77,6 @@ class ResourceWrapper constructor(
     override fun get(res: StringResource, params: List<String>): String =
         getStringResourceId(res)
             .let { getString(it, *params.toTypedArray()) }
-
-
-    @DrawableRes
-    fun getStringResourceId(icon: Icon) =
-        resources.getIdentifier(icon.name, "drawable", context.getPackageName())
 
     @ColorRes
     fun getColorAttr(@AttrRes id: Int): Int {

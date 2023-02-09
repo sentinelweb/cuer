@@ -14,39 +14,33 @@ class BrowseHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                 Screen(
                     title = ActionResources(
                         label = res.getString(R.string.help_browse),
-                        icon = R.drawable.ic_editable_items,
-                        color = R.color.color_on_surface
+                        icon = R.drawable.ic_nav_browse
                     ),
+                    subtitle = res.getString(R.string.help_browse_desc),
                     lines = listOf(
                         ActionResources(
-                            label = res.getString(R.string.help_browse_desc),
-                            icon = R.drawable.ic_play_black,
-                            color = R.color.color_on_surface
-                        ),
-                        ActionResources(
                             label = res.getString(R.string.help_browse_az),
-                            icon = R.drawable.ic_sort_by_alpha,
-                            color = R.color.color_on_surface
+                            icon = R.drawable.ic_sort_by_alpha
                         ),
                         ActionResources(
                             label = res.getString(R.string.help_browse_categories),
-                            icon = R.drawable.ic_category,
-                            color = R.color.color_on_surface
+                            icon = R.drawable.ic_category
                         ),
                         ActionResources(
                             label = res.getString(R.string.help_playlist_search),
-                            icon = R.drawable.ic_search,
-                            color = R.color.color_on_surface
+                            icon = R.drawable.ic_search
                         ),
-//                        ActionResources(
-//                            label = res.getString(R.string.help_playlist_paste_add),
-//                            icon = R.drawable.ic_menu_paste_add_black,
-//                            color = R.color.color_on_surface
-//                        ),
+                        ActionResources(
+                            label = res.getString(R.string.help_playlist_paste_add),
+                            icon = R.drawable.ic_menu_paste_add
+                        ),
                         ActionResources(
                             label = res.getString(R.string.help_playlist_settings),
-                            icon = R.drawable.ic_menu_settings_black,
-                            color = R.color.color_on_surface
+                            icon = R.drawable.ic_menu_settings
+                        ),
+                        ActionResources(
+                            label = "This help",
+                            icon = R.drawable.ic_help
                         ),
                     )
                 )

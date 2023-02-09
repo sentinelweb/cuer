@@ -11,7 +11,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -218,7 +217,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.playlist_item_edit_actionbar, menu)
         helpMenuItem.setOnMenuItemClickListener {
-            OnboardingFragment.show(requireActivity(), playlistItemEditHelpConfig)
+            OnboardingFragment.showHelp(this, playlistItemEditHelpConfig)
             true
         }
         binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
@@ -233,6 +232,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
 
     override fun onStart() {
         super.onStart()
+        OnboardingFragment.showIntro(this, playlistItemEditHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -312,7 +312,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private fun setImage(imageUrl: String?) {
         Glide.with(requireContext())
             .load(imageUrl)
-            .transition(DrawableTransitionOptions.withCrossFade())
+            //.transition(DrawableTransitionOptions.withCrossFade()) // messes up transition
             .into(binding.plieImage)
     }
 

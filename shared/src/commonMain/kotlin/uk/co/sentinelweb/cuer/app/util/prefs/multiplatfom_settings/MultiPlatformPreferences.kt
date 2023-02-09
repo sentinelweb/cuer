@@ -37,6 +37,7 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     LAST_SEARCH_TYPE("lastSearchType"),
     DB_INITIALISED("dbInitialised"),
     LAST_BOTTOM_TAB("lastBottomNavTab"),
+    ONBOARDED_PREFIX("onboarded_"),
     ;
 
     companion object {
@@ -150,5 +151,8 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
         get() = getInt(LAST_BOTTOM_TAB) ?: 0
         set(value) = value
             .let { putInt(LAST_BOTTOM_TAB, it) }
+
+    fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
+    fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)
 
 }

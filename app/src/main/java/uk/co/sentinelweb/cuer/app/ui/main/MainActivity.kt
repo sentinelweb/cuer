@@ -13,13 +13,16 @@ import androidx.core.os.bundleOf
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
-import androidx.navigation.ui.setupWithNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
@@ -27,18 +30,21 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter.BackupResult.*
 import uk.co.sentinelweb.cuer.app.databinding.ActivityMainBinding
+import uk.co.sentinelweb.cuer.app.ext.serialise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainCommonContract.LastTab.*
+import uk.co.sentinelweb.cuer.app.ui.onboarding.AppInstallHelpConfig
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.ONBOARDED_PREFIX
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -66,10 +72,15 @@ class MainActivity :
     private val res: ResourceWrapper by inject()
     private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
 
     private lateinit var navController: NavController
 
     private var _binding: ActivityMainBinding? = null
+
+    private val isOnboarding: Boolean
+        get() = multiPlatformPreferences.getBoolean(ONBOARDED_PREFIX, this::class.simpleName!!, false).not()
+
     private val binding: ActivityMainBinding
         get() = _binding ?: throw IllegalStateException("ActivityMainBinding not bound")
 
@@ -118,28 +129,39 @@ class MainActivity :
 
         volumeControl.controlView = binding.castPlayerVolume
 
-        restoreBottomNavTab(savedInstanceState != null)
+        if (isOnboarding) {
+            navController.navigate(
+                R.id.navigation_onboarding, bundleOf(
+                    ONBOARD_CONFIG.name to AppInstallHelpConfig(res).build().serialise(),
+                    ONBOARD_KEY.name to MainActivity::class.simpleName!!
+                )
+            )
+        } else {
+            restoreBottomNavTab(savedInstanceState != null)
+        }
         presenter.initialise()
     }
 
     override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
-        when (result) {
-            SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
-            SETUP -> snackBarWrapper.make(
-                msg = getString(R.string.backup_setup_message),
-                actionText = getString(R.string.backup_setup_action)
-            ) {
-                navController.navigate(
-                    R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
-                )
-            }.positionAbovePlayer().show()
+        if (!isOnboarding) {
+            when (result) {
+                SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))
+                SETUP -> snackBarWrapper.make(
+                    msg = getString(R.string.backup_setup_message),
+                    actionText = getString(R.string.backup_setup_action)
+                ) {
+                    navController.navigate(
+                        R.id.navigation_settings_backup, bundleOf(DO_AUTO_BACKUP.name to true)
+                    )
+                }.positionAbovePlayer().show()
 
-            FAIL -> snackBarWrapper.makeError(
-                msg = getString(R.string.backup_fix_message),
-                actionText = getString(R.string.backup_fix_action)
-            ) {
-                navController.navigate(R.id.navigation_settings_backup)
-            }.show()
+                FAIL -> snackBarWrapper.makeError(
+                    msg = getString(R.string.backup_fix_message),
+                    actionText = getString(R.string.backup_fix_action)
+                ) {
+                    navController.navigate(R.id.navigation_settings_backup)
+                }.show()
+            }
         }
     }
 
@@ -164,13 +186,13 @@ class MainActivity :
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_paste_add -> checkIntentAndGotoShare()
+            R.id.menu_paste_add -> checkIntentAndPasteAdd()
             R.id.menu_settings -> navController.navigate(R.id.navigation_settings_root)
         }
         return super.onOptionsItemSelected(item)
     }
 
-    private fun checkIntentAndGotoShare() {
+    fun checkIntentAndPasteAdd() {
         // check clipboard data
         clipboard.getPrimaryClip()
             ?.getItemAt(0)
@@ -215,6 +237,7 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
+        hidePlayerIfOnboarding()
     }
 
     override fun onStop() {
@@ -260,6 +283,15 @@ class MainActivity :
         binding.navHostFragment.setPadding(0, 0, 0, 0)
     }
 
+    private fun hidePlayerIfOnboarding() {
+        if (isOnboarding) {
+            lifecycleScope.launch {
+                delay(500)
+                hidePlayer()
+            }
+        }
+    }
+
     var isRaised = true
     override fun lowerPlayer() {
         if (isRaised) {
@@ -284,7 +316,8 @@ class MainActivity :
     }
 
     private fun setupBottomNav() {
-        binding.bottomNavView.setupWithNavController(navController)
+//        binding.bottomNavView.setupWithNavController(navController)
+        NavigationUI.setupWithNavController(binding.bottomNavView, navController, false)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.navigation_browse -> BROWSE
@@ -305,8 +338,8 @@ class MainActivity :
         if (!isConfigChange) {
             prefs.lastBottomTab
                 .also { log.d("get LAST_BOTTOM_TAB: $it") }
-                .takeIf { it > 0 }
-                ?.also {
+                //.takeIf { it > 0}
+                .also {
                     when (MainCommonContract.LastTab.values()[it]) {
                         PLAYLISTS -> if (navController.currentDestination?.id != R.id.navigation_playlists) {
                             R.id.navigation_playlists
@@ -339,6 +372,10 @@ class MainActivity :
             },
             navigatorExtras = null
         )
+    }
+
+    fun finishedOnboarding() {
+        navigateToBottomTab(R.id.navigation_browse)
     }
 
     companion object {

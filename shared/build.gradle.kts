@@ -34,12 +34,10 @@ val ver_ios_deploy_target: String by project
 
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
-//essenty-lifecycle = { group = "com.arkivanov.essenty", name = "lifecycle", version.ref = "essenty" }
-//essenty-instanceKeeper = { group = "com.arkivanov.essenty", name = "instance-keeper", version.ref = "essenty" }
 
 kotlin {
     jvm()
-    js {
+    js(IR) {
         browser()
     }
     android()

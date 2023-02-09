@@ -5,16 +5,23 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.glide.rememberGlidePainter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -26,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.ActionResources
 
 object OnboardingComposables {
     var isTransitioning = false
+
     @Composable
     fun OnboardingUi(view: OnboardingViewModel) {
         OnboardingView(view.model.collectAsState().value, view)
@@ -43,7 +51,36 @@ object OnboardingComposables {
                 Box(
                     modifier = Modifier
                         .height(512.dp)
+                        // still seems to be a bg somewhere for clip :(
+                        .padding(1.dp)
+                        .background(
+                            color = colorResource(id = model.screen.backgroundColor ?: R.color.surface),
+                            //shape = mediumShape
+                        )
+                        .border(
+                            width = 1.dp,
+                            color = colorResource(id = model.screen.title.color ?: R.color.color_on_surface),
+                            //shape = mediumShape
+                        )
+
+                    //.clip(mediumShape)
                 ) {
+                    model.screen.backgroundUrl?.also {
+                        Image(
+                            painter = rememberGlidePainter(
+                                request = it,
+                                fadeIn = true
+                            ),
+                            colorFilter = ColorFilter.tint(Color(0xaa000000), blendMode = BlendMode.Multiply),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                                .wrapContentHeight(),
+                            contentScale = ContentScale.Crop
+                        )
+
+                    }
                     val states = mutableListOf<MutableTransitionState<Boolean>>()
                     Column(
                         modifier = Modifier
@@ -51,13 +88,20 @@ object OnboardingComposables {
                             .padding(horizontal = 32.dp, vertical = 16.dp)
                             .fillMaxWidth()
                     ) {
-                        val layoutModifiers = Modifier.align(Alignment.CenterHorizontally)
+                        //val layoutModifiers = Modifier.align(Alignment.CenterHorizontally)
                         states.add(animatedText(model.screen.title, 0) {
-                            Line(model.screen.title, true, layoutModifiers)
+                            Line(model.screen.title, true,
+                                Modifier.padding(bottom = model.screen.subtitle?.let { 8.dp } ?: 32.dp, top = 16.dp)
+                            )
                         })
+                        model.screen.subtitle?.also { sub ->
+                            states.add(animatedText(model.screen.title, 0) {
+                                LineText(model.screen.title.color(), sub, Modifier.padding(bottom = 32.dp))
+                            })
+                        }
                         model.screen.lines.forEachIndexed { i, line ->
                             states.add(animatedText(line, i + 1) {
-                                Line(line, false, layoutModifiers)
+                                Line(line, false, Modifier.padding(bottom = 16.dp))
                             })
                         }
                     }
@@ -111,6 +155,67 @@ object OnboardingComposables {
     }
 
     @Composable
+    private fun Line(
+        line: ActionResources,
+        isTitle: Boolean,
+        modifier: Modifier = Modifier
+    ) {
+        //val vPad = if (isTitle) 32.dp else 8.dp
+        Row(
+            modifier = modifier
+            // .background(Color.Red)
+
+        ) {
+            //println("line label:" + line.label)
+            line.icon?.also {
+                Icon(
+                    painter = painterResource(it),
+                    tint = line.color(),
+                    contentDescription = stringResource(id = R.string.menu_search),
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                        .size(24.dp)
+                        .align(Alignment.CenterVertically)
+                )
+            }
+            line.label?.also {
+                if (isTitle) {
+                    TitleText(line.color(), it)
+                } else {
+                    LineText(line.color(), it)
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun ActionResources.color(): Color {
+        val color = this.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
+        return color
+    }
+
+    @Composable
+    private fun LineText(color: Color, it: String, modifier: Modifier = Modifier) {
+        Text(
+            modifier = modifier,
+            style = MaterialTheme.typography.body1,
+            color = color,
+            text = it
+        )
+    }
+
+    @Composable
+    private fun TitleText(color: Color, it: String, modifier: Modifier = Modifier) {
+        Text(
+            modifier = modifier,
+            style = MaterialTheme.typography.h5,
+            color = color,
+            text = it
+        )
+    }
+
+
+    @Composable
     private fun ButtonsRow(
         model: OnboardingContract.Model,
         interactions: OnboardingContract.Interactions,
@@ -151,59 +256,4 @@ object OnboardingComposables {
         }
     }
 
-    @Composable
-    private fun Line(
-        line: ActionResources,
-        isTitle: Boolean,
-        modifier: Modifier = Modifier
-    ) {
-        val vPad = if (isTitle) 32.dp else 8.dp
-        Row(
-            modifier = modifier
-                // .background(Color.Red)
-                .padding(bottom = vPad, top = 16.dp)
-        ) {
-            val color = line.color?.let { colorResource(it) } ?: MaterialTheme.colors.onSurface
-            println("line label:" + line.label)
-            line.icon?.also {
-                Icon(
-                    painter = painterResource(it),
-                    tint = color,
-                    contentDescription = stringResource(id = R.string.menu_search),
-                    modifier = Modifier
-                        // .background(Color.Green)
-                        .padding(end = 8.dp)
-                        .size(24.dp)
-                        .align(Alignment.CenterVertically)
-                )
-            }
-            line.label?.also {
-                if (isTitle) {
-                    TitleText(color, it)
-                } else {
-                    LineText(color, it)
-                }
-            }
-        }
-    }
-
-    @Composable
-    private fun LineText(color: Color, it: String, modifier: Modifier = Modifier) {
-        Text(
-            modifier = modifier,
-            style = MaterialTheme.typography.body1,
-            color = color,
-            text = it
-        )
-    }
-
-    @Composable
-    private fun TitleText(color: Color, it: String, modifier: Modifier = Modifier) {
-        Text(
-            modifier = modifier,
-            style = MaterialTheme.typography.h5,
-            color = color,
-            text = it
-        )
-    }
 }

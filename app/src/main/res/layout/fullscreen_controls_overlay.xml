@@ -60,7 +60,7 @@
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_seek_back"
         style="@style/YoutubePlayer.Button"
-        android:src="@drawable/ic_player_fast_rewind_black"
+        android:src="@drawable/ic_player_fast_rewind"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
     />
@@ -81,7 +81,7 @@
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_last"
         style="@style/YoutubePlayer.Button"
-        android:src="@drawable/ic_player_track_b_black"
+        android:src="@drawable/ic_player_track_b"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />
@@ -103,7 +103,7 @@
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_seek_forward"
         style="@style/YoutubePlayer.Button"
-        android:src="@drawable/ic_player_fast_forward_black"
+        android:src="@drawable/ic_player_fast_forward"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"
     />
@@ -125,7 +125,7 @@
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/controls_track_next"
         style="@style/YoutubePlayer.Button"
-        android:src="@drawable/ic_player_track_f_black"
+        android:src="@drawable/ic_player_track_f"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
     />

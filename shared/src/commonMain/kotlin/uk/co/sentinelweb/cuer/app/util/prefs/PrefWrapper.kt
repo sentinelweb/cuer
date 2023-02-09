@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.prefs
 
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
+
 interface Field {
     val fname: String
 }
@@ -17,6 +19,8 @@ interface PrefWrapper<T : Field> {
     fun <E : Enum<E>> getEnum(field: T, def: E): E
     fun getBoolean(field: T, def: Boolean): Boolean
     fun putBoolean(field: T, value: Boolean)
+    fun getBoolean(field: MultiPlatformPreferences, ext: String, def: Boolean): Boolean
+    fun putBoolean(field: MultiPlatformPreferences, ext: String, value: Boolean)
     fun remove(field: T)
     fun has(field: T): Boolean
     fun <T1 : Any?, T2 : Any?> putPair(field: T, pair: Pair<T1, T2>)

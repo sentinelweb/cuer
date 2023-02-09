@@ -30,7 +30,7 @@
             android:id="@+id/action_goto_playlist"
             app:destination="@id/navigation_playlist"
             app:launchSingleTop="true"
-            app:popUpTo="@id/navigation_playlist"
+            app:popUpTo="@id/navigation_playlists"
             app:popUpToInclusive="true"
             app:popExitAnim="@anim/slide_out_right"
         />
@@ -47,11 +47,6 @@
             app:popUpToInclusive="true"
             app:popExitAnim="@anim/slide_out_right"
         />
-
-        <!--            app:enterAnim="@anim/slide_in_right"-->
-        <!--            app:exitAnim="@anim/slide_out_left"-->
-        <!--            app:popEnterAnim="@anim/slide_in_left"-->
-        <!--            app:popExitAnim="@anim/slide_out_right"-->
     </fragment>
 
     <!-- todo check params: compare with share and fragment -->
@@ -251,6 +246,12 @@
         android:id="@+id/navigation_settings_player"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerFragment"
         android:label="@string/prefs_root_player_title"
+    />
+
+    <fragment
+        android:id="@+id/navigation_onboarding"
+        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+        android:label="@string/onboarding_title"
     />
 
 </navigation>

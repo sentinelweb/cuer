@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.item.ItemContract
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class ItemTileView() :
     ItemContract.View, KoinComponent {
@@ -30,6 +31,11 @@ class ItemTileView() :
     private lateinit var _binding: ViewPlaylistsItemTileBinding
     private lateinit var presenter: ItemContract.Presenter
     private val imageProvider: ImageProvider by inject()
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this)
+    }
 
     val root: View
         get() = _binding.root
@@ -69,7 +75,7 @@ class ItemTileView() :
         popup.menu.findItem(R.id.playlists_context_play_external).isVisible = presenter.canLaunch()
         popup.menu.findItem(R.id.playlists_context_star).isVisible = presenter.canEdit()
         popup.menu.findItem(R.id.playlists_context_star).setIcon(
-            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred
         )
         popup.menu.findItem(R.id.playlists_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star

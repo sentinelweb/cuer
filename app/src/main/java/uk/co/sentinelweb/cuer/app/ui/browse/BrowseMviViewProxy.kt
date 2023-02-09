@@ -28,6 +28,9 @@ class BrowseMviViewProxy constructor(
     )
         private set
 
+    var observableLoading: Boolean by mutableStateOf(false)
+        private set
+
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
     fun labelObservable(): LiveData<Label> = _labelData
 
@@ -41,4 +44,7 @@ class BrowseMviViewProxy constructor(
         observableModel = model
     }
 
+    fun loading(isLoading: Boolean) {
+        observableLoading = isLoading
+    }
 }

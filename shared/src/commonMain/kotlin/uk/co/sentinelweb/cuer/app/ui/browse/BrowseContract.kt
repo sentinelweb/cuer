@@ -19,6 +19,7 @@ class BrowseContract {
             data class ClickCategory(val id: Long, val forceItem: Boolean) : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
+            object ActionPasteAdd : Intent()
             object ActionSearch : Intent()
             object ActionHelp : Intent()
             data class SetOrder(val order: Order) : Intent()
@@ -31,6 +32,7 @@ class BrowseContract {
             object ActionSettings : Label()
             object ActionSearch : Label()
             object ActionHelp : Label()
+            object ActionPasteAdd : Label()
 
             data class AddPlaylist(
                 val cat: CategoryDomain,
@@ -79,6 +81,7 @@ class BrowseContract {
             object OnResume : Event()
             object OnUpClicked : Event()
             object OnActionSettingsClicked : Event()
+            object OnActionPasteAdd : Event()
             object OnActionSearchClicked : Event()
             object OnActionHelpClicked : Event()
             data class OnCategoryClicked(val model: CategoryModel) : Event()

@@ -5,7 +5,7 @@
     <item
         android:width="16dp"
         android:height="16dp"
-        android:drawable="@drawable/ic_tree_24"
+        android:drawable="@drawable/ic_tree"
         />
 
 </layer-list>

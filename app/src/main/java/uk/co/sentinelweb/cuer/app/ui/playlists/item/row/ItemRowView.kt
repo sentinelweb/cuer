@@ -1,9 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.playlists.item.row
 
 import android.annotation.SuppressLint
-import android.content.Context.WINDOW_SERVICE
 import android.text.Spannable
-import android.view.*
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import androidx.appcompat.view.menu.MenuBuilder
 import androidx.appcompat.view.menu.MenuPopupHelper
@@ -25,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.view.fade
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
 class ItemRowView() :
@@ -34,7 +37,11 @@ class ItemRowView() :
     private lateinit var presenter: ItemContract.Presenter
     private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
-    private lateinit var wm: WindowManager
+    private val log: LogWrapper by inject()
+
+    init {
+        log.tag(this)
+    }
 
     val root: View
         get() = _binding.root
@@ -54,7 +61,6 @@ class ItemRowView() :
         _binding.listitem.setOnClickListener { presenter.doClick() }
         _binding.listitemOverflowClick.setOnClickListener { showContextualMenu() }
         _binding.listitemIcon.setOnClickListener { presenter.doImageClick() }
-        wm = parent.context.getSystemService(WINDOW_SERVICE) as WindowManager
     }
 
     @SuppressLint("RestrictedApi")
@@ -81,7 +87,7 @@ class ItemRowView() :
         popup.menu.findItem(R.id.playlists_context_play_external).isVisible = presenter.canLaunch()
         popup.menu.findItem(R.id.playlists_context_star).isVisible = presenter.canEdit()
         popup.menu.findItem(R.id.playlists_context_star).setIcon(
-            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred_black
+            if (presenter.isStarred()) R.drawable.ic_unstarred_black else R.drawable.ic_menu_starred
         )
         popup.menu.findItem(R.id.playlists_context_star).setTitle(
             if (presenter.isStarred()) R.string.menu_unstar else R.string.menu_star

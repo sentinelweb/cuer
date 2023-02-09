@@ -137,7 +137,7 @@ class PlaylistMviContract {
 
         data class Header(
             val title: String,
-            val imageUrl: String,
+            val imageUrl: String?,
             val loopModeIndex: Int,
             val loopModeIcon: Icon,
             val loopModeText: String,

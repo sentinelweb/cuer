@@ -84,6 +84,7 @@ data class NavigationModel constructor(
         ALLOW_PLAY(Boolean::class),
         DO_AUTO_BACKUP(Boolean::class),
         ONBOARD_CONFIG(uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config::class),
+        ONBOARD_KEY(String::class),
         ;
     }
 

@@ -62,20 +62,18 @@ Using
 
 ### Browse
 
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-browse-2023-02-04.png" width="400">
-|
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/browse_20221031_200950.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-browse-2023-02-04.png" width="400">
+
 ### Playlist
 
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlist-2023-02-07.png" width="400">
-|
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlist_20221031_200719.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlist-2023-02-07.png" width="400">
 
 ### Playlists
 
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlists_20221031_200615.png" width="400">
-|<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlists-2023-02-04.png" width="400">
-|
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/playlists_20221031_200615.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/ios/ios-playlists-2023-02-04.png" width="400">
 
 ### Video info
 
@@ -92,3 +90,9 @@ Using
 ### Add via Share
 
 <img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/0.76/share_20221031_201927.png" width="400">
+
+### Onboarding
+
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/onboard1_20230209.png" width="400">
+<img src="https://raw.githubusercontent.com/sentinelweb/cuer/develop/media/screenshots/onboard2_20230209.png" width="400">
+

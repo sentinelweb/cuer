@@ -19,12 +19,12 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                 lines = listOf(
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_play_black,
+                        icon = R.drawable.ic_play,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_playlist_black,
+                        icon = R.drawable.ic_playlist,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -39,7 +39,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_edit_24,
+                        icon = R.drawable.ic_edit,
                         color = R.color.color_on_surface
                     )
                 )
@@ -53,7 +53,7 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                 lines = listOf(
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_share_black,
+                        icon = R.drawable.ic_share,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
@@ -63,12 +63,12 @@ class CastPlayerHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_comment_24,
+                        icon = R.drawable.ic_comment,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
                         label = "",
-                        icon = R.drawable.ic_launch_black,
+                        icon = R.drawable.ic_launch,
                         color = R.color.color_on_surface
                     ),
                 )

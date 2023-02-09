@@ -39,6 +39,7 @@ class BrowseController constructor(
             is OnSetOrder -> SetOrder(order)
             is OnActionSearchClicked -> ActionSearch
             is OnActionHelpClicked -> ActionHelp
+            is OnActionPasteAdd -> ActionPasteAdd
         }
     }
 

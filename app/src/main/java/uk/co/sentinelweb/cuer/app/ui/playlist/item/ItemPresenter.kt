@@ -42,7 +42,7 @@ class ItemPresenter(
             if (ytContext.isConnected()) {
                 R.drawable.ic_notif_status_cast_conn_white
             } else {
-                R.drawable.ic_play_black
+                R.drawable.ic_play
             }
         )
         view.dismissMenu()

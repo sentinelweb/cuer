@@ -11,7 +11,7 @@ class NewPlaylistCustomisationResources(
 
     override val customDelete = ActionResources(
         label = res.getString(R.string.action_mark_watched),
-        icon = R.drawable.ic_visibility_24,
+        icon = R.drawable.ic_visibility,
         color = R.color.swipe_action_custom,
     )
 }
