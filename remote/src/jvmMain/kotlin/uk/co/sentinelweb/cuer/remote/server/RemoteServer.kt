@@ -1,15 +1,24 @@
 package uk.co.sentinelweb.cuer.remote.server
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.*
 import io.ktor.http.*
 import io.ktor.http.content.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -17,6 +26,7 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -54,21 +64,25 @@ class RemoteServer constructor(
 
     private fun buildServer(): ApplicationEngine =
         embeddedServer(CIO, port) {
-            install(ContentNegotiation) {
-                json()
-            }
-            install(CORS) {
-                method(HttpMethod.Get)
-                method(HttpMethod.Post)
-                method(HttpMethod.Delete)
-                anyHost()
-            }
-            install(Compression) {
-                gzip()
-            }
-            install(CallLogging) {
-                //level = Level.DEBUG
-            }
+//            install(ContentNegotiation) {
+//                json()
+//            }
+//            install(CORS) {
+//                method(HttpMethod.Get)
+//                method(HttpMethod.Post)
+//                method(HttpMethod.Delete)
+//                anyHost()
+//            }
+//            install(Compression) {
+//                gzip()
+//            }
+//            install(CallLogging) {
+//                //level = Level.DEBUG
+//            }
+            install(CORS)
+            install(ContentNegotiation)
+            install(Compression)
+            install(CallLogging)
             routing {
                 get("/") {
                     call.respondText(
@@ -89,7 +103,7 @@ class RemoteServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlist/{id}") {
-                    (call.parameters["id"]?.toLong())
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL))
                         ?.let { id ->
                             database.getPlaylist(id)
                                 ?.let { ResponseDomain(it) }
@@ -106,7 +120,7 @@ class RemoteServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlistItem/{id}") {
-                    (call.parameters["id"]?.toLong())
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL))
                         ?.let { id ->
                             database.getPlaylistItem(id)
                                 ?.let { ResponseDomain(it) }

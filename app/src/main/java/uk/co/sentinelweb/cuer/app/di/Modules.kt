@@ -87,6 +87,7 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.di.NetModule
+import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
@@ -237,7 +238,7 @@ object Modules {
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-//        .plus(RemoteModule.objectModule)
+        .plus(RemoteModule.objectModule)
         .plus(PlayerModule.localPlayerModule)
         .plus(SharedAppAndroidModule.modules)
 }

@@ -3,12 +3,14 @@ package uk.co.sentinelweb.cuer.app.service.remote
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
@@ -22,6 +24,8 @@ class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
     private val controller: RemoteContract.Controller by scope.inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
+    private val coroutines: CoroutineContextProvider by inject()
+
 
     private val log: LogWrapper by inject()
 
@@ -36,6 +40,7 @@ class RemoteService : Service(), RemoteContract.Service, AndroidScopeComponent {
 
     override fun onDestroy() {
         super.onDestroy()
+
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
