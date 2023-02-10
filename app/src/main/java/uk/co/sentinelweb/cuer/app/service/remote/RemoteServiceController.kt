@@ -4,10 +4,12 @@ import android.content.Context
 import android.content.Context.WIFI_SERVICE
 import android.net.wifi.WifiManager
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 //import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 import java.math.BigInteger
 import java.net.InetAddress
@@ -15,29 +17,29 @@ import java.net.UnknownHostException
 import java.nio.ByteOrder
 
 // todo remove for remote
-interface RemoteServer {
-    val port: Int
-    fun fullAddress(ip: String): String
-    val isRunning: Boolean
-    fun start()
-    fun stop()
-}
-
-class EmptyRemoteServer : RemoteServer {
-    override val port: Int
-        get() = 2345
-
-    override fun fullAddress(ip: String): String {
-        return "fulladdress"
-    }
-
-    override val isRunning: Boolean
-        get() = false
-
-    override fun start() {}
-
-    override fun stop() {}
-}
+//interface RemoteServer {
+//    val port: Int
+//    fun fullAddress(ip: String): String
+//    val isRunning: Boolean
+//    fun start()
+//    fun stop()
+//}
+//
+//class EmptyRemoteServer : RemoteServer {
+//    override val port: Int
+//        get() = 2345
+//
+//    override fun fullAddress(ip: String): String {
+//        return "fulladdress"
+//    }
+//
+//    override val isRunning: Boolean
+//        get() = false
+//
+//    override fun start() {}
+//
+//    override fun stop() {}
+//}
 
 class RemoteServiceController constructor(
     private val service: RemoteService,
@@ -52,6 +54,8 @@ class RemoteServiceController constructor(
     }
 
     private var serverJob: Job? = null
+    private lateinit var multi: MultiCastListener
+
 
     override val isServerStarted: Boolean
         get() = webServer.isRunning
@@ -72,6 +76,21 @@ class RemoteServiceController constructor(
             }
             webServer.start()
         }
+        coroutines.ioScope.launch {
+            multi = MultiCastListener(service)
+            multi.recieveListener = { msg ->
+                log.d("multicast recieve: $msg")
+            }
+            multi.startListener = {
+                log.d("multicast started")
+                coroutines.ioScope.launch {
+                    delay(50)
+                    multi.sendBroadcast()
+                }
+
+            }
+            multi.erun()
+        }
     }
 
     override fun handleAction(action: String?) {
@@ -79,10 +98,17 @@ class RemoteServiceController constructor(
     }
 
     override fun destroy() {
+        log.d("Controller destroy")
         serverJob?.cancel()
         serverJob = null
         webServer.stop()
         notification.destroy()
+        coroutines.ioScope.launch {
+            delay(50)
+            multi.close()
+        }
+
+        log.d("Controller destroyed")
     }
 
     // https://stackoverflow.com/questions/16730711/get-my-wifi-ip-address-android

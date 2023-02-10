@@ -29,11 +29,11 @@ group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
 
 kotlin {
-    js {
+    js(IR) {
         useCommonJs()
         browser {
             commonWebpackConfig {
-                cssSupport.enabled = true
+                //cssSupport.enabled = true
                 outputFileName = outputJsLibName
             }
             runTask {
@@ -48,13 +48,17 @@ kotlin {
 
         val commonMain by getting {
             dependencies {
+                implementation(project(":domain"))
+                implementation(project(":database"))
                 implementation(project(":shared"))
+
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("io.ktor:ktor-client-core:$ver_ktor")
                 implementation("io.insert-koin:koin-core:$ver_koin")
+                implementation("io.ktor:ktor-client-core:$ver_ktor")
+
             }
         }
 
@@ -64,6 +68,11 @@ kotlin {
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
                 implementation("io.ktor:ktor-server-cio:$ver_ktor")
                 implementation("ch.qos.logback:logback-classic:$ver_logback")
+                implementation("io.ktor:ktor-server-cors:$ver_ktor")
+                implementation("io.ktor:ktor-server-content-negotiation:$ver_ktor")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
+                implementation("io.ktor:ktor-server-compression:$ver_ktor")
+                implementation("io.ktor:ktor-server-call-logging:$ver_ktor")
             }
         }
 
@@ -115,16 +124,16 @@ val runServer by tasks.creating(JavaExec::class) {
 }
 
 // include JS artifacts in any JAR we generate
-tasks.getByName<Jar>("jvmJar") {
-    val taskName = if (project.property("isProduction") == "true") {
-        "jsBrowserProductionWebpack"
-    } else {
-        "jsBrowserDevelopmentWebpack"
-    }
-    val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
-    dependsOn(webpackTask) // make sure JS gets compiled first
-    from(File(webpackTask.destinationDirectory, outputJsLibName))
-}
+//tasks.getByName<Jar>("jvmJar") {
+//    val taskName = if (project.property("isProduction") == "true") {
+//        "jsBrowserProductionWebpack"
+//    } else {
+//        "jsBrowserDevelopmentWebpack"
+//    }
+//    val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
+//    dependsOn(webpackTask) // make sure JS gets compiled first
+//    from(File(webpackTask.destinationDirectory, outputJsLibName))
+//}
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
