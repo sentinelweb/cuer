@@ -68,6 +68,7 @@
     <dimen name="tile_overflow_button_size">48dp</dimen>
     <dimen name="prefs_bottom_padding">128dp</dimen>
     <dimen name="snackbar_main_bottom_padding">188dp</dimen>
+    <dimen name="player_translation_y">20dp</dimen>
 
     <integer name="anim_transition_time">300</integer>
 </resources>

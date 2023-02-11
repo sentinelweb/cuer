@@ -296,10 +296,13 @@ class MainActivity :
         }
     }
 
+    // fixme: https://github.com/sentinelweb/cuer/issues/432
     var isRaised = true
     override fun lowerPlayer() {
         if (isRaised) {
-            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+//            log.d("lowerPlayer()")
+//            val baseTranslation = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()//+baseTranslation
             val transAnimation =
                 ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, lowerY)
             transAnimation.setDuration(200)
@@ -310,7 +313,9 @@ class MainActivity :
 
     override fun raisePlayer() {
         if (!isRaised) {
-            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+//            log.d("raisePlayer()")
+//            val baseTranslation = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()//+baseTranslation
             val transAnimation =
                 ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", lowerY, 0f)
             transAnimation.setDuration(200)
