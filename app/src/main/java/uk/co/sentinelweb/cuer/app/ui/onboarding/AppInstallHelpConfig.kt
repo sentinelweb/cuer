@@ -47,6 +47,7 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
             ),
             Screen(
                 backgroundUrl = "https://cuer-275020.firebaseapp.com/images/headers/filip-kominik-IHtVbLRjTZU-unsplash.jpg",
+                backgroundColor = R.color.black,
                 title = ActionResources(
                     label = "Playlists",
                     icon = R.drawable.ic_playlists,
@@ -71,6 +72,28 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     ActionResources(
                         label = "We'll add more platforms soon ....",
                         icon = null,
+                        color = R.color.white
+                    ),
+                )
+            ),
+            Screen(
+                backgroundUrl = "https://cuer-275020.firebaseapp.com/images/other/usability.png",
+                backgroundColor = R.color.black,
+                title = ActionResources(
+                    label = "Help us improve ..,",
+                    icon = null,
+                    color = R.color.white
+                ),
+                subtitle = "We have some big plans for Cuer, and we want to get it good ...",
+                lines = listOf(
+                    ActionResources(
+                        label = "There is a user feedback form in the settings",
+                        icon = R.drawable.ic_menu_settings,
+                        color = R.color.white
+                    ),
+                    ActionResources(
+                        label = "If it's all good ... share, donate really helps 😀",
+                        icon = R.drawable.ic_share,
                         color = R.color.white
                     ),
                 )

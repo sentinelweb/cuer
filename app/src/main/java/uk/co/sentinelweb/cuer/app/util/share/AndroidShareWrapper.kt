@@ -80,4 +80,11 @@ class AndroidShareWrapper(
                 ?.let { it.getItemAt(0)?.let { it.uri ?: it.text }.toString() }
             ?: intent.getStringExtra(EXTRA_TEXT)
 
+    override fun open(url: String) {
+        Intent().apply {
+            action = ACTION_VIEW
+            data = Uri.parse(url)
+        }
+            .run { activity.startActivity(this) }
+    }
 }

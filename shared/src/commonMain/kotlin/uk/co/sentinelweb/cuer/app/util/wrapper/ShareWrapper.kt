@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 abstract class ShareWrapper {
     abstract fun share(media: MediaDomain)
     abstract fun share(playlist: PlaylistDomain)
+    abstract fun open(url: String)
 
     fun fullMessage(media: MediaDomain): String {
         return """Hey! Check out this video:

@@ -283,6 +283,10 @@ class MainActivity :
         binding.navHostFragment.setPadding(0, 0, 0, 0)
     }
 
+
+    fun isPlayerShowing() = playerFragment.isVisible()
+
+
     private fun hidePlayerIfOnboarding() {
         if (isOnboarding) {
             lifecycleScope.launch {
