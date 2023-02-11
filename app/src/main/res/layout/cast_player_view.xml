@@ -19,11 +19,13 @@
         app:fabAlignmentMode="center"
         app:fabCradleMargin="10dp"
         app:fabCradleRoundedCornerRadius="25dp"
-        app:fabCradleVerticalOffset="0dp">
+        app:fabCradleVerticalOffset="0dp"
+    >
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+        >
 
             <uk.co.sentinelweb.cuer.app.ui.common.views.MaskedImageView
                 android:id="@+id/cast_player_image"
@@ -33,7 +35,7 @@
                 android:transitionName="@string/cast_player_trans_image"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon" />
+                app:shapeAppearanceOverlay="@style/ShapeAppearance.Player.Icon"/>
 
             <TextView
                 android:id="@+id/cast_player_playlist_text"

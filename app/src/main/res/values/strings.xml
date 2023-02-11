@@ -188,7 +188,7 @@
     <string name="prefs_root_info_cat_title">App Info</string>
     <string name="prefs_root_version_title">Version</string>
     <string name="prefs_root_version_summary">Version will appear here</string>
-    <string name="prefs_root_info_cat_contact">Contact</string>
+    <string name="prefs_root_info_cat_contact">Communications</string>
 
 
     <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
@@ -406,4 +406,6 @@
     <string name="done">Done</string>
     <string name="finish">Finish</string>
     <string name="browse_add_error">Could add playlist: %1$s</string>
+    <string name="prefs_root_usability_key">root_usability</string>
+    <string name="prefs_root_bymc_key">root_donate_bymc</string>
 </resources>

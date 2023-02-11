@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.common.resources
 
 enum class StringResource(val default: String) {
+    url_usability_form("https://forms.gle/m9F98MZiiVoSuT556"),
+    url_bymc_donate_form("https://www.buymeacoffee.com/cuerapp"),
     menu_playlist_mode_single("Single"),
     menu_playlist_mode_loop("Loop"),
     menu_playlist_mode_shuffle("Shuffle"),

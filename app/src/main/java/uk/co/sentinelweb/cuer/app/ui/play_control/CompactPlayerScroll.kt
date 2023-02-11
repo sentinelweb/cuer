@@ -4,12 +4,20 @@ import android.view.View
 import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
+import org.koin.core.context.GlobalContext
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class CompactPlayerScroll {
 
     interface PlayerHost {
         fun raisePlayer()
         fun lowerPlayer()
+    }
+
+    private val log: LogWrapper = GlobalContext.get().get()
+
+    init {
+        log.tag(this)
     }
 
     fun raisePlayer(f: Fragment) {

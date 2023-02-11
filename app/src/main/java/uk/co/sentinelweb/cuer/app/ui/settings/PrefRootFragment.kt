@@ -15,6 +15,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -60,13 +61,20 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
         get() = findPreference(R.string.prefs_root_debug_send_reports_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_debug_send_reports_key")
 
+    private val usabilityPreference
+        get() = findPreference(R.string.prefs_root_usability_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_usability_key")
+
+    private val bymcPreference
+        get() = findPreference(R.string.prefs_root_usability_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_by_m_c_key")
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
             (view as ViewGroup).addView(it, 0)
             it.setupWithNavController(findNavController())
         }
-        view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
         return view
     }
 
@@ -78,6 +86,12 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     override fun onStart() {
         super.onStart()
         presenter.initialisePrefs()
+        (requireActivity() as? MainActivity)
+            ?.takeIf { it.isPlayerShowing() }
+            ?.also {
+                view?.findViewById<FrameLayout>(android.R.id.list_container)
+                    ?.setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+            }
 
         setPreferencesSummaries()
     }
@@ -101,8 +115,14 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
             getString(R.string.prefs_root_feedback_key) -> presenter.onFeedback()
             getString(R.string.prefs_root_share_key) -> presenter.onShare()
             getString(R.string.prefs_root_onboard_key) -> presenter.resetOnboarding()
+            getString(R.string.prefs_root_usability_key) -> presenter.launchUsability()
+            getString(R.string.prefs_root_bymc_key) -> presenter.launchBymcDonate()
         }
         return super.onPreferenceTreeClick(preference)
+    }
+
+    override fun launchLink(url: String) {
+        shareWrapper.open(url)
     }
 
     override fun sendEmail(data: EmailUseCase.Data) {
