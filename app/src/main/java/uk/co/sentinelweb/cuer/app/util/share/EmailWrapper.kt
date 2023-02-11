@@ -8,7 +8,6 @@ import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 class EmailWrapper(
     private val activity: AppCompatActivity
 ) {
-
     fun launchEmail(data: EmailUseCase.Data) {
         val intent = Intent(ACTION_SEND)
         intent.setType("text/plain")

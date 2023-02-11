@@ -19,6 +19,8 @@ interface PrefRootContract {
         fun onFeedback()
         fun onShare()
         fun resetOnboarding()
+        fun launchUsability()
+        fun launchBymcDonate()
     }
 
     interface View {
@@ -27,6 +29,7 @@ interface PrefRootContract {
         fun setVersion(versionString: String)
         fun sendEmail(data: EmailUseCase.Data)
         fun launchShare(data: ShareUseCase.Data)
+        fun launchLink(url: String)
     }
 
     data class State constructor(

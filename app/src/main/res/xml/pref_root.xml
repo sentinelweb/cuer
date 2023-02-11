@@ -44,14 +44,27 @@
     <PreferenceCategory app:title="@string/prefs_root_info_cat_contact">
         <Preference
             app:icon="@drawable/ic_comment"
-            app:key="@string/prefs_root_feedback_key"
-            app:title="@string/prefs_root_feedback_title"
+            app:key="@string/prefs_root_usability_key"
+            app:title="Usability form"
+            app:summary="Helps us improve the app"
         />
         <Preference
             app:icon="@drawable/ic_share"
             app:key="@string/prefs_root_share_key"
             app:title="@string/prefs_root_share_title"
         />
+        <Preference
+            app:icon="@drawable/ic_buymeacoffee"
+            app:key="@string/prefs_root_bymc_key"
+            app:title="Donate"
+            app:summary="Helps keep the app free"
+        />
+        <Preference
+            app:icon="@drawable/ic_comment"
+            app:key="@string/prefs_root_feedback_key"
+            app:title="@string/prefs_root_feedback_title"
+        />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/prefs_root_debug_cat_title" app:key="@string/prefs_root_debug_cat_key">

@@ -8,7 +8,10 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.context.GlobalContext.get
@@ -43,6 +46,7 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val contextProvider: CoroutineContextProvider by inject()
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
+    private val config: OnboardingContract.Config by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -62,8 +66,20 @@ class OnboardingFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        precacheBackgrounds()
         binding.composeView.setContent {
             OnboardingComposables.OnboardingUi(viewModel)
+        }
+    }
+
+    private fun precacheBackgrounds() {
+        lifecycleScope.launch {
+            config.screens.map { it.backgroundUrl }.forEach { url ->
+                Glide.with(this@OnboardingFragment)
+                    .asBitmap()
+                    .load(url)
+                    .preload();
+            }
         }
     }
 

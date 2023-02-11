@@ -18,11 +18,11 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                 subtitle = "Play and manage the playlist",
                 lines = listOf(
                     ActionResources(
-                        label = "Click the thumbnail to play",
-                        icon = R.drawable.ic_play
+                        label = "Click the text for details"
                     ),
                     ActionResources(
-                        label = "Click the text for details"
+                        label = "Click the thumbnail to play",
+                        icon = R.drawable.ic_play
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_delete),
