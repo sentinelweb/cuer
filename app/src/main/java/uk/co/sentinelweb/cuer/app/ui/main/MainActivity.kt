@@ -237,7 +237,7 @@ class MainActivity :
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 
-        hidePlayerIfOnboarding()
+        hideShowPlayerIfOnboarding()
     }
 
     override fun onStop() {
@@ -287,12 +287,14 @@ class MainActivity :
     fun isPlayerShowing() = playerFragment.isVisible()
 
 
-    private fun hidePlayerIfOnboarding() {
+    private fun hideShowPlayerIfOnboarding() {
         if (isOnboarding) {
             lifecycleScope.launch {
                 delay(500)
                 hidePlayer()
             }
+        } else {
+            showPlayer()
         }
     }
 
