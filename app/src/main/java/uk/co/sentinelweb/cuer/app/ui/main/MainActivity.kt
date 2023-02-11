@@ -286,7 +286,6 @@ class MainActivity :
 
     fun isPlayerShowing() = playerFragment.isVisible()
 
-
     private fun hideShowPlayerIfOnboarding() {
         if (isOnboarding) {
             lifecycleScope.launch {
