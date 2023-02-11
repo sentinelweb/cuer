@@ -118,6 +118,15 @@ fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToStr
 
 fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(AppDetailsDomain.serializer(), input)
 
+// NodeDomain
+fun NodeDomain.serialise() = domainJsonSerializer.encodeToString(NodeDomain.serializer(), this)
+
+fun deserialiseNodeDomain(input: String) = domainJsonSerializer.decodeFromString(NodeDomain.serializer(), input)
+
+fun List<NodeDomain>.serialiseNodeist() = domainJsonSerializer.encodeToString(ListSerializer(NodeDomain.serializer()), this)
+
+fun deserialiseNodeList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(NodeDomain.serializer()), input)
+
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
     mapOf(
@@ -132,6 +141,7 @@ val domainSerializersModule = SerializersModule {
         ErrorDomain::class to ErrorDomain.serializer(),
         ResponseDomain::class to ResponseDomain.serializer(),
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
+        NodeDomain::class to NodeDomain.serializer(),
     )
     polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
     polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
@@ -141,6 +151,7 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
     polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
+    polymorphic(Domain::class, NodeDomain::class, NodeDomain.serializer())
 }.plus(SerializersModule {
     contextual(Instant::class, InstantIso8601Serializer)
 }).plus(SerializersModule {
