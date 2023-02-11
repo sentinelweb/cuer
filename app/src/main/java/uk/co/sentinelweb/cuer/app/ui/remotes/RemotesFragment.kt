@@ -1,0 +1,164 @@
+package uk.co.sentinelweb.cuer.app.ui.remotes
+
+import android.content.Context
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import com.arkivanov.essenty.lifecycle.asEssentyLifecycle
+import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import org.koin.android.ext.android.inject
+import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
+import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.usecase.AddBrowsePlaylistUsecase
+import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+
+class RemotesFragment : Fragment(), AndroidScopeComponent {
+
+    override val scope: Scope by fragmentScopeWithSource<RemotesFragment>()
+    private val controller: RemotesController by inject()
+    private val log: LogWrapper by inject()
+    private val coroutines: CoroutineContextProvider by inject()
+    private val browseMviView: RemotesMviViewProxy by inject()
+    private val snackbarWrapper: SnackbarWrapper by inject()
+    private val navRouter: NavigationRouter by inject()
+    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
+    private val navigationProvider: NavigationProvider by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val res: ResourceWrapper by inject()
+    private val browseHelpConfig: RemotesHelpConfig by inject()
+    private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject()
+
+    private var _binding: FragmentComposeBinding? = null
+    private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
+
+    init {
+        log.tag(this)
+    }
+
+    // saves the data on back press (enabled in onResume)
+    private val upCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            //browseMviView.dispatch(OnUpClicked)
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
+        // todo make a factory to create the controller here move this to onViewCreated see playlistsMviFrag
+        controller.onViewCreated(listOf(), lifecycle.asEssentyLifecycle())
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentComposeBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.composeView.setContent {
+            RemotesComposables.RemotesUi(browseMviView)
+        }
+//        coroutines.mainScope.launch {
+//            delay(300)
+//            browseMviView.dispatch(OnResume)
+//        }
+        observeLabels()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        requireActivity().onBackPressedDispatcher.addCallback(this, upCallback)
+        linkScopeToActivity()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        OnboardingFragment.showIntro(this@RemotesFragment, browseHelpConfig)
+        compactPlayerScroll.raisePlayer(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+    }
+
+    override fun onStop() {
+        super.onStop()
+        //playerView.showPlayer()
+    }
+
+    override fun onDestroyView() {
+        _binding = null
+        super.onDestroyView()
+    }
+
+    private fun observeLabels() {
+        browseMviView.labelObservable().observe(
+            this.viewLifecycleOwner,
+            object : Observer<RemotesContract.MviStore.Label> {
+                override fun onChanged(label: RemotesContract.MviStore.Label) {
+                    when (label) {
+                        else -> Unit
+                    }
+                }
+            })
+    }
+
+    companion object {
+        @JvmStatic
+        val fragmentModule = module {
+            scope(named<RemotesFragment>()) {
+                scoped {
+                    RemotesController(
+                        storeFactory = get(),
+                        modelMapper = get(),
+                        lifecycle = get<RemotesFragment>().lifecycle.asEssentyLifecycle(),
+                        log = get()
+                    )
+                }
+                scoped {
+                    RemotesStoreFactory(
+//                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
+                        storeFactory = DefaultStoreFactory(),
+                        repository = get(),
+                        playlistOrchestrator = get(),
+                        playlistStatsOrchestrator = get(),
+                        strings = get(),
+                        log = get(),
+                        prefs = get()
+                    )
+                }
+                scoped { RemotesRepository(RemotesRepositoryJsonLoader(get()), "browse_categories.json") }
+                scoped { RemotesModelMapper(get(), get()) }
+                scoped { RemotesMviViewProxy(get(), get()) }
+                scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped { RemotesHelpConfig(get()) }
+            }
+        }
+    }
+
+}

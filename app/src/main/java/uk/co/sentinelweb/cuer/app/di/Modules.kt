@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteContract
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
@@ -40,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesFragment
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -113,7 +114,7 @@ object Modules {
         PrefPlayerContract.fragmentModule,
         SearchContract.fragmentModule,
         SearchImageContract.fragmentModule,
-        RemoteContract.serviceModule,
+        RemoteServerService.serviceModule,
         YoutubeFullScreenContract.activityModule,
         AytPortraitContract.activityModule,
         AytLandContract.activityModule,
@@ -124,6 +125,7 @@ object Modules {
         SupportDialogFragment.fragmentModule,
         AppSelectorBottomSheet.fragmentModule,
         OnboardingFragment.fragmentModule,
+        RemotesFragment.fragmentModule,
     )
 
     private val uiModule = module {
@@ -219,7 +221,7 @@ object Modules {
         factory<ApiKeyProvider>(named(ServiceType.YOUTUBE)) { CuerYoutubeApiKeyProvider() }
         factory<ApiKeyProvider>(named(ServiceType.PIXABAY)) { CuerPixabayApiKeyProvider() }
         single { NetModuleConfig(debug = DEBUG) }
-        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication()) }
+        factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication(), get()) }
     }
 
     val allModules = listOf(utilModule)

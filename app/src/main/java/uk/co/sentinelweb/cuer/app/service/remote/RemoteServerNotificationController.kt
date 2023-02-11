@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
-class RemoteNotificationController constructor(
-    private val view: RemoteContract.Notification.View,
-    private val state: RemoteContract.Notification.State
-) : RemoteContract.Notification.External, RemoteContract.Notification.Controller {
-//    init{
+class RemoteServerNotificationController constructor(
+    private val view: RemoteServerContract.Notification.View,
+    private val state: RemoteServerContract.Notification.State
+) : RemoteServerContract.Notification.External, RemoteServerContract.Notification.Controller {
+    //    init{
 //        log.tag(this)
 //    }
     override fun updateNotification(address: String) {

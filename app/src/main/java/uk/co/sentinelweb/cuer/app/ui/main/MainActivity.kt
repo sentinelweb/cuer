@@ -333,6 +333,7 @@ class MainActivity :
                 R.id.navigation_browse -> BROWSE
                 R.id.navigation_playlists -> PLAYLISTS
                 R.id.navigation_playlist -> PLAYLIST
+                R.id.navigation_remotes -> REMOTES
                 else -> BROWSE
             }.ordinal
                 .also { prefs.lastBottomTab = it }
@@ -357,6 +358,10 @@ class MainActivity :
 
                         PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                             R.id.navigation_playlist
+                        } else null
+
+                        REMOTES -> if (navController.currentDestination?.id != R.id.navigation_remotes) {
+                            R.id.navigation_remotes
                         } else null
 
                         else -> if (navController.currentDestination?.id != R.id.navigation_browse) {

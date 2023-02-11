@@ -160,7 +160,7 @@
         </service>
 
         <service
-            android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteService"
+            android:name="uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService"
             android:exported="false" />
         <service
             android:name=".ui.ytplayer.floating.FloatingPlayerService"

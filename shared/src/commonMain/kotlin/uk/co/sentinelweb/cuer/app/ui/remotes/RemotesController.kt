@@ -31,6 +31,11 @@ class RemotesController constructor(
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
             is Event.OnSendPing -> Intent.SendPing
+            Event.OnActionHelpClicked -> Intent.ActionHelpClicked
+            Event.OnActionPasteAdd -> Intent.ActionPasteAdd
+            Event.OnActionSearchClicked -> Intent.ActionSearchClicked
+            Event.OnActionSettingsClicked -> Intent.ActionSettingsClicked
+            Event.OnUpClicked -> Intent.UpClicked
         }
     }
 

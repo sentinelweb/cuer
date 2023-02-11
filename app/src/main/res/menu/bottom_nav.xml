@@ -12,12 +12,18 @@
         android:id="@id/navigation_playlists"
         android:icon="@drawable/ic_playlists"
         android:title="@string/bottomnav_title_playlists"
-        />
+    />
 
     <item
         android:id="@id/navigation_playlist"
         android:icon="@drawable/ic_playlist"
         android:title="@string/bottomnav_title_playlist"
-        />
+    />
+
+    <item
+        android:id="@id/navigation_remotes"
+        android:icon="@drawable/ic_wifi_tethering"
+        android:title="@string/bottomnav_title_remotes"
+    />
 
 </menu>

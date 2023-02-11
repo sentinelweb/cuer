@@ -4,7 +4,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.toJavaInstant
 import uk.co.sentinelweb.cuer.app.BuildConfig
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServiceManager
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
@@ -20,7 +20,7 @@ class PrefRootPresenter constructor(
     private val timeProvider: TimeProvider,
     private val firebaseWrapper: FirebaseWrapper,
     private val log: LogWrapper,
-    private val remoteServiceManger: RemoteServiceManager,
+    private val remoteServiceManger: RemoteServerServiceManager,
     private val coroutines: CoroutineContextProvider,
     private val emailUseCase: EmailUseCase,
     private val shareUseCase: ShareUseCase,

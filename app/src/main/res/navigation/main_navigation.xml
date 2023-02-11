@@ -208,6 +208,27 @@
     </fragment>
 
     <fragment
+        android:id="@+id/navigation_remotes"
+        android:name="uk.co.sentinelweb.cuer.app.ui.remotes.RemotesFragment"
+        android:label="@string/bottomnav_title_playlists"
+        tools:layout="@layout/fragment_compose">
+        <argument
+            android:name="PLAYLIST_ID"
+            app:argType="string"
+            app:nullable="false"/>
+
+        <argument
+            android:name="SOURCE"
+            app:argType="string"
+            app:nullable="false"/>
+
+        <argument
+            android:name="IMAGE_URL"
+            app:argType="string"
+            app:nullable="true"/>
+    </fragment>
+
+    <fragment
         android:id="@+id/navigation_settings_root"
         android:name="uk.co.sentinelweb.cuer.app.ui.settings.PrefRootFragment"
         android:label="@string/menu_settings"

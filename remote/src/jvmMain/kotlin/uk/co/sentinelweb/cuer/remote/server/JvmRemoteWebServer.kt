@@ -1,13 +1,7 @@
 package uk.co.sentinelweb.cuer.remote.server
 
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
 import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.server.request.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import io.ktor.serialization.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
@@ -15,10 +9,11 @@ import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
-import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -26,7 +21,6 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -34,29 +28,29 @@ import java.io.StringWriter
 class RemoteServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper
-) {
+) : RemoteWebServerContract {
     init {
         logWrapper.tag(this)
     }
 
-    val port: Int
+    override val port: Int
         get() = System.getenv("PORT")?.toInt() ?: 9090
 
-    fun fullAddress(ip: String) = "http://$ip:$port"
+    override fun fullAddress(ip: String) = "http://$ip:$port"
 
     private var _appEngine: ApplicationEngine? = null
 
-    val isRunning: Boolean
+    override val isRunning: Boolean
         get() = _appEngine != null
 
-    fun start() {
+    override fun start() {
         buildServer().apply {
             _appEngine = this // start is a blocking call
             start(wait = true)
         }
     }
 
-    fun stop() {
+    override fun stop() {
         _appEngine?.stop(0, 0)
         logWrapper.d("Stopped remote server ...")
         _appEngine = null
