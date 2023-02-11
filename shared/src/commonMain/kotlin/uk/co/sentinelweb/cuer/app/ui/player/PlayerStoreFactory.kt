@@ -112,12 +112,7 @@ class PlayerStoreFactory(
                 is Intent.TrackBack -> queueConsumer.previousItem()
                 is Intent.SkipBack -> skip.skipBack()
                 is Intent.SkipFwd -> skip.skipFwd()
-                is Intent.Position -> updatePosition(
-                    intent.ms,
-                    getState().item,
-                    getState().playerState
-                )
-
+                is Intent.Position -> updatePosition(intent.ms, getState().item, getState().playerState)
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
@@ -136,11 +131,7 @@ class PlayerStoreFactory(
                 is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
-                is Intent.SeekToPosition -> {
-                    log.d("SeekToPosition: ${intent.ms}")
-                    publish(Label.Command(SeekTo(ms = intent.ms)))
-                }
-
+                is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
                 is Intent.InitFromService -> {
                     loadItem(intent.item)
                     queueConsumer.playlist
@@ -252,6 +243,10 @@ class PlayerStoreFactory(
 
                 ENDED -> {
                     queueConsumer.onTrackEnded()
+                }
+
+                ERROR -> {
+                    queueConsumer.nextItem()
                 }
 
                 else -> Unit
