@@ -71,7 +71,6 @@ object RemotesComposables {
 
                             Row(
                                 modifier = Modifier
-                                    .padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 16.dp)
                                     .height(160.dp)
                             ) {
                                 model.imageUrl

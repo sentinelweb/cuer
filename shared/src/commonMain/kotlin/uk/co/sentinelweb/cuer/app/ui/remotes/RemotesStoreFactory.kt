@@ -11,10 +11,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
@@ -132,17 +130,8 @@ class RemotesStoreFactory constructor(
         }
 
         private fun testLoad() {
-            dispatch(
-                Result.SetNodes(
-                    listOf(
-                        NodeDomain(
-                            id = "".toGuidIdentifier(MEMORY),
-                            ipAddress = "",
-                            port = 8989,
-                        )
-                    )
-                )
-            )
+            //dispatch(Result.SetNodes(listOf()))
+            dispatch(Result.UpdateServerState)
         }
 
     }
