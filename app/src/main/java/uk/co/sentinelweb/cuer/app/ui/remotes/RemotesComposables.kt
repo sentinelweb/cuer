@@ -68,19 +68,25 @@ object RemotesComposables {
                                 .verticalScroll(rememberScrollState())
                                 .padding(bottom = 128.dp)
                         ) {
-                            model.imageUrl
-                                ?.also {
-                                    Image(
-                                        painter = rememberGlidePainter(request = it, fadeIn = true),
-                                        //colorFilter = ColorFilter.tint(Color(0xaa000000), blendMode = BlendMode.Multiply),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(160.dp)
-                                            .wrapContentHeight(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
+
+                            Row(
+                                modifier = Modifier
+                                    .padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 16.dp)
+                                    .height(160.dp)
+                            ) {
+                                model.imageUrl
+                                    ?.also { url ->
+                                        Image(
+                                            painter = rememberGlidePainter(request = url, fadeIn = true),
+                                            contentDescription = "",
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(160.dp)
+                                                .wrapContentHeight(),
+                                            contentScale = ContentScale.Crop
+                                        )
+                                    }
+                            }
                             Row(
                                 modifier = Modifier.padding(
                                     start = dimensionResource(R.dimen.app_bar_header_margin_start),
@@ -112,14 +118,8 @@ object RemotesComposables {
                                 contentPadding = PaddingValues(top = 4.dp)
                             ) {
                                 items(model.remoteNodes) { remote ->
-                                    Text(
-                                        text = remote.run { "$address - $deviceType - $device" },
-                                        style = MaterialTheme.typography.h5,
-                                        modifier = Modifier.padding(
-                                            top = 8.dp,
-                                            bottom = 8.dp
-                                        )
-                                    )
+
+                                    RemoteRow(remote)
                                 }
                             }
                         }
@@ -136,6 +136,40 @@ object RemotesComposables {
                 }
             }
         }
+    }
+
+    @Composable
+    private fun RemoteRow(remote: RemotesContract.View.NodeModel) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(
+                    top = 8.dp,
+                    bottom = 8.dp
+                )
+                .background(MaterialTheme.colors.surface),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_wifi_tethering),
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = null,
+                modifier = Modifier.size(48.dp).padding(4.dp)
+            )
+            Column { // todo use textview
+                Text(
+                    text = remote.device,
+                    style = MaterialTheme.typography.h5,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(
+                    text = remote.address,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+
     }
 
     @Composable

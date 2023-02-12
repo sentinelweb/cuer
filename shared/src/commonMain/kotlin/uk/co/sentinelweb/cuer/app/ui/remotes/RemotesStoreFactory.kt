@@ -109,6 +109,7 @@ class RemotesStoreFactory constructor(
                     remoteServerManager.stop()
                     delay(20)
                     dispatch(Result.UpdateServerState)
+                    dispatch(Result.SetNodes(listOf()))
                 }
             }
         }
