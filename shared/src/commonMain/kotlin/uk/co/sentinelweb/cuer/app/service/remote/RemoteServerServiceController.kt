@@ -29,10 +29,10 @@ class RemoteServerServiceController constructor(
         get() = webServer.isRunning
 
     override val address: String?
-        get() = let {
-            if (webServer.isRunning) connectivityWrapper.wifiIpAddress()?.let { webServer.fullAddress(it) }
-            else null
-        }.apply { log.d("address: $this ${webServer.isRunning}") }
+        get() = true.takeIf { webServer.isRunning }
+            ?.let { connectivityWrapper.wifiIpAddress() }
+            ?.let { webServer.fullAddress(it) }
+            ?.apply { log.d("address: $this ${webServer.isRunning}") }
 
     override fun initialise() {
         notification.updateNotification("x")
@@ -44,10 +44,11 @@ class RemoteServerServiceController constructor(
                     ?.also { notification.updateNotification(it) }
             }
             webServer.start()
+            log.d("webServer ended")
         }
         coroutines.ioScope.launch {
             multi.recieveListener = { msg ->
-                log.d("multicast recieve: $msg")
+                log.d("multicast receive: $msg")
             }
             multi.startListener = {
                 log.d("multicast started")
@@ -58,6 +59,7 @@ class RemoteServerServiceController constructor(
 
             }
             multi.runSocketListener()
+            log.d("multicast ended")
         }
     }
 

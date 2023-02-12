@@ -13,10 +13,6 @@ interface RemoteServerContract {
         val isServerStarted: Boolean
         val address: String?
         fun stopSelf()
-
-        companion object {
-            fun instance(): Service? = null
-        }
     }
 
     interface Controller {

@@ -3,16 +3,19 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 import com.arkivanov.mvikotlin.core.store.Reducer
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
-import com.arkivanov.mvikotlin.extensions.coroutines.SuspendBootstrapper
-import com.arkivanov.mvikotlin.extensions.coroutines.SuspendExecutor
+import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
+import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 
 // fixme: 'SuspendBootstrapper<Action : Any>' is deprecated. Please use CoroutineBootstrapper
 class RemotesStoreFactory constructor(
@@ -30,6 +33,7 @@ class RemotesStoreFactory constructor(
     }
 
     private sealed class Result {
+        data class SetNodes(val nodes: List<NodeDomain>) : Result()
 //        data class SetCategory(val category: CategoryDomain) : Result()
 //        data class SetCategoryByTitle(val title: String) : Result()
 //        data class LoadCatgeories(
@@ -47,8 +51,10 @@ class RemotesStoreFactory constructor(
     }
 
     private inner class ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State = this
-//            when (result) {
+        override fun State.reduce(result: Result): State =
+            when (result) {
+                is Result.SetNodes -> copy(nodes = result.nodes)
+
 //                is Result.Display -> this
 //                is Result.SetCategory -> copy(currentCategory = result.category)
 //                is Result.SetOrder -> copy(order = result.order)
@@ -76,72 +82,46 @@ class RemotesStoreFactory constructor(
 //                            },
 //                    )
 //                }
-//            }
+            }
     }
 
-    private class BootstrapperImpl() : SuspendBootstrapper<Action>() {
-        override suspend fun bootstrap() {
+    private class BootstrapperImpl() : CoroutineBootstrapper<Action>() {
+        override fun invoke() {
             dispatch(Action.Init)
         }
     }
 
-    private inner class ExecutorImpl() : SuspendExecutor<Intent, Action, State, Result, Label>() {
-        override suspend fun executeAction(action: Action, getState: () -> State) =
+    private inner class ExecutorImpl() : CoroutineExecutor<Intent, Action, State, Result, Label>() {
+        override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
-                Action.Init -> load()
+                Action.Init -> testLoad()
             }
 
-        private fun load() {
-            log.d("load")
+        override fun executeIntent(intent: Intent, getState: () -> State) =
+            when (intent) {
+
+//
+                Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
+                Intent.ActionSearch -> publish(Label.ActionSearch)
+                Intent.ActionHelp -> publish(Label.ActionHelp)
+                Intent.SendPing -> log.d("send ping")
+                Intent.Up -> publish(Label.Up)
+            }
+
+        private fun testLoad() {
+            dispatch(
+                Result.SetNodes(
+                    listOf(
+                        NodeDomain(
+                            id = "".toGuidIdentifier(MEMORY),
+                            ipAddress = "",
+                            port = 8989,
+                        )
+                    )
+                )
+            )
         }
-
-        override suspend fun executeIntent(intent: Intent, getState: () -> State) = Unit
-//            when (intent) {
-//                is Intent.ClickCategory -> { // todo extract inside closure
-//                    getState().categoryLookup.get(intent.id)
-//                        ?.also { cat ->
-//                            if (cat.subCategories.size > 0) {
-//                                prefs.putString(
-//                                    BROWSE_CAT_TITLE,
-//                                    cat.title
-//                                ) //fixme: change to some built id(maybe include parent)
-//                            }
-//                            cat.platformId
-//                                ?.takeIf { intent.forceItem || cat.subCategories.isEmpty() }
-//                                ?.let { checkPlatformId(cat, getState) }
-//                                ?: run {
-//                                    if (cat.subCategories.isNotEmpty()) {
-//                                        dispatch(Result.SetCategory(category = cat))
-//                                    } else {
-//                                        publish(Label.Error(browseStrings.errorNoPlaylistConfigured))
-//                                    }
-//                                }
-//                        }
-//                        ?: apply { publish(Label.Error(browseStrings.errorNoCatWithID(intent.id))) }
-//                    Unit
-//                }
-//
-//                is Intent.Display -> dispatch(Result.Display)
-//                is Intent.SetOrder -> dispatch(Result.SetOrder(intent.order))
-//                is Intent.Up -> {
-//                    getState().parentLookup.get(getState().currentCategory)
-//                        ?.apply {
-//                            prefs.putString(BROWSE_CAT_TITLE, this.title)
-//                            dispatch(Result.SetCategory(category = this))
-//                        }
-//                        ?: apply {
-//                            prefs.remove(BROWSE_CAT_TITLE)
-//                            publish(Label.TopReached)
-//                        }
-//                    Unit
-//                }
-//
-//                Intent.ActionSettings -> publish(Label.ActionSettings)
-//                Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
-//                Intent.ActionSearch -> publish(Label.ActionSearch)
-//                Intent.ActionHelp -> publish(Label.ActionHelp)
-//            }
-
 
     }
 

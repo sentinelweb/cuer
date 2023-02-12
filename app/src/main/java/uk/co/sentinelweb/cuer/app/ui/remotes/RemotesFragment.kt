@@ -15,18 +15,21 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
-import uk.co.sentinelweb.cuer.app.usecase.AddBrowsePlaylistUsecase
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
+import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -37,15 +40,13 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val controller: RemotesController by inject()
     private val log: LogWrapper by inject()
     private val coroutines: CoroutineContextProvider by inject()
-    private val browseMviView: RemotesMviViewProxy by inject()
+    private val remotesMviView: RemotesMviViewProxy by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-    private val res: ResourceWrapper by inject()
     private val browseHelpConfig: RemotesHelpConfig by inject()
-    private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -57,7 +58,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     // saves the data on back press (enabled in onResume)
     private val upCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
-            //browseMviView.dispatch(OnUpClicked)
+            remotesMviView.dispatch(OnUpClicked)
         }
     }
 
@@ -65,7 +66,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
         // todo make a factory to create the controller here move this to onViewCreated see playlistsMviFrag
-        controller.onViewCreated(listOf(), lifecycle.asEssentyLifecycle())
+        controller.onViewCreated(listOf(remotesMviView), lifecycle.asEssentyLifecycle())
     }
 
     override fun onCreateView(
@@ -80,7 +81,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            RemotesComposables.RemotesUi(browseMviView)
+            RemotesComposables.RemotesUi(remotesMviView)
         }
 //        coroutines.mainScope.launch {
 //            delay(300)
@@ -117,12 +118,20 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     }
 
     private fun observeLabels() {
-        browseMviView.labelObservable().observe(
+        remotesMviView.labelObservable().observe(
             this.viewLifecycleOwner,
             object : Observer<RemotesContract.MviStore.Label> {
                 override fun onChanged(label: RemotesContract.MviStore.Label) {
                     when (label) {
-                        else -> Unit
+                        ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
+                        ActionSearch -> {
+                            SearchBottomSheetFragment()
+                                .show(childFragmentManager, SearchBottomSheetFragment.SEARCH_BOTTOMSHEET_TAG)
+                        }
+
+                        ActionPasteAdd -> (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
+                        ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, browseHelpConfig)
+                        Up -> log.d("Up")
                     }
                 }
             })

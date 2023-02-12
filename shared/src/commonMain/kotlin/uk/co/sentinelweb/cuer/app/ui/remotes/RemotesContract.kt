@@ -11,16 +11,20 @@ class RemotesContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object SendPing : Intent()
-            object UpClicked : Intent()
-            object ActionSettingsClicked : Intent()
+            object Up : Intent()
+            object ActionSettings : Intent()
             object ActionPasteAdd : Intent()
-            object ActionSearchClicked : Intent()
-            object ActionHelpClicked : Intent()
+            object ActionSearch : Intent()
+            object ActionHelp : Intent()
         }
 
         sealed class Label {
             // object None : Label()
-
+            object Up : Label()
+            object ActionSettings : Label()
+            object ActionSearch : Label()
+            object ActionHelp : Label()
+            object ActionPasteAdd : Label()
 
         }
 
@@ -35,6 +39,7 @@ class RemotesContract {
 
         data class Model(
             val title: String,
+            val imageUrl: String?,
             val nodes: List<NodeModel>
         )
 
@@ -46,11 +51,11 @@ class RemotesContract {
 
         sealed class Event {
             object OnSendPing : Event()
-            object OnUpClicked : Event()
             object OnActionSettingsClicked : Event()
             object OnActionPasteAdd : Event()
             object OnActionSearchClicked : Event()
             object OnActionHelpClicked : Event()
+            object OnUpClicked : Event()
         }
     }
 }

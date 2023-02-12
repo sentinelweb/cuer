@@ -21,9 +21,7 @@ class RemotesMviViewProxy constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(
-        Model("Remotes", listOf())
-    )
+    var observableModel: Model by mutableStateOf(Model("Remotes", null, listOf()))
         private set
 
     var observableLoading: Boolean by mutableStateOf(false)

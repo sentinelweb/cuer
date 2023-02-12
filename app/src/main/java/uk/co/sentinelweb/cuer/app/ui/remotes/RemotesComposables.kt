@@ -1,39 +1,46 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.google.accompanist.glide.rememberGlidePainter
 import org.koin.core.context.GlobalContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.Const.PREVIEW_LOG_WRAPPER
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonColors
+import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 object RemotesComposables {
+    val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(RemotesComposables@ this) } }
 
     @Composable
     fun RemotesUi(view: RemotesMviViewProxy) {
         RemotesView(view.observableModel, view.observableLoading, view)
     }
 
+    // todo use scaffold
     @Composable
     fun RemotesView(model: Model, loading: Boolean, view: BaseMviView<Model, Event>) {
         CuerTheme {
@@ -56,9 +63,42 @@ object RemotesComposables {
                                 .fillMaxSize()
                                 .background(MaterialTheme.colors.surface)
                                 .verticalScroll(rememberScrollState())
-                                .padding(top = dimensionResource(R.dimen.page_margin), bottom = 128.dp)
+                                .padding(bottom = 128.dp)
                         ) {
-                            // todo content here
+                            model.imageUrl
+                                ?.also {
+                                    Image(
+                                        painter = rememberGlidePainter(request = it, fadeIn = true),
+                                        //colorFilter = ColorFilter.tint(Color(0xaa000000), blendMode = BlendMode.Multiply),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(160.dp)
+                                            .wrapContentHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            Row(
+                                modifier = Modifier.padding(
+                                    start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                                    top = 16.dp,
+                                )
+                            ) {
+                                HeaderButton("Start", R.drawable.ic_play)
+                                HeaderButton("Ping", R.drawable.ic_error)
+                                HeaderButton("Config", R.drawable.ic_menu_settings)
+                            }
+                            model.title.also {
+                                Text(
+                                    text = it,
+                                    style = MaterialTheme.typography.h2,
+                                    modifier = Modifier.padding(
+                                        start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                                        top = 16.dp,
+                                        bottom = 16.dp
+                                    )
+                                )
+                            }
                         }
                     }
                     if (loading) {
@@ -72,6 +112,30 @@ object RemotesComposables {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun HeaderButton(text: String, icon: Int) {
+        Button(
+            onClick = {},
+            modifier = Modifier
+                .padding(end = 16.dp),
+            border = cuerOutlineButtonStroke(),
+            colors = cuerOutlineButtonColors(),
+            elevation = ButtonDefaults.elevation(0.dp)
+        ) {
+            Icon(
+                painter = painterResource(icon),
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                text = text,
+                style = MaterialTheme.typography.button,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
     }
 
