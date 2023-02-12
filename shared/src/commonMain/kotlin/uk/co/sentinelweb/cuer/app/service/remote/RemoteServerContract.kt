@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
+import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.NodeDomain
@@ -17,6 +18,7 @@ interface RemoteServerContract {
         val isServerStarted: Boolean
         val address: String?
         val localNode: NodeDomain?
+        val remoteNodes: Flow<List<NodeDomain>>
         fun stopSelf()
     }
 
@@ -24,6 +26,7 @@ interface RemoteServerContract {
         val isServerStarted: Boolean
         val address: String?
         val localNode: NodeDomain?
+        val remoteNodes: Flow<List<NodeDomain>>
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()

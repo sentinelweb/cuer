@@ -4,6 +4,8 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
@@ -97,13 +99,28 @@ object RemotesComposables {
                             model.address?.also {
                                 Text(
                                     text = it,
-                                    style = MaterialTheme.typography.h2,
+                                    style = MaterialTheme.typography.h3,
                                     modifier = Modifier.padding(
                                         start = dimensionResource(R.dimen.app_bar_header_margin_start),
                                         top = 16.dp,
                                         bottom = 16.dp
                                     )
                                 )
+                            }
+                            LazyColumn(
+                                modifier = Modifier.height(300.dp),//fillMaxHeight(0.5f),
+                                contentPadding = PaddingValues(top = 4.dp)
+                            ) {
+                                items(model.remoteNodes) { remote ->
+                                    Text(
+                                        text = remote.address,
+                                        style = MaterialTheme.typography.h5,
+                                        modifier = Modifier.padding(
+                                            top = 8.dp,
+                                            bottom = 8.dp
+                                        )
+                                    )
+                                }
                             }
                         }
                     }

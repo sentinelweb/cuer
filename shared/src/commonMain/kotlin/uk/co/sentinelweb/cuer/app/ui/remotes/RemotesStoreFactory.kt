@@ -6,7 +6,9 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
@@ -94,9 +96,11 @@ class RemotesStoreFactory constructor(
 
         }
 
+        private var remotesJob: Job? = null
         private fun stopServer(intent: Intent, state: State) {
             if (remoteServerManager.isRunning()) {
                 coroutines.mainScope.launch {
+                    remotesJob?.cancel()
                     remoteServerManager.stop()
                     delay(20)
                     dispatch(Result.UpdateServerState)
@@ -106,13 +110,17 @@ class RemotesStoreFactory constructor(
 
         private fun startServer(intent: Intent, state: State) {
             if (!remoteServerManager.isRunning()) {// just check if the service exists
-                coroutines.mainScope.launch {
+                remotesJob = coroutines.mainScope.launch {
                     remoteServerManager.start()
                     while (remoteServerManager.getService()?.isServerStarted != true) {// fixme limit?
                         delay(20)
                     }
+
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.address}")
                     dispatch(Result.UpdateServerState)
+                    remoteServerManager.getService()?.remoteNodes?.collectLatest {
+                        dispatch(Result.SetNodes(it))
+                    }
                 }
             }
         }

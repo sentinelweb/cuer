@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.service.remote
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import kotlinx.coroutines.flow.Flow
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.scope.AndroidScopeComponent
@@ -28,6 +29,9 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
 
     override val localNode: NodeDomain?
         get() = controller.localNode
+
+    override val remoteNodes: Flow<List<NodeDomain>>
+        get() = controller.remoteNodes
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: Controller by scope.inject()

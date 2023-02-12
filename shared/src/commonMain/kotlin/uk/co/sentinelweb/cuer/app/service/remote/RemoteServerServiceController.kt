@@ -3,13 +3,18 @@ package uk.co.sentinelweb.cuer.app.service.remote
 //import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Controller.Companion.LOCAL_NODE_ID
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 
 class RemoteServerServiceController constructor(
@@ -29,6 +34,10 @@ class RemoteServerServiceController constructor(
 
     override val isServerStarted: Boolean
         get() = webServer.isRunning
+
+    private val _remoteNodes: MutableStateFlow<List<NodeDomain>> = MutableStateFlow(listOf())
+    override val remoteNodes: Flow<List<NodeDomain>>
+        get() = _remoteNodes
 
     override val address: String?
         get() = true.takeIf { webServer.isRunning }
@@ -60,12 +69,17 @@ class RemoteServerServiceController constructor(
         coroutines.ioScope.launch {
             multi.recieveListener = { msg ->
                 log.d("multicast receive: $msg")
+                when (msg) {
+                    is MultiCastSocketContract.MulticastMessage.Join -> addNode(makeNodeFromMessage(msg.join))
+                    is MultiCastSocketContract.MulticastMessage.Close -> removeNode(makeNodeFromMessage(msg.close))
+                    is MultiCastSocketContract.MulticastMessage.Ping -> addNode(makeNodeFromMessage(msg.ping))
+                }
             }
             multi.startListener = {
                 log.d("multicast started")
                 coroutines.ioScope.launch {
                     delay(50)
-                    multi.sendBroadcast()
+                    multi.sendJoin()
                 }
 
             }
@@ -73,6 +87,37 @@ class RemoteServerServiceController constructor(
             log.d("multicast ended")
         }
     }
+
+    fun addNode(node: NodeDomain) {
+        val mutableList = _remoteNodes.value.toMutableList()
+        val nodes = removeNodeInternal(node, mutableList)
+        nodes.add(node)
+        coroutines.mainScope.launch {
+            _remoteNodes.emit(nodes)
+        }
+    }
+
+    fun removeNode(node: NodeDomain) {
+        val mutableList = _remoteNodes.value.toMutableList()
+        val nodes = removeNodeInternal(node, mutableList)
+        coroutines.mainScope.launch {
+            _remoteNodes.emit(nodes)
+        }
+    }
+
+    private fun removeNodeInternal(node: NodeDomain, nodes: MutableList<NodeDomain>): MutableList<NodeDomain> {
+        nodes
+            .find { it.ipAddress == node.ipAddress && it.port == node.port }
+            ?.also { nodes.remove(it) }
+        return nodes
+    }
+
+
+    private fun makeNodeFromMessage(join: String) = NodeDomain(
+        id = join.toGuidIdentifier(OrchestratorContract.Source.LOCAL_NETWORK),
+        ipAddress = join.split(":").first(),
+        port = join.split(":").last().toInt()
+    )
 
     override fun handleAction(action: String?) {
         notification.handleAction(action)

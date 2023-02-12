@@ -28,6 +28,16 @@ class RemotesModelMapper constructor(
         ).also { log.d("mapped: $it") }
     }
 
+    private fun mapNode(it: NodeDomain): NodeModel =
+        NodeModel(
+            id = it.id,
+            title = it.hostname ?: it.ipAddress,
+            address = "http://${it.ipAddress}:${it.port}",
+            device = it.device ?: "No device",
+            deviceType = it.deviceType ?: OTHER,
+            hostname = it.hostname ?: "No hostname"
+        )
+
     private fun dummyModel() = Model(
         title = "Dummy",
         imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes..png",
@@ -42,15 +52,4 @@ class RemotesModelMapper constructor(
         remoteNodes = listOf(),
         address = "a.a.a.a:aaaa",
     )
-
-    private fun mapNode(it: NodeDomain): NodeModel =
-        NodeModel(
-            id = it.id,
-            title = it.hostname ?: it.ipAddress,
-            address = "http://${it.ipAddress}:${it.port}",
-            device = it.device ?: "No device",
-            deviceType = it.deviceType ?: OTHER,
-            hostname = it.hostname ?: "No hostname"
-        )
-
 }
