@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Notificati
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent {
@@ -24,6 +25,9 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
 
     override val address: String?
         get() = controller.address
+
+    override val localNode: NodeDomain?
+        get() = controller.localNode
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: Controller by scope.inject()
@@ -68,7 +72,7 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
         fun instance(): RemoteServerService? = _instance
 
         val serviceModule = module {
-            single { RemoteServerServiceManager(androidApplication()) }
+            single<RemoteServerContract.Manager> { RemoteServerServiceManager(androidApplication()) }
             scope(named<RemoteServerService>()) {
                 scoped<Controller> {
                     RemoteServerServiceController(

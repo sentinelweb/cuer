@@ -43,17 +43,17 @@ class PrefRootPresenter constructor(
         } else {
             coroutines.mainScope.launch {
                 remoteServiceManger.start()
-                while (remoteServiceManger.get()?.isServerStarted != true) {
+                while (remoteServiceManger.getService()?.isServerStarted != true) {// fixme limit?
                     delay(20)
                 }
-                log.d("isRunning ${remoteServiceManger.isRunning()} svc: ${remoteServiceManger.get()} address: ${remoteServiceManger.get()?.address}")
-                view.setRemoteServiceRunning(true, remoteServiceManger.get()?.address)
+                log.d("isRunning ${remoteServiceManger.isRunning()} svc: ${remoteServiceManger.getService()} address: ${remoteServiceManger.getService()?.address}")
+                view.setRemoteServiceRunning(true, remoteServiceManger.getService()?.address)
             }
         }
     }
 
     override fun initialisePrefs() {
-        view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.get()?.address)
+        view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.getService()?.address)
         view.setVersion("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
 

@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.ServerState.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
@@ -84,11 +85,16 @@ object RemotesComposables {
                                     top = 16.dp,
                                 )
                             ) {
-                                HeaderButton("Start", R.drawable.ic_play)
-                                HeaderButton("Ping", R.drawable.ic_error)
-                                HeaderButton("Config", R.drawable.ic_menu_settings)
+                                when (model.serverState) {
+                                    STOPPED, INITIAL -> HeaderButton("Start", R.drawable.ic_play) { view.dispatch(OnActionStartServerClicked) }
+                                    STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
+                                }
+                                if (model.serverState == STARTED) {
+                                    HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingClicked) }
+                                }
+                                HeaderButton("Config", R.drawable.ic_menu_settings) { OnActionConfigClicked }
                             }
-                            model.title.also {
+                            model.address?.also {
                                 Text(
                                     text = it,
                                     style = MaterialTheme.typography.h2,
@@ -116,14 +122,14 @@ object RemotesComposables {
     }
 
     @Composable
-    private fun HeaderButton(text: String, icon: Int) {
+    private fun HeaderButton(text: String, icon: Int, action: () -> Unit) {
         Button(
-            onClick = {},
+            onClick = { action() },
             modifier = Modifier
                 .padding(end = 16.dp),
             border = cuerOutlineButtonStroke(),
             colors = cuerOutlineButtonColors(),
-            elevation = ButtonDefaults.elevation(0.dp)
+            elevation = ButtonDefaults.elevation(0.dp),
         ) {
             Icon(
                 painter = painterResource(icon),
@@ -149,11 +155,7 @@ private fun BrowsePreview() {
     val modelMapper = RemotesModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(
-        modelMapper.map(
-            RemotesContract.MviStore.State(
-                nodes = listOf()
-            )
-        ),
+        modelMapper.map(RemotesContract.MviStore.State()),
         false,
         view
     )

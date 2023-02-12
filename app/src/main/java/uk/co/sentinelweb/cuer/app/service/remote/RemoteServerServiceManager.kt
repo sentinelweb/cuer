@@ -19,9 +19,9 @@ class RemoteServerServiceManager constructor(
         }
     }
 
-    override fun get(): RemoteServerService? = RemoteServerService.instance()
+    override fun getService(): RemoteServerContract.Service? = RemoteServerService.instance()
 
-    override fun isRunning(): Boolean = RemoteServerService.instance() != null
+    override fun isRunning(): Boolean = RemoteServerService.instance()?.isServerStarted ?: false
 
     private fun intent() = Intent(app, RemoteServerService::class.java)
 

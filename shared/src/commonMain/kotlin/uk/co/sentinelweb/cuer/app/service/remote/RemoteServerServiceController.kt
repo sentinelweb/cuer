@@ -5,9 +5,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Controller.Companion.LOCAL_NODE_ID
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 
 class RemoteServerServiceController constructor(
@@ -33,6 +35,15 @@ class RemoteServerServiceController constructor(
             ?.let { connectivityWrapper.wifiIpAddress() }
             ?.let { webServer.fullAddress(it) }
             ?.apply { log.d("address: $this ${webServer.isRunning}") }
+    override val localNode: NodeDomain?
+        get() = webServer.let {
+            NodeDomain(
+                id = LOCAL_NODE_ID,
+                ipAddress = connectivityWrapper.wifiIpAddress() ?: "-",
+                port = webServer.port ?: -1,
+                hostname = "tiger"
+            )
+        }
 
     override fun initialise() {
         notification.updateNotification("x")

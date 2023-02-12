@@ -132,6 +132,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         ActionPasteAdd -> (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
                         ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, browseHelpConfig)
                         Up -> log.d("Up")
+                        is Message -> snackbarWrapper.make(label.msg)
                     }
                 }
             })
@@ -158,7 +159,9 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         playlistStatsOrchestrator = get(),
                         strings = get(),
                         log = get(),
-                        prefs = get()
+                        prefs = get(),
+                        remoteServerManager = get(),
+                        coroutines = get(),
                     )
                 }
                 scoped { RemotesRepository(RemotesRepositoryJsonLoader(get()), "browse_categories.json") }

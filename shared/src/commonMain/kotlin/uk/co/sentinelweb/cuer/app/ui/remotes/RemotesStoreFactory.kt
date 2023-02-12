@@ -6,14 +6,18 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 
@@ -25,7 +29,9 @@ class RemotesStoreFactory constructor(
     private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val strings: StringDecoder,
     private val log: LogWrapper,
-    private val prefs: MultiPlatformPreferencesWrapper
+    private val prefs: MultiPlatformPreferencesWrapper,
+    private val remoteServerManager: RemoteServerContract.Manager,
+    private val coroutines: CoroutineContextProvider,
 ) {
 
     init {
@@ -34,16 +40,7 @@ class RemotesStoreFactory constructor(
 
     private sealed class Result {
         data class SetNodes(val nodes: List<NodeDomain>) : Result()
-//        data class SetCategory(val category: CategoryDomain) : Result()
-//        data class SetCategoryByTitle(val title: String) : Result()
-//        data class LoadCatgeories(
-//            val root: CategoryDomain,
-//            val existingPlaylists: List<PlaylistDomain>,
-//            val existingPlaylistStats: List<PlaylistStatDomain>
-//        ) : Result()
-//
-//        object Display : Result()
-//        data class SetOrder(val order: BrowseContract.Order) : Result()
+        object UpdateServerState : Result()
     }
 
     private sealed class Action {
@@ -53,35 +50,12 @@ class RemotesStoreFactory constructor(
     private inner class ReducerImpl : Reducer<State, Result> {
         override fun State.reduce(result: Result): State =
             when (result) {
-                is Result.SetNodes -> copy(nodes = result.nodes)
-
-//                is Result.Display -> this
-//                is Result.SetCategory -> copy(currentCategory = result.category)
-//                is Result.SetOrder -> copy(order = result.order)
-//                is Result.SetCategoryByTitle -> {
-//                    this.categoryLookup.values
-//                        .find { it.title == result.title }
-//                        ?.let { copy(currentCategory = it) }
-//                        ?: this
-//                }
-//
-//                is Result.LoadCatgeories -> {
-//                    val categoryLookup1 = result.root.buildIdLookup()
-//                    copy(
-//                        currentCategory = result.root,
-//                        categoryLookup = categoryLookup1,
-//                        parentLookup = result.root.buildParentLookup(),
-//                        existingPlaylists = result.existingPlaylists,
-//                        existingPlaylistStats = result.existingPlaylistStats,
-//                        recent = recentCategories
-//                            .getRecent()
-//                            .reversed()
-//                            .mapNotNull { recentTitle ->
-//                                categoryLookup1.values
-//                                    .find { it.title == recentTitle }
-//                            },
-//                    )
-//                }
+                is Result.SetNodes -> copy(remoteNodes = result.nodes)
+                is Result.UpdateServerState -> copy(
+                    serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
+                    serverAddress = remoteServerManager.getService()?.address,
+                    localNode = remoteServerManager.getService()?.localNode
+                )
             }
     }
 
@@ -98,16 +72,50 @@ class RemotesStoreFactory constructor(
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
-            when (intent) {
-
-//
+            when (intent.also { log.d(it.toString()) }) {
                 Intent.ActionSettings -> publish(Label.ActionSettings)
                 Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
                 Intent.ActionHelp -> publish(Label.ActionHelp)
-                Intent.SendPing -> log.d("send ping")
+                //Intent.SendPing -> log.d("send ping")
                 Intent.Up -> publish(Label.Up)
+                Intent.ActionConfig -> config(intent, getState())
+                Intent.ActionPing -> ping(intent, getState())
+                Intent.ActionStartServer -> startServer(intent, getState())
+                Intent.ActionStopServer -> stopServer(intent, getState())
             }
+
+        private fun config(intent: Intent, state: State) {
+            TODO("Not yet implemented")
+        }
+
+        private fun ping(intent: Intent, state: State) {
+
+
+        }
+
+        private fun stopServer(intent: Intent, state: State) {
+            if (remoteServerManager.isRunning()) {
+                coroutines.mainScope.launch {
+                    remoteServerManager.stop()
+                    delay(20)
+                    dispatch(Result.UpdateServerState)
+                }
+            }
+        }
+
+        private fun startServer(intent: Intent, state: State) {
+            if (!remoteServerManager.isRunning()) {// just check if the service exists
+                coroutines.mainScope.launch {
+                    remoteServerManager.start()
+                    while (remoteServerManager.getService()?.isServerStarted != true) {// fixme limit?
+                        delay(20)
+                    }
+                    log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.address}")
+                    dispatch(Result.UpdateServerState)
+                }
+            }
+        }
 
         private fun testLoad() {
             dispatch(

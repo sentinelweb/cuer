@@ -10,6 +10,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -30,12 +31,15 @@ class RemotesController constructor(
 
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
-            is Event.OnSendPing -> Intent.SendPing
             Event.OnActionHelpClicked -> Intent.ActionHelp
             Event.OnActionPasteAdd -> Intent.ActionPasteAdd
             Event.OnActionSearchClicked -> Intent.ActionSearch
             Event.OnActionSettingsClicked -> Intent.ActionSettings
             Event.OnUpClicked -> Intent.Up
+            Event.OnActionConfigClicked -> Intent.ActionConfig
+            Event.OnActionPingClicked -> Intent.ActionPing
+            Event.OnActionStartServerClicked -> Intent.ActionStartServer
+            Event.OnActionStopServerClicked -> Intent.ActionStopServer
         }
     }
 
@@ -49,7 +53,9 @@ class RemotesController constructor(
                 store.labels bindTo { label -> view.processLabel(label) }
 
                 // view -> store
-                view.events.mapNotNull(eventToIntent) bindTo store
+                view.events
+                    .onEach { println("Event: $it") }
+                    .mapNotNull(eventToIntent) bindTo store
             }
         }
     }
