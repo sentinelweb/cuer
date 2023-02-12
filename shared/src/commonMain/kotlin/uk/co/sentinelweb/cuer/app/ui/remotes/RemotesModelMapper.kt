@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -30,9 +31,9 @@ class RemotesModelMapper constructor(
 
     private fun mapNode(it: NodeDomain): NodeModel =
         NodeModel(
-            id = it.id,
+            id = it.id ?: "node-${it.ipAddress}-${it.port}".toGuidIdentifier(LOCAL_NETWORK),
             title = it.hostname ?: it.ipAddress,
-            address = "http://${it.ipAddress}:${it.port}",
+            address = "${it.ipAddress}:${it.port}",
             device = it.device ?: "No device",
             deviceType = it.deviceType ?: OTHER,
             hostname = it.hostname ?: "No hostname"

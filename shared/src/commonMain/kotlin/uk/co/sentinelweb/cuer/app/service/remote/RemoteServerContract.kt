@@ -20,6 +20,7 @@ interface RemoteServerContract {
         val localNode: NodeDomain?
         val remoteNodes: Flow<List<NodeDomain>>
         fun stopSelf()
+        fun ping()
     }
 
     interface Controller {
@@ -30,6 +31,7 @@ interface RemoteServerContract {
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()
+        fun ping()
 
         companion object {
             val LOCAL_NODE_ID = "local-server-node".toGuidIdentifier(MEMORY)

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.di
 
+import android.os.Build
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
@@ -82,6 +83,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -154,7 +156,16 @@ object Modules {
     }
 
     private val utilModule = module {
-        single { BuildConfigDomain(DEBUG, cuerRemoteEnabled, VERSION_CODE, VERSION_NAME) }
+        single {
+            BuildConfigDomain(
+                DEBUG,
+                cuerRemoteEnabled,
+                VERSION_CODE,
+                VERSION_NAME,
+                device = "${Build.BRAND}-${Build.DEVICE}-${Build.MODEL}",
+                deviceType = ANDROID
+            )
+        }
         factory<LinkScanner> { AndroidLinkScanner(log = get(), mappers = urlMediaMappers) }
         single { CuerAppState() }
 

@@ -10,6 +10,6 @@ object RemoteModule {
 
     val objectModule = module {
         single<RemoteWebServerContract> { RemoteServer(get(), get()) }
-        single<MultiCastSocketContract> { JvmMultiCastSocket(MultiCastSocketContract.Config(), get(), get()) }
+        single<MultiCastSocketContract> { JvmMultiCastSocket(MultiCastSocketContract.Config(), get(), get(), get()) }
     }
 }

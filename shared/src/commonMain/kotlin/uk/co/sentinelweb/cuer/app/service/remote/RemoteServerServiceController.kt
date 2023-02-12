@@ -7,14 +7,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Controller.Companion.LOCAL_NODE_ID
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
+import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 
 class RemoteServerServiceController constructor(
@@ -69,17 +68,17 @@ class RemoteServerServiceController constructor(
         coroutines.ioScope.launch {
             multi.recieveListener = { msg ->
                 log.d("multicast receive: $msg")
-                when (msg) {
-                    is MultiCastSocketContract.MulticastMessage.Join -> addNode(makeNodeFromMessage(msg.join))
-                    is MultiCastSocketContract.MulticastMessage.Close -> removeNode(makeNodeFromMessage(msg.close))
-                    is MultiCastSocketContract.MulticastMessage.Ping -> addNode(makeNodeFromMessage(msg.ping))
+                when (msg.type) {
+                    MsgType.Join -> addNode(msg.node)
+                    MsgType.Close -> removeNode(msg.node)
+                    MsgType.Ping -> addNode(msg.node)
+                    MsgType.PingReply -> addNode(msg.node)
                 }
             }
             multi.startListener = {
-                log.d("multicast started")
                 coroutines.ioScope.launch {
                     delay(50)
-                    multi.sendJoin()
+                    multi.send(MsgType.Join)
                 }
 
             }
@@ -112,19 +111,19 @@ class RemoteServerServiceController constructor(
         return nodes
     }
 
-
-    private fun makeNodeFromMessage(join: String) = NodeDomain(
-        id = join.toGuidIdentifier(OrchestratorContract.Source.LOCAL_NETWORK),
-        ipAddress = join.split(":").first(),
-        port = join.split(":").last().toInt()
-    )
-
     override fun handleAction(action: String?) {
         notification.handleAction(action)
     }
 
+    override fun ping() {
+        multi.send(MsgType.Ping)
+    }
+
     override fun destroy() {
         log.d("Controller destroy")
+        coroutines.mainScope.launch {
+            _remoteNodes.emit(listOf())
+        }
         serverJob?.cancel()
         serverJob = null
         webServer.stop()

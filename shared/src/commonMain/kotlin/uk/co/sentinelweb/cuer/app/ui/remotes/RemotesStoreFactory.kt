@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
@@ -92,8 +93,12 @@ class RemotesStoreFactory constructor(
         }
 
         private fun ping(intent: Intent, state: State) {
-
-
+            if (remoteServerManager.isRunning()) {
+                coroutines.ioScope.launch {
+                    remoteServerManager.getService()?.ping()
+                    withContext(coroutines.Main) { dispatch(Result.UpdateServerState) }
+                }
+            }
         }
 
         private var remotesJob: Job? = null

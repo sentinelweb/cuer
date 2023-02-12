@@ -7,4 +7,8 @@ interface RemoteWebServerContract {
     val isRunning: Boolean
     fun start()
     fun stop()
+
+    companion object {
+        const val WEB_SERVER_PORT_DEF = 9090
+    }
 }

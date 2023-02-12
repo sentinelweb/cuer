@@ -9,8 +9,10 @@ import kotlinx.serialization.modules.SerializersModule
 import kotlinx.serialization.modules.plus
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.*
+import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.InetAddress
@@ -21,7 +23,8 @@ import java.nio.charset.Charset
 class JvmMultiCastSocket(
     private val config: MultiCastSocketContract.Config,
     private val log: LogWrapper,
-    private val connectivityUtil: ConnectivityWrapper
+    private val connectivityUtil: ConnectivityWrapper,
+    private val buildConfigDomain: BuildConfigDomain
 ) : MultiCastSocketContract {
 
     override var recieveListener: ((MulticastMessage) -> Unit)? = null
@@ -41,17 +44,20 @@ class JvmMultiCastSocket(
             broadcastAddress = InetAddress.getByName(config.ip)
             theSocket = MulticastSocket(config.port)
             theSocket!!.joinGroup(broadcastAddress)
-            sendJoin()
-            val buffer = ByteArray(10 * 1024)
+            val buffer = ByteArray(1 * 1024)
             val data1 = DatagramPacket(buffer, buffer.size)
-            log.d("multi start: addr:$broadcastAddress")
+            log.d("multi start: addr: $broadcastAddress")
             startListener?.invoke()
             while (isKeepGoing) {
                 theSocket!!.receive(data1) // blocks
                 val msg = String(buffer, 0, data1.length, Charset.defaultCharset())
                 log.d("multi Received: $msg")
+                val msgDecoded = deserialiseMulti(msg)
                 if (recieveListener != null) {
-                    recieveListener?.invoke(deserialiseMulti(msg))
+                    recieveListener?.invoke(msgDecoded)
+                }
+                if (msgDecoded.type == MsgType.Ping) {
+                    send(MsgType.PingReply)
                 }
             }
         } catch (e: IOException) {
@@ -60,18 +66,14 @@ class JvmMultiCastSocket(
         log.d("exit")
     }
 
-    override fun sendJoin() {
+    override fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {
             try {
-                val localIp = connectivityUtil.getWIFIIP()
-                val webPort = config.webPort
-                val joinMsg = Join("$localIp:$webPort")
-                val joinMsgStr = (joinMsg as MulticastMessage).serialise()
-                val data = DatagramPacket(joinMsgStr.toByteArray(), joinMsgStr.length, broadcastAddress, config.port)
-                theSocket!!.send(data)
-                log.d("sendBroadcast .. done")
+                val joinMsg = MulticastMessage(msgType, address())
+                sendDatagram(joinMsg)
+                log.d("sendMulticast($msgType) .. done")
             } catch (e: Exception) {
-                log.e("sendBroadcast err", e)
+                log.e("sendMulticast($msgType) err", e)
             }
         }
     }
@@ -81,13 +83,8 @@ class JvmMultiCastSocket(
         if (theSocket != null && !theSocket!!.isClosed) {
             // TODO note we might need to send a local exit message to stop blocking ...
             try {
-                val localIp = connectivityUtil.getWIFIIP()
-                val webPort = config.webPort
-                val group = InetAddress.getByName(config.ip)
-                val closeMsg = Close("$localIp:$webPort")
-                val closeMsgStr = (closeMsg as MulticastMessage).serialise()
-                val data = DatagramPacket(closeMsgStr.toByteArray(), closeMsgStr.length, group, config.port)
-                theSocket!!.send(data)
+                val closeMsg = MulticastMessage(MsgType.Close, address())
+                sendDatagram(closeMsg)
                 log.d("multi closing: send lastcall")
                 val local = InetAddress.getByName("localhost")
                 val data1 = DatagramPacket("".toByteArray(), 0, local, config.port)
@@ -100,31 +97,29 @@ class JvmMultiCastSocket(
         }
     }
 
+    private fun address(): NodeDomain = NodeDomain(
+        id = null,
+        ipAddress = connectivityUtil.getWIFIIP()!!,
+        port = config.webPort,
+        device = buildConfigDomain.device,
+        deviceType = buildConfigDomain.deviceType,
+    )
+
+    private fun sendDatagram(msg: MulticastMessage) {
+        val serialise = msg.serialise()
+        val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress, config.port)
+        theSocket!!.send(data)
+    }
+
 
     // region JSON serializer
-    ////////////////////////////////////////////////////////////////////////////
-
-    fun Join.serialise() = wifiJsonSerializer.encodeToString(Join.serializer(), this)
-    fun deserialiseJoin(json: String) = wifiJsonSerializer.decodeFromString(Join.serializer(), json)
-
-
-    fun Ping.serialise() = wifiJsonSerializer.encodeToString(Ping.serializer(), this)
-    fun deserialisePing(json: String) = wifiJsonSerializer.decodeFromString(Ping.serializer(), json)
-
-
-    fun Close.serialise() = wifiJsonSerializer.encodeToString(Close.serializer(), this)
-    fun deserialiseClose(json: String) = wifiJsonSerializer.decodeFromString(Close.serializer(), json)
+    ///////////////////////////////////////////////////////////////////////////
     fun MulticastMessage.serialise() = wifiJsonSerializer.encodeToString(MulticastMessage.serializer(), this)
     fun deserialiseMulti(json: String) = wifiJsonSerializer.decodeFromString(MulticastMessage.serializer(), json)
 
-
-    //private val wifiDomainClassDiscriminator = "class"
-    private val wifiSerializersModule = SerializersModule {
+    private val muiltcastSerializersModule = SerializersModule {
         mapOf(
             MulticastMessage::class to MulticastMessage.serializer(),
-            Close::class to Close.serializer(),
-            Join::class to Join.serializer(),
-            Ping::class to Ping.serializer(),
         )
     }.plus(SerializersModule {
         contextual(Instant::class, InstantIso8601Serializer)
@@ -136,8 +131,7 @@ class JvmMultiCastSocket(
         prettyPrint = true
         isLenient = true
         ignoreUnknownKeys = true
-        //classDiscriminator = wifiDomainClassDiscriminator// property added when base domain type is use (see ResponseDomain)
-        serializersModule = wifiSerializersModule
+        serializersModule = muiltcastSerializersModule
     }
     //endregion
 }

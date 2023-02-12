@@ -113,7 +113,7 @@ object RemotesComposables {
                             ) {
                                 items(model.remoteNodes) { remote ->
                                     Text(
-                                        text = remote.address,
+                                        text = remote.run { "$address - $deviceType - $device" },
                                         style = MaterialTheme.typography.h5,
                                         modifier = Modifier.padding(
                                             top = 8.dp,

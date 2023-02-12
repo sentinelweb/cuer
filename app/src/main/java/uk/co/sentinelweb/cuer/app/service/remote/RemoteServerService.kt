@@ -27,6 +27,10 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
     override val address: String?
         get() = controller.address
 
+    override fun ping() {
+        controller.ping()
+    }
+
     override val localNode: NodeDomain?
         get() = controller.localNode
 
