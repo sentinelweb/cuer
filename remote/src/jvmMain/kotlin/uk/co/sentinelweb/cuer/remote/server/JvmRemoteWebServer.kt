@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.remote.server
 
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
@@ -58,25 +59,21 @@ class RemoteServer constructor(
 
     private fun buildServer(): ApplicationEngine =
         embeddedServer(CIO, port) {
-//            install(ContentNegotiation) {
-//                json()
-//            }
-//            install(CORS) {
-//                method(HttpMethod.Get)
-//                method(HttpMethod.Post)
-//                method(HttpMethod.Delete)
-//                anyHost()
-//            }
-//            install(Compression) {
-//                gzip()
-//            }
-//            install(CallLogging) {
-//                //level = Level.DEBUG
-//            }
-            install(CORS)
-            install(ContentNegotiation)
-            install(Compression)
-            install(CallLogging)
+            install(ContentNegotiation) {
+                json()
+            }
+            install(CORS) {
+                allowMethod(HttpMethod.Get)
+                allowMethod(HttpMethod.Post)
+                allowMethod(HttpMethod.Delete)
+                anyHost()
+            }
+            install(Compression) {
+                gzip()
+            }
+            install(CallLogging) {
+                //level = Level.DEBUG
+            }
             routing {
                 get("/") {
                     call.respondText(
