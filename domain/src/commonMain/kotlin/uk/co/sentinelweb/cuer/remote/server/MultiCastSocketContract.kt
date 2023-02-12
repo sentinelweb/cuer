@@ -15,7 +15,7 @@ interface MultiCastSocketContract {
 
     @Serializable
     data class MulticastMessage(val type: MsgType, val node: NodeDomain) {
-        enum class MsgType { Join, Ping, PingReply, Close }
+        enum class MsgType { Join, JoinReply, Ping, PingReply, Close }
 
     }
 

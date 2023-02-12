@@ -59,6 +59,9 @@ class JvmMultiCastSocket(
                 if (msgDecoded.type == MsgType.Ping) {
                     send(MsgType.PingReply)
                 }
+                if (msgDecoded.type == MsgType.Join) {
+                    send(MsgType.JoinReply)
+                }
             }
         } catch (e: IOException) {
             log.e(e.toString(), e)

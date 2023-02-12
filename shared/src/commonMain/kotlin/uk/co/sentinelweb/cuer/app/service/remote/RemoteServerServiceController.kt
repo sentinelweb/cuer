@@ -73,6 +73,7 @@ class RemoteServerServiceController constructor(
                     MsgType.Close -> removeNode(msg.node)
                     MsgType.Ping -> addNode(msg.node)
                     MsgType.PingReply -> addNode(msg.node)
+                    MsgType.JoinReply -> addNode(msg.node)
                 }
             }
             multi.startListener = {
