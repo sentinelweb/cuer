@@ -23,6 +23,7 @@ object CuerTopAppBarComposables {
         backgroundColor: Color = MaterialTheme.colors.primarySurface,
         contentColor: Color = contentColorFor(backgroundColor),
         onUp: (() -> Unit)? = null,
+        modifier: Modifier = Modifier,
         actions: List<Action> = listOf(),
     ) {
         TopAppBar(
@@ -47,7 +48,8 @@ object CuerTopAppBarComposables {
             },
             backgroundColor = backgroundColor,
             contentColor = contentColor,
-            actions = { Actions(actions) }
+            actions = { Actions(actions) },
+            modifier = modifier
         )
     }
 

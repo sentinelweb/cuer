@@ -11,12 +11,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.google.accompanist.glide.rememberGlidePainter
 import org.koin.core.context.GlobalContext
@@ -47,94 +48,88 @@ object RemotesComposables {
     fun RemotesView(model: Model, loading: Boolean, view: BaseMviView<Model, Event>) {
         CuerTheme {
             Surface {
-                Box(contentAlignment = Alignment.Center) {
-                    Column {
-                        CuerTopAppBarComposables.CuerAppBar(
-                            text = model.title,
-                            onUp = { view.dispatch(OnUpClicked) },
-                            actions = listOf(
-                                Action(CuerMenuItem.Help,
-                                    { view.dispatch(OnActionHelpClicked) }),
-                                Action(CuerMenuItem.Search, { view.dispatch(OnActionSearchClicked) }),
-                                Action(CuerMenuItem.PasteAdd, { view.dispatch(OnActionPasteAdd) }),
-                                Action(CuerMenuItem.Settings, { view.dispatch(OnActionSettingsClicked) }),
-                            )
-                        )
-                        Column(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(MaterialTheme.colors.surface)
-                                .verticalScroll(rememberScrollState())
-                                .padding(bottom = 128.dp)
-                        ) {
+                Box(contentAlignment = Alignment.TopStart) {
+                    CuerTopAppBarComposables.CuerAppBar(
+                        text = model.title,
+                        backgroundColor = Color.Transparent,
+                        onUp = { view.dispatch(OnUpClicked) },
+                        actions = listOf(
+                            Action(CuerMenuItem.Help,
+                                { view.dispatch(OnActionHelpClicked) }),
+                            Action(CuerMenuItem.Search, { view.dispatch(OnActionSearchClicked) }),
+                            Action(CuerMenuItem.PasteAdd, { view.dispatch(OnActionPasteAdd) }),
+                            Action(CuerMenuItem.Settings, { view.dispatch(OnActionSettingsClicked) }),
+                        ),
+                        modifier = Modifier
+                            .zIndex(1f)
+                            .height(56.dp)
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colors.surface)
+                            .verticalScroll(rememberScrollState())
+                            .padding(bottom = 128.dp)
+                    ) {
 
-                            Row(
-                                modifier = Modifier
-                                    .height(160.dp)
-                            ) {
-                                model.imageUrl
-                                    ?.also { url ->
-                                        Image(
-                                            painter = rememberGlidePainter(request = url, fadeIn = true),
-                                            contentDescription = "",
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .height(160.dp)
-                                                .wrapContentHeight(),
-                                            contentScale = ContentScale.Crop
-                                        )
-                                    }
+                        Row(
+                            modifier = Modifier
+                                .height(160.dp)
+                        ) {
+                            model.imageUrl
+                                ?.also { url ->
+                                    Image(
+                                        painter = rememberGlidePainter(request = url, fadeIn = true),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .height(160.dp)
+                                            .wrapContentHeight(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                        }
+                        Row(
+                            modifier = Modifier.padding(
+                                start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                                top = 16.dp,
+                            )
+                        ) {
+                            when (model.serverState) {
+                                STOPPED, INITIAL -> HeaderButton("Start", R.drawable.ic_play) { view.dispatch(OnActionStartServerClicked) }
+                                STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
                             }
-                            Row(
+                            if (model.serverState == STARTED) {
+                                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingClicked) }
+                            }
+                            HeaderButton("Config", R.drawable.ic_menu_settings) { OnActionConfigClicked }
+                        }
+                        model.address?.also {
+                            Text(
+                                text = it,
+                                style = MaterialTheme.typography.h3,
                                 modifier = Modifier.padding(
                                     start = dimensionResource(R.dimen.app_bar_header_margin_start),
                                     top = 16.dp,
+                                    bottom = 16.dp
                                 )
-                            ) {
-                                when (model.serverState) {
-                                    STOPPED, INITIAL -> HeaderButton("Start", R.drawable.ic_play) { view.dispatch(OnActionStartServerClicked) }
-                                    STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
-                                }
-                                if (model.serverState == STARTED) {
-                                    HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingClicked) }
-                                }
-                                HeaderButton("Config", R.drawable.ic_menu_settings) { OnActionConfigClicked }
-                            }
-                            model.address?.also {
-                                Text(
-                                    text = it,
-                                    style = MaterialTheme.typography.h3,
-                                    modifier = Modifier.padding(
-                                        start = dimensionResource(R.dimen.app_bar_header_margin_start),
-                                        top = 16.dp,
-                                        bottom = 16.dp
-                                    )
-                                )
-                            }
-                            LazyColumn(
-                                modifier = Modifier.height(300.dp),//fillMaxHeight(0.5f),
-                                contentPadding = PaddingValues(top = 4.dp)
-                            ) {
-                                items(model.remoteNodes) { remote ->
+                            )
+                        }
+                        LazyColumn(
+                            modifier = Modifier.height(300.dp),//fillMaxHeight(0.5f),
+                            contentPadding = PaddingValues(top = 4.dp)
+                        ) {
+                            items(model.remoteNodes) { remote ->
 
-                                    RemoteRow(remote)
-                                }
+                                RemoteRow(remote)
                             }
                         }
-                    }
-                    if (loading) {
-                        CircularProgressIndicator(
-                            color = colorResource(R.color.primary),
-                            strokeWidth = 8.dp,
-                            modifier = Modifier
-                                .width(64.dp)
-                                .height(64.dp)
-                        )
                     }
                 }
             }
         }
     }
+
 
     @Composable
     private fun RemoteRow(remote: RemotesContract.View.NodeModel) {
