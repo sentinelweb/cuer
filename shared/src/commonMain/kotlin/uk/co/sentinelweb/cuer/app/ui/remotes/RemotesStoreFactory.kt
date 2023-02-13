@@ -11,8 +11,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistStatsOrchestrator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
@@ -21,13 +19,10 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.remote.server.ServerState
 
-// fixme: 'SuspendBootstrapper<Action : Any>' is deprecated. Please use CoroutineBootstrapper
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
-    private val repository: RemotesRepository,
-    private val playlistOrchestrator: PlaylistOrchestrator,
-    private val playlistStatsOrchestrator: PlaylistStatsOrchestrator,
     private val strings: StringDecoder,
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
@@ -78,7 +73,6 @@ class RemotesStoreFactory constructor(
                 Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
                 Intent.ActionHelp -> publish(Label.ActionHelp)
-                //Intent.SendPing -> log.d("send ping")
                 Intent.Up -> publish(Label.Up)
                 Intent.ActionConfig -> config(intent, getState())
                 Intent.ActionPing -> ping(intent, getState())
@@ -87,7 +81,7 @@ class RemotesStoreFactory constructor(
             }
 
         private fun config(intent: Intent, state: State) {
-            TODO("Not yet implemented")
+            publish(Label.ActionConfig)
         }
 
         private fun ping(intent: Intent, state: State) {

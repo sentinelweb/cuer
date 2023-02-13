@@ -1,10 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.common.compose
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.*
 import androidx.compose.material.ButtonDefaults.buttonColors
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -20,3 +24,27 @@ fun cuerOutlineButtonStroke() = BorderStroke(1.dp, MaterialTheme.colors.onSurfac
 
 @Composable
 fun cuerNoOutlineButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.onSurface)
+
+@Composable
+fun HeaderButton(text: String, icon: Int, action: () -> Unit) {
+    Button(
+        onClick = { action() },
+        modifier = Modifier
+            .padding(end = 16.dp),
+        border = cuerOutlineButtonStroke(),
+        colors = cuerOutlineButtonColors(),
+        elevation = ButtonDefaults.elevation(0.dp),
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            tint = MaterialTheme.colors.onSurface,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.button,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}

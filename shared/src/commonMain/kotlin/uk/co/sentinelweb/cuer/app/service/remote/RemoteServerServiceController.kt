@@ -89,6 +89,7 @@ class RemoteServerServiceController constructor(
     }
 
     fun addNode(node: NodeDomain) {
+        if (node.ipAddress == connectivityWrapper.wifiIpAddress() && webServer.port == node.port) return
         val mutableList = _remoteNodes.value.toMutableList()
         val nodes = removeNodeInternal(node, mutableList)
         nodes.add(node)

@@ -24,19 +24,18 @@ import org.koin.core.context.GlobalContext
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.compose.Const.PREVIEW_LOG_WRAPPER
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
-import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonColors
-import uk.co.sentinelweb.cuer.app.ui.common.compose.cuerOutlineButtonStroke
+import uk.co.sentinelweb.cuer.app.ui.common.compose.HeaderButton
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.ServerState.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.remote.server.ServerState.*
 
 object RemotesComposables {
-    val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(RemotesComposables@ this) } }
+    val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(this) } }
 
     @Composable
     fun RemotesUi(view: RemotesMviViewProxy) {
@@ -72,10 +71,7 @@ object RemotesComposables {
                             .padding(bottom = 128.dp)
                     ) {
 
-                        Row(
-                            modifier = Modifier
-                                .height(160.dp)
-                        ) {
+                        Row(modifier = Modifier.height(160.dp)) {
                             model.imageUrl
                                 ?.also { url ->
                                     Image(
@@ -102,7 +98,7 @@ object RemotesComposables {
                             if (model.serverState == STARTED) {
                                 HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingClicked) }
                             }
-                            HeaderButton("Config", R.drawable.ic_menu_settings) { OnActionConfigClicked }
+                            HeaderButton("Config", R.drawable.ic_menu_settings) { view.dispatch(OnActionConfigClicked) }
                         }
                         model.address?.also {
                             Text(
@@ -181,30 +177,6 @@ object RemotesComposables {
             }
         }
 
-    }
-
-    @Composable
-    private fun HeaderButton(text: String, icon: Int, action: () -> Unit) {
-        Button(
-            onClick = { action() },
-            modifier = Modifier
-                .padding(end = 16.dp),
-            border = cuerOutlineButtonStroke(),
-            colors = cuerOutlineButtonColors(),
-            elevation = ButtonDefaults.elevation(0.dp),
-        ) {
-            Icon(
-                painter = painterResource(icon),
-                tint = MaterialTheme.colors.onSurface,
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
-            Text(
-                text = text,
-                style = MaterialTheme.typography.button,
-                modifier = Modifier.padding(start = 8.dp)
-            )
-        }
     }
 
 }

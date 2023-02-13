@@ -1,16 +1,16 @@
-package uk.co.sentinelweb.cuer.app.ui.remotes
+package uk.co.sentinelweb.cuer.app.ui.local
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.NodeModel
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.NodeModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
 
-class RemotesModelMapper constructor(
+class LocalModelMapper constructor(
     private val strings: StringDecoder,
     private val log: LogWrapper,
 ) {
@@ -18,12 +18,11 @@ class RemotesModelMapper constructor(
         log.tag(this)
     }
 
-    fun map(state: RemotesContract.MviStore.State): Model {
+    fun map(state: LocalContract.MviStore.State): Model {
         return Model(
-            title = state.localNode?.hostname ?: state.localNode?.ipAddress ?: "No title",
-            imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
+            title = "Configure Access",
+            imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/artificial-intelligence-3382507_640.jpg",
             localNode = state.localNode?.let { mapNode(it) } ?: dummyModel().localNode,
-            remoteNodes = state.remoteNodes.map { mapNode(it) },
             serverState = state.serverState,
             address = state.serverAddress,
         ).also { log.d("mapped: $it") }
@@ -50,7 +49,6 @@ class RemotesModelMapper constructor(
             device = "DummyDevice",
             deviceType = OTHER,
         ),
-        remoteNodes = listOf(),
         address = "a.a.a.a:aaaa",
     )
 }

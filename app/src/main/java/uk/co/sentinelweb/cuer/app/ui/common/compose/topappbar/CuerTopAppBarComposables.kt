@@ -20,11 +20,11 @@ object CuerTopAppBarComposables {
     @Composable
     fun CuerAppBar(
         text: String,
+        modifier: Modifier = Modifier,
         backgroundColor: Color = MaterialTheme.colors.primarySurface,
         contentColor: Color = contentColorFor(backgroundColor),
-        onUp: (() -> Unit)? = null,
-        modifier: Modifier = Modifier,
         actions: List<Action> = listOf(),
+        onUp: (() -> Unit)? = null,
     ) {
         TopAppBar(
             title = {
