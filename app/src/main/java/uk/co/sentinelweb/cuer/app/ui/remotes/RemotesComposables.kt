@@ -1,15 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -139,15 +138,14 @@ object RemotesComposables {
 
     @Composable
     private fun RemoteRow(remote: RemotesContract.View.NodeModel) {
+        val expanded = remember { mutableStateOf(false) }
         Row(
             modifier = Modifier
+                .clickable { expanded.value = !expanded.value }
                 .fillMaxWidth()
-                .padding(
-                    top = 8.dp,
-                    bottom = 8.dp
-                )
+                .padding(8.dp)
                 .background(MaterialTheme.colors.surface),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 painter = painterResource(R.drawable.ic_wifi_tethering),
@@ -159,13 +157,32 @@ object RemotesComposables {
                 Text(
                     text = remote.device,
                     style = MaterialTheme.typography.h5,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = 8.dp),
                 )
                 Text(
                     text = remote.address,
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier.padding(start = 8.dp)
                 )
+            }
+            DropdownMenu(
+                expanded = expanded.value,
+                onDismissRequest = { expanded.value = false }
+            ) {
+                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                    Text("Connect")
+                }
+                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                    Text("Play")
+                }
+                Divider()
+                DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                    Text("Playlists")
+                }
+
+                DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                    Text("Sync")
+                }
             }
         }
 
@@ -201,7 +218,7 @@ object RemotesComposables {
 @Preview(name = "Top level")
 @Composable
 @ExperimentalAnimationApi
-private fun BrowsePreview() {
+private fun RemotesPreview() {
     val modelMapper = RemotesModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(

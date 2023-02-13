@@ -162,7 +162,7 @@ object Modules {
                 cuerRemoteEnabled,
                 VERSION_CODE,
                 VERSION_NAME,
-                device = "${Build.BRAND}-${Build.DEVICE}-${Build.MODEL}",
+                device = "${Build.BRAND}-${Build.MODEL}",
                 deviceType = ANDROID
             )
         }
