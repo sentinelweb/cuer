@@ -13,6 +13,8 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -28,14 +30,16 @@ import java.io.StringWriter
 
 class RemoteServer constructor(
     private val database: RemoteDatabaseAdapter,
-    private val logWrapper: LogWrapper
-) : RemoteWebServerContract {
+    private val logWrapper: LogWrapper,
+) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
     }
 
+    private val localRepository: LocalRepository by inject()
+
     override val port: Int
-        get() = System.getenv("PORT")?.toInt() ?: 9090
+        get() = localRepository.getLocalNode().port
 
     private var _appEngine: ApplicationEngine? = null
 

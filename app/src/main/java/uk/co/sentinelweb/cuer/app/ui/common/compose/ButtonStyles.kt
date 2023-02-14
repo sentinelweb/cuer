@@ -40,13 +40,14 @@ fun cuerNoOutlineButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.onSurf
 fun HeaderButton(
     text: String,
     icon: Int,
+    modifier: Modifier = Modifier,
     colors: ButtonColors = cuerOutlineButtonColors(),
     border: BorderStroke = cuerOutlineButtonStroke(),
     action: () -> Unit
 ) {
     Button(
         onClick = { action() },
-        modifier = Modifier
+        modifier = modifier
             .padding(end = 16.dp),
         border = border,
         colors = colors,
@@ -67,7 +68,12 @@ fun HeaderButton(
 }
 
 @Composable
-fun HeaderButtonSolid(text: String, icon: Int, action: () -> Unit) {
-    HeaderButton(text, icon, cuerSolidButtonColors(), cuerSolidButtonStroke(), action)
+fun HeaderButtonSolid(
+    text: String,
+    icon: Int,
+    modifier: Modifier = Modifier,
+    action: () -> Unit
+) {
+    HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStroke(), action)
 }
 

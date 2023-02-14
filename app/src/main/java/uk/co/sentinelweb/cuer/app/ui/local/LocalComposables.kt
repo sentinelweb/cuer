@@ -9,6 +9,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -88,8 +89,7 @@ object LocalComposables {
                                     )
                                 }
                         }
-                        //var localNode by rememberSaveable(saver = stateSaverLocalDomain()) { mutableStateOf(model.localNodeDomain) }
-                        var localNode by remember { mutableStateOf(model.localNodeDomain) }
+                        var localNode by rememberSaveable(model, saver = stateSaverLocalDomain()) { mutableStateOf(model.localNodeDomain) }
                         log.d(localNode.serialise())
                         Row(
                             modifier = Modifier.padding(
@@ -102,6 +102,7 @@ object LocalComposables {
                         Text(
                             text = model.localNodeDomain.id?.id?.value ?: "No ID",
                             style = MaterialTheme.typography.body2,
+                            modifier = Modifier.padding(8.dp)
                         )
                         TextField(
                             value = localNode.hostname ?: "",
@@ -122,7 +123,11 @@ object LocalComposables {
                         )
                         var ddExpanded by remember { mutableStateOf(false) }
                         val authType = localNode.authType
-                        HeaderButton(authType::class.simpleName!!, icon = R.drawable.ic_login) { ddExpanded = true }
+                        HeaderButton(
+                            text = authType::class.simpleName!!,
+                            icon = R.drawable.ic_login,
+                            modifier = Modifier.padding(start = 16.dp)
+                        ) { ddExpanded = true }
                         DropdownMenu(
                             expanded = ddExpanded,
                             onDismissRequest = { ddExpanded = false },
