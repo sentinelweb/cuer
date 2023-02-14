@@ -172,9 +172,9 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
+                        localRepository = get()
                     )
                 }
-                scoped { RemotesRepository(RemotesRepositoryJsonLoader(get()), "browse_categories.json") }
                 scoped { RemotesModelMapper(get(), get()) }
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }

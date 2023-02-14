@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.remote.server
+package uk.co.sentinelweb.cuer.remote.server.multicast
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDateTime
@@ -10,7 +10,9 @@ import kotlinx.serialization.modules.plus
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
 import java.io.IOException
@@ -24,10 +26,12 @@ class JvmMultiCastSocket(
     private val config: MultiCastSocketContract.Config,
     private val log: LogWrapper,
     private val connectivityUtil: ConnectivityWrapper,
-    private val buildConfigDomain: BuildConfigDomain
+    private val buildConfigDomain: BuildConfigDomain,
+    private val localRepository: LocalRepository,
+    private val multicastMessageMapper: MulticastMessageMapper,
 ) : MultiCastSocketContract {
 
-    override var recieveListener: ((MulticastMessage) -> Unit)? = null
+    override var recieveListener: ((MsgType, RemoteNodeDomain) -> Unit)? = null
     override var startListener: (() -> Unit)? = null
 
     private lateinit var broadcastAddress: InetAddress
@@ -51,11 +55,12 @@ class JvmMultiCastSocket(
             while (isKeepGoing) {
                 theSocket!!.receive(data1) // blocks
                 val msg = String(buffer, 0, data1.length, Charset.defaultCharset())
-                log.d("multi Received: $msg")
+                //log.d("multi Received: $msg")
                 val msgDecoded = deserialiseMulti(msg)
                 if (recieveListener != null) {
-                    recieveListener?.invoke(msgDecoded)
+                    recieveListener?.invoke(msgDecoded.type, mapRemoteNode(msgDecoded))
                 }
+                // todo reply via web server
                 if (msgDecoded.type == MsgType.Ping) {
                     send(MsgType.PingReply)
                 }
@@ -69,10 +74,14 @@ class JvmMultiCastSocket(
         log.d("exit")
     }
 
+    private fun mapRemoteNode(msgDecoded: MulticastMessage) = multicastMessageMapper.mapFromMulticastMessage(msgDecoded.node)
+
+    fun mapLocalNode() = multicastMessageMapper.mapToMulticastMessage(localRepository.getLocalNode())
+
     override fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {
             try {
-                val joinMsg = MulticastMessage(msgType, address())
+                val joinMsg = MulticastMessage(msgType, mapLocalNode())
                 sendDatagram(joinMsg)
                 log.d("sendMulticast($msgType) .. done")
             } catch (e: Exception) {
@@ -86,27 +95,19 @@ class JvmMultiCastSocket(
         if (theSocket != null && !theSocket!!.isClosed) {
             // TODO note we might need to send a local exit message to stop blocking ...
             try {
-                val closeMsg = MulticastMessage(MsgType.Close, address())
+                val closeMsg = MulticastMessage(MsgType.Close, mapLocalNode())
                 sendDatagram(closeMsg)
-                log.d("multi closing: send lastcall")
+                //log.d("multi closing: send lastcall")
                 val local = InetAddress.getByName("localhost")
                 val data1 = DatagramPacket("".toByteArray(), 0, local, config.port)
                 theSocket!!.send(data1)
-                log.d("multi closing: ")
                 theSocket!!.close()
+                log.d("multi closed")
             } catch (e: Exception) {
                 log.e("multi close ex: ", e)
             }
         }
     }
-
-    private fun address(): NodeDomain = NodeDomain(
-        id = null,
-        ipAddress = connectivityUtil.getWIFIIP()!!,
-        port = config.webPort,
-        device = buildConfigDomain.device,
-        deviceType = buildConfigDomain.deviceType,
-    )
 
     private fun sendDatagram(msg: MulticastMessage) {
         val serialise = msg.serialise()

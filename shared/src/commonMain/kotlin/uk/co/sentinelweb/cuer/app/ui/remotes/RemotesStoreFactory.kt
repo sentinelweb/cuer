@@ -18,8 +18,10 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
+import uk.co.sentinelweb.cuer.remote.server.http
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
@@ -28,6 +30,7 @@ class RemotesStoreFactory constructor(
     private val prefs: MultiPlatformPreferencesWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
+    private val localRepository: LocalRepository,
 ) {
 
     init {
@@ -35,7 +38,7 @@ class RemotesStoreFactory constructor(
     }
 
     private sealed class Result {
-        data class SetNodes(val nodes: List<NodeDomain>) : Result()
+        data class SetNodes(val nodes: List<RemoteNodeDomain>) : Result()
         object UpdateServerState : Result()
     }
 
@@ -49,8 +52,8 @@ class RemotesStoreFactory constructor(
                 is Result.SetNodes -> copy(remoteNodes = result.nodes)
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
-                    serverAddress = remoteServerManager.getService()?.address,
-                    localNode = remoteServerManager.getService()?.localNode
+                    serverAddress = remoteServerManager.getService()?.localNode?.http(),
+                    localNode = remoteServerManager.getService()?.localNode ?: localRepository.getLocalNode()
                 )
             }
     }
@@ -114,7 +117,7 @@ class RemotesStoreFactory constructor(
                         delay(20)
                     }
 
-                    log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.address}")
+                    log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
                     dispatch(Result.UpdateServerState)
                     remoteServerManager.getService()?.remoteNodes?.collectLatest {
                         dispatch(Result.SetNodes(it))

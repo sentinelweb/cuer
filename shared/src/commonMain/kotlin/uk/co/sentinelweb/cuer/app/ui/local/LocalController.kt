@@ -32,6 +32,7 @@ class LocalController constructor(
     private val eventToIntent: suspend Event.() -> Intent = {
         when (this) {
             Event.OnUpClicked -> Intent.Up
+            is Event.OnActionSaveClicked -> Intent.ActionSave(updated)
         }
     }
 

@@ -37,8 +37,6 @@ class RemoteServer constructor(
     override val port: Int
         get() = System.getenv("PORT")?.toInt() ?: 9090
 
-    override fun fullAddress(ip: String) = "http://$ip:$port"
-
     private var _appEngine: ApplicationEngine? = null
 
     override val isRunning: Boolean

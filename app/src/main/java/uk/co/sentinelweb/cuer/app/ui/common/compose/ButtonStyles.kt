@@ -20,31 +20,54 @@ fun cuerOutlineButtonColors() = buttonColors(
 )
 
 @Composable
+fun cuerSolidButtonColors() = buttonColors(
+    backgroundColor = MaterialTheme.colors.primary,
+    contentColor = Color.White,
+    disabledBackgroundColor = MaterialTheme.colors.primaryVariant,
+    disabledContentColor = Color.Gray
+)
+
+@Composable
 fun cuerOutlineButtonStroke() = BorderStroke(1.dp, MaterialTheme.colors.onSurface)
+
+@Composable
+fun cuerSolidButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.primary)
 
 @Composable
 fun cuerNoOutlineButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.onSurface)
 
 @Composable
-fun HeaderButton(text: String, icon: Int, action: () -> Unit) {
+fun HeaderButton(
+    text: String,
+    icon: Int,
+    colors: ButtonColors = cuerOutlineButtonColors(),
+    border: BorderStroke = cuerOutlineButtonStroke(),
+    action: () -> Unit
+) {
     Button(
         onClick = { action() },
         modifier = Modifier
             .padding(end = 16.dp),
-        border = cuerOutlineButtonStroke(),
-        colors = cuerOutlineButtonColors(),
+        border = border,
+        colors = colors,
         elevation = ButtonDefaults.elevation(0.dp),
     ) {
         Icon(
             painter = painterResource(icon),
-            tint = MaterialTheme.colors.onSurface,
+            tint = colors.contentColor(true).value,
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
         Text(
-            text = text,
+            text = text.uppercase(),
             style = MaterialTheme.typography.button,
             modifier = Modifier.padding(start = 8.dp)
         )
     }
 }
+
+@Composable
+fun HeaderButtonSolid(text: String, icon: Int, action: () -> Unit) {
+    HeaderButton(text, icon, cuerSolidButtonColors(), cuerSolidButtonStroke(), action)
+}
+

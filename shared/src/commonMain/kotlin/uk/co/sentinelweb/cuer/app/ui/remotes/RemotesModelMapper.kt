@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.NodeModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class RemotesModelMapper constructor(
     private val strings: StringDecoder,
@@ -20,18 +20,29 @@ class RemotesModelMapper constructor(
 
     fun map(state: RemotesContract.MviStore.State): Model {
         return Model(
-            title = state.localNode?.hostname ?: state.localNode?.ipAddress ?: "No title",
+            title = state.localNode?.hostname ?: "No title",
             imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
-            localNode = state.localNode?.let { mapNode(it) } ?: dummyModel().localNode,
-            remoteNodes = state.remoteNodes.map { mapNode(it) },
+            localNode = state.localNode?.let { mapLocalNode(it) } ?: dummyModel().localNode,
+            remoteNodes = state.remoteNodes.map { mapRemoteNode(it) },
             serverState = state.serverState,
             address = state.serverAddress,
         ).also { log.d("mapped: $it") }
     }
 
-    private fun mapNode(it: NodeDomain): NodeModel =
+    // todo different model type for remote
+    private fun mapRemoteNode(it: RemoteNodeDomain): NodeModel =
         NodeModel(
-            id = it.id ?: "node-${it.ipAddress}-${it.port}".toGuidIdentifier(LOCAL_NETWORK),
+            id = it.id,
+            title = it.hostname ?: it.ipAddress,
+            address = "${it.ipAddress}:${it.port}",
+            device = it.device ?: "No device",
+            deviceType = it.deviceType ?: OTHER,
+            hostname = it.hostname ?: "No hostname"
+        )
+
+    private fun mapLocalNode(it: LocalNodeDomain): NodeModel =
+        NodeModel(
+            id = it.id,
             title = it.hostname ?: it.ipAddress,
             address = "${it.ipAddress}:${it.port}",
             device = it.device ?: "No device",

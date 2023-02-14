@@ -31,7 +31,8 @@ object CuerTopAppBarComposables {
                 Text(
                     text = text,
                     style = MaterialTheme.typography.h4,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = Color.White,
                 )
             },
             navigationIcon = {
@@ -39,7 +40,7 @@ object CuerTopAppBarComposables {
                     IconButton(onClick = { onUp() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            tint = MaterialTheme.colors.onSurface,
+                            tint = Color.White,
                             contentDescription = stringResource(id = R.string.up)
 
                         )
@@ -63,6 +64,7 @@ object CuerTopAppBarComposables {
         Icon(
             painter = painterResource(action.item.icon),
             contentDescription = null,
+            tint = Color.White,
             modifier = Modifier
                 .clickable { action.action() }
                 .size(48.dp)

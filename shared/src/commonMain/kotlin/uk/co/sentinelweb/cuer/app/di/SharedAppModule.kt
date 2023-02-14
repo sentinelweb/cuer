@@ -121,10 +121,6 @@ object SharedAppModule {
         factory { DurationTextColorMapper() }
     }
 
-    private val remoteServerModule = module {
-
-    }
-
     val modules = listOf(objectModule)
         .plus(orchestratorModule)
         .plus(queueModule)

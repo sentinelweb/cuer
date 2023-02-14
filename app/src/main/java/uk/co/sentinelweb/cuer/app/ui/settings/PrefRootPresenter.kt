@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.remote.server.http
 
 class PrefRootPresenter constructor(
     private val view: PrefRootContract.View,
@@ -46,14 +47,15 @@ class PrefRootPresenter constructor(
                 while (remoteServiceManger.getService()?.isServerStarted != true) {// fixme limit?
                     delay(20)
                 }
-                log.d("isRunning ${remoteServiceManger.isRunning()} svc: ${remoteServiceManger.getService()} address: ${remoteServiceManger.getService()?.address}")
-                view.setRemoteServiceRunning(true, remoteServiceManger.getService()?.address)
+                val http = remoteServiceManger.getService()?.localNode?.http()
+                log.d("isRunning ${remoteServiceManger.isRunning()} svc: ${remoteServiceManger.getService()} address: $http")
+                view.setRemoteServiceRunning(true, http)
             }
         }
     }
 
     override fun initialisePrefs() {
-        view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.getService()?.address)
+        view.setRemoteServiceRunning(remoteServiceManger.isRunning(), remoteServiceManger.getService()?.localNode?.http())
         view.setVersion("${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
 

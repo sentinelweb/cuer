@@ -18,8 +18,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label
-import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label.Message
-import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label.Up
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Event.OnUpClicked
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -116,6 +115,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                     when (label) {
                         Up -> dismiss()
                         is Message -> snackbarWrapper.make(label.msg)
+                        is Saved -> dismiss()
                     }
                 }
             })
@@ -146,6 +146,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
+                        localRepository = get()
                     )
                 }
                 scoped { LocalModelMapper(get(), get()) }

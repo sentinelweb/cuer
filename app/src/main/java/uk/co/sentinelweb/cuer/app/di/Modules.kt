@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
+import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
+import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
@@ -91,7 +93,10 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.di.NetModule
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
+import java.io.File
 
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 
@@ -155,6 +160,21 @@ object Modules {
     private val usecaseModule = module {
         single { EmailUseCase(get()) }
         single { ShareUseCase(get()) }
+    }
+
+    private val remoteModule = module {
+        single {
+            "localNode.json"
+                .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
+                .let { FileInteractor(it, get()) }
+                .let { LocalRepository(it, get(), get()) }
+        }
+        single {
+            "remoteNodes.json"
+                .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
+                .let { FileInteractor(it, get()) }
+                .let { RemotesRepository(it, get()) }
+        }
     }
 
     private val utilModule = module {
@@ -254,6 +274,7 @@ object Modules {
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
         .plus(RemoteModule.objectModule)
+        .plus(remoteModule)
         .plus(PlayerModule.localPlayerModule)
         .plus(SharedAppAndroidModule.modules)
 }

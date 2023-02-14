@@ -6,6 +6,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.Companion.DUMMY_LOCAL_NODE
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model
@@ -21,7 +22,7 @@ class LocalMviViewProxy constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(Model("Remotes", null, localNode = null, address = null))
+    var observableModel: Model by mutableStateOf(Model("LocalNode", null, address = null, localNodeDomain = DUMMY_LOCAL_NODE))
         private set
 
     var observableLoading: Boolean by mutableStateOf(false)

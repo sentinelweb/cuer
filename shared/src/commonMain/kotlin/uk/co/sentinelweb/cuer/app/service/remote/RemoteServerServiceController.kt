@@ -7,14 +7,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Controller.Companion.LOCAL_NODE_ID
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.NodeDomain
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
+import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.remote.server.*
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 
 class RemoteServerServiceController constructor(
     private val notification: RemoteServerContract.Notification.External,
@@ -22,58 +21,64 @@ class RemoteServerServiceController constructor(
     private val multi: MultiCastSocketContract,
     private val coroutines: CoroutineContextProvider,
     private val connectivityWrapper: ConnectivityWrapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val remoteRepo: RemotesRepository,
+    private val localRepo: LocalRepository,
 ) : RemoteServerContract.Controller {
 
     init {
         log.tag(this)
     }
 
-    private var serverJob: Job? = null
+    private var _serverJob: Job? = null
+    private var _multiJob: Job? = null
 
     override val isServerStarted: Boolean
         get() = webServer.isRunning
 
-    private val _remoteNodes: MutableStateFlow<List<NodeDomain>> = MutableStateFlow(listOf())
-    override val remoteNodes: Flow<List<NodeDomain>>
+    private val _remoteNodes: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(listOf())
+    override val remoteNodes: Flow<List<RemoteNodeDomain>>
         get() = _remoteNodes
 
-    override val address: String?
-        get() = true.takeIf { webServer.isRunning }
+    private val address: Pair<String, Int>?
+        get() = true
+            .takeIf { webServer.isRunning }
             ?.let { connectivityWrapper.wifiIpAddress() }
-            ?.let { webServer.fullAddress(it) }
+            ?.let { it to webServer.port }
             ?.apply { log.d("address: $this ${webServer.isRunning}") }
-    override val localNode: NodeDomain?
-        get() = webServer.let {
-            NodeDomain(
-                id = LOCAL_NODE_ID,
-                ipAddress = connectivityWrapper.wifiIpAddress() ?: "-",
-                port = webServer.port ?: -1,
-                hostname = "tiger"
-            )
-        }
+
+    private var _localNode: LocalNodeDomain? = null
+    override val localNode: LocalNodeDomain
+        get() = (_localNode ?: throw IllegalStateException("local node not initialised"))
+            .let { node -> address?.let { node.copy(ipAddress = it.first, port = it.second) } ?: node }
 
     override fun initialise() {
-        notification.updateNotification("x")
-        serverJob?.cancel()
-        serverJob = coroutines.ioScope.launch {
+        coroutines.ioScope.launch {
+            _localNode = localRepo.getLocalNode()
+            _remoteNodes.value = remoteRepo.loadAll()
+        }
+        notification.updateNotification("x.x.x.x")
+        _serverJob?.cancel()
+        _serverJob = coroutines.ioScope.launch {
             withContext(coroutines.Main) {
-                connectivityWrapper.wifiIpAddress()
-                    ?.also { webServer.fullAddress(it) }
-                    ?.also { notification.updateNotification(it) }
+                address?.also { notification.updateNotification(it.http()) }
             }
             webServer.start()
             log.d("webServer ended")
         }
-        coroutines.ioScope.launch {
-            multi.recieveListener = { msg ->
-                log.d("multicast receive: $msg")
-                when (msg.type) {
-                    MsgType.Join -> addNode(msg.node)
-                    MsgType.Close -> removeNode(msg.node)
-                    MsgType.Ping -> addNode(msg.node)
-                    MsgType.PingReply -> addNode(msg.node)
-                    MsgType.JoinReply -> addNode(msg.node)
+        _multiJob = coroutines.ioScope.launch {
+            multi.recieveListener = { msgType, remote ->
+                log.d("multicast receive: $msgType remote: $remote")
+                when (msgType) {
+                    MsgType.Join -> remoteRepo.addUpdateNode(remote)
+                    MsgType.Close -> remoteRepo.removeNode(remote)
+                    MsgType.Ping -> remoteRepo.addUpdateNode(remote)
+                    MsgType.PingReply -> remoteRepo.addUpdateNode(remote)
+                    MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
+                }
+                // todo merge updated remote info with list
+                coroutines.mainScope.launch {
+                    _remoteNodes.emit(remoteRepo.remoteNodes)
                 }
             }
             multi.startListener = {
@@ -81,36 +86,10 @@ class RemoteServerServiceController constructor(
                     delay(50)
                     multi.send(MsgType.Join)
                 }
-
             }
             multi.runSocketListener()
             log.d("multicast ended")
         }
-    }
-
-    fun addNode(node: NodeDomain) {
-        if (node.ipAddress == connectivityWrapper.wifiIpAddress() && webServer.port == node.port) return
-        val mutableList = _remoteNodes.value.toMutableList()
-        val nodes = removeNodeInternal(node, mutableList)
-        nodes.add(node)
-        coroutines.mainScope.launch {
-            _remoteNodes.emit(nodes)
-        }
-    }
-
-    fun removeNode(node: NodeDomain) {
-        val mutableList = _remoteNodes.value.toMutableList()
-        val nodes = removeNodeInternal(node, mutableList)
-        coroutines.mainScope.launch {
-            _remoteNodes.emit(nodes)
-        }
-    }
-
-    private fun removeNodeInternal(node: NodeDomain, nodes: MutableList<NodeDomain>): MutableList<NodeDomain> {
-        nodes
-            .find { it.ipAddress == node.ipAddress && it.port == node.port }
-            ?.also { nodes.remove(it) }
-        return nodes
     }
 
     override fun handleAction(action: String?) {
@@ -126,15 +105,15 @@ class RemoteServerServiceController constructor(
         coroutines.mainScope.launch {
             _remoteNodes.emit(listOf())
         }
-        serverJob?.cancel()
-        serverJob = null
         webServer.stop()
+        _serverJob?.cancel()
+        _serverJob = null
         notification.destroy()
         coroutines.ioScope.launch {
-            delay(50)
             multi.close()
+            delay(50)
+            _multiJob?.cancel()
         }
-
         log.d("Controller destroyed")
     }
 

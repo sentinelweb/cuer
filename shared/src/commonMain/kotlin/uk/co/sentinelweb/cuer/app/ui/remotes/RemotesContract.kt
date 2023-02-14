@@ -4,7 +4,9 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.ServerState.INITIAL
 
@@ -37,8 +39,8 @@ class RemotesContract {
         data class State(
             val serverState: ServerState = INITIAL,
             val serverAddress: String? = null,
-            val localNode: NodeDomain? = null,
-            val remoteNodes: List<NodeDomain> = listOf(),
+            val localNode: LocalNodeDomain? = null,
+            val remoteNodes: List<RemoteNodeDomain> = listOf(),
         )
     }
 
@@ -56,7 +58,7 @@ class RemotesContract {
         )
 
         data class NodeModel(
-            val id: OrchestratorContract.Identifier<GUID>,
+            val id: OrchestratorContract.Identifier<GUID>?,
             val title: String,
             val address: String,
             val hostname: String,

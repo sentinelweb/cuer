@@ -17,24 +17,22 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract.Notificati
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent {
     override val isServerStarted: Boolean
         get() = controller.isServerStarted
 
-    override val address: String?
-        get() = controller.address
-
     override fun ping() {
         controller.ping()
     }
 
-    override val localNode: NodeDomain?
+    override val localNode: LocalNodeDomain
         get() = controller.localNode
 
-    override val remoteNodes: Flow<List<NodeDomain>>
+    override val remoteNodes: Flow<List<RemoteNodeDomain>>
         get() = controller.remoteNodes
 
     override val scope: Scope by serviceScopeWithSource()
@@ -89,7 +87,9 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         coroutines = get(),
                         log = get(),
                         connectivityWrapper = get(),
-                        multi = get()
+                        multi = get(),
+                        localRepo = get(),
+                        remoteRepo = get(),
                     )
                 }
                 scoped<External> {

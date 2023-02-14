@@ -116,16 +116,22 @@ fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(C
 // AppDetailsDomain
 fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(ListSerializer(AppDetailsDomain.serializer()), this)
 
-fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(AppDetailsDomain.serializer(), input)
+fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(AppDetailsDomain.serializer()), input)
 
-// NodeDomain
-fun NodeDomain.serialise() = domainJsonSerializer.encodeToString(NodeDomain.serializer(), this)
+// LocalNodeDomain
+fun LocalNodeDomain.serialise() = domainJsonSerializer.encodeToString(LocalNodeDomain.serializer(), this)
 
-fun deserialiseNodeDomain(input: String) = domainJsonSerializer.decodeFromString(NodeDomain.serializer(), input)
+fun deserialiseLocalNode(input: String) = domainJsonSerializer.decodeFromString(LocalNodeDomain.serializer(), input)
 
-fun List<NodeDomain>.serialiseNodeist() = domainJsonSerializer.encodeToString(ListSerializer(NodeDomain.serializer()), this)
+// RemoteNodeDomain
+fun RemoteNodeDomain.serialise() = domainJsonSerializer.encodeToString(RemoteNodeDomain.serializer(), this)
 
-fun deserialiseNodeList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(NodeDomain.serializer()), input)
+fun deserialiseRemoteNode(input: String) = domainJsonSerializer.decodeFromString(RemoteNodeDomain.serializer(), input)
+
+fun List<RemoteNodeDomain>.serialise() = domainJsonSerializer.encodeToString(ListSerializer(RemoteNodeDomain.serializer()), this)
+
+fun deserialiseRemoteNodeList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(RemoteNodeDomain.serializer()), input)
+
 
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
@@ -141,7 +147,12 @@ val domainSerializersModule = SerializersModule {
         ErrorDomain::class to ErrorDomain.serializer(),
         ResponseDomain::class to ResponseDomain.serializer(),
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
-        NodeDomain::class to NodeDomain.serializer(),
+        LocalNodeDomain::class to LocalNodeDomain.serializer(),
+        RemoteNodeDomain::class to RemoteNodeDomain.serializer(),
+
+        LocalNodeDomain.AuthConfig.Username::class to LocalNodeDomain.AuthConfig.Username.serializer(),
+        RemoteNodeDomain.AuthType.Username::class to RemoteNodeDomain.AuthType.Username.serializer(),
+        RemoteNodeDomain.AuthType.Token::class to RemoteNodeDomain.AuthType.Token.serializer(),
     )
     polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
     polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
@@ -151,7 +162,13 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
     polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
-    polymorphic(Domain::class, NodeDomain::class, NodeDomain.serializer())
+    polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
+    polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
+
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Username::class, LocalNodeDomain.AuthConfig.Username.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Username::class, RemoteNodeDomain.AuthType.Username.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Token::class, RemoteNodeDomain.AuthType.Token.serializer())
+
 }.plus(SerializersModule {
     contextual(Instant::class, InstantIso8601Serializer)
 }).plus(SerializersModule {

@@ -8,12 +8,15 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
+import uk.co.sentinelweb.cuer.remote.server.http
 
 class LocalStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
@@ -21,6 +24,7 @@ class LocalStoreFactory constructor(
     private val log: LogWrapper,
     private val prefs: MultiPlatformPreferencesWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
+    private val localRepository: LocalRepository,
     private val coroutines: CoroutineContextProvider,
 ) {
 
@@ -41,8 +45,8 @@ class LocalStoreFactory constructor(
             when (result) {
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
-                    serverAddress = remoteServerManager.getService()?.address,
-                    localNode = remoteServerManager.getService()?.localNode
+                    serverAddress = remoteServerManager.getService()?.localNode?.http(),
+                    localNode = localRepository.getLocalNode()
                 )
             }
     }
@@ -60,13 +64,25 @@ class LocalStoreFactory constructor(
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
-            when (intent.also { log.d(it.toString()) }) {
-                //Intent.SendPing -> log.d("send ping")
+            when (intent) {
                 Intent.Up -> publish(Label.Up)
+                is Intent.ActionSave -> save(intent, getState())
             }
 
+        private fun save(intent: Intent.ActionSave, state: State) {
+            localRepository.getLocalNode()
+                .copy(
+                    hostname = intent.updated.hostname,
+                    port = intent.updated.port,
+                    authType = intent.updated.authType,
+                )
+                .also { localRepository.saveLocalNode(it) }
+
+            dispatch(Result.UpdateServerState)
+            publish(Label.Saved)
+        }
+
         private fun testLoad() {
-            //dispatch(Result.SetNodes(listOf()))
             dispatch(Result.UpdateServerState)
         }
 

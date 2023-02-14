@@ -53,8 +53,7 @@ object RemotesComposables {
                         backgroundColor = Color.Transparent,
                         onUp = { view.dispatch(OnUpClicked) },
                         actions = listOf(
-                            Action(CuerMenuItem.Help,
-                                { view.dispatch(OnActionHelpClicked) }),
+                            Action(CuerMenuItem.Help, { view.dispatch(OnActionHelpClicked) }),
                             Action(CuerMenuItem.Search, { view.dispatch(OnActionSearchClicked) }),
                             Action(CuerMenuItem.PasteAdd, { view.dispatch(OnActionPasteAdd) }),
                             Action(CuerMenuItem.Settings, { view.dispatch(OnActionSettingsClicked) }),
