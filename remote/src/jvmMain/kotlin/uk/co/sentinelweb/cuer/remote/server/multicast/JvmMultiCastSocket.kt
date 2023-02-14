@@ -29,6 +29,7 @@ class JvmMultiCastSocket(
     private val buildConfigDomain: BuildConfigDomain,
     private val localRepository: LocalRepository,
     private val multicastMessageMapper: MulticastMessageMapper,
+    private val connectivityWrapper: ConnectivityWrapper,
 ) : MultiCastSocketContract {
 
     override var recieveListener: ((MsgType, RemoteNodeDomain) -> Unit)? = null
@@ -74,9 +75,14 @@ class JvmMultiCastSocket(
         log.d("exit")
     }
 
-    private fun mapRemoteNode(msgDecoded: MulticastMessage) = multicastMessageMapper.mapFromMulticastMessage(msgDecoded.node)
+    private fun mapRemoteNode(msgDecoded: MulticastMessage) =
+        multicastMessageMapper.mapFromMulticastMessage(msgDecoded.node)
 
-    fun mapLocalNode() = multicastMessageMapper.mapToMulticastMessage(localRepository.getLocalNode())
+    fun mapLocalNode() =
+        multicastMessageMapper.mapToMulticastMessage(
+            // fixme - this is a bit of a hack to get the local node to update wifi address
+            localRepository.getLocalNode().copy(ipAddress = connectivityWrapper.getWIFIIP()!!)
+        )
 
     override fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {

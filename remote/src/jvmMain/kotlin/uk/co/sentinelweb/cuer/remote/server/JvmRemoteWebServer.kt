@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import java.io.PrintWriter
 import java.io.StringWriter
 
-class RemoteServer constructor(
+class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
 ) : RemoteWebServerContract, KoinComponent {
