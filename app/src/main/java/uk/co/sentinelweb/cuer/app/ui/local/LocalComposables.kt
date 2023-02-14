@@ -122,7 +122,7 @@ object LocalComposables {
                             modifier = Modifier.padding(16.dp)
                         )
                         var ddExpanded by remember { mutableStateOf(false) }
-                        val authType = localNode.authType
+                        val authType = localNode.authConfig
                         HeaderButton(
                             text = authType::class.simpleName!!,
                             icon = R.drawable.ic_login,
@@ -133,17 +133,17 @@ object LocalComposables {
                             onDismissRequest = { ddExpanded = false },
                         ) {
                             DropdownMenuItem(onClick = {
-                                localNode = localNode.copy(authType = Open)
+                                localNode = localNode.copy(authConfig = Open)
                                 ddExpanded = false
                             }) { Text(text = "Open") }
 
                             DropdownMenuItem(onClick = {
-                                localNode = localNode.copy(authType = Confirm)
+                                localNode = localNode.copy(authConfig = Confirm)
                                 ddExpanded = false
                             }) { Text(text = "Confirm") }
 
                             DropdownMenuItem(onClick = {
-                                localNode = localNode.copy(authType = Username("", ""))
+                                localNode = localNode.copy(authConfig = Username("", ""))
                                 ddExpanded = false
                             }) { Text(text = "Password") }
                         }
@@ -153,15 +153,19 @@ object LocalComposables {
                             is Username -> {
 
                                 TextField(
-                                    value = (localNode.authType as Username).username,
-                                    onValueChange = { localNode = localNode.copy(authType = (localNode.authType as Username).copy(username = it)) },
+                                    value = (localNode.authConfig as Username).username,
+                                    onValueChange = {
+                                        localNode = localNode.copy(authConfig = (localNode.authConfig as Username).copy(username = it))
+                                    },
                                     label = { Text("Username") },
                                     modifier = Modifier.padding(16.dp)
                                 )
 
                                 TextField(
-                                    value = (localNode.authType as Username).password,
-                                    onValueChange = { localNode = localNode.copy(authType = (localNode.authType as Username).copy(password = it)) },
+                                    value = (localNode.authConfig as Username).password,
+                                    onValueChange = {
+                                        localNode = localNode.copy(authConfig = (localNode.authConfig as Username).copy(password = it))
+                                    },
                                     label = { Text("Password") },
                                     modifier = Modifier.padding(16.dp)
                                 )

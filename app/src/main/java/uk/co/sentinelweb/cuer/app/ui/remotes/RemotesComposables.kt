@@ -32,6 +32,8 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
 import uk.co.sentinelweb.cuer.remote.server.ServerState.*
 
 object RemotesComposables {
@@ -105,17 +107,23 @@ object RemotesComposables {
                                 style = MaterialTheme.typography.h3,
                                 modifier = Modifier.padding(
                                     start = dimensionResource(R.dimen.app_bar_header_margin_start),
-                                    top = 16.dp,
-                                    bottom = 16.dp
+                                    top = 8.dp,
+                                    bottom = 0.dp
                                 )
                             )
                         }
+                        model.localNode.apply {
+                            Text(
+                                text = "$hostname : $deviceType : ${authType}",
+                                style = MaterialTheme.typography.body2,
+                                modifier = Modifier.padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 8.dp)
+                            )
+                        }
                         LazyColumn(
-                            modifier = Modifier.height(300.dp),//fillMaxHeight(0.5f),
+                            modifier = Modifier.height(300.dp),
                             contentPadding = PaddingValues(top = 4.dp)
                         ) {
                             items(model.remoteNodes) { remote ->
-
                                 RemoteRow(remote)
                             }
                         }
@@ -145,12 +153,17 @@ object RemotesComposables {
             )
             Column { // todo use textview
                 Text(
-                    text = remote.device,
+                    text = remote.title,
                     style = MaterialTheme.typography.h5,
                     modifier = Modifier.padding(start = 8.dp),
                 )
                 Text(
                     text = remote.address,
+                    style = MaterialTheme.typography.body2,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(
+                    text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
                     style = MaterialTheme.typography.body2,
                     modifier = Modifier.padding(start = 8.dp)
                 )
@@ -175,9 +188,7 @@ object RemotesComposables {
                 }
             }
         }
-
     }
-
 }
 
 
@@ -186,29 +197,13 @@ object RemotesComposables {
 @ExperimentalAnimationApi
 private fun RemotesPreview() {
     val modelMapper = RemotesModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
+    val localNode = LocalNodeDomain(
+        id = null, ipAddress = "x.x.x.x", port = 1234, hostname = "hostname", deviceType = ANDROID,
+    )
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(
-        modelMapper.map(RemotesContract.MviStore.State()),
+        modelMapper.map(RemotesContract.MviStore.State(localNode = localNode)),
         false,
         view
     )
 }
-//
-//@Preview(name = "chip")
-//@Composable
-//@ExperimentalAnimationApi
-//private fun ChipPreview() {
-//    val model = CategoryModel(
-//        id = 1,
-//        title = "title",
-//        description = "null",
-//        thumbNailUrl = "https://cuer-275020.web.app/images/headers/Socrates.jpg",
-//        existingPlaylist = null,
-//        forceItem = false,
-//        isPlaylist = false,
-//        subCategories = emptyList(),
-//        subCount = 4
-//    )
-//    val view = object : BaseMviView<Model, Event>() {}
-//    BrowseComposables.CatChip(model, 1, view)
-//}

@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseLocalNode
@@ -17,6 +18,7 @@ class LocalRepository(
     private val fileInteractor: FileInteractor,
     private val coroutineContext: CoroutineContextProvider,
     private val guidCreator: GuidCreator,
+    private val buildConfigDomain: BuildConfigDomain,
 ) {
 
     private val _node: MutableStateFlow<LocalNodeDomain> = MutableStateFlow(getLocalNode())
@@ -36,11 +38,19 @@ class LocalRepository(
             ?.loadJson()
             ?.takeIf { it.isNotEmpty() }
             ?.let { attemptDeserialize(it) }
+            ?.copy(
+                version = buildConfigDomain.version,
+                versionCode = buildConfigDomain.versionCode
+            )
             ?: run {
                 LocalNodeDomain(
                     id = guidCreator.create().toIdentifier(LOCAL_NETWORK),
                     ipAddress = "",
                     port = WEB_SERVER_PORT_DEF,
+                    deviceType = buildConfigDomain.deviceType,
+                    device = buildConfigDomain.device,
+                    version = buildConfigDomain.version,
+                    versionCode = buildConfigDomain.versionCode,
                 ).also { saveLocalNode(it) }
             }
 

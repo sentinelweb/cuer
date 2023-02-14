@@ -14,6 +14,7 @@ class RemotesContract {
 
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
+            object Refresh : Intent()
             object Up : Intent()
             object ActionSettings : Intent()
             object ActionPasteAdd : Intent()
@@ -39,7 +40,7 @@ class RemotesContract {
         data class State(
             val serverState: ServerState = INITIAL,
             val serverAddress: String? = null,
-            val localNode: LocalNodeDomain? = null,
+            val localNode: LocalNodeDomain,
             val remoteNodes: List<RemoteNodeDomain> = listOf(),
         )
     }
@@ -52,7 +53,7 @@ class RemotesContract {
             val title: String,
             val imageUrl: String?,
             val address: String?,
-            val localNode: NodeModel?,
+            val localNode: NodeModel,
             val remoteNodes: List<NodeModel>,
             val serverState: ServerState = INITIAL,
         )
@@ -63,11 +64,12 @@ class RemotesContract {
             val address: String,
             val hostname: String,
             val device: String,
-            val deviceType: NodeDomain.DeviceType
+            val deviceType: NodeDomain.DeviceType,
+            val authType: String
         )
 
         sealed class Event {
-            //object OnSendPing : Event()
+            object OnRefresh : Event()
             object OnActionSettingsClicked : Event()
             object OnActionPasteAdd : Event()
             object OnActionSearchClicked : Event()

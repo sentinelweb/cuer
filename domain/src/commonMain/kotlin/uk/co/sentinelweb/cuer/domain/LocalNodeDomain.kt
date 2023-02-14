@@ -11,12 +11,17 @@ data class LocalNodeDomain(
     val hostname: String? = null,
     val device: String? = null,
     val deviceType: DeviceType? = null,
-    val authType: AuthConfig = AuthConfig.Open
+    val authConfig: AuthConfig = AuthConfig.Open,
+    val version: String? = null,
+    val versionCode: Int? = null,
 ) : NodeDomain() {
 
     @Serializable
     sealed class AuthConfig {
+        @Serializable
         object Open : AuthConfig()
+
+        @Serializable
         object Confirm : AuthConfig()
 
         @Serializable

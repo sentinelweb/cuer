@@ -62,7 +62,7 @@ fun HeaderButton(
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.button,
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(start = 4.dp)
         )
     }
 }

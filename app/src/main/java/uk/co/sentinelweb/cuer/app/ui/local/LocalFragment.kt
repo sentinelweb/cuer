@@ -45,6 +45,8 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
         log.tag(this)
     }
 
+    var onDismissListener: (() -> Unit)? = null
+
     // saves the data on back press (enabled in onResume)
     private val upCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
@@ -73,10 +75,6 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
         binding.composeView.setContent {
             LocalComposables.RemotesUi(localMviView)
         }
-//        coroutines.mainScope.launch {
-//            delay(300)
-//            browseMviView.dispatch(OnResume)
-//        }
         observeLabels()
     }
 
@@ -97,11 +95,6 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
     }
 
-    override fun onStop() {
-        super.onStop()
-        //playerView.showPlayer()
-    }
-
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()
@@ -115,7 +108,10 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                     when (label) {
                         Up -> dismiss()
                         is Message -> snackbarWrapper.make(label.msg)
-                        is Saved -> dismiss()
+                        is Saved -> {
+                            onDismissListener?.invoke()
+                            dismiss()
+                        }
                     }
                 }
             })

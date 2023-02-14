@@ -81,6 +81,7 @@ class RemotesStoreFactory constructor(
                 Intent.ActionPing -> ping(intent, getState())
                 Intent.ActionStartServer -> startServer(intent, getState())
                 Intent.ActionStopServer -> stopServer(intent, getState())
+                Intent.Refresh -> dispatch(Result.UpdateServerState)
             }
 
         private fun config(intent: Intent, state: State) {
@@ -135,8 +136,8 @@ class RemotesStoreFactory constructor(
 
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
-            name = "RemnotesStore",
-            initialState = State(),
+            name = "RemotesStore",
+            initialState = State(localNode = localRepository.getLocalNode()),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()

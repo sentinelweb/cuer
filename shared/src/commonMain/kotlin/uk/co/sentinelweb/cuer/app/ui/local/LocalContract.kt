@@ -57,7 +57,7 @@ class LocalContract {
             hostname = "dummy",
             device = "",
             deviceType = NodeDomain.DeviceType.OTHER,
-            authType = AuthConfig.Open
+            authConfig = AuthConfig.Open
         )
     }
 }

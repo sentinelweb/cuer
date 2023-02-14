@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -87,10 +88,6 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         binding.composeView.setContent {
             RemotesComposables.RemotesUi(remotesMviView)
         }
-//        coroutines.mainScope.launch {
-//            delay(300)
-//            browseMviView.dispatch(OnResume)
-//        }
         observeLabels()
     }
 
@@ -144,8 +141,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     }
 
     private fun showConfigFragment() {
-        dialogFragment =
-            LocalFragment.newInstance()
+        dialogFragment = LocalFragment.newInstance()
+        (dialogFragment as LocalFragment).onDismissListener = { remotesMviView.dispatch(Event.OnRefresh) }
         dialogFragment?.show(childFragmentManager, CONFIG_FRAGMENT_TAG)
     }
 
@@ -182,5 +179,4 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
             }
         }
     }
-
 }

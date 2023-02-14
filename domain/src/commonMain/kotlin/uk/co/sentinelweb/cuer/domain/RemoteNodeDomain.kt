@@ -22,6 +22,7 @@ data class RemoteNodeDomain(
 
     @Serializable
     sealed class AuthType {
+        @Serializable
         object Open : AuthType()
 
         @Serializable

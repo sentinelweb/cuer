@@ -9,6 +9,7 @@ import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper.Companion.dummyNodeModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -21,7 +22,7 @@ class RemotesMviViewProxy constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(Model("Remotes", null, localNode = null, remoteNodes = listOf(), address = null))
+    var observableModel: Model by mutableStateOf(Model("Remotes", null, localNode = dummyNodeModel(), remoteNodes = listOf(), address = null))
         private set
 
     var observableLoading: Boolean by mutableStateOf(false)

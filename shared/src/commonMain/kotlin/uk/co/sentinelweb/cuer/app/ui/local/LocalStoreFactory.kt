@@ -74,7 +74,7 @@ class LocalStoreFactory constructor(
                 .copy(
                     hostname = intent.updated.hostname,
                     port = intent.updated.port,
-                    authType = intent.updated.authType,
+                    authConfig = intent.updated.authConfig,
                 )
                 .also { localRepository.saveLocalNode(it) }
 

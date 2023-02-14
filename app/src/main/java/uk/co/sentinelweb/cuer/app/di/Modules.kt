@@ -167,7 +167,7 @@ object Modules {
             "localNode.json"
                 .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
                 .let { FileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get()) }
+                .let { LocalRepository(it, get(), get(), get()) }
         }
         single {
             "remoteNodes.json"

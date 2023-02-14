@@ -20,9 +20,9 @@ class RemotesModelMapper constructor(
 
     fun map(state: RemotesContract.MviStore.State): Model {
         return Model(
-            title = state.localNode?.hostname ?: "No title",
+            title = state.localNode.hostname ?: "No title",
             imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
-            localNode = state.localNode?.let { mapLocalNode(it) } ?: dummyModel().localNode,
+            localNode = state.localNode.let { mapLocalNode(it) },
             remoteNodes = state.remoteNodes.map { mapRemoteNode(it) },
             serverState = state.serverState,
             address = state.serverAddress,
@@ -37,7 +37,8 @@ class RemotesModelMapper constructor(
             address = "${it.ipAddress}:${it.port}",
             device = it.device ?: "No device",
             deviceType = it.deviceType ?: OTHER,
-            hostname = it.hostname ?: "No hostname"
+            hostname = it.hostname ?: "No hostname",
+            authType = it.authType::class.simpleName ?: "-",
         )
 
     private fun mapLocalNode(it: LocalNodeDomain): NodeModel =
@@ -47,21 +48,27 @@ class RemotesModelMapper constructor(
             address = "${it.ipAddress}:${it.port}",
             device = it.device ?: "No device",
             deviceType = it.deviceType ?: OTHER,
-            hostname = it.hostname ?: "No hostname"
+            hostname = it.hostname ?: "No hostname",
+            authType = it.authConfig::class.simpleName ?: "-",
         )
 
-    private fun dummyModel() = Model(
-        title = "Dummy",
-        imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
-        localNode = NodeModel(
+    companion object {
+        fun dummyModel() = Model(
+            title = "Dummy",
+            imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
+            localNode = dummyNodeModel(),
+            remoteNodes = listOf(),
+            address = "a.a.a.a:aaaa",
+        )
+
+        fun dummyNodeModel() = NodeModel(
             id = "".toGuidIdentifier(MEMORY),
             title = "DummyLocal",
             hostname = "DummyHostname",
             address = "d.d.d.d",
             device = "DummyDevice",
             deviceType = OTHER,
-        ),
-        remoteNodes = listOf(),
-        address = "a.a.a.a:aaaa",
-    )
+            authType = "DummyAuthType",
+        )
+    }
 }

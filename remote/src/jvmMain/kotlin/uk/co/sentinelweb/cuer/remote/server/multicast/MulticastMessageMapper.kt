@@ -16,7 +16,7 @@ class MulticastMessageMapper(private val config: BuildConfigDomain) {
             ipAddress = localNode.ipAddress,
             port = localNode.port,
             device = localNode.device,
-            authType = mapAuthType(localNode.authType),
+            authType = mapAuthType(localNode.authConfig),
             versionCode = config.versionCode,
         )
     }

@@ -165,9 +165,12 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
     polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
 
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Open::class, LocalNodeDomain.AuthConfig.Open.serializer())
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Confirm::class, LocalNodeDomain.AuthConfig.Confirm.serializer())
     polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Username::class, LocalNodeDomain.AuthConfig.Username.serializer())
-    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Username::class, RemoteNodeDomain.AuthType.Username.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Open::class, RemoteNodeDomain.AuthType.Open.serializer())
     polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Token::class, RemoteNodeDomain.AuthType.Token.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Username::class, RemoteNodeDomain.AuthType.Username.serializer())
 
 }.plus(SerializersModule {
     contextual(Instant::class, InstantIso8601Serializer)
