@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
 import io.ktor.server.http.content.*
+import io.ktor.server.plugins.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.compression.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -19,12 +20,16 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
+import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.CONNECT_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -37,7 +42,7 @@ class JvmRemoteWebServer constructor(
     }
 
     private val localRepository: LocalRepository by inject()
-
+    override var connectMessageListener: ((ConnectMessage) -> Unit)? = null
     override val port: Int
         get() = localRepository.getLocalNode().port
 
@@ -46,9 +51,10 @@ class JvmRemoteWebServer constructor(
     override val isRunning: Boolean
         get() = _appEngine != null
 
-    override fun start() {
+    override fun start(onStarted: () -> Unit) {
         buildServer().apply {
             _appEngine = this // start is a blocking call
+            onStarted()
             start(wait = true)
         }
     }
@@ -62,7 +68,7 @@ class JvmRemoteWebServer constructor(
     private fun buildServer(): ApplicationEngine =
         embeddedServer(CIO, port) {
             install(ContentNegotiation) {
-                json()
+                json(domainMessageJsonSerializer)
             }
             install(CORS) {
                 allowMethod(HttpMethod.Get)
@@ -96,7 +102,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlist/{id}") {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL))
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylist(id)
                                 ?.let { ResponseDomain(it) }
@@ -113,7 +119,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlistItem/{id}") {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL))
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylistItem(id)
                                 ?.let { ResponseDomain(it) }
@@ -126,11 +132,24 @@ class JvmRemoteWebServer constructor(
                         }
                     logWrapper.d(call.request.uri)
                 }
+                post(CONNECT_API.PATH) {
+                    logWrapper.d("${CONNECT_API.PATH} : " + call.request.uri)
+                    (try {
+                        call.receive<RequestMessage>()
+                    } catch (e: BadRequestException) {
+                        logWrapper.e("connect: bad request", e)
+                        null
+                    })
+                        ?.let { it.payload as ConnectMessage }
+                        ?.also { connectMessageListener?.invoke(it) }
+                        ?.also { call.respond(HttpStatusCode.OK) }
+                        ?: call.error(HttpStatusCode.BadRequest, "No message")
+                }
                 post("/checkLink") {
                     val post = call.receiveParameters()
                     //logWrapper.d("scan:" + post)
                     try {
-                        (post["url"])
+                        post["url"]
                             ?.let { url ->
                                 //logWrapper.d("scan:" + url)
                                 try {

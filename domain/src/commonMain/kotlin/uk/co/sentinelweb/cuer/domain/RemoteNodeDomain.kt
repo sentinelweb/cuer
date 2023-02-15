@@ -16,8 +16,8 @@ data class RemoteNodeDomain(
     val lastRead: Instant? = null,
     val lastWrite: Instant? = null,
     val dateAdded: Instant? = null,
-    val version: String,
-    val versionCode: Int,
+    val version: String? = null,
+    val versionCode: Int? = null,
 ) : NodeDomain() {
 
     @Serializable

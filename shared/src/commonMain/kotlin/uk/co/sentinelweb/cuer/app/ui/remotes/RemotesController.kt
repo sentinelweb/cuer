@@ -39,6 +39,7 @@ class RemotesController constructor(
             Event.OnUpClicked -> Intent.Up
             Event.OnActionConfigClicked -> Intent.ActionConfig
             Event.OnActionPingClicked -> Intent.ActionPing
+            is Event.OnActionPingNodeClicked -> Intent.ActionPingNode(remote)
             Event.OnActionStartServerClicked -> Intent.ActionStartServer
             Event.OnActionStopServerClicked -> Intent.ActionStopServer
         }

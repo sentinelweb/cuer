@@ -34,6 +34,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.ServerState.*
 
 object RemotesComposables {
@@ -71,7 +72,6 @@ object RemotesComposables {
                             .verticalScroll(rememberScrollState())
                             .padding(bottom = 128.dp)
                     ) {
-
                         Row(modifier = Modifier.height(160.dp)) {
                             model.imageUrl
                                 ?.also { url ->
@@ -124,7 +124,7 @@ object RemotesComposables {
                             contentPadding = PaddingValues(top = 4.dp)
                         ) {
                             items(model.remoteNodes) { remote ->
-                                RemoteRow(remote)
+                                RemoteRow(remote, view)
                             }
                         }
                     }
@@ -135,14 +135,15 @@ object RemotesComposables {
 
 
     @Composable
-    private fun RemoteRow(remote: RemotesContract.View.NodeModel) {
+    private fun RemoteRow(remote: RemotesContract.View.NodeModel, view: BaseMviView<Model, Event>) {
         val expanded = remember { mutableStateOf(false) }
         Row(
             modifier = Modifier
                 .clickable { expanded.value = !expanded.value }
                 .fillMaxWidth()
                 .padding(8.dp)
-                .background(MaterialTheme.colors.surface),
+                .background(MaterialTheme.colors.surface)
+                .clickable { view.dispatch(OnActionPingNodeClicked(remote.domain as RemoteNodeDomain)) },
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(

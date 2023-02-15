@@ -12,8 +12,10 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.*
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType
 
 class RemoteServerServiceController constructor(
     private val notification: RemoteServerContract.Notification.External,
@@ -24,6 +26,8 @@ class RemoteServerServiceController constructor(
     private val log: LogWrapper,
     private val remoteRepo: RemotesRepository,
     private val localRepo: LocalRepository,
+    private val connectMessageMapper: ConnectMessageMapper,
+    private val remoteInteractor: RemoteInteractor
 ) : RemoteServerContract.Controller {
 
     init {
@@ -52,6 +56,39 @@ class RemoteServerServiceController constructor(
         get() = (_localNode ?: throw IllegalStateException("local node not initialised"))
             .let { node -> address?.let { node.copy(ipAddress = it.first, port = it.second) } ?: node }
 
+    private val connectMessageHandler = { msg: ConnectMessage ->
+        val remote = mapRemoteNode(msg)
+        log.d("receive connect: ${msg.type} remote: $remote")
+        // todo decode remote
+        when (msg.type) {
+            MsgType.Join -> remoteRepo.addUpdateNode(remote)
+            MsgType.Close -> remoteRepo.removeNode(remote)
+            MsgType.Ping -> remoteRepo.addUpdateNode(remote)
+            MsgType.PingReply -> remoteRepo.addUpdateNode(remote)
+            MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
+        }
+        // todo merge updated remote info with local list
+        coroutines.mainScope.launch {
+            log.d("remotes list:\n" + remoteRepo.remoteNodes.map { it.run { "host: - $id ${ipport()}" } }.joinToString("\n"))
+            _remoteNodes.emit(remoteRepo.remoteNodes) // fixme this is not emitting after the second time
+            if (localRepo.getLocalNode().id != remote.id) {
+                withContext(coroutines.ioScope.coroutineContext) {
+                    when (msg.type) {
+                        MsgType.Join -> remoteInteractor.connect(remote, MsgType.JoinReply)
+                        MsgType.Ping -> remoteInteractor.connect(remote, MsgType.PingReply)
+
+                        else -> Unit
+                    }
+                }
+            }
+        }
+        Unit
+    }
+
+    private fun mapRemoteNode(msgDecoded: ConnectMessage) =
+        connectMessageMapper.mapFromMulticastMessage(msgDecoded.node)
+
+
     override fun initialise() {
         coroutines.ioScope.launch {
             _localNode = localRepo.getLocalNode()
@@ -60,27 +97,16 @@ class RemoteServerServiceController constructor(
         notification.updateNotification("x.x.x.x")
         _serverJob?.cancel()
         _serverJob = coroutines.ioScope.launch {
-            withContext(coroutines.Main) {
-                address?.also { notification.updateNotification(it.http()) }
+            webServer.connectMessageListener = connectMessageHandler
+            webServer.start {
+                coroutines.mainScope.launch {
+                    address?.also { notification.updateNotification(it.http()) }
+                }
             }
-            webServer.start()
             log.d("webServer ended")
         }
         _multiJob = coroutines.ioScope.launch {
-            multi.recieveListener = { msgType, remote ->
-                log.d("multicast receive: $msgType remote: $remote")
-                when (msgType) {
-                    MsgType.Join -> remoteRepo.addUpdateNode(remote)
-                    MsgType.Close -> remoteRepo.removeNode(remote)
-                    MsgType.Ping -> remoteRepo.addUpdateNode(remote)
-                    MsgType.PingReply -> remoteRepo.addUpdateNode(remote)
-                    MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
-                }
-                // todo merge updated remote info with list
-                coroutines.mainScope.launch {
-                    _remoteNodes.emit(remoteRepo.remoteNodes)
-                }
-            }
+            multi.connectMessageListener = connectMessageHandler
             multi.startListener = {
                 coroutines.ioScope.launch {
                     delay(50)

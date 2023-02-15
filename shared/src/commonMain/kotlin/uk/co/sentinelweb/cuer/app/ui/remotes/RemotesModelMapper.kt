@@ -39,6 +39,7 @@ class RemotesModelMapper constructor(
             deviceType = it.deviceType ?: OTHER,
             hostname = it.hostname ?: "No hostname",
             authType = it.authType::class.simpleName ?: "-",
+            domain = it,
         )
 
     private fun mapLocalNode(it: LocalNodeDomain): NodeModel =
@@ -50,6 +51,7 @@ class RemotesModelMapper constructor(
             deviceType = it.deviceType ?: OTHER,
             hostname = it.hostname ?: "No hostname",
             authType = it.authConfig::class.simpleName ?: "-",
+            domain = it
         )
 
     companion object {
@@ -69,6 +71,7 @@ class RemotesModelMapper constructor(
             device = "DummyDevice",
             deviceType = OTHER,
             authType = "DummyAuthType",
+            domain = RemoteNodeDomain(id = null, ipAddress = "d.d.d.d", port = 0)
         )
     }
 }

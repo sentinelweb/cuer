@@ -12,7 +12,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
+import uk.co.sentinelweb.cuer.domain.system.RequestDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.server.message.messageSerializersModule
 
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(
     ChannelDomain.serializer(), this
@@ -108,6 +110,7 @@ fun deserialiseBackupFileModel(input: String) = domainJsonSerializer.decodeFromS
 
 // response
 fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(ResponseDomain.serializer(), this)
+fun RequestDomain.serialise() = domainJsonSerializer.encodeToString(RequestDomain.serializer(), this)
 
 fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(ResponseDomain.serializer(), input)
 
@@ -145,6 +148,7 @@ val domainSerializersModule = SerializersModule {
         SearchLocalDomain::class to SearchLocalDomain.serializer(),
         BackupFileModel::class to BackupFileModel.serializer(),
         ErrorDomain::class to ErrorDomain.serializer(),
+        RequestDomain::class to RequestDomain.serializer(),
         ResponseDomain::class to ResponseDomain.serializer(),
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
         LocalNodeDomain::class to LocalNodeDomain.serializer(),
@@ -182,8 +186,16 @@ val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
     ignoreUnknownKeys = true
-    classDiscriminator = domainClassDiscriminator// property added when base domain type is use (see ResponseDomain)
+    classDiscriminator = domainClassDiscriminator
     serializersModule = domainSerializersModule
+}
+
+val domainMessageJsonSerializer = Json {
+    prettyPrint = true
+    isLenient = true
+    ignoreUnknownKeys = true
+    classDiscriminator = domainClassDiscriminator//"classTypeDiscriminator"
+    serializersModule = domainSerializersModule.plus(messageSerializersModule)
 }
 
 

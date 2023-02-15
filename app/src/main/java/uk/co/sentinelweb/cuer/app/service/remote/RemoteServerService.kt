@@ -90,6 +90,8 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         multi = get(),
                         localRepo = get(),
                         remoteRepo = get(),
+                        connectMessageMapper = get(),
+                        remoteInteractor = get()
                     )
                 }
                 scoped<External> {

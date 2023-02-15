@@ -1,20 +1,13 @@
 package uk.co.sentinelweb.cuer.remote.server.multicast
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.serializers.InstantIso8601Serializer
-import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.modules.SerializersModule
-import kotlinx.serialization.modules.plus
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.remote.server.ConnectMessageMapper
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.MulticastMessage.MsgType
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType
+import uk.co.sentinelweb.cuer.remote.server.message.deserialiseMulti
+import uk.co.sentinelweb.cuer.remote.server.message.serialise
 import java.io.IOException
 import java.net.DatagramPacket
 import java.net.InetAddress
@@ -25,14 +18,11 @@ import java.nio.charset.Charset
 class JvmMultiCastSocket(
     private val config: MultiCastSocketContract.Config,
     private val log: LogWrapper,
-    private val connectivityUtil: ConnectivityWrapper,
-    private val buildConfigDomain: BuildConfigDomain,
     private val localRepository: LocalRepository,
-    private val multicastMessageMapper: MulticastMessageMapper,
-    private val connectivityWrapper: ConnectivityWrapper,
+    private val connectMessageMapper: ConnectMessageMapper,
 ) : MultiCastSocketContract {
 
-    override var recieveListener: ((MsgType, RemoteNodeDomain) -> Unit)? = null
+    override var connectMessageListener: ((ConnectMessage) -> Unit)? = null
     override var startListener: (() -> Unit)? = null
 
     private lateinit var broadcastAddress: InetAddress
@@ -58,16 +48,7 @@ class JvmMultiCastSocket(
                 val msg = String(buffer, 0, data1.length, Charset.defaultCharset())
                 //log.d("multi Received: $msg")
                 val msgDecoded = deserialiseMulti(msg)
-                if (recieveListener != null) {
-                    recieveListener?.invoke(msgDecoded.type, mapRemoteNode(msgDecoded))
-                }
-                // todo reply via web server
-                if (msgDecoded.type == MsgType.Ping) {
-                    send(MsgType.PingReply)
-                }
-                if (msgDecoded.type == MsgType.Join) {
-                    send(MsgType.JoinReply)
-                }
+                connectMessageListener?.invoke(msgDecoded)
             }
         } catch (e: IOException) {
             log.e(e.toString(), e)
@@ -75,19 +56,13 @@ class JvmMultiCastSocket(
         log.d("exit")
     }
 
-    private fun mapRemoteNode(msgDecoded: MulticastMessage) =
-        multicastMessageMapper.mapFromMulticastMessage(msgDecoded.node)
-
     fun mapLocalNode() =
-        multicastMessageMapper.mapToMulticastMessage(
-            // fixme - this is a bit of a hack to get the local node to update wifi address
-            localRepository.getLocalNode().copy(ipAddress = connectivityWrapper.getWIFIIP()!!)
-        )
+        connectMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true)
 
     override fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {
             try {
-                val joinMsg = MulticastMessage(msgType, mapLocalNode())
+                val joinMsg = ConnectMessage(msgType, mapLocalNode())
                 sendDatagram(joinMsg)
                 log.d("sendMulticast($msgType) .. done")
             } catch (e: Exception) {
@@ -101,7 +76,7 @@ class JvmMultiCastSocket(
         if (theSocket != null && !theSocket!!.isClosed) {
             // TODO note we might need to send a local exit message to stop blocking ...
             try {
-                val closeMsg = MulticastMessage(MsgType.Close, mapLocalNode())
+                val closeMsg = ConnectMessage(MsgType.Close, mapLocalNode())
                 sendDatagram(closeMsg)
                 //log.d("multi closing: send lastcall")
                 val local = InetAddress.getByName("localhost")
@@ -115,33 +90,9 @@ class JvmMultiCastSocket(
         }
     }
 
-    private fun sendDatagram(msg: MulticastMessage) {
+    private fun sendDatagram(msg: ConnectMessage) {
         val serialise = msg.serialise()
         val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress, config.port)
         theSocket!!.send(data)
     }
-
-
-    // region JSON serializer
-    ///////////////////////////////////////////////////////////////////////////
-    fun MulticastMessage.serialise() = wifiJsonSerializer.encodeToString(MulticastMessage.serializer(), this)
-    fun deserialiseMulti(json: String) = wifiJsonSerializer.decodeFromString(MulticastMessage.serializer(), json)
-
-    private val muiltcastSerializersModule = SerializersModule {
-        mapOf(
-            MulticastMessage::class to MulticastMessage.serializer(),
-        )
-    }.plus(SerializersModule {
-        contextual(Instant::class, InstantIso8601Serializer)
-    }).plus(SerializersModule {
-        contextual(LocalDateTime::class, LocalDateTimeIso8601Serializer)
-    })
-
-    val wifiJsonSerializer = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
-        serializersModule = muiltcastSerializersModule
-    }
-    //endregion
 }

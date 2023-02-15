@@ -19,9 +19,11 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
@@ -31,6 +33,7 @@ class RemotesStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
+    private val remoteInteractor: RemoteInteractor
 ) {
 
     init {
@@ -71,7 +74,7 @@ class RemotesStoreFactory constructor(
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
-            when (intent.also { log.d(it.toString()) }) {
+            when (intent) {
                 Intent.ActionSettings -> publish(Label.ActionSettings)
                 Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
@@ -82,7 +85,14 @@ class RemotesStoreFactory constructor(
                 Intent.ActionStartServer -> startServer(intent, getState())
                 Intent.ActionStopServer -> stopServer(intent, getState())
                 Intent.Refresh -> dispatch(Result.UpdateServerState)
+                is Intent.ActionPingNode -> pingNode(intent, getState())
             }
+
+        private fun pingNode(intent: Intent.ActionPingNode, state: State) {
+            coroutines.ioScope.launch {
+                remoteInteractor.connect(intent.remote, ConnectMessage.MsgType.Ping)
+            }
+        }
 
         private fun config(intent: Intent, state: State) {
             publish(Label.ActionConfig)
@@ -114,14 +124,16 @@ class RemotesStoreFactory constructor(
             if (!remoteServerManager.isRunning()) {// just check if the service exists
                 remotesJob = coroutines.mainScope.launch {
                     remoteServerManager.start()
-                    while (remoteServerManager.getService()?.isServerStarted != true) {// fixme limit?
-                        delay(20)
-                    }
-
+                    // fixme limit?
+                    while (remoteServerManager.getService()?.isServerStarted != true) delay(20)
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
                     dispatch(Result.UpdateServerState)
+                    log.d("remotes flow:" + remoteServerManager.getService()?.remoteNodes)
+                    // fixme this doesnt emit after the second time? (something cancelling?)
                     remoteServerManager.getService()?.remoteNodes?.collectLatest {
+                        log.d("collect remotes: ${it.size}")
                         dispatch(Result.SetNodes(it))
+                        log.d("dispatched remotes: ${it.size}")
                     }
                 }
             }

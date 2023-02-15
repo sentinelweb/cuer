@@ -1,0 +1,20 @@
+package uk.co.sentinelweb.cuer.net.remote
+
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.CONNECT_API
+import uk.co.sentinelweb.cuer.remote.server.ipport
+import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
+
+internal class RemoteConnectService(
+    private val executor: ServiceExecutor
+) {
+
+    internal suspend fun sendConnect(
+        node: RemoteNodeDomain,
+        msg: RequestMessage
+    ): Unit = executor.post(
+        path = node.ipport() + CONNECT_API.PATH,
+        body = msg,
+    )
+}

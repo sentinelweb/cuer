@@ -24,6 +24,7 @@ class RemotesContract {
             object ActionStopServer : Intent()
             object ActionPing : Intent()
             object ActionConfig : Intent()
+            data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
         }
 
         sealed class Label {
@@ -65,7 +66,8 @@ class RemotesContract {
             val hostname: String,
             val device: String,
             val deviceType: NodeDomain.DeviceType,
-            val authType: String
+            val authType: String,
+            val domain: NodeDomain
         )
 
         sealed class Event {
@@ -79,6 +81,7 @@ class RemotesContract {
             object OnActionStopServerClicked : Event()
             object OnActionPingClicked : Event()
             object OnActionConfigClicked : Event()
+            data class OnActionPingNodeClicked(val remote: RemoteNodeDomain) : Event()
         }
     }
 }

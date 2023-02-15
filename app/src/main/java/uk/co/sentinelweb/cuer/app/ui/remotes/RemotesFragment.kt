@@ -169,7 +169,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
-                        localRepository = get()
+                        localRepository = get(),
+                        remoteInteractor = get()
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

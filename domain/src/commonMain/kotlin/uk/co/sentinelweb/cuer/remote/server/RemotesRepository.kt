@@ -34,7 +34,7 @@ class RemotesRepository constructor(
 
     fun addUpdateNode(node: RemoteNodeDomain) {
         val local = localNodeRepo.getLocalNode()
-        if (node.ipAddress == local.ipAddress && node.port == local.port) return
+        if (node.id == local.id) return
 
         removeNodeInternal(node)
         _remoteNodes.add(node)
@@ -46,7 +46,7 @@ class RemotesRepository constructor(
 
     private fun removeNodeInternal(node: RemoteNodeDomain) {
         _remoteNodes
-            .find { it.ipAddress == node.ipAddress && it.port == node.port }
+            .find { it.id == node.id }
             ?.also { _remoteNodes.remove(it) }
     }
 }
