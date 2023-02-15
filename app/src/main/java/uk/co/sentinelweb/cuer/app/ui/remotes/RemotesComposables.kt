@@ -43,12 +43,12 @@ object RemotesComposables {
 
     @Composable
     fun RemotesUi(view: RemotesMviViewProxy) {
-        RemotesView(view.observableModel, view.observableLoading, view)
+        RemotesView(view.observableModel, view)
     }
 
     // todo use scaffold
     @Composable
-    fun RemotesView(model: Model, loading: Boolean, view: BaseMviView<Model, Event>) {
+    fun RemotesView(model: Model, view: BaseMviView<Model, Event>) {
         CuerTheme {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
@@ -223,7 +223,6 @@ private fun RemotesPreview() {
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(
         modelMapper.map(RemotesContract.MviStore.State(localNode = localNode)),
-        false,
         view
     )
 }
