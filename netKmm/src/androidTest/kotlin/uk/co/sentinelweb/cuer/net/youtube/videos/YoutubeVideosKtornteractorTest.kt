@@ -79,13 +79,9 @@ class YoutubeVideosKtornteractorTest {
         override fun isConnected() = true
         override fun isMetered() = true
         override fun getWIFIID(): String? = "SSID"
-
         override fun getWIFIIP(): String? = "WIFI.IP"
-
         override fun getLocalIpAddress(): String? = ""
-
         override fun isNonMobileAvailable(): Boolean = true
-
         override fun wifiIpAddress(): String? = "WIFI.IP"
     }
 

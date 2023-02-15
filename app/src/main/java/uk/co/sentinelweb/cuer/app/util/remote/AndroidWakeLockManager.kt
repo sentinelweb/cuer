@@ -32,5 +32,4 @@ class AndroidWakeLockManager(private val context: Context) : WakeLockManager {
     companion object {
         private const val TAG = "Cuer:WakeLock"
     }
-
 }
