@@ -13,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -137,55 +138,73 @@ object RemotesComposables {
     @Composable
     private fun RemoteRow(remote: RemotesContract.View.NodeModel, view: BaseMviView<Model, Event>) {
         val expanded = remember { mutableStateOf(false) }
-        Row(
-            modifier = Modifier
-                .clickable { expanded.value = !expanded.value }
-                .fillMaxWidth()
-                .padding(8.dp)
-                .background(MaterialTheme.colors.surface)
-                .clickable { view.dispatch(OnActionPingNodeClicked(remote.domain as RemoteNodeDomain)) },
-            verticalAlignment = Alignment.CenterVertically,
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_wifi_tethering),
-                tint = MaterialTheme.colors.onSurface,
-                contentDescription = null,
-                modifier = Modifier.size(48.dp).padding(4.dp)
-            )
-            Column { // todo use textview
-                Text(
-                    text = remote.title,
-                    style = MaterialTheme.typography.h5,
-                    modifier = Modifier.padding(start = 8.dp),
-                )
-                Text(
-                    text = remote.address,
-                    style = MaterialTheme.typography.body2,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-                Text(
-                    text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
-                    style = MaterialTheme.typography.body2,
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-            DropdownMenu(
-                expanded = expanded.value,
-                onDismissRequest = { expanded.value = false }
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    //.clickable { expanded.value = !expanded.value }
+                    .background(MaterialTheme.colors.surface),
+                verticalAlignment = Alignment.CenterVertically,
             ) {
-                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                    Text("Connect")
+                Icon(
+                    painter = painterResource(R.drawable.ic_wifi_tethering),
+                    tint = MaterialTheme.colors.onSurface,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp).padding(4.dp)
+                )
+                Column { // todo use textview
+                    Text(
+                        text = remote.title,
+                        style = MaterialTheme.typography.h5,
+                        modifier = Modifier.padding(start = 8.dp),
+                    )
+                    Text(
+                        text = remote.address,
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    Text(
+                        text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
-                DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                    Text("Play")
-                }
-                Divider()
-                DropdownMenuItem(onClick = { /* Handle settings! */ }) {
-                    Text("Playlists")
-                }
-
-                DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
-                    Text("Sync")
+            }
+            // overflow button and dropdown
+            Box(
+                modifier = Modifier.wrapContentWidth(align = Alignment.End),
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_vert),
+                    tint = colorResource(R.color.grey_500),
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp).padding(8.dp).clickable { expanded.value = !expanded.value },
+                )
+                DropdownMenu(
+                    expanded = expanded.value,
+                    modifier = Modifier.width(200.dp),
+                    onDismissRequest = { expanded.value = false }
+                ) {
+                    DropdownMenuItem(onClick = { view.dispatch(OnActionPingNodeClicked(remote.domain as RemoteNodeDomain)) }) {
+                        Text("Ping")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                        Text("Connect")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                        Text("Sync")
+                    }
+                    Divider()
+                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                        Text("Play")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                        Text("Playlists")
+                    }
                 }
             }
         }
