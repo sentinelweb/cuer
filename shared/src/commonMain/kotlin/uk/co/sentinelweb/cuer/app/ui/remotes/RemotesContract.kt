@@ -22,7 +22,7 @@ class RemotesContract {
             object ActionHelp : Intent()
             object ActionStartServer : Intent()
             object ActionStopServer : Intent()
-            object ActionPing : Intent()
+            object ActionPingMulticast : Intent()
             object ActionConfig : Intent()
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
         }
@@ -79,7 +79,7 @@ class RemotesContract {
             object OnUpClicked : Event()
             object OnActionStartServerClicked : Event()
             object OnActionStopServerClicked : Event()
-            object OnActionPingClicked : Event()
+            object OnActionPingMulticastClicked : Event()
             object OnActionConfigClicked : Event()
             data class OnActionPingNodeClicked(val remote: RemoteNodeDomain) : Event()
         }

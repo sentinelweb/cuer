@@ -3,15 +3,11 @@ package uk.co.sentinelweb.cuer.app.service.remote
 //import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.*
 import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
@@ -40,10 +36,6 @@ class RemoteServerServiceController constructor(
     override val isServerStarted: Boolean
         get() = webServer.isRunning
 
-    private val _remoteNodes: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(listOf())
-    override val remoteNodes: Flow<List<RemoteNodeDomain>>
-        get() = _remoteNodes
-
     private val address: Pair<String, Int>?
         get() = true
             .takeIf { webServer.isRunning }
@@ -67,18 +59,14 @@ class RemoteServerServiceController constructor(
             MsgType.PingReply -> remoteRepo.addUpdateNode(remote)
             MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
         }
-        // todo merge updated remote info with local list
-        coroutines.mainScope.launch {
-            log.d("remotes list:\n" + remoteRepo.remoteNodes.map { it.run { "host: - $id ${ipport()}" } }.joinToString("\n"))
-            _remoteNodes.emit(remoteRepo.remoteNodes) // fixme this is not emitting after the second time
-            if (localRepo.getLocalNode().id != remote.id) {
-                withContext(coroutines.ioScope.coroutineContext) {
-                    when (msg.type) {
-                        MsgType.Join -> remoteInteractor.connect(remote, MsgType.JoinReply)
-                        MsgType.Ping -> remoteInteractor.connect(remote, MsgType.PingReply)
 
-                        else -> Unit
-                    }
+        if (localRepo.getLocalNode().id != remote.id) {
+            coroutines.mainScope.launch {
+                when (msg.type) {
+                    MsgType.Join -> remoteInteractor.connect(MsgType.JoinReply, remote)
+                    MsgType.Ping -> remoteInteractor.connect(MsgType.PingReply, remote)
+
+                    else -> Unit
                 }
             }
         }
@@ -92,7 +80,7 @@ class RemoteServerServiceController constructor(
     override fun initialise() {
         coroutines.ioScope.launch {
             _localNode = localRepo.getLocalNode()
-            _remoteNodes.value = remoteRepo.loadAll()
+            //_remoteNodes.value = remoteRepo.loadAll()
         }
         notification.updateNotification("x.x.x.x")
         _serverJob?.cancel()
@@ -128,9 +116,9 @@ class RemoteServerServiceController constructor(
 
     override fun destroy() {
         log.d("Controller destroy")
-        coroutines.mainScope.launch {
-            _remoteNodes.emit(listOf())
-        }
+//        coroutines.mainScope.launch {
+//            _remoteNodes.emit(listOf())
+//        }
         webServer.stop()
         _serverJob?.cancel()
         _serverJob = null

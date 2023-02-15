@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.remote.server
 import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
-import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class RemotesRepository constructor(
     private val fileInteractor: FileInteractor,
@@ -11,6 +10,7 @@ class RemotesRepository constructor(
 ) {
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
 
+    var updatesCallback: ((List<RemoteNodeDomain>) -> Unit)? = null
     val remoteNodes: List<RemoteNodeDomain>
         get() = _remoteNodes
 
@@ -19,17 +19,9 @@ class RemotesRepository constructor(
         fileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
             ?.let { _remoteNodes.addAll(deserialiseRemoteNodeList(it)) }
-        return remoteNodes
-    }
 
-    fun save(list: List<RemoteNodeDomain>) {
-        _remoteNodes.clear()
-        _remoteNodes.addAll(list)
-        saveNodeList(list)
-    }
-
-    private fun saveNodeList(list: List<RemoteNodeDomain>) {
-        fileInteractor.saveJson(list.serialise())
+        updatesCallback?.invoke(_remoteNodes)
+        return _remoteNodes
     }
 
     fun addUpdateNode(node: RemoteNodeDomain) {
@@ -38,10 +30,12 @@ class RemotesRepository constructor(
 
         removeNodeInternal(node)
         _remoteNodes.add(node)
+        updatesCallback?.invoke(_remoteNodes)
     }
 
     fun removeNode(node: RemoteNodeDomain) {
         removeNodeInternal(node)
+        updatesCallback?.invoke(_remoteNodes)
     }
 
     private fun removeNodeInternal(node: RemoteNodeDomain) {

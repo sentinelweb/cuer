@@ -14,8 +14,8 @@ internal class RemoteKtorInteractor(
 ) : RemoteInteractor {
 
     override suspend fun connect(
+        messageType: ConnectMessage.MsgType,
         remote: RemoteNodeDomain,
-        messageType: ConnectMessage.MsgType
     ): NetResult<String> {
         return try {
             val connectMessage = ConnectMessage(messageType, connectMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true))

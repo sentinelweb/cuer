@@ -97,7 +97,7 @@ object RemotesComposables {
                                 STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
                             }
                             if (model.serverState == STARTED) {
-                                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingClicked) }
+                                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingMulticastClicked) }
                             }
                             HeaderButton("Config", R.drawable.ic_menu_settings) { view.dispatch(OnActionConfigClicked) }
                         }

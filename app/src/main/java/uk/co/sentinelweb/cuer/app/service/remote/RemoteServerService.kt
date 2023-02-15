@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.service.remote
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import kotlinx.coroutines.flow.Flow
 import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.scope.AndroidScopeComponent
@@ -18,7 +17,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent {
@@ -31,9 +29,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
 
     override val localNode: LocalNodeDomain
         get() = controller.localNode
-
-    override val remoteNodes: Flow<List<RemoteNodeDomain>>
-        get() = controller.remoteNodes
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: Controller by scope.inject()

@@ -8,8 +8,8 @@ interface RemoteInteractor {
 
     @Throws(Exception::class)
     suspend fun connect(
+        messageType: ConnectMessage.MsgType,
         remote: RemoteNodeDomain,
-        messageType: ConnectMessage.MsgType
     ): NetResult<String>
 
 }

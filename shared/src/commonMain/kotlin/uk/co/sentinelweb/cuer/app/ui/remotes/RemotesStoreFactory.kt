@@ -8,7 +8,6 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
@@ -21,9 +20,10 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType.Ping
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
@@ -33,7 +33,8 @@ class RemotesStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
-    private val remoteInteractor: RemoteInteractor
+    private val remoteInteractor: RemoteInteractor,
+    private val remotesRepository: RemotesRepository,
 ) {
 
     init {
@@ -81,7 +82,7 @@ class RemotesStoreFactory constructor(
                 Intent.ActionHelp -> publish(Label.ActionHelp)
                 Intent.Up -> publish(Label.Up)
                 Intent.ActionConfig -> config(intent, getState())
-                Intent.ActionPing -> ping(intent, getState())
+                Intent.ActionPingMulticast -> pingMulticast(intent, getState())
                 Intent.ActionStartServer -> startServer(intent, getState())
                 Intent.ActionStopServer -> stopServer(intent, getState())
                 Intent.Refresh -> dispatch(Result.UpdateServerState)
@@ -90,7 +91,7 @@ class RemotesStoreFactory constructor(
 
         private fun pingNode(intent: Intent.ActionPingNode, state: State) {
             coroutines.ioScope.launch {
-                remoteInteractor.connect(intent.remote, ConnectMessage.MsgType.Ping)
+                remoteInteractor.connect(Ping, intent.remote)
             }
         }
 
@@ -98,7 +99,7 @@ class RemotesStoreFactory constructor(
             publish(Label.ActionConfig)
         }
 
-        private fun ping(intent: Intent, state: State) {
+        private fun pingMulticast(intent: Intent, state: State) {
             if (remoteServerManager.isRunning()) {
                 coroutines.ioScope.launch {
                     remoteServerManager.getService()?.ping()
@@ -115,35 +116,33 @@ class RemotesStoreFactory constructor(
                     remoteServerManager.stop()
                     delay(20)
                     dispatch(Result.UpdateServerState)
+                    remotesRepository.updatesCallback = null
                     dispatch(Result.SetNodes(listOf()))
                 }
             }
         }
 
         private fun startServer(intent: Intent, state: State) {
-            if (!remoteServerManager.isRunning()) {// just check if the service exists
-                remotesJob = coroutines.mainScope.launch {
+            if (!remoteServerManager.isRunning()) {
+                coroutines.mainScope.launch {
                     remoteServerManager.start()
                     // fixme limit?
                     while (remoteServerManager.getService()?.isServerStarted != true) delay(20)
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
                     dispatch(Result.UpdateServerState)
-                    log.d("remotes flow:" + remoteServerManager.getService()?.remoteNodes)
-                    // fixme this doesnt emit after the second time? (something cancelling?)
-                    remoteServerManager.getService()?.remoteNodes?.collectLatest {
-                        log.d("collect remotes: ${it.size}")
-                        dispatch(Result.SetNodes(it))
-                        log.d("dispatched remotes: ${it.size}")
+                }
+                remotesRepository.updatesCallback = { remoteNodes ->
+                    log.d("remotes callback: ${remoteNodes.size}")
+                    coroutines.mainScope.launch {
+                        dispatch(Result.SetNodes(remoteNodes))
                     }
                 }
             }
         }
 
         private fun testLoad() {
-            //dispatch(Result.SetNodes(listOf()))
             dispatch(Result.UpdateServerState)
         }
-
     }
 
     fun create(): MviStore =
