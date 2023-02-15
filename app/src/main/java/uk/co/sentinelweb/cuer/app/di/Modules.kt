@@ -73,6 +73,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
+import uk.co.sentinelweb.cuer.app.util.remote.AndroidWakeLockManager
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.AndroidLinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -95,6 +96,7 @@ import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.di.NetModule
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
+import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 
@@ -175,6 +177,7 @@ object Modules {
                 .let { FileInteractor(it, get()) }
                 .let { RemotesRepository(it, get()) }
         }
+        single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
     }
 
     private val utilModule = module {

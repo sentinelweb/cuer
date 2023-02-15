@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    package="uk.co.sentinelweb.cuer.app">
+          xmlns:tools="http://schemas.android.com/tools"
+          package="uk.co.sentinelweb.cuer.app">
 
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+
     <!--android:dataExtractionRules="@xml/data_extraction"-->
     <queries>
-        <package android:name="com.squareup.cash" />
-        <package android:name="de.schildbach.wallet" />
-        <package android:name="co.mona.android" />
-        <package android:name="com.bitcoin.mwallet" />
-        <package android:name="com.coinomi.wallet" />
-        <package android:name="com.coinbase.android" />
-        <package android:name="fr.acinq.eclair.wallet.mainnet2" />
+        <package android:name="com.squareup.cash"/>
+        <package android:name="de.schildbach.wallet"/>
+        <package android:name="co.mona.android"/>
+        <package android:name="com.bitcoin.mwallet"/>
+        <package android:name="com.coinomi.wallet"/>
+        <package android:name="com.coinbase.android"/>
+        <package android:name="fr.acinq.eclair.wallet.mainnet2"/>
         <package android:name="org.electrum.electrum" />
         <package android:name="exodusmovement.exodus" />
         <package android:name="com.gemini.android.app" />

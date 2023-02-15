@@ -86,7 +86,8 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         localRepo = get(),
                         remoteRepo = get(),
                         connectMessageMapper = get(),
-                        remoteInteractor = get()
+                        remoteInteractor = get(),
+                        wakeLockManager = get()
                     )
                 }
                 scoped<External> {

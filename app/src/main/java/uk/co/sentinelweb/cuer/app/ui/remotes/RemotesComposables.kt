@@ -140,7 +140,7 @@ object RemotesComposables {
         val expanded = remember { mutableStateOf(false) }
         Box(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd
+            contentAlignment = Alignment.CenterEnd,
         ) {
             Row(
                 modifier = Modifier

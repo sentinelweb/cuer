@@ -23,7 +23,8 @@ class RemoteServerServiceController constructor(
     private val remoteRepo: RemotesRepository,
     private val localRepo: LocalRepository,
     private val connectMessageMapper: ConnectMessageMapper,
-    private val remoteInteractor: RemoteInteractor
+    private val remoteInteractor: RemoteInteractor,
+    private val wakeLockManager: WakeLockManager
 ) : RemoteServerContract.Controller {
 
     init {
@@ -104,6 +105,7 @@ class RemoteServerServiceController constructor(
             multi.runSocketListener()
             log.d("multicast ended")
         }
+        wakeLockManager.acquireWakeLock()
     }
 
     override fun handleAction(action: String?) {
@@ -119,6 +121,7 @@ class RemoteServerServiceController constructor(
 //        coroutines.mainScope.launch {
 //            _remoteNodes.emit(listOf())
 //        }
+        wakeLockManager.releaseWakeLock()
         webServer.stop()
         _serverJob?.cancel()
         _serverJob = null
