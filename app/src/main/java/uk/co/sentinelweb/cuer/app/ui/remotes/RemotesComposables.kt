@@ -102,7 +102,12 @@ object RemotesComposables {
                             )
                         ) {
                             when (model.serverState) {
-                                STOPPED, INITIAL -> HeaderButton("Start", R.drawable.ic_play) { view.dispatch(OnActionStartServerClicked) }
+                                STOPPED, INITIAL -> HeaderButton(
+                                    if (model.wifiState.connected) "Start" else "No WiFi",
+                                    R.drawable.ic_play,
+                                    enabled = model.wifiState.connected
+                                ) { view.dispatch(OnActionStartServerClicked) }
+
                                 STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
                             }
                             if (model.serverState == STARTED) {

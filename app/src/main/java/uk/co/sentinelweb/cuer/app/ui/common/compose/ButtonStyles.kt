@@ -28,13 +28,15 @@ fun cuerSolidButtonColors() = buttonColors(
 )
 
 @Composable
-fun cuerOutlineButtonStroke() = BorderStroke(1.dp, MaterialTheme.colors.onSurface)
+fun cuerOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(1.dp, cuerOutlineButtonColors().contentColor(enabled).value)
+val cuerOutlineButtonStrokEnabler = @Composable { e: Boolean -> cuerOutlineButtonStroke(e) }
 
 @Composable
-fun cuerSolidButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.primary)
+fun cuerSolidButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerSolidButtonColors().contentColor(enabled).value)
+val cuerSolidButtonStrokeEnabler = @Composable { e: Boolean -> cuerSolidButtonStroke(e) }
 
 @Composable
-fun cuerNoOutlineButtonStroke() = BorderStroke(0.dp, MaterialTheme.colors.onSurface)
+fun cuerNoOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerOutlineButtonColors().backgroundColor(enabled).value)
 
 @Composable
 fun HeaderButton(
@@ -42,27 +44,30 @@ fun HeaderButton(
     icon: Int,
     modifier: Modifier = Modifier,
     colors: ButtonColors = cuerOutlineButtonColors(),
-    border: BorderStroke = cuerOutlineButtonStroke(),
+    border: @Composable (Boolean) -> BorderStroke = cuerOutlineButtonStrokEnabler,
+    enabled: Boolean = true,
     action: () -> Unit
 ) {
     Button(
         onClick = { action() },
         modifier = modifier
             .padding(end = 16.dp),
-        border = border,
+        border = border(enabled),
         colors = colors,
+        enabled = enabled,
         elevation = ButtonDefaults.elevation(0.dp),
     ) {
         Icon(
             painter = painterResource(icon),
-            tint = colors.contentColor(true).value,
+            tint = colors.contentColor(enabled).value,
             contentDescription = null,
             modifier = Modifier.size(24.dp)
         )
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.button,
-            modifier = Modifier.padding(start = 4.dp)
+            modifier = Modifier.padding(start = 4.dp),
+            color = colors.contentColor(enabled).value,
         )
     }
 }
@@ -72,8 +77,9 @@ fun HeaderButtonSolid(
     text: String,
     icon: Int,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     action: () -> Unit
 ) {
-    HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStroke(), action)
+    HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStrokeEnabler, enabled, action)
 }
 
