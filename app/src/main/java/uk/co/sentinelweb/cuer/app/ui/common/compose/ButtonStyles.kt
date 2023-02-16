@@ -32,7 +32,7 @@ fun cuerOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(1.dp, cuerOu
 val cuerOutlineButtonStrokEnabler = @Composable { e: Boolean -> cuerOutlineButtonStroke(e) }
 
 @Composable
-fun cuerSolidButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerSolidButtonColors().contentColor(enabled).value)
+fun cuerSolidButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerSolidButtonColors().backgroundColor(enabled).value)
 val cuerSolidButtonStrokeEnabler = @Composable { e: Boolean -> cuerSolidButtonStroke(e) }
 
 @Composable

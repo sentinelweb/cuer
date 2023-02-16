@@ -220,6 +220,7 @@ object LocalComposables {
                                 }
                             }
                         }
+                        Row(modifier = Modifier.height(200.dp)) {}
                     }
                 }
             }

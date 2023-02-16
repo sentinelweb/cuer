@@ -78,6 +78,9 @@ class LocalStoreFactory constructor(
                     hostname = intent.updated.hostname,
                     port = intent.updated.port,
                     authConfig = intent.updated.authConfig,
+                    wifiAutoStart = intent.updated.wifiAutoStart,
+                    wifiAutoNotify = intent.updated.wifiAutoNotify,
+                    wifiAutoConnectSSIDs = intent.updated.wifiAutoConnectSSIDs,
                 )
                 .also { localRepository.saveLocalNode(it) }
 
