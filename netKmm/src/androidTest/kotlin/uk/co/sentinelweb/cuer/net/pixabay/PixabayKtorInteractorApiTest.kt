@@ -9,6 +9,7 @@ import org.junit.Test
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ErrorMapper
@@ -40,7 +41,7 @@ class PixabayKtorInteractorApiTest {
     private val connectivityWrapper = object : ConnectivityWrapper {
         override fun isConnected() = true
         override fun isMetered() = true
-        override fun getWIFIID(): String? = "SSID"
+        override fun getWIFIInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState()
         override fun getWIFIIP(): String? = "WIFI.IP"
         override fun getLocalIpAddress(): String? = ""
         override fun isNonMobileAvailable(): Boolean = true
