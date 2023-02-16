@@ -9,15 +9,18 @@ import com.arkivanov.mvikotlin.extensions.coroutines.events
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 
 class RemotesController constructor(
     storeFactory: RemotesStoreFactory,
     private val modelMapper: RemotesModelMapper,
+    private val wifiStateProvider: WifiStateProvider,
     lifecycle: Lifecycle?,
     log: LogWrapper,
 ) {
@@ -58,6 +61,10 @@ class RemotesController constructor(
                 view.events
                     .onEach { println("Event: $it") }
                     .mapNotNull(eventToIntent) bindTo store
+
+                wifiStateProvider.wifiStateFlow
+                    .onEach { println("Wifi Event: $it") }
+                    .map { Intent.WifiStateChange(it) } bindTo store
             }
         }
     }

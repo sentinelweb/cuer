@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain
@@ -25,6 +26,7 @@ class RemotesContract {
             object ActionPingMulticast : Intent()
             object ActionConfig : Intent()
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
+            data class WifiStateChange(val wifiState: WifiStateProvider.WifiState) : Intent()
         }
 
         sealed class Label {
@@ -43,6 +45,7 @@ class RemotesContract {
             val serverAddress: String? = null,
             val localNode: LocalNodeDomain,
             val remoteNodes: List<RemoteNodeDomain> = listOf(),
+            val wifiState: WifiStateProvider.WifiState,
         )
     }
 
@@ -57,6 +60,7 @@ class RemotesContract {
             val localNode: NodeModel,
             val remoteNodes: List<NodeModel>,
             val serverState: ServerState = INITIAL,
+            val wifiState: WifiStateProvider.WifiState,
         )
 
         data class NodeModel(

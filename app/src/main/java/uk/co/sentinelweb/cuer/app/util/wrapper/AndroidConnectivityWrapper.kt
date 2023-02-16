@@ -4,15 +4,18 @@ import android.content.Context
 import android.content.Context.WIFI_SERVICE
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
+import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import java.math.BigInteger
 import java.net.InetAddress
 import java.net.NetworkInterface
 import java.net.SocketException
 import java.net.UnknownHostException
 import java.nio.ByteOrder
+
 
 class AndroidConnectivityWrapper constructor(
     private val context: Context,
@@ -75,33 +78,31 @@ class AndroidConnectivityWrapper constructor(
                     || type == ConnectivityManager.TYPE_WIMAX)
         } ?: false
 
-    override fun getWIFIID(): String? {
-        var connectivity: ConnectivityManager? = null
-        try {
-            connectivity = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        } catch (e: NullPointerException) {
-            /* Sometime we get an IConnectivityMannager not found */
-        }
-        if (connectivity == null) {
-            log.d("Couldn't get connectivity manager")
-        } else {
-            val info = connectivity.activeNetworkInfo
-            if (info != null) {
-                if (info.type == ConnectivityManager.TYPE_WIFI) { // need to check the type returned for wifi.
-                    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-                    val wifiInfo = wifiManager.connectionInfo
-                    var ssid = wifiInfo.ssid
-                    if (ssid != null && ssid.length > 0 && ssid[0] == '"' && ssid.length > 2) {
-                        ssid = ssid.substring(1, ssid.length - 1)
-                    }
-                    if ("" != ssid.trim()) return ssid
-                }
-            } else {
-                return null
-            }
-        }
-        return null
+    override fun getWIFIInfo(): WifiStateProvider.WifiState {
+//        val connManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//        val networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+        val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
+//        log.d("networkInfo: $networkInfo")
+//        return networkInfo
+//            ?.takeIf { it.isConnected }
+//            ?.let { wifiManager.connectionInfo }
+        return wifiManager.connectionInfo
+            ?.takeIf { it.ipAddress != 0 }// hack but connectivity manager return the wrong connected state
+            ?.run {
+                WifiStateProvider.WifiState(
+                    connected = ipAddress != 0,
+                    ssid = ssid,
+                    bssid = bssid,
+                    ip = ipToString(),
+                    linkSpeed = linkSpeed,
+                    rssi = rssi,
+                )
+            } ?: WifiStateProvider.WifiState()
+
     }
+
+    private fun WifiInfo.ipToString() =
+        (ipAddress and 0xFF).toString() + "." + (ipAddress shr 8 and 0xFF) + "." + (ipAddress shr 16 and 0xFF) + "." + (ipAddress shr 24 and 0xFF)
 
     override fun getWIFIIP(): String? {
         val connectivity = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -111,7 +112,7 @@ class AndroidConnectivityWrapper constructor(
             val info = connectivity.activeNetworkInfo
             if (info != null) {
                 if (info.type == ConnectivityManager.TYPE_WIFI) { // need to check the type returned for wifi.
-                    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
                     val wifiInfo = wifiManager.connectionInfo
                     val ipAddress = wifiInfo.ipAddress
                     return (ipAddress and 0xFF).toString() + "." + (ipAddress shr 8 and 0xFF) + "." + (ipAddress shr 16 and 0xFF) + "." + (ipAddress shr 24 and 0xFF)

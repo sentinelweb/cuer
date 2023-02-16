@@ -33,6 +33,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -73,7 +74,7 @@ object RemotesComposables {
                             .verticalScroll(rememberScrollState())
                             .padding(bottom = 128.dp)
                     ) {
-                        Row(modifier = Modifier.height(160.dp)) {
+                        Box(modifier = Modifier.height(160.dp)) {
                             model.imageUrl
                                 ?.also { url ->
                                     Image(
@@ -86,6 +87,13 @@ object RemotesComposables {
                                         contentScale = ContentScale.Crop
                                     )
                                 }
+                            Text(
+                                text = model.wifiState.run { "$connected $ssid $ip" },
+                                color = colorResource(R.color.white),
+                                modifier = Modifier
+                                    .align(Alignment.BottomStart)
+                                    .padding(16.dp)
+                            )
                         }
                         Row(
                             modifier = Modifier.padding(
@@ -222,7 +230,7 @@ private fun RemotesPreview() {
     )
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(
-        modelMapper.map(RemotesContract.MviStore.State(localNode = localNode)),
+        modelMapper.map(RemotesContract.MviStore.State(localNode = localNode, wifiState = WifiStateProvider.WifiState())),
         view
     )
 }

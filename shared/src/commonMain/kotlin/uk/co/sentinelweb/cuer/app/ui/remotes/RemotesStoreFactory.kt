@@ -16,7 +16,9 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -35,6 +37,7 @@ class RemotesStoreFactory constructor(
     private val localRepository: LocalRepository,
     private val remoteInteractor: RemoteInteractor,
     private val remotesRepository: RemotesRepository,
+    private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
     init {
@@ -43,6 +46,7 @@ class RemotesStoreFactory constructor(
 
     private sealed class Result {
         data class SetNodes(val nodes: List<RemoteNodeDomain>) : Result()
+        data class UpdateWifiState(val state: WifiStateProvider.WifiState) : Result()
         object UpdateServerState : Result()
     }
 
@@ -59,6 +63,8 @@ class RemotesStoreFactory constructor(
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
                     localNode = remoteServerManager.getService()?.localNode ?: localRepository.getLocalNode()
                 )
+
+                is Result.UpdateWifiState -> copy(wifiState = result.state)
             }
     }
 
@@ -69,6 +75,7 @@ class RemotesStoreFactory constructor(
     }
 
     private inner class ExecutorImpl() : CoroutineExecutor<Intent, Action, State, Result, Label>() {
+
         override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
                 Action.Init -> testLoad()
@@ -87,6 +94,7 @@ class RemotesStoreFactory constructor(
                 Intent.ActionStopServer -> stopServer(intent, getState())
                 Intent.Refresh -> dispatch(Result.UpdateServerState)
                 is Intent.ActionPingNode -> pingNode(intent, getState())
+                is Intent.WifiStateChange -> dispatch(Result.UpdateWifiState(intent.wifiState))
             }
 
         private fun pingNode(intent: Intent.ActionPingNode, state: State) {
@@ -148,7 +156,10 @@ class RemotesStoreFactory constructor(
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "RemotesStore",
-            initialState = State(localNode = localRepository.getLocalNode()),
+            initialState = State(
+                localNode = localRepository.getLocalNode(),
+                wifiState = connectivityWrapper.getWIFIInfo()
+            ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()

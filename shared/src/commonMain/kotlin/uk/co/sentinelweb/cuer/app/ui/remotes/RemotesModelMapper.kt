@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.NodeModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -26,6 +27,7 @@ class RemotesModelMapper constructor(
             remoteNodes = state.remoteNodes.map { mapRemoteNode(it) },
             serverState = state.serverState,
             address = state.serverAddress,
+            wifiState = state.wifiState,
         ).also { log.d("mapped: $it") }
     }
 
@@ -61,6 +63,7 @@ class RemotesModelMapper constructor(
             localNode = dummyNodeModel(),
             remoteNodes = listOf(),
             address = "a.a.a.a:aaaa",
+            wifiState = WifiStateProvider.WifiState()
         )
 
         fun dummyNodeModel() = NodeModel(

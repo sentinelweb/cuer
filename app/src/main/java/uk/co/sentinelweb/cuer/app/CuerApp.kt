@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper.Companion.SERVICE_NOT_FOUND
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import kotlin.time.ExperimentalTime
 
 @ExperimentalTime
@@ -34,6 +35,7 @@ class CuerApp : Application() {
     private val castSessionListener: CuerCastSessionListener by inject()
     private val queue: QueueMediatorContract.Producer by inject()
     private val screenStateReceiver: ScreenStateReceiver by inject()
+    private val wifiReceiver: WifiStateProvider by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -62,6 +64,7 @@ class CuerApp : Application() {
         firebaseWrapper.sendUnsentReports()
         setDefaultExceptionHander()
         screenStateReceiver.register(this)
+        wifiReceiver.register()
     }
 
     override fun onTerminate() {
@@ -79,6 +82,7 @@ class CuerApp : Application() {
         }
         queue.destroy()
         screenStateReceiver.unregister(this) // registered in module
+        wifiReceiver.unregister()
     }
 
     private var oldHandler: Thread.UncaughtExceptionHandler? = null
