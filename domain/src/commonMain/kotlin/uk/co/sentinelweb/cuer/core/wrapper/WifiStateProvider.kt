@@ -7,12 +7,13 @@ interface WifiStateProvider {
     val wifiStateFlow: Flow<WifiState>
 
     data class WifiState(
-        val connected: Boolean = false,
+        val isConnected: Boolean = false,
         val ssid: String? = null,
         val ip: String? = null,
         val linkSpeed: Int? = null,
         val bssid: String? = null,
         val rssi: Int? = null,
+        val isObscured: Boolean = false,
     )
 
     fun register()

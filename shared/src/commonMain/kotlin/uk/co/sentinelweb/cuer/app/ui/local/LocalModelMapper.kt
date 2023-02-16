@@ -19,6 +19,7 @@ class LocalModelMapper constructor(
             localNodeDomain = state.localNode,
             serverState = state.serverState,
             address = state.serverAddress,
+            wifiState = state.wifiState
         )
     }
 }

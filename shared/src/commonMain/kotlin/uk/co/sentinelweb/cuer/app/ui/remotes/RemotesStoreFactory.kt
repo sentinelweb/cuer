@@ -95,7 +95,13 @@ class RemotesStoreFactory constructor(
                 Intent.Refresh -> dispatch(Result.UpdateServerState)
                 is Intent.ActionPingNode -> pingNode(intent, getState())
                 is Intent.WifiStateChange -> dispatch(Result.UpdateWifiState(intent.wifiState))
+                is Intent.ActionObscuredPerm -> launchLocationPermission()
             }
+
+        private fun launchLocationPermission() {
+            //TODO("Launch location permission")
+            // todo launch location permission
+        }
 
         private fun pingNode(intent: Intent.ActionPingNode, state: State) {
             coroutines.ioScope.launch {

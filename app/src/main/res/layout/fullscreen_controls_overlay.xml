@@ -225,7 +225,7 @@
             android:id="@+id/controls_close"
             style="@style/YoutubePlayer.MenuButton"
             android:contentDescription="@string/menu_exit"
-            app:srcCompat="@drawable/ic_clear_24"
+            app:srcCompat="@drawable/ic_clear"
             tools:ignore="RtlHardcoded"/>
 
     </LinearLayout>

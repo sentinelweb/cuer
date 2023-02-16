@@ -79,27 +79,24 @@ class AndroidConnectivityWrapper constructor(
         } ?: false
 
     override fun getWIFIInfo(): WifiStateProvider.WifiState {
-//        val connManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-//        val networkInfo = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
         val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
-//        log.d("networkInfo: $networkInfo")
-//        return networkInfo
-//            ?.takeIf { it.isConnected }
-//            ?.let { wifiManager.connectionInfo }
         return wifiManager.connectionInfo
-            ?.takeIf { it.ipAddress != 0 }// hack but connectivity manager return the wrong connected state
+            ?.takeIf { it.ipAddress != 0 } // hack but connectivity manager return the wrong connected state
             ?.run {
+                val obscured = ssid == UNKNOWN_SSID
                 WifiStateProvider.WifiState(
-                    connected = ipAddress != 0,
-                    ssid = ssid,
+                    isConnected = ipAddress != 0,
+                    isObscured = obscured,
+                    ssid = if (obscured) null else ssid.stripQuotes(),
                     bssid = bssid,
                     ip = ipToString(),
                     linkSpeed = linkSpeed,
                     rssi = rssi,
                 )
             } ?: WifiStateProvider.WifiState()
-
     }
+
+    fun String.stripQuotes() = if (length > 0 && this[0] == '"' && length > 2) substring(1, length - 1) else this
 
     private fun WifiInfo.ipToString() =
         (ipAddress and 0xFF).toString() + "." + (ipAddress shr 8 and 0xFF) + "." + (ipAddress shr 16 and 0xFF) + "." + (ipAddress shr 24 and 0xFF)
@@ -145,5 +142,9 @@ class AndroidConnectivityWrapper constructor(
             null
         }
         return ipAddressString
+    }
+
+    companion object {
+        const val UNKNOWN_SSID = "<unknown ssid>" // android constant added in R(30) but this shows in Q
     }
 }

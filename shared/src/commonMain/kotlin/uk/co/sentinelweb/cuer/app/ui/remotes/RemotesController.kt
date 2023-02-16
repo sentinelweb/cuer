@@ -45,6 +45,7 @@ class RemotesController constructor(
             is Event.OnActionPingNodeClicked -> Intent.ActionPingNode(remote)
             Event.OnActionStartServerClicked -> Intent.ActionStartServer
             Event.OnActionStopServerClicked -> Intent.ActionStopServer
+            Event.OnActionObscuredPermClicked -> Intent.ActionObscuredPerm
         }
     }
 

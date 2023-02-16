@@ -1,11 +1,8 @@
 package uk.co.sentinelweb.cuer.app.ui.local
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.Saver
@@ -31,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.State
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain.AuthConfig.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseLocalNode
@@ -121,33 +119,33 @@ object LocalComposables {
                             label = { Text("Port") },
                             modifier = Modifier.padding(16.dp)
                         )
-                        var ddExpanded by remember { mutableStateOf(false) }
-                        val authType = localNode.authConfig
+                        // auth config
+                        var authDropdownExpanded by remember { mutableStateOf(false) }
                         HeaderButton(
-                            text = authType::class.simpleName!!,
+                            text = localNode.authConfig::class.simpleName!!,
                             icon = R.drawable.ic_login,
                             modifier = Modifier.padding(start = 16.dp)
-                        ) { ddExpanded = true }
+                        ) { authDropdownExpanded = true }
                         DropdownMenu(
-                            expanded = ddExpanded,
-                            onDismissRequest = { ddExpanded = false },
+                            expanded = authDropdownExpanded,
+                            onDismissRequest = { authDropdownExpanded = false },
                         ) {
                             DropdownMenuItem(onClick = {
                                 localNode = localNode.copy(authConfig = Open)
-                                ddExpanded = false
+                                authDropdownExpanded = false
                             }) { Text(text = "Open") }
 
                             DropdownMenuItem(onClick = {
                                 localNode = localNode.copy(authConfig = Confirm)
-                                ddExpanded = false
+                                authDropdownExpanded = false
                             }) { Text(text = "Confirm") }
 
                             DropdownMenuItem(onClick = {
                                 localNode = localNode.copy(authConfig = Username("", ""))
-                                ddExpanded = false
+                                authDropdownExpanded = false
                             }) { Text(text = "Password") }
                         }
-                        when (authType) {
+                        when (localNode.authConfig) {
                             Open -> Unit
                             Confirm -> Unit
                             is Username -> {
@@ -171,22 +169,72 @@ object LocalComposables {
                                 )
                             }
                         }
+                        // wificonfig
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = localNode.wifiAutoNotify,
+                                onCheckedChange = { localNode = localNode.copy(wifiAutoNotify = it) }
+                            )
+                            Text(text = "Wifi Auto Notify")
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(
+                                checked = localNode.wifiAutoStart,
+                                onCheckedChange = {
+                                    log.d("wifiAutoStart: $it")
+                                    localNode = localNode.copy(wifiAutoStart = it)
+                                }
+                            )
+                            Text(text = "Wifi Auto Start")
+                        }
+                        if (localNode.wifiAutoStart) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            ) {
+                                val showAdd = model.wifiState
+                                    .takeIf { it.isConnected && !it.isObscured }
+                                    ?.let { localNode.wifiAutoConnectSSIDs.contains(it.ssid).not() }
+                                    ?: false
+
+                                if (showAdd) {
+                                    HeaderButton(
+                                        text = "Add",
+                                        icon = R.drawable.ic_add,
+                                        modifier = Modifier.padding(start = 16.dp)
+                                    ) {
+                                        localNode =
+                                            localNode.copy(wifiAutoConnectSSIDs = localNode.wifiAutoConnectSSIDs.plus(model.wifiState.ssid!!))
+                                    }
+                                }
+                                localNode.wifiAutoConnectSSIDs.forEach {
+                                    HeaderButton(
+                                        text = it,
+                                        icon = R.drawable.ic_clear,
+                                        modifier = Modifier.padding(start = 16.dp)
+                                    ) {
+                                        localNode =
+                                            localNode.copy(wifiAutoConnectSSIDs = localNode.wifiAutoConnectSSIDs.filter { ssid -> ssid != it })
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
     }
-
-    fun stateSaverLocalDomain() = Saver<MutableState<LocalNodeDomain>, String>(
-        save = { state -> state.value.serialise() },
-        restore = { value ->
-            @Suppress("UNCHECKED_CAST")
-            mutableStateOf((deserialiseLocalNode(value as String)))
-        }
-    )
-
 }
 
+@Composable
+fun stateSaverLocalDomain() = Saver<MutableState<LocalNodeDomain>, String>(
+    save = { state -> state.value.serialise() },
+    restore = { value ->
+        @Suppress("UNCHECKED_CAST")
+        mutableStateOf((deserialiseLocalNode(value as String)))
+    }
+)
 
 @Preview(name = "Top level")
 @Composable
@@ -195,7 +243,7 @@ private fun RemotesPreview() {
     val modelMapper = LocalModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
     val view = object : BaseMviView<Model, Event>() {}
     LocalComposables.RemotesView(
-        modelMapper.map(State()),
+        modelMapper.map(State(wifiState = WifiStateProvider.WifiState())),
         view
     )
 }

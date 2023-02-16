@@ -12,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
+import uk.co.sentinelweb.cuer.remote.server.ServerState
 
 class LocalMviViewProxy constructor(
     private val log: LogWrapper,
@@ -22,7 +24,9 @@ class LocalMviViewProxy constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(Model("LocalNode", null, address = null, localNodeDomain = DUMMY_LOCAL_NODE))
+    var observableModel: Model by mutableStateOf(
+        MODEL_INIT
+    )
         private set
 
     var observableLoading: Boolean by mutableStateOf(false)
@@ -42,5 +46,16 @@ class LocalMviViewProxy constructor(
 
     fun loading(isLoading: Boolean) {
         observableLoading = isLoading
+    }
+
+    companion object {
+        val MODEL_INIT = Model(
+            serverState = ServerState.INITIAL,
+            title = "LocalNode",
+            imageUrl = null,
+            address = null,
+            localNodeDomain = DUMMY_LOCAL_NODE,
+            wifiState = WifiStateProvider.WifiState()
+        )
     }
 }

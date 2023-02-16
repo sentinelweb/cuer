@@ -87,13 +87,22 @@ object RemotesComposables {
                                         contentScale = ContentScale.Crop
                                     )
                                 }
-                            Text(
-                                text = model.wifiState.run { "$connected $ssid $ip" },
-                                color = colorResource(R.color.white),
-                                modifier = Modifier
-                                    .align(Alignment.BottomStart)
-                                    .padding(16.dp)
-                            )
+                            model.wifiState
+                                .takeIf { it.isConnected }
+                                ?.run {
+                                    Text(
+                                        text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
+                                        color = colorResource(R.color.white),
+                                        modifier = Modifier
+                                            .align(Alignment.BottomStart)
+                                            .padding(16.dp)
+                                            .clickable {
+                                                if (isObscured) {
+                                                    view.dispatch(OnActionObscuredPermClicked)
+                                                }
+                                            },
+                                    )
+                                }
                         }
                         Row(
                             modifier = Modifier.padding(
@@ -103,9 +112,9 @@ object RemotesComposables {
                         ) {
                             when (model.serverState) {
                                 STOPPED, INITIAL -> HeaderButton(
-                                    if (model.wifiState.connected) "Start" else "No WiFi",
+                                    if (model.wifiState.isConnected) "Start" else "No WiFi",
                                     R.drawable.ic_play,
-                                    enabled = model.wifiState.connected
+                                    enabled = model.wifiState.isConnected
                                 ) { view.dispatch(OnActionStartServerClicked) }
 
                                 STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }

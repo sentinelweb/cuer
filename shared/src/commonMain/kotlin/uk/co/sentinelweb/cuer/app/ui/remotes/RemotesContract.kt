@@ -25,6 +25,7 @@ class RemotesContract {
             object ActionStopServer : Intent()
             object ActionPingMulticast : Intent()
             object ActionConfig : Intent()
+            object ActionObscuredPerm : Intent()
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
             data class WifiStateChange(val wifiState: WifiStateProvider.WifiState) : Intent()
         }
@@ -85,6 +86,7 @@ class RemotesContract {
             object OnActionStopServerClicked : Event()
             object OnActionPingMulticastClicked : Event()
             object OnActionConfigClicked : Event()
+            object OnActionObscuredPermClicked : Event()
             data class OnActionPingNodeClicked(val remote: RemoteNodeDomain) : Event()
         }
     }

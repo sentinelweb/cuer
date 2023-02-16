@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
@@ -26,6 +27,7 @@ class LocalStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val localRepository: LocalRepository,
     private val coroutines: CoroutineContextProvider,
+    private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
     init {
@@ -46,7 +48,8 @@ class LocalStoreFactory constructor(
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
-                    localNode = localRepository.getLocalNode()
+                    localNode = localRepository.getLocalNode(),
+                    wifiState = connectivityWrapper.getWIFIInfo(),
                 )
             }
     }
@@ -91,7 +94,7 @@ class LocalStoreFactory constructor(
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "LocalStore",
-            initialState = State(),
+            initialState = State(wifiState = connectivityWrapper.getWIFIInfo()),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()

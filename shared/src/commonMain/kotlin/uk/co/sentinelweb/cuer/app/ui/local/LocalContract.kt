@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.local
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain.AuthConfig
 import uk.co.sentinelweb.cuer.domain.NodeDomain
@@ -27,6 +28,7 @@ class LocalContract {
             val serverState: ServerState = INITIAL,
             val serverAddress: String? = null,
             val localNode: LocalNodeDomain = DUMMY_LOCAL_NODE,
+            val wifiState: WifiStateProvider.WifiState
         )
     }
 
@@ -39,7 +41,8 @@ class LocalContract {
             val imageUrl: String?,
             val localNodeDomain: LocalNodeDomain,
             val address: String?,
-            val serverState: ServerState = INITIAL,
+            val serverState: ServerState,
+            val wifiState: WifiStateProvider.WifiState
         )
 
 
