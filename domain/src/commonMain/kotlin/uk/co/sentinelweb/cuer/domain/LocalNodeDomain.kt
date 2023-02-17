@@ -14,7 +14,6 @@ data class LocalNodeDomain(
     val authConfig: AuthConfig = AuthConfig.Open,
     val version: String? = null,
     val versionCode: Int? = null,
-    val wifiAutoNotify: Boolean = false,
     val wifiAutoStart: Boolean = false,
     val wifiAutoConnectSSIDs: List<String> = listOf(),
 ) : NodeDomain() {

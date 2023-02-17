@@ -172,13 +172,6 @@ object LocalComposables {
                         // wificonfig
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Checkbox(
-                                checked = localNode.wifiAutoNotify,
-                                onCheckedChange = { localNode = localNode.copy(wifiAutoNotify = it) }
-                            )
-                            Text(text = "Wifi Auto Notify")
-                        }
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
                                 checked = localNode.wifiAutoStart,
                                 onCheckedChange = {
                                     log.d("wifiAutoStart: $it")
