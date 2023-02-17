@@ -48,6 +48,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.GUID
 
 
@@ -73,6 +74,7 @@ class MainActivity :
     private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
+    private val buildConfig: BuildConfigDomain by inject()
 
     private lateinit var navController: NavController
 
@@ -342,6 +344,9 @@ class MainActivity :
                 navigateToBottomTab(it.itemId)
             }
             true
+        }
+        if (buildConfig.cuerRemoteEnabled.not()) {
+            binding.bottomNavView.getMenu().removeItem(R.id.navigation_remotes);
         }
     }
 
