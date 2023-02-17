@@ -13,6 +13,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.context.GlobalContext
+import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -21,7 +22,8 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider.WifiState
 
 class WifiStateReceiver(
     private val connectivityWrapper: ConnectivityWrapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val wifiStartChecker: WifiStartChecker,
 ) : BroadcastReceiver(), WifiStateProvider {
 
     private val _wifiStateFlow: MutableStateFlow<WifiState> = MutableStateFlow(WifiState())
@@ -43,6 +45,7 @@ class WifiStateReceiver(
             if (netInfo?.type == ConnectivityManager.TYPE_WIFI) {
                 connectivityWrapper.getWIFIInfo()
                     .also { log.d("wifiState: $it") }
+                    .also { wifiStartChecker.checkToStartServer(it) }
                     .also { _wifiStateFlow.value = it }
             }
         }

@@ -8,7 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
@@ -32,6 +32,13 @@ class RemotesController constructor(
     init {
         log.tag(this)
         lifecycle?.doOnDestroy { store.dispose() }
+    }
+
+    fun onRefresh() {
+        CoroutineScope(Dispatchers.Main).launch {
+            delay(300)
+            store.accept(Intent.Refresh)
+        }
     }
 
     private val eventToIntent: suspend Event.() -> Intent = {

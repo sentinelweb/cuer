@@ -106,6 +106,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
+        controller.onRefresh()
     }
 
     override fun onStop() {

@@ -180,7 +180,7 @@ object Modules {
                 .let { RemotesRepository(it, get()) }
         }
         single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
-        single<WifiStateProvider> { WifiStateReceiver(get(), get()) }
+        single<WifiStateProvider> { WifiStateReceiver(get(), get(), get()) }
     }
 
     private val utilModule = module {
