@@ -22,16 +22,16 @@
         />
     </PreferenceCategory>
 
-    <PreferenceCategory
-        app:key="@string/prefs_root_remote_service_cat_key"
-        app:title="@string/prefs_root_remote_service_title">
-        <CheckBoxPreference
-            app:icon="@drawable/ic_remote_service"
-            app:key="@string/prefs_root_remote_service_key"
-            app:title="@string/prefs_root_remote_service_title"
-            app:summary="@string/prefs_root_remote_service_not_running"
-        />
-    </PreferenceCategory>
+    <!--    <PreferenceCategory-->
+    <!--        app:key="@string/prefs_root_remote_service_cat_key"-->
+    <!--        app:title="@string/prefs_root_remote_service_title">-->
+    <!--        <CheckBoxPreference-->
+    <!--            app:icon="@drawable/ic_remote_service"-->
+    <!--            app:key="@string/prefs_root_remote_service_key"-->
+    <!--            app:title="@string/prefs_root_remote_service_title"-->
+    <!--            app:summary="@string/prefs_root_remote_service_not_running"-->
+    <!--        />-->
+    <!--    </PreferenceCategory>-->
 
     <PreferenceCategory app:title="@string/prefs_root_info_cat_title">
         <Preference

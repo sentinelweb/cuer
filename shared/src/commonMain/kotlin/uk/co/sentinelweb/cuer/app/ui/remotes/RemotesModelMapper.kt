@@ -57,24 +57,24 @@ class RemotesModelMapper constructor(
         )
 
     companion object {
-        fun dummyModel() = Model(
+        fun blankModel() = Model(
             title = "Dummy",
             imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
-            localNode = dummyNodeModel(),
+            localNode = blankNodeModel(),
             remoteNodes = listOf(),
-            address = "a.a.a.a:aaaa",
+            address = "",
             wifiState = WifiStateProvider.WifiState()
         )
 
-        fun dummyNodeModel() = NodeModel(
+        fun blankNodeModel() = NodeModel(
             id = "".toGuidIdentifier(MEMORY),
-            title = "DummyLocal",
-            hostname = "DummyHostname",
-            address = "d.d.d.d",
-            device = "DummyDevice",
+            title = "",
+            hostname = "-",
+            address = "",
+            device = "-",
             deviceType = OTHER,
-            authType = "DummyAuthType",
-            domain = RemoteNodeDomain(id = null, ipAddress = "d.d.d.d", port = 0)
+            authType = "",
+            domain = RemoteNodeDomain(id = null, ipAddress = "", port = 0)
         )
     }
 }
