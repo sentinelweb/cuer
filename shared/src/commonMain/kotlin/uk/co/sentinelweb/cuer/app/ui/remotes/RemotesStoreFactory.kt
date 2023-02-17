@@ -22,7 +22,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
-import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType.Ping
@@ -36,7 +35,6 @@ class RemotesStoreFactory constructor(
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
     private val remoteInteractor: RemoteInteractor,
-    private val remotesRepository: RemotesRepository,
     private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
@@ -78,7 +76,7 @@ class RemotesStoreFactory constructor(
 
         override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
-                Action.Init -> testLoad()
+                Action.Init -> init()
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
@@ -96,10 +94,10 @@ class RemotesStoreFactory constructor(
                 is Intent.ActionPingNode -> pingNode(intent, getState())
                 is Intent.WifiStateChange -> dispatch(Result.UpdateWifiState(intent.wifiState))
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
+                is Intent.RemoteUpdate -> dispatch(Result.SetNodes(intent.remotes))
             }
 
         private fun launchLocationPermission() {
-            //TODO("Launch location permission")
             // todo launch location permission
         }
 
@@ -116,26 +114,13 @@ class RemotesStoreFactory constructor(
         private fun pingMulticast(intent: Intent, state: State) {
             if (remoteServerManager.isRunning()) {
                 coroutines.ioScope.launch {
-                    remoteServerManager.getService()?.ping()
+                    remoteServerManager.getService()?.multicastPing()
                     withContext(coroutines.Main) { dispatch(Result.UpdateServerState) }
                 }
             }
         }
 
         private var remotesJob: Job? = null
-        private fun stopServer(intent: Intent, state: State) {
-            if (remoteServerManager.isRunning()) {
-                coroutines.mainScope.launch {
-                    remotesJob?.cancel()
-                    remoteServerManager.stop()
-                    delay(20)
-                    dispatch(Result.UpdateServerState)
-                    remotesRepository.updatesCallback = null
-                    dispatch(Result.SetNodes(listOf()))
-                }
-            }
-        }
-
         private fun startServer(intent: Intent, state: State) {
             if (!remoteServerManager.isRunning()) {
                 coroutines.mainScope.launch {
@@ -143,19 +128,29 @@ class RemotesStoreFactory constructor(
                     // fixme limit?
                     while (remoteServerManager.getService()?.isServerStarted != true) delay(20)
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
+
+                    remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }
                     dispatch(Result.UpdateServerState)
-                }
-                remotesRepository.updatesCallback = { remoteNodes ->
-                    log.d("remotes callback: ${remoteNodes.size}")
-                    coroutines.mainScope.launch {
-                        dispatch(Result.SetNodes(remoteNodes))
-                    }
                 }
             }
         }
 
-        private fun testLoad() {
+        private fun stopServer(intent: Intent, state: State) {
+            if (remoteServerManager.isRunning()) {
+                coroutines.mainScope.launch {
+                    remotesJob?.cancel()
+                    remoteServerManager.stop()
+                    delay(20)
+                    dispatch(Result.UpdateServerState)
+                }
+            }
+        }
+
+        private fun init() {
             dispatch(Result.UpdateServerState)
+            if (remoteServerManager.isRunning()) {
+                remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }
+            }
         }
     }
 

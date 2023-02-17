@@ -14,8 +14,9 @@ interface RemoteServerContract {
     interface Service {
         val isServerStarted: Boolean
         val localNode: LocalNodeDomain
+        var stopListener: (() -> Unit)?
         fun stopSelf()
-        fun ping()
+        fun multicastPing()
     }
 
     interface Controller {
@@ -24,7 +25,7 @@ interface RemoteServerContract {
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()
-        fun ping()
+        fun multicastPing()
     }
 
     interface Notification {

@@ -3,10 +3,12 @@ package uk.co.sentinelweb.cuer.app.service.remote
 //import uk.co.sentinelweb.cuer.remote.server.RemoteServer
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.*
@@ -24,7 +26,9 @@ class RemoteServerServiceController constructor(
     private val localRepo: LocalRepository,
     private val connectMessageMapper: ConnectMessageMapper,
     private val remoteInteractor: RemoteInteractor,
-    private val wakeLockManager: WakeLockManager
+    private val wakeLockManager: WakeLockManager,
+    private val wifiStateProvider: WifiStateProvider,
+    private val service: RemoteServerContract.Service,
 ) : RemoteServerContract.Controller {
 
     init {
@@ -33,6 +37,7 @@ class RemoteServerServiceController constructor(
 
     private var _serverJob: Job? = null
     private var _multiJob: Job? = null
+    private var _wifiJob: Job? = null
 
     override val isServerStarted: Boolean
         get() = webServer.isRunning
@@ -83,7 +88,7 @@ class RemoteServerServiceController constructor(
             _localNode = localRepo.getLocalNode()
             //_remoteNodes.value = remoteRepo.loadAll()
         }
-        notification.updateNotification("x.x.x.x")
+        notification.updateNotification("Starting server...")
         _serverJob?.cancel()
         _serverJob = coroutines.ioScope.launch {
             webServer.connectMessageListener = connectMessageHandler
@@ -105,6 +110,13 @@ class RemoteServerServiceController constructor(
             multi.runSocketListener()
             log.d("multicast ended")
         }
+        _wifiJob = coroutines.mainScope.launch {
+            wifiStateProvider.wifiStateFlow.collectLatest { state ->
+                if (state.isConnected.not()) {
+                    service.stopSelf()
+                }
+            }
+        }
         wakeLockManager.acquireWakeLock()
     }
 
@@ -112,15 +124,12 @@ class RemoteServerServiceController constructor(
         notification.handleAction(action)
     }
 
-    override fun ping() {
+    override fun multicastPing() {
         multi.send(MsgType.Ping)
     }
 
     override fun destroy() {
         log.d("Controller destroy")
-//        coroutines.mainScope.launch {
-//            _remoteNodes.emit(listOf())
-//        }
         wakeLockManager.releaseWakeLock()
         webServer.stop()
         _serverJob?.cancel()
@@ -130,7 +139,10 @@ class RemoteServerServiceController constructor(
             multi.close()
             delay(50)
             _multiJob?.cancel()
+            _multiJob = null
         }
+        _wifiJob?.cancel()
+        _wifiJob = null
         log.d("Controller destroyed")
     }
 

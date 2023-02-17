@@ -16,11 +16,13 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 
 class RemotesController constructor(
     storeFactory: RemotesStoreFactory,
     private val modelMapper: RemotesModelMapper,
     private val wifiStateProvider: WifiStateProvider,
+    private val remotesRepository: RemotesRepository,
     lifecycle: Lifecycle?,
     log: LogWrapper,
 ) {
@@ -66,6 +68,10 @@ class RemotesController constructor(
                 wifiStateProvider.wifiStateFlow
                     .onEach { println("Wifi Event: $it") }
                     .map { Intent.WifiStateChange(it) } bindTo store
+
+                remotesRepository.updatesFlow
+                    .onEach { println("Remote Event: $it") }
+                    .map { Intent.RemoteUpdate(it) } bindTo store
             }
         }
     }

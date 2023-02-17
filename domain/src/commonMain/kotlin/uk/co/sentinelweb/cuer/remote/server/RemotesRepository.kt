@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.remote.server
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
@@ -10,7 +12,9 @@ class RemotesRepository constructor(
 ) {
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
 
-    var updatesCallback: ((List<RemoteNodeDomain>) -> Unit)? = null
+    //var updatesCallback: ((List<RemoteNodeDomain>) -> Unit)? = null
+    private val _updatesFlow: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(emptyList())
+    val updatesFlow: Flow<List<RemoteNodeDomain>> get() = _updatesFlow
     val remoteNodes: List<RemoteNodeDomain>
         get() = _remoteNodes
 
@@ -20,7 +24,8 @@ class RemotesRepository constructor(
             ?.takeIf { it.isNotEmpty() }
             ?.let { _remoteNodes.addAll(deserialiseRemoteNodeList(it)) }
 
-        updatesCallback?.invoke(_remoteNodes)
+        //updatesCallback?.invoke(_remoteNodes)
+        _updatesFlow.value = _remoteNodes
         return _remoteNodes
     }
 
@@ -30,12 +35,14 @@ class RemotesRepository constructor(
 
         removeNodeInternal(node)
         _remoteNodes.add(node)
-        updatesCallback?.invoke(_remoteNodes)
+        //updatesCallback?.invoke(_remoteNodes)
+        _updatesFlow.value = _remoteNodes
     }
 
     fun removeNode(node: RemoteNodeDomain) {
         removeNodeInternal(node)
-        updatesCallback?.invoke(_remoteNodes)
+        //updatesCallback?.invoke(_remoteNodes)
+        _updatesFlow.value = _remoteNodes
     }
 
     private fun removeNodeInternal(node: RemoteNodeDomain) {

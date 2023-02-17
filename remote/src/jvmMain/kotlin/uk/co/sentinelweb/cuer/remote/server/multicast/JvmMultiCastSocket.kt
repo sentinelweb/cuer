@@ -47,8 +47,10 @@ class JvmMultiCastSocket(
                 theSocket!!.receive(data1) // blocks
                 val msg = String(buffer, 0, data1.length, Charset.defaultCharset())
                 //log.d("multi Received: $msg")
-                val msgDecoded = deserialiseMulti(msg)
-                connectMessageListener?.invoke(msgDecoded)
+                if (isKeepGoing) {
+                    val msgDecoded = deserialiseMulti(msg)
+                    connectMessageListener?.invoke(msgDecoded)
+                }
             }
         } catch (e: IOException) {
             log.e(e.toString(), e)

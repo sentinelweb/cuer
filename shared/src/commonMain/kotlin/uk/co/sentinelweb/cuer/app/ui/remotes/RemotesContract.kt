@@ -28,6 +28,7 @@ class RemotesContract {
             object ActionObscuredPerm : Intent()
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
             data class WifiStateChange(val wifiState: WifiStateProvider.WifiState) : Intent()
+            data class RemoteUpdate(val remotes: List<RemoteNodeDomain>) : Intent()
         }
 
         sealed class Label {

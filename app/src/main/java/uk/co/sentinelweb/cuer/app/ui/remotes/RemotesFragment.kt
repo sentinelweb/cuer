@@ -158,7 +158,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         modelMapper = get(),
                         lifecycle = get<RemotesFragment>().lifecycle.asEssentyLifecycle(),
                         log = get(),
-                        wifiStateProvider = get()
+                        wifiStateProvider = get(),
+                        remotesRepository = get(),
                     )
                 }
                 scoped {
@@ -172,7 +173,6 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         coroutines = get(),
                         localRepository = get(),
                         remoteInteractor = get(),
-                        remotesRepository = get(),
                         connectivityWrapper = get()
                     )
                 }

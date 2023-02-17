@@ -23,12 +23,14 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
     override val isServerStarted: Boolean
         get() = controller.isServerStarted
 
-    override fun ping() {
-        controller.ping()
+    override fun multicastPing() {
+        controller.multicastPing()
     }
 
     override val localNode: LocalNodeDomain
         get() = controller.localNode
+
+    override var stopListener: (() -> Unit)? = null
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: Controller by scope.inject()
@@ -53,6 +55,7 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
         controller.destroy()
         scope.close()
         _instance = null
+        stopListener?.invoke()
     }
 
     // Note 1: intent can be null with start sticky - it might make sense to handle this and the wrapper
@@ -87,7 +90,9 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         remoteRepo = get(),
                         connectMessageMapper = get(),
                         remoteInteractor = get(),
-                        wakeLockManager = get()
+                        wakeLockManager = get(),
+                        wifiStateProvider = get(),
+                        service = get()
                     )
                 }
                 scoped<External> {
