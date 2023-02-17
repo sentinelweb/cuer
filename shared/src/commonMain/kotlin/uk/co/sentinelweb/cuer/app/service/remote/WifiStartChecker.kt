@@ -10,7 +10,8 @@ class WifiStartChecker(
     fun checkToStartServer(wifiState: WifiStateProvider.WifiState) {
         val localNode = localRepository.getLocalNode()
 
-        val shouldStartOnWifi = localNode.wifiAutoStart && (localNode.wifiAutoConnectSSIDs.let { it.isEmpty() || it.contains(wifiState.ssid) })
+        val shouldStartOnWifi =
+            localNode.wifiAutoStart && (wifiState.isObscured || localNode.wifiAutoConnectSSIDs.let { it.isEmpty() || it.contains(wifiState.ssid) })
 
         if (manager.isRunning().not() && wifiState.isConnected && shouldStartOnWifi) {
             manager.start()
