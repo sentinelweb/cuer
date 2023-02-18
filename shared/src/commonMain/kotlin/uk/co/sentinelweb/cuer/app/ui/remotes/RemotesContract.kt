@@ -59,13 +59,13 @@ class RemotesContract {
             val title: String,
             val imageUrl: String?,
             val address: String?,
-            val localNode: NodeModel,
-            val remoteNodes: List<NodeModel>,
+            val localNode: LocalNodeModel,
+            val remoteNodes: List<RemoteNodeModel>,
             val serverState: ServerState = INITIAL,
             val wifiState: WifiStateProvider.WifiState,
         )
 
-        data class NodeModel(
+        data class LocalNodeModel(
             val id: OrchestratorContract.Identifier<GUID>?,
             val title: String,
             val address: String,
@@ -73,7 +73,18 @@ class RemotesContract {
             val device: String,
             val deviceType: NodeDomain.DeviceType,
             val authType: String,
-            val domain: NodeDomain
+            val domain: LocalNodeDomain,
+        )
+
+        data class RemoteNodeModel(
+            val id: OrchestratorContract.Identifier<GUID>?,
+            val title: String,
+            val address: String,
+            val hostname: String,
+            val device: String,
+            val deviceType: NodeDomain.DeviceType,
+            val authType: String,
+            val domain: RemoteNodeDomain,
         )
 
         sealed class Event {

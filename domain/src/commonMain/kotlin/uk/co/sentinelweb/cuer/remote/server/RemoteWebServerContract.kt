@@ -1,11 +1,8 @@
 package uk.co.sentinelweb.cuer.remote.server
 
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
-
 interface RemoteWebServerContract {
     val port: Int
     val isRunning: Boolean
-    var connectMessageListener: ((ConnectMessage) -> Unit)?
 
     fun start(onStarted: () -> Unit)
 

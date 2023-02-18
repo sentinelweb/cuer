@@ -2,46 +2,56 @@ package uk.co.sentinelweb.cuer.remote.server
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class RemotesRepository constructor(
     private val fileInteractor: FileInteractor,
     private val localNodeRepo: LocalRepository,
+    private val coroutines: CoroutineContextProvider,
 ) {
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
 
-    //var updatesCallback: ((List<RemoteNodeDomain>) -> Unit)? = null
     private val _updatesFlow: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(emptyList())
     val updatesFlow: Flow<List<RemoteNodeDomain>> get() = _updatesFlow
-    val remoteNodes: List<RemoteNodeDomain>
-        get() = _remoteNodes
 
-    fun loadAll(): List<RemoteNodeDomain> {
+    private val updateRemotesMutex = Mutex()
+
+    init {
+        coroutines.mainScope.launch { loadAll() }
+    }
+
+    suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()
         fileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
-            ?.let { _remoteNodes.addAll(deserialiseRemoteNodeList(it)) }
+            ?.let { deserialiseRemoteNodeList(it) }
+            //?.let { it.map { it.copy(isConnected = false) } }
+            ?.let { _remoteNodes.addAll(it) }
 
-        //updatesCallback?.invoke(_remoteNodes)
         _updatesFlow.value = _remoteNodes
         return _remoteNodes
     }
 
-    fun addUpdateNode(node: RemoteNodeDomain) {
+    suspend fun addUpdateNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
         val local = localNodeRepo.getLocalNode()
         if (node.id == local.id) return
 
         removeNodeInternal(node)
         _remoteNodes.add(node)
-        //updatesCallback?.invoke(_remoteNodes)
+        saveAll()
         _updatesFlow.value = _remoteNodes
     }
 
-    fun removeNode(node: RemoteNodeDomain) {
+    suspend fun removeNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
         removeNodeInternal(node)
-        //updatesCallback?.invoke(_remoteNodes)
+        saveAll()
         _updatesFlow.value = _remoteNodes
     }
 
@@ -49,6 +59,19 @@ class RemotesRepository constructor(
         _remoteNodes
             .find { it.id == node.id }
             ?.also { _remoteNodes.remove(it) }
+    }
+
+    private fun saveAll() {
+        fileInteractor.saveJson(_remoteNodes.serialise())
+    }
+
+    suspend fun setDisconnected() = updateRemotesMutex.withLock {
+        _remoteNodes
+            .map { it.copy(isConnected = false) }
+            .also { _remoteNodes.clear() }
+            .also { _remoteNodes.addAll(it) }
+            .also { saveAll() }
+            .also { _updatesFlow.value = _remoteNodes }
     }
 }
 

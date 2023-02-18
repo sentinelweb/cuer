@@ -10,9 +10,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.*
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
 import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType
 
 class RemoteServerServiceController constructor(
@@ -24,11 +22,9 @@ class RemoteServerServiceController constructor(
     private val log: LogWrapper,
     private val remoteRepo: RemotesRepository,
     private val localRepo: LocalRepository,
-    private val connectMessageMapper: ConnectMessageMapper,
-    private val remoteInteractor: RemoteInteractor,
     private val wakeLockManager: WakeLockManager,
     private val wifiStateProvider: WifiStateProvider,
-    private val service: RemoteServerContract.Service,
+    private val service: RemoteServerContract.Service
 ) : RemoteServerContract.Controller {
 
     init {
@@ -47,51 +43,20 @@ class RemoteServerServiceController constructor(
             .takeIf { webServer.isRunning }
             ?.let { connectivityWrapper.wifiIpAddress() }
             ?.let { it to webServer.port }
-            ?.apply { log.d("address: $this ${webServer.isRunning}") }
+//            ?.apply { log.d("address: $this ${webServer.isRunning}") }
 
     private var _localNode: LocalNodeDomain? = null
     override val localNode: LocalNodeDomain
         get() = (_localNode ?: throw IllegalStateException("local node not initialised"))
             .let { node -> address?.let { node.copy(ipAddress = it.first, port = it.second) } ?: node }
 
-    private val connectMessageHandler = { msg: ConnectMessage ->
-        val remote = mapRemoteNode(msg)
-        log.d("receive connect: ${msg.type} remote: $remote")
-        // todo decode remote
-        when (msg.type) {
-            MsgType.Join -> remoteRepo.addUpdateNode(remote)
-            MsgType.Close -> remoteRepo.removeNode(remote)
-            MsgType.Ping -> remoteRepo.addUpdateNode(remote)
-            MsgType.PingReply -> remoteRepo.addUpdateNode(remote)
-            MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
-        }
-
-        if (localRepo.getLocalNode().id != remote.id) {
-            coroutines.mainScope.launch {
-                when (msg.type) {
-                    MsgType.Join -> remoteInteractor.connect(MsgType.JoinReply, remote)
-                    MsgType.Ping -> remoteInteractor.connect(MsgType.PingReply, remote)
-
-                    else -> Unit
-                }
-            }
-        }
-        Unit
-    }
-
-    private fun mapRemoteNode(msgDecoded: ConnectMessage) =
-        connectMessageMapper.mapFromMulticastMessage(msgDecoded.node)
-
-
     override fun initialise() {
         coroutines.ioScope.launch {
             _localNode = localRepo.getLocalNode()
-            //_remoteNodes.value = remoteRepo.loadAll()
         }
         notification.updateNotification("Starting server...")
         _serverJob?.cancel()
         _serverJob = coroutines.ioScope.launch {
-            webServer.connectMessageListener = connectMessageHandler
             webServer.start {
                 coroutines.mainScope.launch {
                     address?.also { notification.updateNotification(it.http()) }
@@ -100,10 +65,9 @@ class RemoteServerServiceController constructor(
             log.d("webServer ended")
         }
         _multiJob = coroutines.ioScope.launch {
-            multi.connectMessageListener = connectMessageHandler
             multi.startListener = {
                 coroutines.ioScope.launch {
-                    delay(50)
+                    delay(200)
                     multi.send(MsgType.Join)
                 }
             }
@@ -124,7 +88,7 @@ class RemoteServerServiceController constructor(
         notification.handleAction(action)
     }
 
-    override fun multicastPing() {
+    override suspend fun multicastPing() {
         multi.send(MsgType.Ping)
     }
 
@@ -143,6 +107,9 @@ class RemoteServerServiceController constructor(
         }
         _wifiJob?.cancel()
         _wifiJob = null
+        coroutines.mainScope.launch {
+            remoteRepo.setDisconnected()
+        }
         log.d("Controller destroyed")
     }
 

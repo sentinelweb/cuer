@@ -23,7 +23,7 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
     override val isServerStarted: Boolean
         get() = controller.isServerStarted
 
-    override fun multicastPing() {
+    override suspend fun multicastPing() {
         controller.multicastPing()
     }
 
@@ -50,7 +50,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
 
     override fun onDestroy() {
         super.onDestroy()
-
         log.d("Service destroyed")
         controller.destroy()
         scope.close()
@@ -88,11 +87,9 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         multi = get(),
                         localRepo = get(),
                         remoteRepo = get(),
-                        connectMessageMapper = get(),
-                        remoteInteractor = get(),
                         wakeLockManager = get(),
                         wifiStateProvider = get(),
-                        service = get()
+                        service = get(),
                     )
                 }
                 scoped<External> {
@@ -107,16 +104,17 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         appState = get(),
                         timeProvider = get(),
                         log = get(),
-                        res = get()
+                        res = get(),
                     )
                 }
                 scoped { Notification.State() }
             }
+
             factory<RemoteDatabaseAdapter> {
                 AppRemoteDatabaseAdapter(
                     playlistOrchestrator = get(),
                     playlistItemOrchestrator = get(),
-                    addLinkUsecase = get()
+                    addLinkUsecase = get(),
                 )
             }
 

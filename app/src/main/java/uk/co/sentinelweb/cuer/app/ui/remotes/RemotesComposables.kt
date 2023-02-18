@@ -6,9 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,7 +34,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.ServerState.*
 
 object RemotesComposables {
@@ -158,8 +155,12 @@ object RemotesComposables {
 
 
     @Composable
-    private fun RemoteRow(remote: RemotesContract.View.NodeModel, view: BaseMviView<Model, Event>) {
-        val expanded = remember { mutableStateOf(false) }
+    private fun RemoteRow(remote: RemotesContract.View.RemoteNodeModel, view: BaseMviView<Model, Event>) {
+        var expanded by remember { mutableStateOf(false) }
+        val contentColor = remote.domain.isConnected
+            .takeIf { it }
+            ?.let { MaterialTheme.colors.onSurface }
+            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
         Box(
             modifier = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.CenterEnd,
@@ -168,29 +169,32 @@ object RemotesComposables {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    //.clickable { expanded.value = !expanded.value }
                     .background(MaterialTheme.colors.surface),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     painter = painterResource(R.drawable.ic_wifi_tethering),
-                    tint = MaterialTheme.colors.onSurface,
+                    tint = contentColor,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp).padding(4.dp)
                 )
                 Column { // todo use textview
                     Text(
                         text = remote.title,
+                        color = contentColor,
                         style = MaterialTheme.typography.h5,
-                        modifier = Modifier.padding(start = 8.dp),
+                        modifier = Modifier
+                            .padding(start = 8.dp),
                     )
                     Text(
                         text = remote.address,
+                        color = contentColor,
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     Text(
                         text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
+                        color = contentColor,
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(start = 8.dp)
                     )
@@ -204,14 +208,14 @@ object RemotesComposables {
                     painter = painterResource(R.drawable.ic_more_vert),
                     tint = colorResource(R.color.grey_500),
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp).padding(8.dp).clickable { expanded.value = !expanded.value },
+                    modifier = Modifier.size(48.dp).padding(8.dp).clickable { expanded = !expanded },
                 )
                 DropdownMenu(
-                    expanded = expanded.value,
+                    expanded = expanded,
                     modifier = Modifier.width(200.dp),
-                    onDismissRequest = { expanded.value = false }
+                    onDismissRequest = { expanded = false }
                 ) {
-                    DropdownMenuItem(onClick = { view.dispatch(OnActionPingNodeClicked(remote.domain as RemoteNodeDomain)) }) {
+                    DropdownMenuItem(onClick = { expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain)) }) {
                         Text("Ping")
                     }
                     DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
@@ -230,6 +234,14 @@ object RemotesComposables {
                 }
             }
         }
+    }
+
+    private fun dispatchAndClose(
+        view: BaseMviView<Model, Event>,
+        event: OnActionPingNodeClicked
+    ): Boolean {
+        view.dispatch(event)
+        return false
     }
 }
 

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
+import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
 
 interface RemoteServerContract {
 
@@ -16,7 +17,7 @@ interface RemoteServerContract {
         val localNode: LocalNodeDomain
         var stopListener: (() -> Unit)?
         fun stopSelf()
-        fun multicastPing()
+        suspend fun multicastPing()
     }
 
     interface Controller {
@@ -25,7 +26,11 @@ interface RemoteServerContract {
         fun initialise()
         fun handleAction(action: String?)
         fun destroy()
-        fun multicastPing()
+        suspend fun multicastPing()
+    }
+
+    interface ConnectMessageHandler {
+        suspend fun messageReceived(msg: ConnectMessage)
     }
 
     interface Notification {

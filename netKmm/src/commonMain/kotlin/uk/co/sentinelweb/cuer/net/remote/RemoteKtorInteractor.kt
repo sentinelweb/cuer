@@ -16,11 +16,11 @@ internal class RemoteKtorInteractor(
     override suspend fun connect(
         messageType: ConnectMessage.MsgType,
         remote: RemoteNodeDomain,
-    ): NetResult<String> {
+    ): NetResult<Boolean> {
         return try {
             val connectMessage = ConnectMessage(messageType, connectMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true))
             val dto = connectService.sendConnect(remote, RequestMessage(connectMessage))
-            NetResult.Data(dto.toString())
+            NetResult.Data(true) // fixme - verify reqeust success
         } catch (e: Exception) {
             NetResult.Error(e)
         }

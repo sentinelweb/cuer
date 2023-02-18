@@ -177,7 +177,7 @@ object Modules {
             "remoteNodes.json"
                 .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
                 .let { FileInteractor(it, get()) }
-                .let { RemotesRepository(it, get()) }
+                .let { RemotesRepository(it, get(), get()) }
         }
         single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
         single<WifiStateProvider> { WifiStateReceiver(get(), get(), get()) }

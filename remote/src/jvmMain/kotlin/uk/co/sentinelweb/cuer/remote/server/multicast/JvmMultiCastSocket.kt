@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.remote.server.multicast
 
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.remote.server.ConnectMessageMapper
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -14,15 +15,14 @@ import java.net.InetAddress
 import java.net.MulticastSocket
 import java.nio.charset.Charset
 
-// fixme copied from jvm
 class JvmMultiCastSocket(
     private val config: MultiCastSocketContract.Config,
     private val log: LogWrapper,
     private val localRepository: LocalRepository,
     private val connectMessageMapper: ConnectMessageMapper,
+    private val connectMessageHndler: RemoteServerContract.ConnectMessageHandler,
 ) : MultiCastSocketContract {
 
-    override var connectMessageListener: ((ConnectMessage) -> Unit)? = null
     override var startListener: (() -> Unit)? = null
 
     private lateinit var broadcastAddress: InetAddress
@@ -33,11 +33,11 @@ class JvmMultiCastSocket(
         log.tag(this)
     }
 
-    override fun runSocketListener() {
+    override suspend fun runSocketListener() {
         try {
             isKeepGoing = true
             broadcastAddress = InetAddress.getByName(config.ip)
-            theSocket = MulticastSocket(config.port)
+            theSocket = MulticastSocket(config.multiPort)
             theSocket!!.joinGroup(broadcastAddress)
             val buffer = ByteArray(1 * 1024)
             val data1 = DatagramPacket(buffer, buffer.size)
@@ -49,7 +49,7 @@ class JvmMultiCastSocket(
                 //log.d("multi Received: $msg")
                 if (isKeepGoing) {
                     val msgDecoded = deserialiseMulti(msg)
-                    connectMessageListener?.invoke(msgDecoded)
+                    connectMessageHndler.messageReceived(msgDecoded)
                 }
             }
         } catch (e: IOException) {
@@ -61,7 +61,7 @@ class JvmMultiCastSocket(
     fun mapLocalNode() =
         connectMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true)
 
-    override fun send(msgType: MsgType) {
+    override suspend fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {
             try {
                 val joinMsg = ConnectMessage(msgType, mapLocalNode())
@@ -81,8 +81,9 @@ class JvmMultiCastSocket(
                 val closeMsg = ConnectMessage(MsgType.Close, mapLocalNode())
                 sendDatagram(closeMsg)
                 //log.d("multi closing: send lastcall")
+                // todo check if i need this
                 val local = InetAddress.getByName("localhost")
-                val data1 = DatagramPacket("".toByteArray(), 0, local, config.port)
+                val data1 = DatagramPacket("".toByteArray(), 0, local, config.multiPort)
                 theSocket!!.send(data1)
                 theSocket!!.close()
                 log.d("multi closed")
@@ -94,7 +95,7 @@ class JvmMultiCastSocket(
 
     private fun sendDatagram(msg: ConnectMessage) {
         val serialise = msg.serialise()
-        val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress, config.port)
+        val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress, config.multiPort)
         theSocket!!.send(data)
     }
 }

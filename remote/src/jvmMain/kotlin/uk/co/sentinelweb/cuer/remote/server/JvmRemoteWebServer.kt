@@ -18,6 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
@@ -36,13 +37,14 @@ import java.io.StringWriter
 class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
+    private val connectMessageListener: RemoteServerContract.ConnectMessageHandler
 ) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
     }
 
     private val localRepository: LocalRepository by inject()
-    override var connectMessageListener: ((ConnectMessage) -> Unit)? = null
+
     override val port: Int
         get() = localRepository.getLocalNode().port
 
@@ -141,7 +143,7 @@ class JvmRemoteWebServer constructor(
                         null
                     })
                         ?.let { it.payload as ConnectMessage }
-                        ?.also { connectMessageListener?.invoke(it) }
+                        ?.also { connectMessageListener.messageReceived(it) }
                         ?.also { call.respond(HttpStatusCode.OK) }
                         ?: call.error(HttpStatusCode.BadRequest, "No message")
                 }

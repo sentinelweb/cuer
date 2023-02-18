@@ -3,8 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.NodeModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
@@ -32,8 +31,8 @@ class RemotesModelMapper constructor(
     }
 
     // todo different model type for remote
-    private fun mapRemoteNode(it: RemoteNodeDomain): NodeModel =
-        NodeModel(
+    private fun mapRemoteNode(it: RemoteNodeDomain): RemoteNodeModel =
+        RemoteNodeModel(
             id = it.id,
             title = it.hostname ?: it.ipAddress,
             address = "${it.ipAddress}:${it.port}",
@@ -44,8 +43,8 @@ class RemotesModelMapper constructor(
             domain = it,
         )
 
-    private fun mapLocalNode(it: LocalNodeDomain): NodeModel =
-        NodeModel(
+    private fun mapLocalNode(it: LocalNodeDomain): LocalNodeModel =
+        LocalNodeModel(
             id = it.id,
             title = it.hostname ?: it.ipAddress,
             address = "${it.ipAddress}:${it.port}",
@@ -66,7 +65,7 @@ class RemotesModelMapper constructor(
             wifiState = WifiStateProvider.WifiState()
         )
 
-        fun blankNodeModel() = NodeModel(
+        fun blankNodeModel() = LocalNodeModel(
             id = "".toGuidIdentifier(MEMORY),
             title = "",
             hostname = "-",
@@ -74,7 +73,7 @@ class RemotesModelMapper constructor(
             device = "-",
             deviceType = OTHER,
             authType = "",
-            domain = RemoteNodeDomain(id = null, ipAddress = "", port = 0)
+            domain = LocalNodeDomain(id = null, ipAddress = "", port = 0)
         )
     }
 }

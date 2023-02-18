@@ -10,6 +10,6 @@ interface RemoteInteractor {
     suspend fun connect(
         messageType: ConnectMessage.MsgType,
         remote: RemoteNodeDomain,
-    ): NetResult<String>
+    ): NetResult<Boolean>
 
 }

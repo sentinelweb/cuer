@@ -53,16 +53,16 @@ class RemotesStoreFactory constructor(
     }
 
     private inner class ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
-                is Result.SetNodes -> copy(remoteNodes = result.nodes)
+        override fun State.reduce(msg: Result): State =
+            when (msg) {
+                is Result.SetNodes -> copy(remoteNodes = msg.nodes)
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
                     localNode = remoteServerManager.getService()?.localNode ?: localRepository.getLocalNode()
                 )
 
-                is Result.UpdateWifiState -> copy(wifiState = result.state)
+                is Result.UpdateWifiState -> copy(wifiState = msg.state)
             }
     }
 
@@ -86,12 +86,12 @@ class RemotesStoreFactory constructor(
                 Intent.ActionSearch -> publish(Label.ActionSearch)
                 Intent.ActionHelp -> publish(Label.ActionHelp)
                 Intent.Up -> publish(Label.Up)
-                Intent.ActionConfig -> config(intent, getState())
-                Intent.ActionPingMulticast -> pingMulticast(intent, getState())
-                Intent.ActionStartServer -> startServer(intent, getState())
-                Intent.ActionStopServer -> stopServer(intent, getState())
+                Intent.ActionConfig -> config(intent)
+                Intent.ActionPingMulticast -> pingMulticast(intent)
+                Intent.ActionStartServer -> startServer(intent)
+                Intent.ActionStopServer -> stopServer(intent)
                 Intent.Refresh -> dispatch(Result.UpdateServerState)
-                is Intent.ActionPingNode -> pingNode(intent, getState())
+                is Intent.ActionPingNode -> pingNode(intent)
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
                 is Intent.RemoteUpdate -> dispatch(Result.SetNodes(intent.remotes))
@@ -109,27 +109,27 @@ class RemotesStoreFactory constructor(
             // todo launch location permission
         }
 
-        private fun pingNode(intent: Intent.ActionPingNode, state: State) {
+        private fun pingNode(intent: Intent.ActionPingNode) {
             coroutines.ioScope.launch {
                 remoteInteractor.connect(Ping, intent.remote)
             }
         }
 
-        private fun config(intent: Intent, state: State) {
+        private fun config(intent: Intent) {
             publish(Label.ActionConfig)
         }
 
-        private fun pingMulticast(intent: Intent, state: State) {
+        private fun pingMulticast(intent: Intent) {
             if (remoteServerManager.isRunning()) {
                 coroutines.ioScope.launch {
                     remoteServerManager.getService()?.multicastPing()
-                    withContext(coroutines.Main) { dispatch(Result.UpdateServerState) }
+                    withContext(coroutines.Main) { dispatch(Result.UpdateServerState) } // is this necessary?
                 }
             }
         }
 
         private var remotesJob: Job? = null
-        private fun startServer(intent: Intent, state: State) {
+        private fun startServer(intent: Intent) {
             if (!remoteServerManager.isRunning()) {
                 coroutines.mainScope.launch {
                     remoteServerManager.start()
@@ -143,7 +143,7 @@ class RemotesStoreFactory constructor(
             }
         }
 
-        private fun stopServer(intent: Intent, state: State) {
+        private fun stopServer(intent: Intent) {
             if (remoteServerManager.isRunning()) {
                 coroutines.mainScope.launch {
                     remotesJob?.cancel()
