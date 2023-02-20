@@ -35,7 +35,7 @@ class RemotesRepository constructor(
         coroutines.mainScope.launch { loadAll() }
     }
 
-    suspend fun loadAll(): List<RemoteNodeDomain>/* = updateRemotesMutex.withLock*/ {
+    suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()
         fileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
@@ -47,7 +47,7 @@ class RemotesRepository constructor(
         return _remoteNodes
     }
 
-    suspend fun addUpdateNode(node: RemoteNodeDomain) /*= updateRemotesMutex.withLock*/ {
+    suspend fun addUpdateNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
         val local = localNodeRepo.getLocalNode()
 //        log.d("addUpdateNode: input isLocal: ${node.id == local.id} ${summarise(node)} ")
         if (node.id == local.id) return

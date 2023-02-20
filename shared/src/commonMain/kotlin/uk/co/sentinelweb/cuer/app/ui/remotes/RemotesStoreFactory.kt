@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType.Ping
@@ -36,6 +37,7 @@ class RemotesStoreFactory constructor(
     private val localRepository: LocalRepository,
     private val remoteInteractor: RemoteInteractor,
     private val connectivityWrapper: ConnectivityWrapper,
+    private val remotesRepository: RemotesRepository,
 ) {
 
     init {
@@ -116,7 +118,11 @@ class RemotesStoreFactory constructor(
 
         private fun pingNode(intent: Intent.ActionPingNode) {
             coroutines.ioScope.launch {
-                remoteInteractor.connect(Ping, intent.remote)
+                remotesRepository.addUpdateNode(
+                    intent.remote.copy(
+                        isConnected = remoteInteractor.connect(Ping, intent.remote).isSuccessful
+                    )
+                )
             }
         }
 
