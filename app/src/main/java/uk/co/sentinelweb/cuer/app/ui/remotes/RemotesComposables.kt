@@ -27,6 +27,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.HeaderButton
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
+import uk.co.sentinelweb.cuer.app.ui.common.compose.views.deleteSwipeResources
+import uk.co.sentinelweb.cuer.app.ui.common.compose.views.editSwipeResources
+import uk.co.sentinelweb.cuer.app.ui.common.compose.views.swipeToDismiss
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
@@ -45,6 +48,7 @@ object RemotesComposables {
     }
 
     // todo use scaffold
+    @OptIn(ExperimentalMaterialApi::class)
     @Composable
     fun RemotesView(model: Model, view: BaseMviView<Model, Event>) {
         CuerTheme {
@@ -144,7 +148,10 @@ object RemotesComposables {
                             contentPadding = PaddingValues(top = 4.dp)
                         ) {
                             items(model.remoteNodes) { remote ->
-                                RemoteRow(remote, view)
+                                swipeToDismiss(
+                                    editSwipeResources { view.dispatch(OnActionPingNodeClicked(remote.domain)) },
+                                    deleteSwipeResources { view.dispatch(OnActionDeleteSwipe(remote.domain)) }
+                                ) { RemoteRow(remote, view) }
                             }
                         }
                     }

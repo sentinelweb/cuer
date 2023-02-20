@@ -44,6 +44,9 @@
     <color name="transparent">#00000000</color>
     <color name="error_image_load_color">@color/grey_300</color>
     <color name="placeholder_image_load_color">@color/grey_100</color>
+    <color name="delete">@color/red_600</color>
+    <color name="move">@color/blue_600</color>
+    <color name="edit">@color/green_600</color>
 
     <color name="build_primary">@color/secondary</color>
     <color name="build_primary_variant">@color/secondary_variant</color>

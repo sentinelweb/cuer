@@ -30,7 +30,7 @@ class PlaylistHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBu
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_move),
-                        icon = R.drawable.ic_move_24
+                        icon = R.drawable.ic_move
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_playlist_reorder),

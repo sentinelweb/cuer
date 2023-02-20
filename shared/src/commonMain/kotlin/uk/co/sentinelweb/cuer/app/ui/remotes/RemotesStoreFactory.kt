@@ -97,7 +97,12 @@ class RemotesStoreFactory constructor(
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
                 is Intent.RemoteUpdate -> remotesUpdate(intent)
+                is Intent.DeleteRemote -> deleteRemote(intent)
             }
+
+        private fun deleteRemote(intent: Intent.DeleteRemote) {
+            coroutines.mainScope.launch { remotesRepository.removeNode(intent.remote) }
+        }
 
         private fun remotesUpdate(intent: Intent.RemoteUpdate) {
             //log.d(intent.remotes.map { it.run {"$hostname - $ipAddress - $isConnected"} }.joinToString(prefix = "remotes uppdate:\n" ) { "\n"})
