@@ -31,7 +31,7 @@ class KtorClientBuilder {
                         log.d(message)
                     }
                 }
-                level = LogLevel.BODY
+                level = LogLevel.INFO
             }
         }
     }

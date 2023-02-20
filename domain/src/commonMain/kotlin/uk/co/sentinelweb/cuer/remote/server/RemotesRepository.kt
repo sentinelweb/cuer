@@ -7,6 +7,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -15,11 +16,18 @@ class RemotesRepository constructor(
     private val fileInteractor: FileInteractor,
     private val localNodeRepo: LocalRepository,
     private val coroutines: CoroutineContextProvider,
+    private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
+
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
 
     private val _updatesFlow: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(emptyList())
-    val updatesFlow: Flow<List<RemoteNodeDomain>> get() = _updatesFlow
+
+    val updatesFlow: Flow<List<RemoteNodeDomain>>
+        get() = _updatesFlow
 
     private val updateRemotesMutex = Mutex()
 
@@ -27,7 +35,7 @@ class RemotesRepository constructor(
         coroutines.mainScope.launch { loadAll() }
     }
 
-    suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
+    suspend fun loadAll(): List<RemoteNodeDomain>/* = updateRemotesMutex.withLock*/ {
         _remoteNodes.clear()
         fileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
@@ -35,34 +43,37 @@ class RemotesRepository constructor(
             //?.let { it.map { it.copy(isConnected = false) } }
             ?.let { _remoteNodes.addAll(it) }
 
-        _updatesFlow.value = _remoteNodes
+        _updatesFlow.emit(_remoteNodes.toList())
         return _remoteNodes
     }
 
-    suspend fun addUpdateNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
+    suspend fun addUpdateNode(node: RemoteNodeDomain) /*= updateRemotesMutex.withLock*/ {
         val local = localNodeRepo.getLocalNode()
+//        log.d("addUpdateNode: input isLocal: ${node.id == local.id} ${summarise(node)} ")
         if (node.id == local.id) return
 
-        removeNodeInternal(node)
-        _remoteNodes.add(node)
+        _remoteNodes
+            .indexOfFirst { it.id == node.id }
+            .takeIf { it >= 0 }
+            ?.also { index -> _remoteNodes[index] = node }
+            ?: _remoteNodes.add(node)
+
+//        _remoteNodes.forEach { rn ->
+//            log.d("addUpdateNode: node updated: ${summarise(rn)}")
+//        }
+
         saveAll()
-        _updatesFlow.value = _remoteNodes
+        _updatesFlow.value = _remoteNodes.toList()
     }
+
+    private fun summarise(node: RemoteNodeDomain) = "node: ${node.isConnected} ${node.hostname} ${node.ipAddress} ${node.id}"
 
     suspend fun removeNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
-        removeNodeInternal(node)
-        saveAll()
-        _updatesFlow.value = _remoteNodes
-    }
-
-    private fun removeNodeInternal(node: RemoteNodeDomain) {
         _remoteNodes
             .find { it.id == node.id }
             ?.also { _remoteNodes.remove(it) }
-    }
-
-    private fun saveAll() {
-        fileInteractor.saveJson(_remoteNodes.serialise())
+        saveAll()
+        _updatesFlow.emit(_remoteNodes.toList())
     }
 
     suspend fun setDisconnected() = updateRemotesMutex.withLock {
@@ -71,7 +82,11 @@ class RemotesRepository constructor(
             .also { _remoteNodes.clear() }
             .also { _remoteNodes.addAll(it) }
             .also { saveAll() }
-            .also { _updatesFlow.value = _remoteNodes }
+            .also { _updatesFlow.emit(_remoteNodes.toList()) }
+    }
+
+    private fun saveAll() {
+        fileInteractor.saveJson(_remoteNodes.serialise())
     }
 }
 

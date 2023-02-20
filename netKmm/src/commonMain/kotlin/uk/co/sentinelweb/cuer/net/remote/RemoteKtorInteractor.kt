@@ -20,7 +20,7 @@ internal class RemoteKtorInteractor(
         return try {
             val connectMessage = ConnectMessage(messageType, connectMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true))
             val dto = connectService.sendConnect(remote, RequestMessage(connectMessage))
-            NetResult.Data(true) // fixme - verify reqeust success
+            NetResult.Data(true)
         } catch (e: Exception) {
             NetResult.Error(e)
         }

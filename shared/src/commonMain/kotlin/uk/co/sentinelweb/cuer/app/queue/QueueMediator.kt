@@ -52,6 +52,7 @@ class QueueMediator constructor(
     private /*lateinit*/ var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
     override val currentItemFlow: Flow<PlaylistItemDomain?>
         get() = _currentItemFlow.distinctUntilChanged { old, new -> old == new }.onEach { log.d("currentItemFlow: ${it?.summarise()}") }
+
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
     override val currentPlaylistFlow: Flow<PlaylistDomain>
         get() = _currentPlaylistFlow.distinctUntilChanged()

@@ -94,8 +94,13 @@ class RemotesStoreFactory constructor(
                 is Intent.ActionPingNode -> pingNode(intent)
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
-                is Intent.RemoteUpdate -> dispatch(Result.SetNodes(intent.remotes))
+                is Intent.RemoteUpdate -> remotesUpdate(intent)
             }
+
+        private fun remotesUpdate(intent: Intent.RemoteUpdate) {
+            //log.d(intent.remotes.map { it.run {"$hostname - $ipAddress - $isConnected"} }.joinToString(prefix = "remotes uppdate:\n" ) { "\n"})
+            dispatch(Result.SetNodes(intent.remotes))
+        }
 
         private fun wifiStateChange(intent: Intent.WifiStateChange) {
             dispatch(Result.UpdateWifiState(intent.wifiState))

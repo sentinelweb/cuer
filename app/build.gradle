@@ -255,6 +255,7 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
     testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+    testImplementation "app.cash.turbine:turbine:$ver_turbine"
 
     androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"

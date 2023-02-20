@@ -13,14 +13,15 @@ internal class ErrorMapper(
             log.e(msg, t)
             NetResult.NetworkError<R>(t)
         }
-        // todo get http code
-//        is HttpException -> {
-//            log.e(msg, t)
-//            NetResult.HttpError<R>(t, code = t.code().toString())
-//        }
+
+        is RequestFailureException -> {
+            log.e(msg, t)
+            NetResult.HttpError<R>(t, code = t.code.toString(), msg = t.description)
+        }
+
         else -> {
             log.e(msg, t)
-            NetResult.Error<R>(t)
+            NetResult.Error<R>(t, msg = t.message)
         }
     }
 
