@@ -18,4 +18,5 @@ interface WifiStateProvider {
 
     fun register()
     fun unregister()
+    fun updateWifiInfo()
 }

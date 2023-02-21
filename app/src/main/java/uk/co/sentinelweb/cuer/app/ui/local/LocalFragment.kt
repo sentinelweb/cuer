@@ -137,11 +137,8 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                     LocalStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         storeFactory = DefaultStoreFactory(),
-                        strings = get(),
                         log = get(),
-                        prefs = get(),
                         remoteServerManager = get(),
-                        coroutines = get(),
                         localRepository = get(),
                         connectivityWrapper = get(),
                     )

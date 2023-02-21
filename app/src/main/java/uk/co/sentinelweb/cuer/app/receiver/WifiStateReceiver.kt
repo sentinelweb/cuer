@@ -43,8 +43,7 @@ class WifiStateReceiver(
             val netInfo: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
             //dumpNetworkData(intent, context)
             if (netInfo?.type == ConnectivityManager.TYPE_WIFI) {
-                connectivityWrapper.getWIFIInfo()
-                    .also { log.d("wifiState: $it") }
+                connectivityWrapper.getWifiInfo()
                     .also { wifiStartChecker.checkToStartServer(it) }
                     .also { _wifiStateFlow.value = it }
             }
@@ -62,6 +61,11 @@ class WifiStateReceiver(
     override fun unregister() {
         val appContext: Application = GlobalContext.get().get()
         appContext.unregisterReceiver(this)
+    }
+
+    override fun updateWifiInfo() {
+        connectivityWrapper.getWifiInfo()
+            .also { _wifiStateFlow.value = it }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)

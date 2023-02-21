@@ -41,11 +41,11 @@ class PixabayKtorInteractorApiTest {
     private val connectivityWrapper = object : ConnectivityWrapper {
         override fun isConnected() = true
         override fun isMetered() = true
-        override fun getWIFIInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState()
-        override fun getWIFIIP(): String? = "WIFI.IP"
-        override fun getLocalIpAddress(): String? = ""
+        override fun getWifiInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState()
+        override fun getWIFIIP(): String = "WIFI.IP"
+        override fun getLocalIpAddress(): String = ""
         override fun isNonMobileAvailable(): Boolean = true
-        override fun wifiIpAddress(): String? = "WIFI.IP"
+        override fun wifiIpAddress(): String = "WIFI.IP"
     }
     private lateinit var sut: PixabayInteractor
 

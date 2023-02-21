@@ -46,7 +46,7 @@ class WifiStateReceiverTest {
         }
         val wifiState = WifiStateProvider.WifiState(isConnected = false)
         val wifiStateConnected = WifiStateProvider.WifiState(isConnected = true)
-        every { connectivityWrapper.getWIFIInfo() }.returnsMany(wifiState, wifiStateConnected)
+        every { connectivityWrapper.getWifiInfo() }.returnsMany(wifiState, wifiStateConnected)
         sut = WifiStateReceiver(connectivityWrapper, log, wifiStartChecker)
 
         sut.wifiStateFlow.test {

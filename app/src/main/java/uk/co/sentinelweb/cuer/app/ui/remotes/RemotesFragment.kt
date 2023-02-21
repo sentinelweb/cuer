@@ -19,7 +19,6 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
@@ -32,9 +31,10 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.permission.LocaltionPermissionOpener
+import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class RemotesFragment : Fragment(), AndroidScopeComponent {
@@ -42,10 +42,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     override val scope: Scope by fragmentScopeWithSource<RemotesFragment>()
     private val controller: RemotesController by inject()
     private val log: LogWrapper by inject()
-    private val coroutines: CoroutineContextProvider by inject()
     private val remotesMviView: RemotesMviViewProxy by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val navRouter: NavigationRouter by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
@@ -175,13 +173,16 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         localRepository = get(),
                         remoteInteractor = get(),
                         connectivityWrapper = get(),
-                        remotesRepository = get()
+                        remotesRepository = get(),
+                        locationPermissionLaunch = get(),
+                        wifiStateProvider = get()
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }
+                scoped<LocationPermissionLaunch> { LocaltionPermissionOpener(this.getFragmentActivity()) }
             }
         }
     }

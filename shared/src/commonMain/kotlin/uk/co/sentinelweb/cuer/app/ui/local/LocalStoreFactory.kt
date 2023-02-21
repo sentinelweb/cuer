@@ -7,12 +7,9 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -21,12 +18,9 @@ import uk.co.sentinelweb.cuer.remote.server.http
 
 class LocalStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
-    private val strings: StringDecoder,
     private val log: LogWrapper,
-    private val prefs: MultiPlatformPreferencesWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val localRepository: LocalRepository,
-    private val coroutines: CoroutineContextProvider,
     private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
@@ -43,13 +37,13 @@ class LocalStoreFactory constructor(
     }
 
     private inner class ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
+        override fun State.reduce(msg: Result): State =
+            when (msg) {
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
                     localNode = localRepository.getLocalNode(),
-                    wifiState = connectivityWrapper.getWIFIInfo(),
+                    wifiState = connectivityWrapper.getWifiInfo(),
                 )
             }
     }
@@ -69,10 +63,10 @@ class LocalStoreFactory constructor(
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 Intent.Up -> publish(Label.Up)
-                is Intent.ActionSave -> save(intent, getState())
+                is Intent.ActionSave -> save(intent)
             }
 
-        private fun save(intent: Intent.ActionSave, state: State) {
+        private fun save(intent: Intent.ActionSave) {
             localRepository.getLocalNode()
                 .copy(
                     hostname = intent.updated.hostname,
@@ -96,7 +90,7 @@ class LocalStoreFactory constructor(
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "LocalStore",
-            initialState = State(wifiState = connectivityWrapper.getWIFIInfo()),
+            initialState = State(wifiState = connectivityWrapper.getWifiInfo()),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()

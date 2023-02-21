@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
+import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -38,6 +39,8 @@ class RemotesStoreFactory constructor(
     private val remoteInteractor: RemoteInteractor,
     private val connectivityWrapper: ConnectivityWrapper,
     private val remotesRepository: RemotesRepository,
+    private val locationPermissionLaunch: LocationPermissionLaunch,
+    private val wifiStateProvider: WifiStateProvider,
 ) {
 
     init {
@@ -92,7 +95,7 @@ class RemotesStoreFactory constructor(
                 Intent.ActionPingMulticast -> pingMulticast(intent)
                 Intent.ActionStartServer -> startServer(intent)
                 Intent.ActionStopServer -> stopServer(intent)
-                Intent.Refresh -> dispatch(Result.UpdateServerState)
+                Intent.Refresh -> refresh()
                 is Intent.ActionPingNode -> pingNode(intent)
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
@@ -105,7 +108,6 @@ class RemotesStoreFactory constructor(
         }
 
         private fun remotesUpdate(intent: Intent.RemoteUpdate) {
-            //log.d(intent.remotes.map { it.run {"$hostname - $ipAddress - $isConnected"} }.joinToString(prefix = "remotes uppdate:\n" ) { "\n"})
             dispatch(Result.SetNodes(intent.remotes))
         }
 
@@ -118,7 +120,7 @@ class RemotesStoreFactory constructor(
         }
 
         private fun launchLocationPermission() {
-            // todo launch location permission
+            locationPermissionLaunch.launchLocationPermission()
         }
 
         private fun pingNode(intent: Intent.ActionPingNode) {
@@ -176,6 +178,11 @@ class RemotesStoreFactory constructor(
                 remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }
             }
         }
+
+        private fun refresh() {
+            dispatch(Result.UpdateServerState)
+            wifiStateProvider.updateWifiInfo()
+        }
     }
 
     fun create(): MviStore =
@@ -183,7 +190,7 @@ class RemotesStoreFactory constructor(
             name = "RemotesStore",
             initialState = State(
                 localNode = localRepository.getLocalNode(),
-                wifiState = connectivityWrapper.getWIFIInfo()
+                wifiState = connectivityWrapper.getWifiInfo()
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },

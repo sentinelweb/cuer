@@ -78,7 +78,7 @@ class AndroidConnectivityWrapper constructor(
                     || type == ConnectivityManager.TYPE_WIMAX)
         } ?: false
 
-    override fun getWIFIInfo(): WifiStateProvider.WifiState {
+    override fun getWifiInfo(): WifiStateProvider.WifiState {
         val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
         return wifiManager.connectionInfo
             ?.takeIf { it.ipAddress != 0 } // hack but connectivity manager return the wrong connected state
