@@ -254,6 +254,7 @@ object Modules {
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
         factory { AppListBuilder(androidApplication(), get()) }
+        factory { PlayerConnectedChecker(get(), get()) }
     }
 
     private val appNetModule = module {

@@ -53,6 +53,10 @@ class FloatingWindowMviView(
             mainPlayControls
                 ?.apply { setPlayerState(it) }
         })
+        diff(get = Model::texts, set = {
+            it.playlistTitle
+                ?.also { mainPlayControls?.setPlaylistName(it) }
+        })
         diff(get = Model::playlistItem, set = { item ->
             currentItem = item
             notification.setPlaylistItem(item, LOCAL)
