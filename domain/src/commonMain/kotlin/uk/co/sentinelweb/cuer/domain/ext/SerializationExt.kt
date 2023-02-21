@@ -12,7 +12,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
+import uk.co.sentinelweb.cuer.domain.system.RequestDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.server.message.messageSerializersModule
 
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(
     ChannelDomain.serializer(), this
@@ -108,6 +110,7 @@ fun deserialiseBackupFileModel(input: String) = domainJsonSerializer.decodeFromS
 
 // response
 fun ResponseDomain.serialise() = domainJsonSerializer.encodeToString(ResponseDomain.serializer(), this)
+fun RequestDomain.serialise() = domainJsonSerializer.encodeToString(RequestDomain.serializer(), this)
 
 fun deserialiseResponse(input: String) = domainJsonSerializer.decodeFromString(ResponseDomain.serializer(), input)
 
@@ -116,7 +119,22 @@ fun deserialiseCategory(input: String) = domainJsonSerializer.decodeFromString(C
 // AppDetailsDomain
 fun List<AppDetailsDomain>.serialiseAppList() = domainJsonSerializer.encodeToString(ListSerializer(AppDetailsDomain.serializer()), this)
 
-fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(AppDetailsDomain.serializer(), input)
+fun deserialiseAppList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(AppDetailsDomain.serializer()), input)
+
+// LocalNodeDomain
+fun LocalNodeDomain.serialise() = domainJsonSerializer.encodeToString(LocalNodeDomain.serializer(), this)
+
+fun deserialiseLocalNode(input: String) = domainJsonSerializer.decodeFromString(LocalNodeDomain.serializer(), input)
+
+// RemoteNodeDomain
+fun RemoteNodeDomain.serialise() = domainJsonSerializer.encodeToString(RemoteNodeDomain.serializer(), this)
+
+fun deserialiseRemoteNode(input: String) = domainJsonSerializer.decodeFromString(RemoteNodeDomain.serializer(), input)
+
+fun List<RemoteNodeDomain>.serialise() = domainJsonSerializer.encodeToString(ListSerializer(RemoteNodeDomain.serializer()), this)
+
+fun deserialiseRemoteNodeList(input: String) = domainJsonSerializer.decodeFromString(ListSerializer(RemoteNodeDomain.serializer()), input)
+
 
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
@@ -130,8 +148,15 @@ val domainSerializersModule = SerializersModule {
         SearchLocalDomain::class to SearchLocalDomain.serializer(),
         BackupFileModel::class to BackupFileModel.serializer(),
         ErrorDomain::class to ErrorDomain.serializer(),
+        RequestDomain::class to RequestDomain.serializer(),
         ResponseDomain::class to ResponseDomain.serializer(),
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
+        LocalNodeDomain::class to LocalNodeDomain.serializer(),
+        RemoteNodeDomain::class to RemoteNodeDomain.serializer(),
+
+        LocalNodeDomain.AuthConfig.Username::class to LocalNodeDomain.AuthConfig.Username.serializer(),
+        RemoteNodeDomain.AuthType.Username::class to RemoteNodeDomain.AuthType.Username.serializer(),
+        RemoteNodeDomain.AuthType.Token::class to RemoteNodeDomain.AuthType.Token.serializer(),
     )
     polymorphic(Domain::class, PlaylistDomain::class, PlaylistDomain.serializer())
     polymorphic(Domain::class, MediaDomain::class, MediaDomain.serializer())
@@ -141,6 +166,16 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, PlaylistTreeDomain::class, PlaylistTreeDomain.serializer())
     polymorphic(Domain::class, SearchLocalDomain::class, SearchLocalDomain.serializer())
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
+    polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
+    polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
+
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Open::class, LocalNodeDomain.AuthConfig.Open.serializer())
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Confirm::class, LocalNodeDomain.AuthConfig.Confirm.serializer())
+    polymorphic(LocalNodeDomain.AuthConfig::class, LocalNodeDomain.AuthConfig.Username::class, LocalNodeDomain.AuthConfig.Username.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Open::class, RemoteNodeDomain.AuthType.Open.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Token::class, RemoteNodeDomain.AuthType.Token.serializer())
+    polymorphic(RemoteNodeDomain.AuthType::class, RemoteNodeDomain.AuthType.Username::class, RemoteNodeDomain.AuthType.Username.serializer())
+
 }.plus(SerializersModule {
     contextual(Instant::class, InstantIso8601Serializer)
 }).plus(SerializersModule {
@@ -151,8 +186,16 @@ val domainJsonSerializer = Json {
     prettyPrint = true
     isLenient = true
     ignoreUnknownKeys = true
-    classDiscriminator = domainClassDiscriminator// property added when base domain type is use (see ResponseDomain)
+    classDiscriminator = domainClassDiscriminator
     serializersModule = domainSerializersModule
+}
+
+val domainMessageJsonSerializer = Json {
+    prettyPrint = true
+    isLenient = true
+    ignoreUnknownKeys = true
+    classDiscriminator = domainClassDiscriminator//"classTypeDiscriminator"
+    serializersModule = domainSerializersModule.plus(messageSerializersModule)
 }
 
 

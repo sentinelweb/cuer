@@ -22,13 +22,13 @@ sealed class NetResult<R> constructor(
 
     open class Error<R>(
         val t: Throwable?,
-        val msg: String? = null,
+        val msg: String? = t?.message.toString(),
         val code: String? = null
     ) : NetResult<R>(false)
 
     class NetworkError<R>(
         t: Exception,
-        msg: String? = null,
+        msg: String? = t.message.toString(),
         code: String? = null
     ) : Error<R>(t, msg, code)
 

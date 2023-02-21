@@ -5,4 +5,6 @@ data class BuildConfigDomain(
     val cuerRemoteEnabled: Boolean,
     val versionCode: Int,
     val version: String,
+    val device: String,
+    val deviceType: NodeDomain.DeviceType,
 )

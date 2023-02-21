@@ -20,17 +20,19 @@ object CuerTopAppBarComposables {
     @Composable
     fun CuerAppBar(
         text: String,
+        modifier: Modifier = Modifier,
         backgroundColor: Color = MaterialTheme.colors.primarySurface,
         contentColor: Color = contentColorFor(backgroundColor),
-        onUp: (() -> Unit)? = null,
         actions: List<Action> = listOf(),
+        onUp: (() -> Unit)? = null,
     ) {
         TopAppBar(
             title = {
                 Text(
                     text = text,
                     style = MaterialTheme.typography.h4,
-                    maxLines = 1
+                    maxLines = 1,
+                    color = Color.White,
                 )
             },
             navigationIcon = {
@@ -38,7 +40,7 @@ object CuerTopAppBarComposables {
                     IconButton(onClick = { onUp() }) {
                         Icon(
                             Icons.Default.ArrowBack,
-                            tint = MaterialTheme.colors.onSurface,
+                            tint = Color.White,
                             contentDescription = stringResource(id = R.string.up)
 
                         )
@@ -47,7 +49,8 @@ object CuerTopAppBarComposables {
             },
             backgroundColor = backgroundColor,
             contentColor = contentColor,
-            actions = { Actions(actions) }
+            actions = { Actions(actions) },
+            modifier = modifier
         )
     }
 
@@ -61,6 +64,7 @@ object CuerTopAppBarComposables {
         Icon(
             painter = painterResource(action.item.icon),
             contentDescription = null,
+            tint = Color.White,
             modifier = Modifier
                 .clickable { action.action() }
                 .size(48.dp)

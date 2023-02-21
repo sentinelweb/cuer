@@ -7,19 +7,19 @@ import android.content.Intent
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteNotificationController.Companion.ACTION_STOP
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerNotificationController.Companion.ACTION_STOP
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class RemoteNotification constructor(
-    private val service: RemoteService,
+class RemoteServerNotification constructor(
+    private val service: RemoteServerService,
     private val appState: CuerAppState,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
     private val res: ResourceWrapper
-) : RemoteContract.Notification.View {
+) : RemoteServerContract.Notification.View {
 
     init {
         log.tag(this)
@@ -65,7 +65,7 @@ class RemoteNotification constructor(
     }
 
     private fun pendingIntent(action: String): PendingIntent {
-        val intent = Intent(service, RemoteService::class.java).apply {
+        val intent = Intent(service, RemoteServerService::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
         }

@@ -27,6 +27,9 @@ internal class ServiceExecutor(
             urlParams.forEach { parameter(it.key, it.value) }
             headers.forEach { header(it.key, it.value) }
         }
+        if (response.status.value >= 400) {
+            throw RequestFailureException(response.status.value, response.status.description)
+        }
         response.body<T>()
     } catch (e: Exception) {
         log.e("get", e)
@@ -48,6 +51,9 @@ internal class ServiceExecutor(
             urlParams.forEach { parameter(it.key, it.value) }
             headers.forEach { header(it.key, it.value) }
         }
+        if (response.status.value >= 400) {
+            throw RequestFailureException(response.status.value, response.status.description)
+        }
         response.body<T>()
     } catch (e: Exception) {
         log.e("post", e)
@@ -63,10 +69,12 @@ internal class ServiceExecutor(
             urlParams.forEach { parameter(it.key, it.value) }
             headers.forEach { header(it.key, it.value) }
         }
+        if (response.status.value >= 400) {
+            throw RequestFailureException(response.status.value, response.status.description)
+        }
         response.body<T>()
     } catch (e: Exception) {
         log.e("put", e)
         throw e
     }
-
 }

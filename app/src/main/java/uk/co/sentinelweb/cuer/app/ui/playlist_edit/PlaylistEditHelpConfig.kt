@@ -19,7 +19,7 @@ class PlaylistEditHelpConfig(val res: ResourceWrapper) : OnboardingContract.Conf
                 lines = listOf(
                     ActionResources(
                         label = res.getString(R.string.help_pe_save),
-                        icon = R.drawable.ic_button_tick_24_white
+                        icon = R.drawable.ic_tick
                     ),
                     ActionResources(
                         label = res.getString(R.string.help_pe_star),

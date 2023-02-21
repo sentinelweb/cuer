@@ -38,12 +38,12 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val versionCategory
         get() = findPreference(R.string.prefs_root_version_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_version_key")
-    private val remoteServiceCategory
-        get() = findPreferenceCategory(R.string.prefs_root_remote_service_cat_key)
-            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_cat_key")
-    private val remoteServicePreference
-        get() = findCheckbox(R.string.prefs_root_remote_service_key)
-            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_key")
+//    private val remoteServiceCategory
+//        get() = findPreferenceCategory(R.string.prefs_root_remote_service_cat_key)
+//            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_cat_key")
+//    private val remoteServicePreference
+//        get() = findCheckbox(R.string.prefs_root_remote_service_key)
+//            ?: throw IllegalArgumentException("Couldn't get: prefs_root_remote_service_key")
 
     private val feedbackPreference
         get() = findPreference(R.string.prefs_root_feedback_key)
@@ -102,8 +102,8 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_root, rootKey)
-        remoteServiceCategory.isVisible = buildConfig.cuerRemoteEnabled
-        remoteServicePreference.isVisible = buildConfig.cuerRemoteEnabled
+        //remoteServiceCategory.isVisible = buildConfig.cuerRemoteEnabled
+        //remoteServicePreference.isVisible = buildConfig.cuerRemoteEnabled
         //debugPreference.isVisible = buildConfig.isDebug
         bugReportPreference.isVisible = buildConfig.isDebug
     }
@@ -111,7 +111,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     override fun onPreferenceTreeClick(preference: Preference): Boolean {
         when (preference.key) {
             getString(R.string.prefs_root_debug_send_reports_key) -> presenter.sendDebugReports()
-            getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
+            // getString(R.string.prefs_root_remote_service_key) -> presenter.toggleRemoteService()
             getString(R.string.prefs_root_feedback_key) -> presenter.onFeedback()
             getString(R.string.prefs_root_share_key) -> presenter.onShare()
             getString(R.string.prefs_root_onboard_key) -> presenter.resetOnboarding()
@@ -142,18 +142,18 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
                 .let { it.get(Random.nextInt(it.size)) }
     }
 
-    override fun setRemoteServiceRunning(running: Boolean, address: String?) {
-        remoteServicePreference
-            .apply {
-                setChecked(running)
-                val summary =
-                    if (running)
-                        getString(R.string.prefs_root_remote_service_running) + ": " + address
-                    else
-                        getString(R.string.prefs_root_remote_service_not_running)
-                setSummary(summary)
-            }
-    }
+//    override fun setRemoteServiceRunning(running: Boolean, address: String?) {
+//        remoteServicePreference
+//            .apply {
+//                setChecked(running)
+//                val summary =
+//                    if (running)
+//                        getString(R.string.prefs_root_remote_service_running) + ": " + address
+//                    else
+//                        getString(R.string.prefs_root_remote_service_not_running)
+//                setSummary(summary)
+//            }
+//    }
 
     override fun showMessage(msg: String) {
         snackbarWrapper.make(msg).show()

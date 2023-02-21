@@ -14,7 +14,7 @@ import java.time.Instant
 interface PrefRootContract {
     interface Presenter {
         fun sendDebugReports()
-        fun toggleRemoteService()
+//        fun toggleRemoteService()
         fun initialisePrefs()
         fun onFeedback()
         fun onShare()
@@ -25,7 +25,8 @@ interface PrefRootContract {
 
     interface View {
         fun showMessage(msg: String)
-        fun setRemoteServiceRunning(running: Boolean, address: String?)
+
+        //        fun setRemoteServiceRunning(running: Boolean, address: String?)
         fun setVersion(versionString: String)
         fun sendEmail(data: EmailUseCase.Data)
         fun launchShare(data: ShareUseCase.Data)
@@ -48,8 +49,8 @@ interface PrefRootContract {
                         log = get(),
                         firebaseWrapper = get(),
                         timeProvider = get(),
-                        remoteServiceManger = get(),
-                        coroutines = get(),
+//                        remoteServiceManger = get(),
+//                        coroutines = get(),
                         emailUseCase = get(),
                         shareUseCase = get(),
                     )

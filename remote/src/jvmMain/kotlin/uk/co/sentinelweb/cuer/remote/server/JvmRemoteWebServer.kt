@@ -1,52 +1,67 @@
 package uk.co.sentinelweb.cuer.remote.server
 
-import io.ktor.application.*
-import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.http.content.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
 import io.ktor.server.cio.*
 import io.ktor.server.engine.*
+import io.ktor.server.http.content.*
+import io.ktor.server.plugins.*
+import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.compression.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.request.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
+import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
+import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 import java.io.PrintWriter
 import java.io.StringWriter
 
-class RemoteServer constructor(
+class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
-    private val logWrapper: LogWrapper
-) {
+    private val logWrapper: LogWrapper,
+    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler
+) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
     }
 
-    val port: Int
-        get() = System.getenv("PORT")?.toInt() ?: 9090
+    private val localRepository: LocalRepository by inject()
 
-    fun fullAddress(ip: String) = "http://$ip:$port"
+    override val port: Int
+        get() = localRepository.getLocalNode().port
 
     private var _appEngine: ApplicationEngine? = null
 
-    val isRunning: Boolean
+    override val isRunning: Boolean
         get() = _appEngine != null
 
-    fun start() {
+    override fun start(onStarted: () -> Unit) {
         buildServer().apply {
             _appEngine = this // start is a blocking call
+            onStarted()
             start(wait = true)
         }
     }
 
-    fun stop() {
+    override fun stop() {
         _appEngine?.stop(0, 0)
         logWrapper.d("Stopped remote server ...")
         _appEngine = null
@@ -55,12 +70,12 @@ class RemoteServer constructor(
     private fun buildServer(): ApplicationEngine =
         embeddedServer(CIO, port) {
             install(ContentNegotiation) {
-                json()
+                json(domainMessageJsonSerializer)
             }
             install(CORS) {
-                method(HttpMethod.Get)
-                method(HttpMethod.Post)
-                method(HttpMethod.Delete)
+                allowMethod(HttpMethod.Get)
+                allowMethod(HttpMethod.Post)
+                allowMethod(HttpMethod.Delete)
                 anyHost()
             }
             install(Compression) {
@@ -89,7 +104,7 @@ class RemoteServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlist/{id}") {
-                    (call.parameters["id"]?.toLong())
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylist(id)
                                 ?.let { ResponseDomain(it) }
@@ -106,7 +121,7 @@ class RemoteServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlistItem/{id}") {
-                    (call.parameters["id"]?.toLong())
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylistItem(id)
                                 ?.let { ResponseDomain(it) }
@@ -119,11 +134,24 @@ class RemoteServer constructor(
                         }
                     logWrapper.d(call.request.uri)
                 }
+                post(AVAILABLE_API.PATH) {
+                    logWrapper.d("${AVAILABLE_API.PATH} : " + call.request.uri)
+                    (try {
+                        call.receive<RequestMessage>()
+                    } catch (e: BadRequestException) {
+                        logWrapper.e("connect: bad request", e)
+                        null
+                    })
+                        ?.let { it.payload as AvailableMessage }
+                        ?.also { connectMessageListener.messageReceived(it) }
+                        ?.also { call.respond(HttpStatusCode.OK) }
+                        ?: call.error(HttpStatusCode.BadRequest, "No message")
+                }
                 post("/checkLink") {
                     val post = call.receiveParameters()
                     //logWrapper.d("scan:" + post)
                     try {
-                        (post["url"])
+                        post["url"]
                             ?.let { url ->
                                 //logWrapper.d("scan:" + url)
                                 try {

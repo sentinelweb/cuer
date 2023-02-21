@@ -12,7 +12,7 @@ import kotlin.test.assertEquals
 @RunWith(AndroidJUnit4::class)
 class AndroidLinkScannerTest {
     val sut = AndroidLinkScanner(
-        log = AndroidLogWrapper(BuildConfigDomain(true, 50, "version")),
+        log = AndroidLogWrapper(BuildConfigDomain(true, true, 50, "version", "device", NodeDomain.DeviceType.ANDROID)),
         mappers = urlMediaMappers
     )
 

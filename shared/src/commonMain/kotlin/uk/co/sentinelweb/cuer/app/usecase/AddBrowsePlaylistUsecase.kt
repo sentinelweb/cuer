@@ -29,23 +29,25 @@ class AddBrowsePlaylistUsecase(
             ?.also { log.d("found existing playlist = ${it.id}") }
             ?.also { return@execute (it) }
 
-        if (!connectivityWrapper.isConnected()) {
-            return null
-        }
+        if (!connectivityWrapper.isConnected()) return null
 
-        return playlistOrchestrator.loadByPlatformId(platformId, PLATFORM.deepOptions(false))
-            ?.also { log.d("${it.platformId}: ${it.title}") }
-            ?.let {
-                it.copy(
-                    image = category.image ?: it.image,
-                    thumb = category.image ?: it.thumb,
-                    parentId = parentId,
-                    // platformId = platformId,
-                    config = it.config.copy(
-                        description = category.description
+        return try {
+            playlistOrchestrator.loadByPlatformId(platformId, PLATFORM.deepOptions(false))
+                ?.also { log.d("${it.platformId}: ${it.title}") }
+                ?.let {
+                    it.copy(
+                        image = category.image ?: it.image,
+                        thumb = category.image ?: it.thumb,
+                        parentId = parentId,
+                        config = it.config.copy(
+                            description = category.description
+                        )
                     )
-                )
-            }
-            ?.let { addPlaylistUsecase.addPlaylist(it, null) }
+                }
+                ?.let { addPlaylistUsecase.addPlaylist(it, null) }
+        } catch (e: Exception) {
+            log.e("Couldnt load playlist: $category", e)
+            null
+        }
     }
 }

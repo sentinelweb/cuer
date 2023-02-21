@@ -48,6 +48,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.GUID
 
 
@@ -73,6 +74,7 @@ class MainActivity :
     private val prefs: MultiPlatformPreferencesWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper by inject()
+    private val buildConfig: BuildConfigDomain by inject()
 
     private lateinit var navController: NavController
 
@@ -333,6 +335,7 @@ class MainActivity :
                 R.id.navigation_browse -> BROWSE
                 R.id.navigation_playlists -> PLAYLISTS
                 R.id.navigation_playlist -> PLAYLIST
+                R.id.navigation_remotes -> REMOTES
                 else -> BROWSE
             }.ordinal
                 .also { prefs.lastBottomTab = it }
@@ -341,6 +344,9 @@ class MainActivity :
                 navigateToBottomTab(it.itemId)
             }
             true
+        }
+        if (buildConfig.cuerRemoteEnabled.not()) {
+            binding.bottomNavView.getMenu().removeItem(R.id.navigation_remotes);
         }
     }
 
@@ -357,6 +363,10 @@ class MainActivity :
 
                         PLAYLIST -> if (navController.currentDestination?.id != R.id.navigation_playlist) {
                             R.id.navigation_playlist
+                        } else null
+
+                        REMOTES -> if (navController.currentDestination?.id != R.id.navigation_remotes) {
+                            R.id.navigation_remotes
                         } else null
 
                         else -> if (navController.currentDestination?.id != R.id.navigation_browse) {

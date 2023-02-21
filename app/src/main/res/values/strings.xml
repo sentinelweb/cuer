@@ -246,6 +246,7 @@
     <string name="browse_error_no_category">No category with that id = %1$s</string>
     <string name="browse_recent">Recently viewed</string>
     <string name="browse_all_cats_title">All categories</string>
+    <string name="browse_add_error">Couldn\'t add playlist: %1$s</string>
     
     <!-- player -->
     <string name="player_fab_fullscreen">Fullscreen</string>
@@ -405,7 +406,6 @@
     <string name="next">Next</string>
     <string name="done">Done</string>
     <string name="finish">Finish</string>
-    <string name="browse_add_error">Could add playlist: %1$s</string>
-    <string name="prefs_root_usability_key">root_usability</string>
-    <string name="prefs_root_bymc_key">root_donate_bymc</string>
+    <string name="move">Move</string>
+    <string name="bottomnav_title_remotes">Remotes</string>
 </resources>

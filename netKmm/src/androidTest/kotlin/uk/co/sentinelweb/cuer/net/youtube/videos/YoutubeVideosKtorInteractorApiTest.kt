@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.SearchRemoteDomain
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
@@ -47,6 +48,11 @@ class YoutubeVideosKtorInteractorApiTest {
     private val connectivityWrapper = object : ConnectivityWrapper {
         override fun isConnected() = true
         override fun isMetered() = true
+        override fun getWifiInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState()
+        override fun getWIFIIP(): String = "WIFI.IP"
+        override fun getLocalIpAddress(): String = ""
+        override fun isNonMobileAvailable(): Boolean = true
+        override fun wifiIpAddress(): String = "WIFI.IP"
     }
     private val imageMapper = YoutubeImageMapper()
     private lateinit var sut: YoutubeInteractor

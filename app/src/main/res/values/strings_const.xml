@@ -14,6 +14,13 @@
     <string name="prefs_root_backup_key">root_backup</string>
     <string name="prefs_root_player_key">root_player</string>
     <string name="prefs_root_debug_send_reports_key">root_send_reports</string>
+    <string name="prefs_root_version_key">version</string>
+    <string name="prefs_root_feedback_key">root_feedback</string>
+    <string name="prefs_root_share_key">root_share</string>
+    <string name="prefs_root_debug_cat_key">root_debug</string>
+    <string name="prefs_root_onboard_key">root_onboard</string>
+    <string name="prefs_root_usability_key">root_usability</string>
+    <string name="prefs_root_bymc_key">root_donate_bymc</string>
     <string name="prefs_backup_backup_key">manual_backup</string>
     <string name="prefs_backup_restore_key">manual_restore</string>
     <string name="prefs_player_auto_float_key">player_auto_float</string>
@@ -21,11 +28,7 @@
     <string name="prefs_backup_clear_auto_key">backup_auto_clear</string>
     <string name="prefs_backup_summary_auto_key">backup_auto_summary</string>
     <string name="prefs_backup_set_auto_key">backup_auto_set</string>
-    <string name="prefs_root_version_key">version</string>
-    <string name="prefs_root_feedback_key">root_feedback</string>
-    <string name="prefs_root_share_key">root_share</string>
-    <string name="prefs_root_debug_cat_key">root_debug</string>
-    <string name="prefs_root_onboard_key">root_onboard</string>
+
     <string name="app_email">cuerapp@gmail.com</string>
     <string name="share_uri">https://cuer.app</string>
     <string name="share_short_uri">cuer.app</string>

@@ -10,9 +10,5 @@ object SharedAppAndroidModule {
         factory { AssetOperations(androidContext()) }
     }
 
-    private val dbModule = module {
-
-    }
-
     val modules = listOf(utilModule)
 }

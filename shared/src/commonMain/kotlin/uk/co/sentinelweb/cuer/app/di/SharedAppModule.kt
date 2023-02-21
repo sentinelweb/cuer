@@ -16,6 +16,9 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
+import uk.co.sentinelweb.cuer.app.service.remote.AvailableMessageHandler
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
@@ -114,6 +117,8 @@ object SharedAppModule {
                 log = get()
             )
         }
+        factory { WifiStartChecker(get(), get()) }
+        factory<RemoteServerContract.AvailableMessageHandler> { AvailableMessageHandler(get(), get(), get(), get(), get()) }
     }
 
     private val uiModule = module {

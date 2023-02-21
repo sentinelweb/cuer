@@ -6,8 +6,8 @@ import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.plugins.logging.*
 import io.ktor.serialization.kotlinx.json.*
-import kotlinx.serialization.json.Json
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 
 expect val defaultPlatformEngine: HttpClientEngine
@@ -17,10 +17,7 @@ class KtorClientBuilder {
     fun build(config: NetModuleConfig, log: LogWrapper) = HttpClient(defaultPlatformEngine) {
         expectSuccess = false
         install(ContentNegotiation) {
-            json(Json {
-                classDiscriminator = "@class"
-                ignoreUnknownKeys = true
-            })
+            json(domainMessageJsonSerializer)
         }
         install(HttpTimeout) {
             this.connectTimeoutMillis = config.timeoutMs
@@ -34,7 +31,7 @@ class KtorClientBuilder {
                         log.d(message)
                     }
                 }
-                level = LogLevel.HEADERS
+                level = LogLevel.INFO
             }
         }
     }

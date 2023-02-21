@@ -80,7 +80,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/pe_create"
-                            app:icon="@drawable/ic_button_tick_24_white"
+                            app:icon="@drawable/ic_tick"
                             tools:text="Commit"
                         />
 
@@ -235,7 +235,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pe_playable"
                 android:contentDescription="@string/help_pe_editabe_items"
-                android:drawableLeft="@drawable/ic_move_24"
+                android:drawableLeft="@drawable/ic_move"
                 android:drawableTint="@color/light_color_on_surface"
                 android:drawablePadding="4dp"
             />

@@ -33,7 +33,6 @@ android {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
         }
-
     }
 
     signingConfigs {
@@ -124,7 +123,7 @@ android {
 dependencies {
     implementation project(":shared")
     implementation project(":netKmm")
-//    implementation project(":remote")
+    implementation project(":remote")
     implementation project(":database")// todo: remove get through shared
     implementation project(":domain")
 
@@ -256,6 +255,7 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
     testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
+    testImplementation "app.cash.turbine:turbine:$ver_turbine"
 
     androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
     androidTestImplementation "com.google.truth:truth:$ver_truth"

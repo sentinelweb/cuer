@@ -19,7 +19,7 @@ class BackupHelpConfig(val res: ResourceWrapper) : OnboardingContract.ConfigBuil
                 lines = listOf(
                     ActionResources(
                         label = "Save / Create",
-                        icon = R.drawable.ic_button_tick_24_white,
+                        icon = R.drawable.ic_tick,
                         color = R.color.color_on_surface
                     ),
                     ActionResources(
