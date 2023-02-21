@@ -26,7 +26,7 @@ import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType.Ping
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Ping
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
@@ -127,7 +127,7 @@ class RemotesStoreFactory constructor(
             coroutines.ioScope.launch {
                 remotesRepository.addUpdateNode(
                     intent.remote.copy(
-                        isConnected = remoteInteractor.connect(Ping, intent.remote).isSuccessful
+                        isAvailable = remoteInteractor.available(Ping, intent.remote).isSuccessful
                     )
                 )
             }

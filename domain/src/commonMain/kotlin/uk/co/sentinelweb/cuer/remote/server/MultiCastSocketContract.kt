@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.remote.server
 
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.WEB_SERVER_PORT_DEF
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 
 interface MultiCastSocketContract {
 
     var startListener: (() -> Unit)?
 
     suspend fun runSocketListener()
-    suspend fun send(msgType: ConnectMessage.MsgType)
+    suspend fun send(msgType: AvailableMessage.MsgType)
     fun close()
 
 

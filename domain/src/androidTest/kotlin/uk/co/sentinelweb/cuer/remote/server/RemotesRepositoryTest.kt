@@ -61,7 +61,7 @@ class RemotesRepositoryTest {
 
         sut.updatesFlow.test {
             assertEquals(initialNodes, awaitItem())
-            val updated = initialNodes[0].copy(isConnected = true)
+            val updated = initialNodes[0].copy(isAvailable = true)
             sut.addUpdateNode(updated)
             coVerify { fileInteractor.saveJson(any()) }
             val updatedList = awaitItem()
@@ -102,11 +102,11 @@ class RemotesRepositoryTest {
             assertEquals(initialNodes, awaitItem())
 
             initialNodes.forEach { initialNode ->
-                val nodeUpdated = initialNode.copy(isConnected = true)
+                val nodeUpdated = initialNode.copy(isAvailable = true)
                 sut.addUpdateNode(nodeUpdated)
-                assertTrue(awaitItem().filter { it.id == nodeUpdated.id }.first().isConnected)
+                assertTrue(awaitItem().filter { it.id == nodeUpdated.id }.first().isAvailable)
             }
-            sut.setDisconnected()
+            sut.setUnAvailable()
 
             assertEquals(initialNodes, awaitItem())
             cancelAndIgnoreRemainingEvents()
@@ -115,7 +115,7 @@ class RemotesRepositoryTest {
 
     private fun remoteNodeDomains(): List<RemoteNodeDomain> {
         val initialNodes = fixture<List<RemoteNodeDomain>>()
-            .mapIndexed { i, it -> it.copy(isConnected = false, hostname = "host$i", ipAddress = "x.x.x.$i") }
+            .mapIndexed { i, it -> it.copy(isAvailable = false, hostname = "host$i", ipAddress = "x.x.x.$i") }
         return initialNodes
     }
 }

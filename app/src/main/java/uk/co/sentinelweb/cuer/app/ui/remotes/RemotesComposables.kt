@@ -164,7 +164,7 @@ object RemotesComposables {
     @Composable
     private fun RemoteRow(remote: RemotesContract.View.RemoteNodeModel, view: BaseMviView<Model, Event>) {
         var expanded by remember { mutableStateOf(false) }
-        val contentColor = remote.domain.isConnected
+        val contentColor = remote.domain.isAvailable
             .takeIf { it }
             ?.let { MaterialTheme.colors.onSurface }
             ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)

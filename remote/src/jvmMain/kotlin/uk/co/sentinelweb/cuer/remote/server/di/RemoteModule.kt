@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.remote.server.di
 
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.remote.server.ConnectMessageMapper
+import uk.co.sentinelweb.cuer.remote.server.AvailableMessageMapper
 import uk.co.sentinelweb.cuer.remote.server.JvmRemoteWebServer
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
 import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract.Companion.MULTICAST_PORT_DEBUG_DEF
@@ -20,6 +20,6 @@ object RemoteModule {
             val config = MultiCastSocketContract.Config(multiPort = multiPort)
             JvmMultiCastSocket(config, get(), get(), get(), get())
         }
-        factory { ConnectMessageMapper(get(), get()) }
+        factory { AvailableMessageMapper(get(), get()) }
     }
 }

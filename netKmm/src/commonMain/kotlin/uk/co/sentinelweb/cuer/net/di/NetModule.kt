@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayKtorInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayService
 import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
-import uk.co.sentinelweb.cuer.net.remote.RemoteConnectService
+import uk.co.sentinelweb.cuer.net.remote.RemoteAvailableService
 import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
 import uk.co.sentinelweb.cuer.net.remote.RemoteKtorInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
@@ -37,7 +37,7 @@ object NetModule {
         factory { PixabayService(executor = get(named(PIXABAY))) }
 
         factory(named(REMOTE)) { ServiceExecutor(get(named(REMOTE)), REMOTE, get()) }
-        factory { RemoteConnectService(executor = get(named(REMOTE))) }
+        factory { RemoteAvailableService(executor = get(named(REMOTE))) }
     }
 
     private val interactorModule = module {
@@ -66,8 +66,8 @@ object NetModule {
         }
         factory<RemoteInteractor> {
             RemoteKtorInteractor(
-                connectService = get(),
-                connectMessageMapper = get(),
+                availableService = get(),
+                availableMessageMapper = get(),
                 localRepository = get()
             )
         }

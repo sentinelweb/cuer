@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 
 @Serializable
-data class ConnectMessage(val type: MsgType, val node: DeviceInfo) : Message {
+data class AvailableMessage(val type: MsgType, val node: DeviceInfo) : Message {
     enum class MsgType { Join, JoinReply, Ping, PingReply, Close }
 
     @Serializable

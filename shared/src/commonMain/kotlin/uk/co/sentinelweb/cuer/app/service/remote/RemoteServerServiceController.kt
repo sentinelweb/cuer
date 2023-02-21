@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.*
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage.MsgType
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType
 
 class RemoteServerServiceController constructor(
     private val notification: RemoteServerContract.Notification.External,
@@ -108,7 +108,7 @@ class RemoteServerServiceController constructor(
         _wifiJob?.cancel()
         _wifiJob = null
         coroutines.mainScope.launch {
-            remoteRepo.setDisconnected()
+            remoteRepo.setUnAvailable()
         }
         log.d("Controller destroyed")
     }

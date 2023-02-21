@@ -27,9 +27,9 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.CONNECT_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -37,7 +37,7 @@ import java.io.StringWriter
 class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
-    private val connectMessageListener: RemoteServerContract.ConnectMessageHandler
+    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler
 ) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
@@ -134,15 +134,15 @@ class JvmRemoteWebServer constructor(
                         }
                     logWrapper.d(call.request.uri)
                 }
-                post(CONNECT_API.PATH) {
-                    logWrapper.d("${CONNECT_API.PATH} : " + call.request.uri)
+                post(AVAILABLE_API.PATH) {
+                    logWrapper.d("${AVAILABLE_API.PATH} : " + call.request.uri)
                     (try {
                         call.receive<RequestMessage>()
                     } catch (e: BadRequestException) {
                         logWrapper.e("connect: bad request", e)
                         null
                     })
-                        ?.let { it.payload as ConnectMessage }
+                        ?.let { it.payload as AvailableMessage }
                         ?.also { connectMessageListener.messageReceived(it) }
                         ?.also { call.respond(HttpStatusCode.OK) }
                         ?: call.error(HttpStatusCode.BadRequest, "No message")

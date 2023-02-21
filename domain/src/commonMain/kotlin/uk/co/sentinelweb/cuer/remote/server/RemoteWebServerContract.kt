@@ -11,8 +11,8 @@ interface RemoteWebServerContract {
     companion object {
         const val WEB_SERVER_PORT_DEF = 9090
 
-        object CONNECT_API {
-            val PATH = "/connect"
+        object AVAILABLE_API {
+            val PATH = "/available"
         }
     }
 }

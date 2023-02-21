@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 
 interface RemoteServerContract {
 
@@ -29,8 +29,8 @@ interface RemoteServerContract {
         suspend fun multicastPing()
     }
 
-    interface ConnectMessageHandler {
-        suspend fun messageReceived(msg: ConnectMessage)
+    interface AvailableMessageHandler {
+        suspend fun messageReceived(msg: AvailableMessage)
     }
 
     interface Notification {

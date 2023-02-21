@@ -9,7 +9,7 @@ data class RemoteNodeDomain(
     val id: OrchestratorContract.Identifier<GUID>?,
     val ipAddress: String,
     val port: Int,
-    val isConnected: Boolean = false,
+    val isAvailable: Boolean = false,
     val hostname: String? = null,
     val device: String? = null,
     val deviceType: DeviceType? = null,

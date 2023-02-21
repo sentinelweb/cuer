@@ -66,7 +66,7 @@ class RemotesRepository constructor(
         _updatesFlow.value = _remoteNodes.toList()
     }
 
-    private fun summarise(node: RemoteNodeDomain) = "node: ${node.isConnected} ${node.hostname} ${node.ipAddress} ${node.id}"
+    private fun summarise(node: RemoteNodeDomain) = "node: ${node.isAvailable} ${node.hostname} ${node.ipAddress} ${node.id}"
 
     suspend fun removeNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
         _remoteNodes
@@ -76,9 +76,9 @@ class RemotesRepository constructor(
         _updatesFlow.emit(_remoteNodes.toList())
     }
 
-    suspend fun setDisconnected() = updateRemotesMutex.withLock {
+    suspend fun setUnAvailable() = updateRemotesMutex.withLock {
         _remoteNodes
-            .map { it.copy(isConnected = false) }
+            .map { it.copy(isAvailable = false) }
             .also { _remoteNodes.clear() }
             .also { _remoteNodes.addAll(it) }
             .also { saveAll() }

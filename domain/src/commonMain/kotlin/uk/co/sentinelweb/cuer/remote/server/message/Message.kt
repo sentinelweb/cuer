@@ -14,17 +14,17 @@ interface Message {
 
 // region JSON serializer
 ///////////////////////////////////////////////////////////////////////////
-fun ConnectMessage.serialise() = messageJsonSerializer.encodeToString(ConnectMessage.serializer(), this)
-fun deserialiseMulti(json: String) = messageJsonSerializer.decodeFromString(ConnectMessage.serializer(), json)
+fun AvailableMessage.serialise() = messageJsonSerializer.encodeToString(AvailableMessage.serializer(), this)
+fun deserialiseMulti(json: String) = messageJsonSerializer.decodeFromString(AvailableMessage.serializer(), json)
 
 fun RequestMessage.serialise() = messageJsonSerializer.encodeToString(RequestMessage.serializer(), this)
 
 val messageSerializersModule = SerializersModule {
     mapOf(
-        ConnectMessage::class to ConnectMessage.serializer(),
+        AvailableMessage::class to AvailableMessage.serializer(),
         RequestMessage::class to RequestMessage.serializer(),
     )
-    polymorphic(Message::class, ConnectMessage::class, ConnectMessage.serializer())
+    polymorphic(Message::class, AvailableMessage::class, AvailableMessage.serializer())
     polymorphic(Message::class, RequestMessage::class, RequestMessage.serializer())
 
 }.plus(SerializersModule {

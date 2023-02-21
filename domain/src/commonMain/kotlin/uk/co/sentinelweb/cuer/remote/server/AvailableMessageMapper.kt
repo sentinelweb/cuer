@@ -4,15 +4,15 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
-import uk.co.sentinelweb.cuer.remote.server.message.ConnectMessage
+import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 
-class ConnectMessageMapper(
+class AvailableMessageMapper(
     private val config: BuildConfigDomain,
     private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
-    fun mapToMulticastMessage(localNode: LocalNodeDomain, refreshIp: Boolean): ConnectMessage.DeviceInfo {
-        return ConnectMessage.DeviceInfo(
+    fun mapToMulticastMessage(localNode: LocalNodeDomain, refreshIp: Boolean): AvailableMessage.DeviceInfo {
+        return AvailableMessage.DeviceInfo(
             id = localNode.id,
             hostname = localNode.hostname,
             deviceType = localNode.deviceType,
@@ -25,13 +25,13 @@ class ConnectMessageMapper(
         )
     }
 
-    private fun mapAuthType(authType: LocalNodeDomain.AuthConfig): ConnectMessage.AuthMethod = when (authType) {
-        is LocalNodeDomain.AuthConfig.Open -> ConnectMessage.AuthMethod.Open
-        is LocalNodeDomain.AuthConfig.Username -> ConnectMessage.AuthMethod.Username
-        is LocalNodeDomain.AuthConfig.Confirm -> ConnectMessage.AuthMethod.Confirm
+    private fun mapAuthType(authType: LocalNodeDomain.AuthConfig): AvailableMessage.AuthMethod = when (authType) {
+        is LocalNodeDomain.AuthConfig.Open -> AvailableMessage.AuthMethod.Open
+        is LocalNodeDomain.AuthConfig.Username -> AvailableMessage.AuthMethod.Username
+        is LocalNodeDomain.AuthConfig.Confirm -> AvailableMessage.AuthMethod.Confirm
     }
 
-    fun mapFromMulticastMessage(msg: ConnectMessage.DeviceInfo): RemoteNodeDomain {
+    fun mapFromMulticastMessage(msg: AvailableMessage.DeviceInfo): RemoteNodeDomain {
         return RemoteNodeDomain(
             id = msg.id,
             ipAddress = msg.ipAddress,
@@ -45,9 +45,9 @@ class ConnectMessageMapper(
         )
     }
 
-    private fun mapAuthType(authType: ConnectMessage.AuthMethod): RemoteNodeDomain.AuthType = when (authType) {
-        ConnectMessage.AuthMethod.Open -> RemoteNodeDomain.AuthType.Open
-        ConnectMessage.AuthMethod.Username -> RemoteNodeDomain.AuthType.Username()
-        ConnectMessage.AuthMethod.Confirm -> RemoteNodeDomain.AuthType.Token()
+    private fun mapAuthType(authType: AvailableMessage.AuthMethod): RemoteNodeDomain.AuthType = when (authType) {
+        AvailableMessage.AuthMethod.Open -> RemoteNodeDomain.AuthType.Open
+        AvailableMessage.AuthMethod.Username -> RemoteNodeDomain.AuthType.Username()
+        AvailableMessage.AuthMethod.Confirm -> RemoteNodeDomain.AuthType.Token()
     }
 }
