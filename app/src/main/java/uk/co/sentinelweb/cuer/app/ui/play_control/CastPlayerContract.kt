@@ -83,7 +83,6 @@ interface CastPlayerContract {
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
         var isUpcoming: Boolean = false,
-        var source: OrchestratorContract.Source = OrchestratorContract.Source.LOCAL,
         var playlistName: String? = null
     ) : ViewModel()
 

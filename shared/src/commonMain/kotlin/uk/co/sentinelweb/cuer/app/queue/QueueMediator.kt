@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
@@ -47,17 +49,19 @@ class QueueMediator constructor(
         get() = state.playlist
     override val playlistId: Identifier<GUID>?
         get() = if (state.playlistIdentifier != NO_PLAYLIST) state.playlistIdentifier else null
-    override val source: Source
-        get() = state.playlistIdentifier.source
+//    override val source: Source
+//        get() = state.playlistIdentifier.source
 
     private /*lateinit*/ var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
     override val currentItemFlow: Flow<PlaylistItemDomain?>
         get() = _currentItemFlow.distinctUntilChanged { old, new -> old == new }
-            .onEach { log.d("currentItemFlow: ${it?.summarise()}") }
+            .onEach { log.d("currentItemFlow.onEach: ${it?.summarise()}") }
 
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
     override val currentPlaylistFlow: Flow<PlaylistDomain>
         get() = _currentPlaylistFlow.distinctUntilChanged()
+
+    private val playlistRefreshMutex:Mutex = Mutex()
 
     init {
         log.tag(this)
@@ -72,6 +76,7 @@ class QueueMediator constructor(
     private fun listenToDb() {
         playlistOrchestrator.updates
             .onEach { (op, source, plist) ->
+                log.d("playlist changed: $op, $source, ${plist.id} ${plist.title}")
                 try {
                     if (plist.id == state.playlistIdentifier) {
                         when (op) {
@@ -163,7 +168,7 @@ class QueueMediator constructor(
         (playlist.indexOfItemId(playlistItemId)
             ?.let { foundIndex ->
                 playlist.copy(currentIndex = foundIndex)
-                    .apply { playlistOrchestrator.save(this, Options(source, true)) }
+                    .apply { playlistOrchestrator.save(this, id!!.source.flatOptions()) }
             }
             ?: let {
                 log.d("item not found in playlist")
@@ -283,7 +288,7 @@ class QueueMediator constructor(
         nextItem()
     }
 
-    private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain) {
+    private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain) = playlistRefreshMutex.withLock {
         // if the playlist is the same then don't change the current item
         val playlistIdentifier = playlistDomain.id
         val dbg = Exception()

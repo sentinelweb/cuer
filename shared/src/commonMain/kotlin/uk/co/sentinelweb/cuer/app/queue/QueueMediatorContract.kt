@@ -26,7 +26,6 @@ interface QueueMediatorContract {
     }
 
     interface Consumer : Shared {
-        val source: OrchestratorContract.Source
         fun onTrackEnded()
         fun nextItem()
         fun previousItem()

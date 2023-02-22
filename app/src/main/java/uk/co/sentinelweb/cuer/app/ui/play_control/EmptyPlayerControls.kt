@@ -33,11 +33,7 @@ class EmptyPlayerControls : PlayerContract.PlayerControls {
 
     override fun setPlaylistImage(image: ImageDomain?) = Unit
 
-    override fun setPlaylistItem(
-        playlistItem: PlaylistItemDomain?,
-        source: OrchestratorContract.Source
-    ) = Unit
-
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) = Unit
     override fun disconnectSource() = Unit
 
     override fun seekTo(ms: Long) = Unit
