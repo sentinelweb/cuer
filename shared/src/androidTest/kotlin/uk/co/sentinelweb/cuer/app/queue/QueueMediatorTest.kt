@@ -39,6 +39,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
@@ -66,6 +67,9 @@ class QueueMediatorTest {
 
     @MockK
     lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
+
+    @MockK
+    lateinit var mockPlaylistAndItemMapper: PlaylistAndItemMapper
 
     private val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -138,7 +142,8 @@ class QueueMediatorTest {
             playlistOrDefaultUsecase,
             mockPrefsWrapper,
             log,
-            mockRecentLocalPlaylists
+            mockRecentLocalPlaylists,
+            mockPlaylistAndItemMapper
         )
         sut.currentItemFlow
             .onEach {
