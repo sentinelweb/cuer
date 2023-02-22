@@ -46,6 +46,7 @@ import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 
 
 class PlaylistItemEditViewModel constructor(
@@ -65,6 +66,7 @@ class PlaylistItemEditViewModel constructor(
     private val res: ResourceWrapper,
     private val coroutines: CoroutineContextProvider,
     private val timeProvider: TimeProvider,
+    private val paiMapper: PlaylistAndItemMapper,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -252,7 +254,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideo() {
         state.editingPlaylistItem?.let { item ->
-            playUseCase.playLogic(item, state.selectedPlaylists.firstOrNull(), false)
+            playUseCase.playLogic(paiMapper.map(state.selectedPlaylists.firstOrNull(), item), false)
         } ?: run { toast.show("Please save the item first ...") }
     }
 

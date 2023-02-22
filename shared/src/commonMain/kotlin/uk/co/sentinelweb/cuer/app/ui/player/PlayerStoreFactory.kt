@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.startPosition
@@ -128,9 +129,9 @@ class PlayerStoreFactory(
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
-                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
-                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
-                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
+                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()))
+                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()))
+                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().playlistAndItem()))
                 is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
                 is Intent.InitFromService -> {
                     loadItem(intent.item)
@@ -174,17 +175,17 @@ class PlayerStoreFactory(
         }
 
         private fun init() {
-            itemLoader.load()?.also { item ->
-                log.d("itemLoader.load(${item.media.title}))")
-                loadItem(item)
+            itemLoader.load()?.also { playlistAndItem ->
+                log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
+                loadItem(playlistAndItem)
             }
         }
 
-        private fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
-            item.playlistId
-                ?.apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
-                ?.apply { livePlaybackController.clear(item.media.platformId) }
-                ?.apply { queueProducer.playNow(this, item.id) }
+        private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
+            playlistAndItem
+                .apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
+                .apply { livePlaybackController.clear(item.media.platformId) }
+                .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {

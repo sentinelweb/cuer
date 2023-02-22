@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.databinding.DialogPlayBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
@@ -22,7 +23,7 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
 class PlayDialog constructor(
     private val f: Fragment,
@@ -47,16 +48,16 @@ class PlayDialog constructor(
 
     private lateinit var dialog: AlertDialog
 
-    override fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
+    override fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain) {//item: PlaylistItemDomain?, playlistTitle: String?
 
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
         binding.dpLaunchYoutube.setOnClickListener {
-            item?.apply { youtubeApi.launchVideoWithTimeSystem(media) }
+            playlistAndItem.apply { youtubeApi.launchVideoWithTimeSystem(item.media) }
             dialog.dismiss()
         }
         binding.dpChromecast.setOnClickListener {
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
-            item?.apply { playUseCase.setQueueItem(this) }
+            playlistAndItem.apply { playUseCase.setQueueItem(this) }
                 ?: throw IllegalStateException("No item to play")
             (f.requireActivity() as? MainActivity)?.showPlayer()
             dialog.dismiss()
@@ -66,7 +67,7 @@ class PlayDialog constructor(
             navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER,
-                    mapOf(NavigationModel.Param.PLAYLIST_ITEM to item)
+                    mapOf(PLAYLIST_AND_ITEM to PlaylistAndItemDomain)
                 )
             )
         }
@@ -75,17 +76,17 @@ class PlayDialog constructor(
             navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER_FULL,
-                    mapOf(NavigationModel.Param.PLAYLIST_ITEM to item)
+                    mapOf(PLAYLIST_AND_ITEM to PlaylistAndItemDomain)
                 )
             )
         }
         binding.dpFloating.setOnClickListener {
             val hasPermission = floatingService.hasPermission(f.requireActivity())
             if (hasPermission) {
-                item?.apply { playUseCase.setQueueItem(this) }
+                playlistAndItem.apply { playUseCase.setQueueItem(this) }
                     ?: throw IllegalStateException("No item to play")
                 // fixme the item is not received by the player mvi binding not made yet?
-                floatingService.start(f.requireActivity(), item)
+                floatingService.start(f.requireActivity(), playlistAndItem)
                 playUseCase.attachControls(
                     (f.requireActivity() as? MainContract.View)?.playerControls
                 )
@@ -95,7 +96,7 @@ class PlayDialog constructor(
                 floatingService.requestPermission(f.requireActivity())
             }
         }
-        item?.apply {
+        playlistAndItem.apply {
             val createView = itemFactory.createView(binding.dpItemLayout, false)
             binding.dpItemLayout.addView(createView as ItemRowView)
             itemFactory
@@ -103,7 +104,7 @@ class PlayDialog constructor(
                 .update(
                     itemModelMapper.mapItem(
                         modelId = item.playlistId ?: throw IllegalStateException("No playlist id"),
-                        item = this,
+                        item = item,
                         index = 0,
                         canEdit = false,
                         canDelete = false,

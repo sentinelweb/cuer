@@ -51,6 +51,7 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.*
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 
 class PlaylistMviStoreFactory(
@@ -78,6 +79,7 @@ class PlaylistMviStoreFactory(
     private val idGenerator: IdGenerator,
     private val shareWrapper: ShareWrapper,
     private val platformLauncher: PlatformLaunchWrapper,
+    private val paiMapper: PlaylistAndItemMapper,
 ) {
     init {
         log.tag(this)
@@ -157,7 +159,10 @@ class PlaylistMviStoreFactory(
                 //else -> copy()
             }
 
-        private fun buildIdList(domain: PlaylistDomain?, state: State): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
+        private fun buildIdList(
+            domain: PlaylistDomain?,
+            state: State
+        ): MutableMap<Identifier<GUID>, PlaylistItemDomain> {
             val existingReverseLookup = state.itemsIdMapReversed
             val itemsIdMap = mutableMapOf<Identifier<GUID>, PlaylistItemDomain>()
             domain?.items?.mapIndexed { index, item ->
@@ -167,7 +172,8 @@ class PlaylistMviStoreFactory(
             return itemsIdMap
         }
 
-        private fun MutableMap<Identifier<GUID>, PlaylistItemDomain>.reverseLookup() = this.let { m -> m.keys.associateBy { m[it]!! } }.toMutableMap()
+        private fun MutableMap<Identifier<GUID>, PlaylistItemDomain>.reverseLookup() =
+            this.let { m -> m.keys.associateBy { m[it]!! } }.toMutableMap()
     }
 
     private class BootstrapperImpl() :
@@ -287,7 +293,14 @@ class PlaylistMviStoreFactory(
             state.playlistIdentifier
                 .also {
                     recentLocalPlaylists.addRecentId(it.id)
-                    publish(Label.Navigate(NavigationModel(Target.PLAYLIST_EDIT, mapOf(SOURCE to it.source, PLAYLIST_ID to it.id.value)), null))
+                    publish(
+                        Label.Navigate(
+                            NavigationModel(
+                                Target.PLAYLIST_EDIT,
+                                mapOf(SOURCE to it.source, PLAYLIST_ID to it.id.value)
+                            ), null
+                        )
+                    )
                 }
         }
 
@@ -295,7 +308,14 @@ class PlaylistMviStoreFactory(
             state.playlistItemDomain(intent.item)
                 ?.playlistId
                 ?.let {
-                    publish(Label.Navigate(NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to it.id.value, Param.PLAY_NOW to false, SOURCE to LOCAL))))
+                    publish(
+                        Label.Navigate(
+                            NavigationModel(
+                                PLAYLIST,
+                                mapOf(PLAYLIST_ID to it.id.value, Param.PLAY_NOW to false, SOURCE to LOCAL)
+                            )
+                        )
+                    )
                 }
         }
 
@@ -419,13 +439,11 @@ class PlaylistMviStoreFactory(
         }
 
         private fun play(intent: Intent.Play, state: State) {
-//            if (isPlaylistPlaying()) {
-//                chromeCastWrapper.killCurrentSession()
-//            } else if (!canPlayPlaylist()) {
-//                view.showError("Please add the playlist first")
-//            } else {
-            playUseCase.playLogic(state.playlist?.currentItemOrStart(), state.playlist, false)
-//            }
+            state.playlist
+                ?.takeIf { it.items.isNotEmpty() }
+                ?.also { pl ->
+                    playUseCase.playLogic(paiMapper.map(pl, pl.currentItemOrStart()!!), false)
+                }
         }
 
         private fun playItem(intent: Intent.PlayItem, state: State) {
@@ -436,7 +454,7 @@ class PlaylistMviStoreFactory(
                     } else if (!canPlayPlaylistItem(itemDomain)) {
                         publish(Message(strings.get(StringResource.playlist_error_please_add)))
                     } else {
-                        playUseCase.playLogic(itemDomain, state.playlist, intent.start)
+                        playUseCase.playLogic(paiMapper.map(state.playlist!!, itemDomain), intent.start)
                     }
                 }
         }
@@ -751,7 +769,9 @@ class PlaylistMviStoreFactory(
         // endregion
 
         // region utils
-        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) = itemsIdMap.get(itemModel.id)
+        private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
+            itemsIdMap.get(itemModel.id)
+
         private fun State.canPlayPlaylist() = playlist?.id?.source == LOCAL
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
             itemDomain.playlistId?.source == LOCAL
@@ -777,7 +797,11 @@ class PlaylistMviStoreFactory(
                     ?: run {
                         if (dbInit.isInitialized()) {
                             //log.d("call executeRefresh: setPlaylistData.default: id = ${prefsWrapper.lastViewedPlaylistId}")
-                            executeRefresh(state = getState(), scrollToCurrent = true, id = prefsWrapper.lastViewedPlaylistId)
+                            executeRefresh(
+                                state = getState(),
+                                scrollToCurrent = true,
+                                id = prefsWrapper.lastViewedPlaylistId
+                            )
                         } else {
                             dbInit.addListener { success: Boolean ->
                                 if (success) {
@@ -798,7 +822,12 @@ class PlaylistMviStoreFactory(
             }
         }
 
-        private suspend fun executeRefresh(animate: Boolean = true, scrollToCurrent: Boolean = false, state: State, id: Identifier<GUID>? = null) {
+        private suspend fun executeRefresh(
+            animate: Boolean = true,
+            scrollToCurrent: Boolean = false,
+            state: State,
+            id: Identifier<GUID>? = null
+        ) {
             publish(Label.Loading)
             try {
                 log.d("executeRefresh: state.id: ${state.playlistIdentifier} scrollToCurrent: $scrollToCurrent focusIndex: ${state.focusIndex} id: $id")

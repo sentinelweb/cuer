@@ -4,7 +4,6 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -13,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
 class FloatingWindowMviView(
     private val service: FloatingPlayerService,
@@ -23,7 +22,7 @@ class FloatingWindowMviView(
 ) : BaseMviView<Model, Event>(),
     PlayerContract.View {
 
-    private var currentItem: PlaylistItemDomain? = null
+    private var currentItem: PlaylistAndItemDomain? = null
 
     var mainPlayControls: PlayerContract.PlayerControls? = null
         get() = field
@@ -57,11 +56,11 @@ class FloatingWindowMviView(
             it.playlistTitle
                 ?.also { mainPlayControls?.setPlaylistName(it) }
         })
-        diff(get = Model::playlistItem, set = { item ->
-            currentItem = item
-            notification.setPlaylistItem(item)
+        diff(get = Model::playlistAndItem, set = { playlistAndItem ->
+            currentItem = playlistAndItem
+            notification.setPlaylistItem(playlistAndItem?.item)
             mainPlayControls?.apply {
-                item?.also { item ->
+                playlistAndItem?.item?.also { item ->
                     item.media.duration?.let { setDuration(it / 1000f) }
                     item.media.positon?.let { setCurrentSecond(it / 1000f) }
                     item.media.title?.let { setTitle(it) }

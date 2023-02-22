@@ -44,7 +44,8 @@ object SharedAppModule {
                 prefsWrapper = get(),
                 mediaUpdate = get(),
                 playlistOrDefaultUsecase = get(),
-                recentLocalPlaylists = get()
+                recentLocalPlaylists = get(),
+                playlistAndItemMapper = get()
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }

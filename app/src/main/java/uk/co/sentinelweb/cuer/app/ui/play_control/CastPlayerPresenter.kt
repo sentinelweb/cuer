@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
@@ -17,6 +16,7 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -25,7 +25,8 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
     private val res: ResourceWrapper,
-    private val playUseCase: PlayUseCase
+    private val playUseCase: PlayUseCase,
+    private val playlistAndItemMapper: PlaylistAndItemMapper,
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
@@ -69,8 +70,7 @@ class CastPlayerPresenter(
             }
         } ?: run {
             playUseCase.playLogic(
-                state.playlistItem ?: throw IllegalStateException("No playlist item"),
-                null,
+                playlistAndItemMapper.map(state.playlistItem ?: throw IllegalStateException("No playlist item")),
                 false
             )
         }
@@ -284,7 +284,6 @@ class CastPlayerPresenter(
     override fun skipSeekTo(target: Long) {
         listener?.seekTo(target)
     }
-
 
 
     override fun skipSetBackText(text: String) {

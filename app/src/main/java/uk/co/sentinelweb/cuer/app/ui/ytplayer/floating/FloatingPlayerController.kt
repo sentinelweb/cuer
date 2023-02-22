@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKB
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -21,7 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService.Com
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
+import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistAndItem
 
 class FloatingPlayerController constructor(
     private val service: FloatingPlayerContract.Service,
@@ -113,15 +113,15 @@ class FloatingPlayerController constructor(
             // log.d(serviceWrapper.getServiceData(YoutubeCastService::class.java.name).toString())
             ACTION_INIT -> {
                 intent
-                    .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
-                    ?.let { deserialisePlaylistItem(it) }
+                    .getStringExtra(PLAYLIST_AND_ITEM.toString())
+                    ?.let { deserialisePlaylistAndItem(it) }
                     ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
             }
 
             ACTION_PLAY_ITEM -> {
                 intent
-                    .getStringExtra(NavigationModel.Param.PLAYLIST_ITEM.toString())
-                    ?.let { deserialisePlaylistItem(it) }
+                    .getStringExtra(PLAYLIST_AND_ITEM.toString())
+                    ?.let { deserialisePlaylistAndItem(it) }
                     ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
             }
 

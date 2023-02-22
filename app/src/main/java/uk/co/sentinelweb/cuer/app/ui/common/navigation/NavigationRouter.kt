@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -39,14 +40,14 @@ class NavigationRouter constructor(
         when (nav.target) {
             NAV_NONE -> Unit
             LOCAL_PLAYER_FULL ->
-                (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
+                (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
                 }
                     ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
 
             LOCAL_PLAYER -> {
-                (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
+                (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
                     AytPortraitActivity.start(activity, it)
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }

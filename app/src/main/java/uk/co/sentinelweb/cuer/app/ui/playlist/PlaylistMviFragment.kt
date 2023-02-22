@@ -810,7 +810,8 @@ class PlaylistMviFragment : Fragment(),
                         multiPrefs = get(),
                         idGenerator = get(),
                         shareWrapper = get(),
-                        platformLauncher = get()
+                        platformLauncher = get(),
+                        paiMapper = get()
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

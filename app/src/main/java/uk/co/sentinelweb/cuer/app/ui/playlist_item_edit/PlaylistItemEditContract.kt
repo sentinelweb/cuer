@@ -91,7 +91,8 @@ interface PlaylistItemEditContract {
                         recentLocalPlaylists = get(),
                         res = get(),
                         coroutines = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        paiMapper = get()
                     )
                 }
                 scoped { State() }

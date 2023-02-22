@@ -64,7 +64,8 @@ class PlayerModelMapper constructor(
                     } ?: 0f
                 ),
                 screen = screen,
-                playlistItem = state.item
+                playlistItem = state.item,
+                playlistAndItem = state.playlistAndItem()
             )
         }
 

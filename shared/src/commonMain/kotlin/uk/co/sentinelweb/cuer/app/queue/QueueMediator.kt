@@ -5,8 +5,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import summarise
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
@@ -19,11 +19,9 @@ import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.*
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 
@@ -38,7 +36,8 @@ class QueueMediator constructor(
     private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper,
-    private val recentLocalPlaylists: RecentLocalPlaylists
+    private val recentLocalPlaylists: RecentLocalPlaylists,
+    private val playlistAndItemMapper: PlaylistAndItemMapper,
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
 
     override val currentItem: PlaylistItemDomain?
@@ -49,8 +48,9 @@ class QueueMediator constructor(
         get() = state.playlist
     override val playlistId: Identifier<GUID>?
         get() = if (state.playlistIdentifier != NO_PLAYLIST) state.playlistIdentifier else null
-//    override val source: Source
-//        get() = state.playlistIdentifier.source
+
+    override val playlistAndItem: PlaylistAndItemDomain?
+        get() = state.currentItem?.let { playlistAndItemMapper.map(state.playlist, it) }
 
     private /*lateinit*/ var _currentItemFlow: MutableStateFlow<PlaylistItemDomain?>
     override val currentItemFlow: Flow<PlaylistItemDomain?>
@@ -61,7 +61,7 @@ class QueueMediator constructor(
     override val currentPlaylistFlow: Flow<PlaylistDomain>
         get() = _currentPlaylistFlow.distinctUntilChanged()
 
-    private val playlistRefreshMutex:Mutex = Mutex()
+    private val playlistRefreshMutex: Mutex = Mutex()
 
     init {
         log.tag(this)

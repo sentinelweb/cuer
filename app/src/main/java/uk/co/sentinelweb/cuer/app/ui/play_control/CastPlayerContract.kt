@@ -6,7 +6,6 @@ import androidx.navigation.fragment.FragmentNavigator
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -101,7 +100,8 @@ interface CastPlayerContract {
                         log = get(),
                         skipControl = get(),
                         res = get(),
-                        playUseCase = get()
+                        playUseCase = get(),
+                        playlistAndItemMapper = get()
                     )
                 }
                 scoped<SkipContract.External> {

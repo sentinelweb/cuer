@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.*
@@ -32,8 +31,8 @@ interface PlayerContract {
             object OpenInApp : Intent()
             object Share : Intent()
 
-            data class InitFromService(val item: PlaylistItemDomain) : Intent()
-            data class PlayItemFromService(val item: PlaylistItemDomain) : Intent()
+            data class InitFromService(val item: PlaylistAndItemDomain) : Intent()
+            data class PlayItemFromService(val item: PlaylistAndItemDomain) : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -51,9 +50,9 @@ interface PlayerContract {
             data class Command(val command: PlayerCommand) : Label()
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Label()
             data class ChannelOpen(val channel: ChannelDomain) : Label()
-            data class FullScreenPlayerOpen(val item: PlaylistItemDomain) : Label()
-            data class PortraitPlayerOpen(val item: PlaylistItemDomain) : Label()
-            data class PipPlayerOpen(val item: PlaylistItemDomain) : Label()
+            data class FullScreenPlayerOpen(val item: PlaylistAndItemDomain) : Label()
+            data class PortraitPlayerOpen(val item: PlaylistAndItemDomain) : Label()
+            data class PipPlayerOpen(val item: PlaylistAndItemDomain) : Label()
             data class ShowSupport(val item: PlaylistItemDomain) : Label()
             data class Share(val item: PlaylistItemDomain) : Label()
             data class ItemOpen(val item: PlaylistItemDomain) : Label()
@@ -69,7 +68,13 @@ interface PlayerContract {
             val skipBackText: String = "-",
             val screen: Screen = Screen.DESCRIPTION,
             val position: Long = -1,
-        )
+        ) {
+            fun playlistAndItem() = PlaylistAndItemDomain(
+                item = item!!,
+                playlistId = playlist!!.id,
+                playlistTitle = playlist.title
+            )
+        }
     }
 
     interface View : MviView<View.Model, View.Event> {
@@ -85,6 +90,7 @@ interface PlayerContract {
             val description: DescriptionModel,
             val screen: Screen,
             val playlistItem: PlaylistItemDomain?,
+            val playlistAndItem: PlaylistAndItemDomain? = null,
         ) {
             data class Texts(
                 val title: String?,
@@ -131,8 +137,8 @@ interface PlayerContract {
             data class LinkClick(val link: LinkDomain.UrlLinkDomain) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
-            data class OnInitFromService(val item: PlaylistItemDomain) : Event()
-            data class OnPlayItemFromService(val item: PlaylistItemDomain) : Event()
+            data class OnInitFromService(val item: PlaylistAndItemDomain) : Event()
+            data class OnPlayItemFromService(val item: PlaylistAndItemDomain) : Event()
             data class OnSeekToPosition(val ms: Long) : Event()
         }
     }
@@ -147,7 +153,7 @@ interface PlayerContract {
     }
 
     interface PlaylistItemLoader {
-        fun load(): PlaylistItemDomain?
+        fun load(): PlaylistAndItemDomain?
     }
 
     enum class ConnectionState {
