@@ -5,13 +5,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import summarise
+import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -231,6 +228,7 @@ class QueueMediator constructor(
     private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
         //log.d("updateCurrentItemFromMedia: item.null=${state.currentItem != null} ${updatedMedia.summarise()}")
         state.currentItem = state.currentItem
+            ?.takeIf { it.media.id?.source != OrchestratorContract.Source.MEMORY }
             ?.run {
                 media.let {
                     MediaPositionUpdateDomain(
@@ -243,12 +241,12 @@ class QueueMediator constructor(
                 }.let {
                     //log.d("updateCurrentItemFromMedia: media update: pl.null=${playlist == null} ${it}")
                     //log.d("updateCurrentMediaItem b4 sv: position=${state.currentItem?.media?.positon} target=${it.positon}")
-                    val x = mediaUpdate.updateMedia(playlist!!, it, state.playlistIdentifier.flatOptions(true))
-                        ?.let { copy(media = it) }
-                    //log.d("mediaUpdate complete ;$x")
-                    x
+                    mediaUpdate.updateMedia(playlist!!, it, it.id.source.flatOptions(emit = true))
+                        .let { copy(media = it) }
+                    //?.also { log.d("mediaUpdate complete ;") }
                 }
             }
+            ?: state.currentItem
         //log.d("updateCurrentItemFromMedia: state.currentItem.pos:${state.currentItem?.media?.positon}")
         state.playlist = state.playlist
             ?.let {

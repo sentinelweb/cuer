@@ -13,11 +13,8 @@ class PlaylistMediaUpdateUsecase constructor(
         playlist: PlaylistDomain,
         update: UpdateDomain<MediaDomain>,
         options: OrchestratorContract.Options
-    ): MediaDomain? =
+    ): MediaDomain =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> if (playlist.type == PlaylistDomain.PlaylistTypeDomain.APP) {
-                mediaOrchestrator.update(update, options.copy(source = OrchestratorContract.Source.LOCAL))
-            } else null
             OrchestratorContract.Source.LOCAL -> mediaOrchestrator.update(update, options)
             else -> throw UnsupportedOperationException("Media update not supported for ${options.source}")
         }

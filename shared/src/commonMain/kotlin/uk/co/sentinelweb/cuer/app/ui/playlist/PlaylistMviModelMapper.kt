@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
 
@@ -63,7 +64,8 @@ class PlaylistMviModelMapper constructor(
         return PlaylistMviContract.View.Model(
             header = Header(
                 title = domain.title.capitalize(),
-                imageUrl = (domain.image ?: domain.thumb)?.url ?: throw IllegalArgumentException("No image for playlist"),
+                imageUrl = (domain.image ?: domain.thumb)?.url
+                    ?: throw IllegalArgumentException("No image for playlist"),
                 loopModeIndex = domain.mode.ordinal,
                 loopModeIcon = iconMapper.map(domain.mode),
                 loopModeText = when (domain.mode) {
@@ -71,6 +73,7 @@ class PlaylistMviModelMapper constructor(
                     PlaylistDomain.PlaylistModeDomain.LOOP -> strings.get(StringResource.menu_playlist_mode_loop)
                     PlaylistDomain.PlaylistModeDomain.SHUFFLE -> strings.get(StringResource.menu_playlist_mode_shuffle)
                 },
+                loopVisible = domain.config.playable && domain.type != APP, // source == MEMORY ??
                 playIcon = if (isPlaying) Icon.ic_playlist_close else Icon.ic_playlist_play,
                 playText = strings.get(if (isPlaying) StringResource.stop else StringResource.menu_play),
                 starredIcon = if (domain.starred) Icon.ic_starred else Icon.ic_starred_off,
@@ -81,6 +84,7 @@ class PlaylistMviModelMapper constructor(
                 isPlayFromStart = domain.playItemsFromStart,
                 isPinned = pinned,
                 canPlay = domain.config.playable,
+                playEnabled = domain.items.size > 0,
                 canEdit = domain.config.editable,
                 canDelete = domain.config.deletable,
                 canEditItems = domain.config.editableItems,
@@ -160,6 +164,7 @@ class PlaylistMviModelMapper constructor(
                 loopModeIndex = 0,
                 loopModeIcon = Icon.ic_playmode_straight,
                 loopModeText = "Single",
+                loopVisible = false,
                 playIcon = Icon.ic_playlist_play,
                 playText = "Play",
                 starredIcon = Icon.ic_starred_off,
@@ -176,7 +181,8 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = false,
                 hasChildren = 0,
                 canUpdate = false,
-                itemsText = "-/-"
+                itemsText = "-/-",
+                playEnabled = false,
             ),
             items = null,
             isCards = false,

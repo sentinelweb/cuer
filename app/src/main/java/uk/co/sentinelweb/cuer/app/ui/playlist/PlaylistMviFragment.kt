@@ -481,7 +481,8 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))
         binding.playlistFabPlay.text = model.playText
         binding.playlistFabPlay.isVisible = model.canPlay
-        binding.playlistFabPlaymode.isVisible = model.canPlay
+        binding.playlistFabPlay.isEnabled = model.playEnabled
+        binding.playlistFabPlaymode.isVisible = model.loopVisible
         binding.playlistFabPlaymode.text = model.loopModeText
         binding.playlistItems.text = model.itemsText
         binding.playlistStarButton.setIconResource(res.getDrawableResourceId(model.starredIcon))
