@@ -26,7 +26,6 @@ class CompositeLogWrapper constructor(
             firebase.setCrashlyticTag(tag)
             firebase.logMessage("DEBUG: $tag: $msg")
         }
-
     }
 
     override fun i(msg: String) {
