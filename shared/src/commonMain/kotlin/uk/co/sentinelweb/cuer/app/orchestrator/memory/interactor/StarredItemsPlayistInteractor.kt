@@ -46,7 +46,7 @@ class StarredItemsPlayistInteractor constructor(
         starred = true,
         image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
-            playable = false,
+            playable = true,
             editable = false,
             deletable = false
         )

@@ -48,7 +48,7 @@ class RecentItemsPlayistInteractor constructor(
         starred = false,
         image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pexels-ketut-subiyanto-4474038-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
-            playable = false,
+            playable = true,
             editable = false,
             deletable = false
         )

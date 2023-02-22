@@ -46,7 +46,7 @@ class UnfinishedItemsPlayistInteractor constructor(
         starred = true,
         image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/florencia-viadana-crop-RqRCejwnccw-unsplash.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
-            playable = false,
+            playable = true,
             editable = false,
             deletable = false
         )
