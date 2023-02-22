@@ -69,11 +69,13 @@ interface PlayerContract {
             val screen: Screen = Screen.DESCRIPTION,
             val position: Long = -1,
         ) {
-            fun playlistAndItem() = PlaylistAndItemDomain(
-                item = item!!,
-                playlistId = playlist!!.id,
-                playlistTitle = playlist.title
-            )
+            fun playlistAndItem(): PlaylistAndItemDomain? = item?.let {
+                PlaylistAndItemDomain(
+                    item = it,
+                    playlistId = playlist?.id,
+                    playlistTitle = playlist?.title
+                )
+            }
         }
     }
 

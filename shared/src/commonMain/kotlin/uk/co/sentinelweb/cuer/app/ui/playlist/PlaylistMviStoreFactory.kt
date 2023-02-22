@@ -193,7 +193,7 @@ class PlaylistMviStoreFactory(
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) = intent
-            .also { log.d(it.toString()) }
+            //.also { log.d(it.toString()) }
             .let {
                 when (intent) {
                     is Intent.Refresh -> refresh(getState())
@@ -523,9 +523,6 @@ class PlaylistMviStoreFactory(
                     if (state.isHeadless) {
                         publish(Label.PlayItem(playlistItem = this))
                     } else {
-                        val source =
-                            if (state.playlist?.type != PlaylistDomain.PlaylistTypeDomain.APP) state.playlistIdentifier.source
-                            else LOCAL
                         publish(Label.ShowItem(modelId = intent.item.id, item = this))
                     }
                 }
@@ -681,7 +678,7 @@ class PlaylistMviStoreFactory(
 
         private fun updateItem(
             index: Int,
-            modelId: OrchestratorContract.Identifier<GUID>,
+            modelId: Identifier<GUID>,
             changedItem: PlaylistItemDomain,
             state: State,
         ) {
@@ -772,7 +769,6 @@ class PlaylistMviStoreFactory(
         private fun State.playlistItemDomain(itemModel: PlaylistItemMviContract.Model.Item) =
             itemsIdMap.get(itemModel.id)
 
-        private fun State.canPlayPlaylist() = playlist?.id?.source == LOCAL
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
             itemDomain.playlistId?.source == LOCAL
         // endregion utils

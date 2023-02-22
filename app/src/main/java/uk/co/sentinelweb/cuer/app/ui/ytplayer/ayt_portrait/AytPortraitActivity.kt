@@ -19,7 +19,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
@@ -203,7 +202,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
-            SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
+            SOURCE.name to playlistAndItem.playlistId?.source.toString(),
             PLAYLIST_ID.name to (playlistAndItem.playlistId?.id?.value),
             PLAYLIST_ITEM_ID.name to (playlistAndItem.item.id?.id?.value),
         )

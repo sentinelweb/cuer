@@ -59,23 +59,23 @@ class PlayerStoreFactory(
     }
 
     private object ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
-                is Result.State -> copy(playerState = result.state)
+        override fun State.reduce(msg: Result): State =
+            when (msg) {
+                is Result.State -> copy(playerState = msg.state)
                 is Result.SetVideo -> copy(
-                    item = result.item,
-                    playlist = result.playlist ?: playlist
+                    item = msg.item,
+                    playlist = msg.playlist ?: playlist
                 )
 
-                is Result.Playlist -> copy(playlist = result.playlist)
+                is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(screen = result.screen)
+                is Result.Screen -> copy(screen = msg.screen)
                 is Result.SkipTimes -> copy(
-                    skipFwdText = result.fwd ?: skipFwdText,
-                    skipBackText = result.back ?: skipBackText
+                    skipFwdText = msg.fwd ?: skipFwdText,
+                    skipBackText = msg.back ?: skipBackText
                 )
 
-                is Result.Position -> copy(position = result.pos)
+                is Result.Position -> copy(position = msg.pos)
             }
     }
 
@@ -129,9 +129,9 @@ class PlayerStoreFactory(
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
-                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()))
-                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()))
-                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().playlistAndItem()))
+                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()!!))
+                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()!!))
+                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
                 is Intent.InitFromService -> {
                     loadItem(intent.item)

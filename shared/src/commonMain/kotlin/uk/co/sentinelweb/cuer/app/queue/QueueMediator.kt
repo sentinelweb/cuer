@@ -291,11 +291,11 @@ class QueueMediator constructor(
     private suspend fun refreshQueueFrom(playlistDomain: PlaylistDomain) = playlistRefreshMutex.withLock {
         // if the playlist is the same then don't change the current item
         val playlistIdentifier = playlistDomain.id
-        val dbg = Exception()
-        val dbgTr = dbg.stackTraceToString()
-        log.d("refreshQueueFrom: new playlist id: $playlistIdentifier")
-        log.d("refreshQueueFrom: playlist title: ${playlistDomain.title}")
-        log.d("refreshQueueFrom: dbgTr: $dbgTr")
+//        val dbg = Exception()
+//        val dbgTr = dbg.stackTraceToString()
+//        log.d("refreshQueueFrom: new playlist id: $playlistIdentifier")
+//        log.d("refreshQueueFrom: playlist title: ${playlistDomain.title}")
+//        log.d("refreshQueueFrom: dbgTr: $dbgTr")
         if (state.playlistIdentifier != playlistIdentifier) {
             state.playlistIdentifier = playlistIdentifier
                 ?: throw IllegalStateException("No playlist ID")

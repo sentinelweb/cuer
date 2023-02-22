@@ -31,8 +31,8 @@ data class NavigationModel constructor(
         val requiredParams: List<Param> = listOf(),
         @Suppress("unused") val optionalParams: List<Param> = listOf()
     ) {
-        LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_ITEM)),
-        LOCAL_PLAYER(listOf(Param.PLAYLIST_ITEM)),
+        LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_AND_ITEM)),
+        LOCAL_PLAYER(listOf(Param.PLAYLIST_AND_ITEM)),
         WEB_LINK(listOf(LINK)),
         SHARE(listOf(LINK)),
         CRYPTO_LINK(listOf(Param.CRYPTO_ADDRESS)),

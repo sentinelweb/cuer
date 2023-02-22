@@ -58,7 +58,6 @@ class PlayDialog constructor(
         binding.dpChromecast.setOnClickListener {
             castDialogWrapper.showRouteSelector(f.childFragmentManager)
             playlistAndItem.apply { playUseCase.setQueueItem(this) }
-                ?: throw IllegalStateException("No item to play")
             (f.requireActivity() as? MainActivity)?.showPlayer()
             dialog.dismiss()
         }
@@ -67,7 +66,7 @@ class PlayDialog constructor(
             navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER,
-                    mapOf(PLAYLIST_AND_ITEM to PlaylistAndItemDomain)
+                    mapOf(PLAYLIST_AND_ITEM to playlistAndItem)
                 )
             )
         }
@@ -76,7 +75,7 @@ class PlayDialog constructor(
             navigationRouter.navigate(
                 NavigationModel(
                     NavigationModel.Target.LOCAL_PLAYER_FULL,
-                    mapOf(PLAYLIST_AND_ITEM to PlaylistAndItemDomain)
+                    mapOf(PLAYLIST_AND_ITEM to playlistAndItem)
                 )
             )
         }
@@ -84,7 +83,6 @@ class PlayDialog constructor(
             val hasPermission = floatingService.hasPermission(f.requireActivity())
             if (hasPermission) {
                 playlistAndItem.apply { playUseCase.setQueueItem(this) }
-                    ?: throw IllegalStateException("No item to play")
                 // fixme the item is not received by the player mvi binding not made yet?
                 floatingService.start(f.requireActivity(), playlistAndItem)
                 playUseCase.attachControls(
