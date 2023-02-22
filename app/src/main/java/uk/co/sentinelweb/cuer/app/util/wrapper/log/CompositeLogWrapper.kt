@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.util.wrapper.log
 
-import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
