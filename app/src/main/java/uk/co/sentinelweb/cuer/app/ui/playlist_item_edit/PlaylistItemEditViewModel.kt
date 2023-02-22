@@ -16,8 +16,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
@@ -422,7 +421,9 @@ class PlaylistItemEditViewModel constructor(
 
     fun checkToSave() {
         if (!state.isSaved && (state.isMediaChanged || state.isPlaylistsChanged)) {
-            if (state.isOnSharePlaylist) {
+            if (state.media?.id?.source == MEMORY) { // share playlist media ids are null - this is for youtube search (created ids to play)
+                _navigateLiveData.value = NavigationModel(NAV_DONE)
+            } else if (state.isOnSharePlaylist) {
                 doCommitAndReturn()
             } else if (isNew) {
                 _dialogModelLiveData.value = modelMapper.mapSaveConfirmAlert({
