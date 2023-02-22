@@ -117,7 +117,7 @@ class YoutubeCastConnectionListener constructor(
                         setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
                     }
                 }
-                queue.currentItem?.let { setPlaylistItem(it, queue.source) }
+                queue.currentItem?.let { setPlaylistItem(it) }
                 setPlaylistName(queue.playlist?.title ?: "none")
                 setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
             }

@@ -40,7 +40,7 @@ class RemotesRepository constructor(
         fileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
             ?.let { deserialiseRemoteNodeList(it) }
-            //?.let { it.map { it.copy(isConnected = false) } }
+            ?.let { it.map { it.copy(isAvailable = false) } }
             ?.let { _remoteNodes.addAll(it) }
 
         _updatesFlow.emit(_remoteNodes.toList())

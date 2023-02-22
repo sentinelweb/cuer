@@ -105,7 +105,6 @@ interface ShareContract {
                         queue = get(),
                         state = get(),
                         log = get(),
-                        ytContextHolder = get(),
                         mapper = get(),
                         prefsWrapper = get(),
                         timeProvider = get(),
@@ -113,18 +112,13 @@ interface ShareContract {
                         playlistOrchestrator = get(),
                         shareStrings = get(),
                         recentLocalPlaylists = get(),
-//                        platformIdFilter = PlatformIdFilter()
+                        playerConnected = get(),
                     )
                 }
                 scoped { AndroidShareWrapper(get<ShareActivity>()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<ShareActivity>(), get()) }
                 viewModel { State() }
-                scoped {
-                    ShareModelMapper(
-                        ytContextHolder = get(),
-                        res = get()
-                    )
-                }
+                scoped { ShareModelMapper(playerConnected = get(), res = get()) }
                 scoped { navigationRouter(false, get<ShareActivity>()) }
                 scoped<ShareStrings> { AndroidShareStrings(get()) }
                 scoped<PlayerContract.PlayerControls> { EmptyPlayerControls() }

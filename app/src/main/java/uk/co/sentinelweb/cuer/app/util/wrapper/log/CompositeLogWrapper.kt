@@ -2,10 +2,12 @@ package uk.co.sentinelweb.cuer.app.util.wrapper.log
 
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 
 class CompositeLogWrapper constructor(
     private val firebase: FirebaseWrapper,
-    private val android: AndroidLogWrapper
+    private val android: AndroidLogWrapper,
+    private val buildConfig: BuildConfigDomain
 ) : LogWrapper {
     override var tag: String
         get() = android.tag
@@ -19,6 +21,10 @@ class CompositeLogWrapper constructor(
 
     override fun d(msg: String) {
         android.d(msg)
+        if (buildConfig.isDebug) {
+            firebase.setCrashlyticTag(tag)
+            firebase.logMessage("DEBUG: $tag: $msg")
+        }
     }
 
     override fun i(msg: String) {

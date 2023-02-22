@@ -1,12 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.share
 
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlayerConnectedChecker
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 
 class ShareModelMapper constructor(
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolder,
+    private val playerConnected: PlayerConnectedChecker,
     private val res: ResourceWrapper,
 ) {
     fun mapShareModel(
@@ -14,7 +14,7 @@ class ShareModelMapper constructor(
         finish: (Boolean, Boolean, Boolean) -> Unit,
         canCommit: Boolean
     ): ShareContract.Model {
-        val isConnected = ytContextHolder.isConnected()
+        val isConnected = playerConnected.isConnected()
         val isMedia = state.scanResult?.let { it.type == MEDIA } ?: false
         val isNew = state.scanResult?.let { it.isNew || (isMedia && !it.isOnPlaylist) } ?: false
         return if (isNew) {

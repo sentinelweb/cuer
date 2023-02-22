@@ -170,10 +170,7 @@ class PlayerControlsNotificationController constructor(
 
     override fun setPlaylistImage(image: ImageDomain?) = Unit
 
-    override fun setPlaylistItem(
-        playlistItem: PlaylistItemDomain?,
-        source: OrchestratorContract.Source
-    ) {
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
         if (state.media?.id != playlistItem?.media?.id) {
             state.bitmap = null
         }

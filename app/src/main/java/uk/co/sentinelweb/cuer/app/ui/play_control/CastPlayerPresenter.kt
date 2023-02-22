@@ -218,11 +218,7 @@ class CastPlayerPresenter(
         view.setPlaylistName(name)
     }
 
-    override fun setPlaylistItem(
-        playlistItem: PlaylistItemDomain?,
-        source: OrchestratorContract.Source
-    ) {
-        state.source = source
+    override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
         state.playlistItem = playlistItem?.apply {
             media.thumbNail?.url?.apply { view.setImage(this) }
             media.title?.apply { state.title = this }

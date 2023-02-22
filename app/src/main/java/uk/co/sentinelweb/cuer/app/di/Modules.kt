@@ -244,7 +244,7 @@ object Modules {
         factory { NotificationWrapper(androidApplication()) }
         factory { ResourceWrapper(androidApplication()) }
         factory<StringDecoder> { get<ResourceWrapper>() }
-        factory<LogWrapper> { CompositeLogWrapper(get(), get()) }
+        factory<LogWrapper> { CompositeLogWrapper(get(), get(), get()) }
         factory { AndroidLogWrapper(get()) }
         factory { ContentProviderFileWrapper(androidApplication()) }
         factory { SoftKeyboardWrapper() }
@@ -254,6 +254,7 @@ object Modules {
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
         factory { AppListBuilder(androidApplication(), get()) }
+        factory { PlayerConnectedChecker(get(), get()) }
     }
 
     private val appNetModule = module {

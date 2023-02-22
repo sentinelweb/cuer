@@ -5,7 +5,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     kotlin("plugin.serialization")
-    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
+    id("co.touchlab.faktory.kmmbridge") version "0.3.4"
     kotlin("native.cocoapods")
     id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
 }

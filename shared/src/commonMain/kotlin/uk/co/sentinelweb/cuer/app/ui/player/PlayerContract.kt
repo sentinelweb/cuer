@@ -168,7 +168,7 @@ interface PlayerContract {
         fun restoreState()
         fun setPlaylistName(name: String)
         fun setPlaylistImage(image: ImageDomain?)
-        fun setPlaylistItem(playlistItem: PlaylistItemDomain?, source: OrchestratorContract.Source)
+        fun setPlaylistItem(playlistItem: PlaylistItemDomain?)
         fun disconnectSource()
         fun seekTo(ms: Long)
         fun getPlaylistItem(): PlaylistItemDomain?

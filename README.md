@@ -2,7 +2,7 @@
 
 [![Actions Status](https://github.com/sentinelweb/cuer/workflows/Android%20CI/badge.svg)](https://github.com/sentinelweb/cuer/actions)
 
-## Youtube Media queue manager for Android
+## Youtube Media queue manager for Android/ios/desktop
 
 This project is a playlist manager for Youtube content. (In development)
 
