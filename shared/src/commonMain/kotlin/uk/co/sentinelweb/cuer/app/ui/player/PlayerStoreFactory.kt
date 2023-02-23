@@ -150,10 +150,6 @@ class PlayerStoreFactory(
         }
 
         private fun playItemFromService(intent: Intent.PlayItemFromService) {
-//            loadItem(intent.item)
-//            // fixme here need to get the item index uodate?
-//            queueConsumer.playlist
-//                ?.also { dispatch(Result.Playlist(it)) }
             coroutines.mainScope.launch {
                 log.d("playItemFromService: playlistId${intent.playlistAndItem.playlistId} playlistTitle:${intent.playlistAndItem.playlistTitle} itemId:${intent.playlistAndItem.item.id} itemTitle:${intent.playlistAndItem.item.media.title}")
                 queueProducer.playNow(intent.playlistAndItem.playlistId!!, intent.playlistAndItem.item.id)

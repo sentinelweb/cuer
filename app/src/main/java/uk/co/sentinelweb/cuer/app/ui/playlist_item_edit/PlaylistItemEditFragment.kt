@@ -144,7 +144,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        log.d("onViewCreated:" + arguments.toString())
+        //log.d("onViewCreated:" + arguments.toString())
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
