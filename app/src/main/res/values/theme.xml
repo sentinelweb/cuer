@@ -43,7 +43,7 @@
         <item name="colorMove">@color/move</item>
         <item name="colorEdit">@color/edit</item>
         <item name="contextMenuItemColor">?android:textColorSecondary</item>
-        <item name="playerButtonColor">@color/player_button_tint</item>
+        <item name="playerButtonColor">@color/button_csl</item>
         <item name="colorProgress">@color/primary</item>
         <item name="bodyFont">@font/montserrat</item>
         <item name="headlineFont">@font/didact_gothic</item>

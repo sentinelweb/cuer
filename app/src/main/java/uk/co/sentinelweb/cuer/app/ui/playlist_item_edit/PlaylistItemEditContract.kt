@@ -92,7 +92,8 @@ interface PlaylistItemEditContract {
                         res = get(),
                         coroutines = get(),
                         timeProvider = get(),
-                        paiMapper = get()
+                        paiMapper = get(),
+                        mediaUpdateFromPlatformUseCase = get()
                     )
                 }
                 scoped { State() }

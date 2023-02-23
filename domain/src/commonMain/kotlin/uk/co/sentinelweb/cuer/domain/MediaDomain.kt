@@ -27,6 +27,7 @@ data class MediaDomain(
     val isLiveBroadcast: Boolean = false,
     val isLiveBroadcastUpcoming: Boolean = false,
     val playFromStart: Boolean = false,
+    @Contextual val broadcastDate: LocalDateTime? = null, // todo https://github.com/sentinelweb/cuer/issues/196
 ) : Domain {
 
     enum class MediaTypeDomain {

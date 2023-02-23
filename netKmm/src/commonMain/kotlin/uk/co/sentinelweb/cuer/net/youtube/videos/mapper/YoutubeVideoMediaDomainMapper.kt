@@ -35,7 +35,9 @@ internal class YoutubeVideoMediaDomainMapper(
                 ),
                 published = it.snippet.publishedAt.let { ts -> timeStampMapper.parseTimestamp(ts) },
                 isLiveBroadcast = it.snippet.liveBroadcastContent.let { it == LIVE || it == UPCOMING },
-                isLiveBroadcastUpcoming = it.snippet.liveBroadcastContent.let { it == UPCOMING }
+                isLiveBroadcastUpcoming = it.snippet.liveBroadcastContent.let { it == UPCOMING },
+                broadcastDate = it.liveStreamingDetails?.scheduledStartTime
+                    ?.let { ts -> timeStampMapper.parseTimestamp(ts) },
             )
         }
 

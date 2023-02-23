@@ -91,6 +91,8 @@ class PlaylistMviModelMapper constructor(
                 canDeleteItems = domain.config.deletableItems,
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
                 canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
+                shareVisible = true,
+                shareEnabled = domain.items.isNotEmpty(),
                 itemsText = domain.items
                     .takeIf { it.isNotEmpty() }
                     ?.let { "${domain.currentIndex.plus(1)}/${it.size}" }
@@ -183,6 +185,8 @@ class PlaylistMviModelMapper constructor(
                 canUpdate = false,
                 itemsText = "-/-",
                 playEnabled = false,
+                shareVisible = false,
+                shareEnabled = false,
             ),
             items = null,
             isCards = false,

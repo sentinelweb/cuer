@@ -8,17 +8,18 @@ import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SHUFFLE
+import uk.co.sentinelweb.cuer.domain.ext.isLiveOrUpcoming
 
 class PlayerModelMapper constructor(
     private val timeFormatter: TimeFormatter,
     private val timeProvider: TimeProvider,
     private val descriptionMapper: DescriptionMapper,
-    private val logWrapper: LogWrapper,
+    private val log: LogWrapper,
     private val ribbonCreator: RibbonCreator,
 ) {
 
     init {
-        logWrapper.tag(this)
+        log.tag(this)
     }
 
     fun map(state: PlayerContract.MviStore.State): PlayerContract.View.Model =
@@ -44,21 +45,18 @@ class PlayerModelMapper constructor(
                         )
                     }
                     ?: descriptionMapper.mapEmpty(),
-                nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
-                prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
+                buttons = PlayerContract.View.Model.Buttons(
+                    nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
+                    prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
+                    seekEnabled = item?.media?.duration != null && item.media.isLiveOrUpcoming(),
+                ),
                 itemImage = item?.media?.thumbNail?.url,
                 playState = playerState,
                 times = PlayerContract.View.Model.Times(
                     positionText = mapPosition(),
-                    durationText = item?.media?.duration?.let {
-                        timeFormatter.formatMillis(
-                            it,
-                            SECS
-                        )
-                    } ?: "-",
+                    durationText = item?.media?.duration?.let { timeFormatter.formatMillis(it, SECS) } ?: "-",
                     liveTime = mapLiveTime(),
-                    isLive = item?.media?.run { isLiveBroadcast || isLiveBroadcastUpcoming }
-                        ?: false,
+                    isLive = item?.media?.isLiveOrUpcoming() ?: false,
                     seekBarFraction = item?.media?.positon?.let { pos ->
                         item.media.duration?.let { pos.toFloat() / it }
                     } ?: 0f
@@ -68,6 +66,7 @@ class PlayerModelMapper constructor(
                 playlistAndItem = state.playlistAndItem()
             )
         }
+    //.also { log.d("buttons: ${it.buttons} index: ${state.playlist?.currentIndex} dur:${state.item?.media?.duration}") }
 
     private fun PlayerContract.MviStore.State.mapPosition() = item?.media?.let {
         if (it.isLiveBroadcast) {

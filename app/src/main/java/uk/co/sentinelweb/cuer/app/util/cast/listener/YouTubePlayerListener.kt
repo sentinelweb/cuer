@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.isLiveOrUpcoming
 import uk.co.sentinelweb.cuer.domain.ext.startPosition
 import uk.co.sentinelweb.cuer.domain.ext.stringMedia
 import kotlin.math.max
@@ -70,9 +71,10 @@ class YouTubePlayerListener(
             playerUi?.setConnectionState(PlayerContract.ConnectionState.CC_DISCONNECTED)
             playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
             playerUi?.setCurrentSecond(0f)
-
+            playerUi?.setButtons(buildButtons(this))
         } ?: run {
             playerUi?.reset()
+            playerUi?.setButtons(buildButtons(null))
             playerUi = null
         }
         playerUi?.removeListener(this)
@@ -99,7 +101,7 @@ class YouTubePlayerListener(
             ?.apply { livePlaybackController.gotDuration((duration * 1000).toLong()) }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
-
+        playerUi?.setButtons(buildButtons(queue.currentItem).copy(seekEnabled = true))
         state.currentMedia
             ?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
     }
@@ -286,6 +288,7 @@ class YouTubePlayerListener(
             playerUi?.setPlaylistItem(queue.currentItem)
             playerUi?.setPlaylistName(queue.playlist?.title ?: "none")
             playerUi?.setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
+            playerUi?.setButtons(buildButtons(this))
         } ?: run {
             state.currentMedia = null
             state.receivedVideoId = null
@@ -293,8 +296,17 @@ class YouTubePlayerListener(
             playerUi?.reset()
             playerUi?.setPlaylistItem(null)
             playerUi?.setPlaylistName("No Item")
+            playerUi?.setButtons(buildButtons(null))
         }
     }
+
+    private fun buildButtons(item: PlaylistItemDomain?) = PlayerContract.View.Model.Buttons(
+        nextTrackEnabled = queue.playlist
+            ?.run { currentIndex < (queue.playlist?.items?.size ?: 0) - 1 }
+            ?: false,
+        prevTrackEnabled = queue.playlist?.run { currentIndex > 0 } ?: false,
+        seekEnabled = item == null || (item.media.duration != null && item.media.isLiveOrUpcoming()),
+    )
 
     private fun setupPlayer(controls: PlayerContract.PlayerControls) {
         controls.apply {

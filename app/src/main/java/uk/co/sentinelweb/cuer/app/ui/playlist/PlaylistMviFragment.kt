@@ -63,7 +63,6 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -96,7 +95,6 @@ class PlaylistMviFragment : Fragment(),
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
-    private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val navigationProvider: NavigationProvider by inject()
@@ -502,10 +500,11 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
         binding.playlistUpdateButton.isVisible = model.canUpdate
-        binding.playlistShareButton.isVisible = true
+        binding.playlistShareButton.isVisible = model.shareVisible
+        binding.playlistShareButton.isEnabled = model.shareEnabled
         binding.playlistLaunchButton.isVisible = model.canUpdate
         binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
-            if (model.canEdit || model.canPlay || model.canUpdate || true) R.dimen.app_bar_header_height_playlist
+            if (model.canEdit || model.canPlay || model.canUpdate || model.shareVisible) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions
         )
         appBarOffsetScrollRange = -1
@@ -673,10 +672,6 @@ class PlaylistMviFragment : Fragment(),
     private fun showMessage(message: String) {
         toastWrapper.show(message)
     }
-
-    private fun exit() {
-        findNavController().popBackStack()
-    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -743,7 +738,7 @@ class PlaylistMviFragment : Fragment(),
 
     // region ShareContract.Committer
     override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
-        viewProxy.dispatch(Event.OnCommit(afterCommit))
+        viewProxy.dispatch(OnCommit(afterCommit))
     }
     // endregion
 

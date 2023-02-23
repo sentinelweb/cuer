@@ -90,6 +90,14 @@ class CastPlayerFragment() :
         SupportDialogFragment.show(requireActivity(), media)
     }
 
+    override fun setNextTrackEnabled(nextTrackEnabled: Boolean) {
+        binding.castPlayerTrackNext.isEnabled = nextTrackEnabled
+    }
+
+    override fun setPrevTrackEnabled(prevTrackEnabled: Boolean) {
+        binding.castPlayerTrackLast.isEnabled = prevTrackEnabled
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         linkScopeToActivity()

@@ -68,6 +68,9 @@ class FloatingWindowMviView(
                 }
             }
         })
+        diff(get = Model::buttons, set = { buttons ->
+            mainPlayControls?.setButtons(buttons)
+        })
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {

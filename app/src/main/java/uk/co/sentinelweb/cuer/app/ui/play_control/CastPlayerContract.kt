@@ -70,6 +70,8 @@ interface CastPlayerContract {
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
         fun showSupport(media: MediaDomain)
+        fun setNextTrackEnabled(nextTrackEnabled: Boolean)
+        fun setPrevTrackEnabled(prevTrackEnabled: Boolean)
     }
 
     data class State(

@@ -158,6 +158,8 @@ class PlaylistMviContract {
             val canDelete: Boolean,
             val canEditItems: Boolean,
             val canDeleteItems: Boolean,
+            val shareVisible: Boolean,
+            val shareEnabled: Boolean,
             val hasChildren: Int,
             val itemsText: String
         )

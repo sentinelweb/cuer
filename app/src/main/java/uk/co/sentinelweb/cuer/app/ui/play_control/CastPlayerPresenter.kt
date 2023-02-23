@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
@@ -241,7 +242,7 @@ class CastPlayerPresenter(
                 view.setDuration(mapper.formatTime(state.durationMs))
                 view.setDurationColors(R.color.text_primary, R.color.transparent)
             }
-            view.setSeekEnabled(!state.isLiveStream)
+//            view.setSeekEnabled(!state.isLiveStream)
         }
     }
 
@@ -280,6 +281,11 @@ class CastPlayerPresenter(
     }
 
     override fun getPlaylistItem(): PlaylistItemDomain? = state.playlistItem
+    override fun setButtons(buttons: PlayerContract.View.Model.Buttons) {
+        view.setSeekEnabled(buttons.seekEnabled)
+        view.setNextTrackEnabled(buttons.nextTrackEnabled)
+        view.setPrevTrackEnabled(buttons.prevTrackEnabled)
+    }
 
     override fun skipSeekTo(target: Long) {
         listener?.seekTo(target)

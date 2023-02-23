@@ -85,8 +85,7 @@ interface PlayerContract {
         data class Model(
             val texts: Texts,
             val playState: PlayerStateDomain,
-            val nextTrackEnabled: Boolean,
-            val prevTrackEnabled: Boolean,
+            val buttons: Buttons,
             val times: Times,
             val itemImage: String?,
             val description: DescriptionModel,
@@ -94,6 +93,12 @@ interface PlayerContract {
             val playlistItem: PlaylistItemDomain?,
             val playlistAndItem: PlaylistAndItemDomain? = null,
         ) {
+            data class Buttons(
+                val nextTrackEnabled: Boolean,
+                val prevTrackEnabled: Boolean,
+                val seekEnabled: Boolean,
+            )
+
             data class Texts(
                 val title: String?,
                 val playlistTitle: String?,
@@ -180,6 +185,7 @@ interface PlayerContract {
         fun disconnectSource()
         fun seekTo(ms: Long)
         fun getPlaylistItem(): PlaylistItemDomain?
+        fun setButtons(buttons: View.Model.Buttons)
 
         interface Listener {
             fun play()

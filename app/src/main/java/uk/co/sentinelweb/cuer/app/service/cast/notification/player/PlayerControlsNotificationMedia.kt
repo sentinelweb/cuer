@@ -69,6 +69,10 @@ class PlayerControlsNotificationMedia constructor(
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
+        val mediaSessionToken = if (state.seekEnabled) {
+            (appState.mediaSession?.sessionToken
+                ?: throw IllegalArgumentException("No media session ID allocated"))
+        } else null
         val builder = NotificationCompat.Builder(
             service,
             appState.castNotificationChannelId ?: throw IllegalStateException("No media session")
@@ -80,10 +84,7 @@ class PlayerControlsNotificationMedia constructor(
             .setWhen(timeProvider.currentTimeMillis())
             .setStyle(
                 MediaNotificationCompat.MediaStyle()
-                    .setMediaSession(
-                        appState.mediaSession?.sessionToken
-                            ?: throw IllegalArgumentException("No media session ID allocated")
-                    )
+                    .setMediaSession(mediaSessionToken)
                     .setShowCancelButton(true)
                     .setCancelButtonIntent(disconnectPendingIntent)
                     .run {
@@ -128,7 +129,9 @@ class PlayerControlsNotificationMedia constructor(
             }
         }
         builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
-        builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
+        if (state.nextEnabled) {
+            builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
+        }
         // #6 star - disabled
         builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
         return builder.build()

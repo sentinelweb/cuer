@@ -89,6 +89,7 @@ object SharedAppModule {
         factory { PlaylistOrDefaultUsecase(get(), get()) }
         factory { AddPlaylistUsecase(get(), get(), get(), get()) }
         factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
+        factory { MediaUpdateFromPlatformUseCase(get(), get()) }
     }
 
     private val objectModule = module {
