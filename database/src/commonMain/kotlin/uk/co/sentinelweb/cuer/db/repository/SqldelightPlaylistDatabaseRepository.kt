@@ -287,9 +287,8 @@ class SqldelightPlaylistDatabaseRepository(
                 it.copy(image = it.image?.let { imageDatabaseRepository.checkToSaveImage(it) })
             }
             .let { toSaveDomain ->
-                //val playlistEntity = playlistMapper.map(it)
                 with(database.playlistEntityQueries) {
-                    if (toSaveDomain.id != null) {
+                    if (toSaveDomain.id?.source == source) {
                         val playlistEntity = playlistMapper.map(toSaveDomain)
                         update(playlistEntity)
                         toSaveDomain.id!!.id
@@ -298,8 +297,6 @@ class SqldelightPlaylistDatabaseRepository(
                             .let { playlistMapper.map(toSaveDomain.copy(id = it)) }
                             .also { create(it) }
                             .id.toGUID()
-//                        create(playlistEntity)
-//                        getInsertId().executeAsOne()
                     }
                 }
             }.also { playlistId ->

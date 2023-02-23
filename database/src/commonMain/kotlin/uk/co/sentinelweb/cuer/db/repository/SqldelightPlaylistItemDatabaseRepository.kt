@@ -52,7 +52,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         try {
             domain
                 .let { item ->
-                    if (item.media.id == null || !flat) {
+                    if (item.media.id?.source != source || !flat) {
                         log.d("Save media check: ${item.media.platformId}")
                         val saved = mediaDatabaseRepository.save(item.media, emit = emit, flat = false)
                             .takeIf { it.isSuccessful }
@@ -73,7 +73,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                         } catch (n: NullPointerException) {
                             null
                         }
-                        itemDomain to if (itemDomain.id != null) {
+                        itemDomain to if (itemDomain.id?.source == source) {
                             if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
                                 throw ConflictException(
                                     "conflicting playlistitem id for ${itemDomain.media.id}_${itemDomain.playlistId!!.id}" +
@@ -261,15 +261,16 @@ class SqldelightPlaylistItemDatabaseRepository(
         return domains
             .let { itemDomains ->
                 itemDomains
-                    .filter { it.media.id == null || !flat }
+                    .filter { it.media.id?.source != source || !flat }
                     .takeIf { it.size > 0 }
                     ?.let {
+                        // save all the unsaved media items and make a lookup
                         mediaDatabaseRepository
                             .saveMediasInternal(it.map { it.media }, false)
                             .associateBy { it.platformId }
                     }?.let { lookup ->
                         itemDomains.map {
-                            if (it.media.id == null)
+                            if (it.media.id?.source != source)
                                 it.copy(media = lookup.get(it.media.platformId)!!)
                             else it
                         }

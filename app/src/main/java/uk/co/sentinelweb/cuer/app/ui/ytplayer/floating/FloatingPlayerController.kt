@@ -122,7 +122,7 @@ class FloatingPlayerController constructor(
                 intent
                     .getStringExtra(PLAYLIST_AND_ITEM.toString())
                     ?.let { deserialisePlaylistAndItem(it) }
-                    ?.also { playerMviViw.dispatch(OnInitFromService(it)) }
+                    ?.also { playerMviViw.dispatch(OnPlayItemFromService(it)) }
             }
 
             ACTION_SKIPF ->

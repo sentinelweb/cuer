@@ -8,7 +8,6 @@ import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
@@ -58,13 +57,13 @@ class PlayerController constructor(
             is PortraitClick -> PortraitPlayerOpen
             is PipClick -> PipPlayerOpen
             //is OnDestroy -> {log.d("map destroy");Destroy}
-            is OnInitFromService -> InitFromService(item)
-            is OnPlayItemFromService -> PlayItemFromService(item)
+            is OnInitFromService -> InitFromService(playlistAndItem)
+            is OnPlayItemFromService -> PlayItemFromService(playlistAndItem)
             is OnSeekToPosition -> SeekToPosition(ms)
             is Support -> Intent.Support
             is StarClick -> Intent.StarClick
-            is OpenClick -> Intent.OpenInApp
-            is ShareClick -> Intent.Share
+            is OpenClick -> OpenInApp
+            is ShareClick -> Share
         }
     }
 

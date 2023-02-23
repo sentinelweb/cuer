@@ -14,8 +14,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFi
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -367,7 +366,7 @@ class PlaylistMviStoreFactory(
         }
 
         private fun playlistSelected(intent: Intent.PlaylistSelected, state: State) {
-            intent.playlist.id?.let { /*if (selected) */moveItemToPlaylist(intent.playlist, state) }
+            intent.playlist.id?.let { moveItemToPlaylist(intent.playlist, state) }
         }
 
         private fun moveItemToPlaylist(playlist: PlaylistDomain, state: State) {
@@ -770,7 +769,7 @@ class PlaylistMviStoreFactory(
             itemsIdMap.get(itemModel.id)
 
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
-            itemDomain.playlistId?.source == LOCAL
+            itemDomain.id?.source == LOCAL || itemDomain.id?.source == MEMORY || itemDomain.id?.source == LOCAL_NETWORK
         // endregion utils
 
         // region loadRefresh

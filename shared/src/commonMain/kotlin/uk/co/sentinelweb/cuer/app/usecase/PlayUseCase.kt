@@ -34,8 +34,6 @@ class PlayUseCase constructor(
     }
 
     fun playLogic(
-//        itemDomain: PlaylistItemDomain?,
-//        playlist: PlaylistDomain?,
         playlistAndItem: PlaylistAndItemDomain,
         resetPos: Boolean
     ) {

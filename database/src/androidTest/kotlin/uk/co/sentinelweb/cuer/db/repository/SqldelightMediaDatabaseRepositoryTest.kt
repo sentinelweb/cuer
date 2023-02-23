@@ -19,11 +19,14 @@ import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.db.util.DatabaseTestRule
 import uk.co.sentinelweb.cuer.db.util.MainCoroutineRule
 import uk.co.sentinelweb.cuer.db.util.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import kotlin.test.*
 
@@ -49,6 +52,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 
     private val database: Database by inject()
     private val channelDatabaseRepository: ChannelDatabaseRepository by inject()
+    private val guidCreator: GuidCreator by inject()
 
     val sut: MediaDatabaseRepository by inject()
 
@@ -60,6 +64,31 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
     @Test
     fun saveCreate() = runTest {
         val initial = fixture<MediaDomain>().copy(id = null)
+        sut.updates.test {
+            val saved = sut.save(initial, emit = true, flat = false).data!!
+
+            val expected = initial.copy(
+                id = saved.id,
+                platform = saved.platform,
+                platformId = saved.platformId,
+                channelData = initial.channelData.copy(
+                    id = saved.channelData.id,
+                    thumbNail = initial.channelData.thumbNail?.copy(id = saved.channelData.thumbNail?.id),
+                    image = initial.channelData.image?.copy(id = saved.channelData.image?.id)
+                ),
+                thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
+                image = initial.image?.copy(id = saved.image?.id)
+            )
+
+            assertEquals(expected, saved)
+            assertEquals(FULL to saved, awaitItem())
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun saveCreateWithOtherIdSource() = runTest {
+        val initial = fixture<MediaDomain>().copy(id = guidCreator.create().toIdentifier(MEMORY))
         sut.updates.test {
             val saved = sut.save(initial, emit = true, flat = false).data!!
 

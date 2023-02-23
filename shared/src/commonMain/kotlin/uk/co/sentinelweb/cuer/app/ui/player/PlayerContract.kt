@@ -31,8 +31,8 @@ interface PlayerContract {
             object OpenInApp : Intent()
             object Share : Intent()
 
-            data class InitFromService(val item: PlaylistAndItemDomain) : Intent()
-            data class PlayItemFromService(val item: PlaylistAndItemDomain) : Intent()
+            data class InitFromService(val playlistAndItem: PlaylistAndItemDomain) : Intent()
+            data class PlayItemFromService(val playlistAndItem: PlaylistAndItemDomain) : Intent()
             data class PlayPause(val isPlaying: Boolean?) : Intent()
             data class Position(val ms: Long) : Intent()
             data class PlayState(val state: PlayerStateDomain) : Intent()
@@ -139,8 +139,8 @@ interface PlayerContract {
             data class LinkClick(val link: LinkDomain.UrlLinkDomain) : Event()
             data class DurationReceived(val ms: Long) : Event()
             data class IdReceived(val videoId: String) : Event()
-            data class OnInitFromService(val item: PlaylistAndItemDomain) : Event()
-            data class OnPlayItemFromService(val item: PlaylistAndItemDomain) : Event()
+            data class OnInitFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
+            data class OnPlayItemFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
             data class OnSeekToPosition(val ms: Long) : Event()
         }
     }

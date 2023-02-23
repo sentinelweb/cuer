@@ -256,7 +256,7 @@ class SqldelightMediaDatabaseRepository(
                     } catch (n: NullPointerException) {
                         null
                     }
-                    if (toSaveDomain.id != null) {
+                    if (toSaveDomain.id?.source == source) {
                         val mediaEntity = mediaMapper.map(toSaveDomain)
                         // manual check for platform-platformId duplication
                         // throw ConflictException if id is different for same platform-platformId

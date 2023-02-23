@@ -121,11 +121,7 @@ class PlayerStoreFactory(
                 is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
-                is Intent.ChannelOpen ->
-                    getState().item?.media?.channelData
-                        ?.let { publish(Label.ChannelOpen(it)) }
-                        ?: Unit
-
+                is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
@@ -133,33 +129,36 @@ class PlayerStoreFactory(
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
-                is Intent.InitFromService -> {
-                    loadItem(intent.item)
-                    queueConsumer.playlist
-                        ?.also { dispatch(Result.Playlist(it)) }
-                    Unit
-                }
-
-                is Intent.PlayItemFromService -> {
-                    loadItem(intent.item)
-                    queueConsumer.playlist
-                        ?.also { dispatch(Result.Playlist(it)) }
-                    Unit
-                }
-
-                Intent.Support -> getState().item
-                    ?.let { publish(Label.ShowSupport(it)) }
-                    ?: Unit
-
+                is Intent.InitFromService -> initFromService(intent)
+                is Intent.PlayItemFromService -> playItemFromService(intent)
+                Intent.Support -> getState().item?.let { publish(Label.ShowSupport(it)) } ?: Unit
                 Intent.StarClick -> toggleStar(getState().item).let { Unit }
-                is Intent.OpenInApp -> getState().item
-                    ?.let { publish(Label.ItemOpen(it)) }
-                    ?: Unit
-
-                is Intent.Share -> getState().item
-                    ?.let { publish(Label.Share(it)) }
-                    ?: Unit
+                is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
+                is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
             }
+
+        private fun openChannel(state: State) =
+            state.item?.media?.channelData
+                ?.let { publish(Label.ChannelOpen(it)) }
+                ?: Unit
+
+        private fun initFromService(intent: Intent.InitFromService) {
+            loadItem(intent.playlistAndItem)
+            queueConsumer.playlist
+                ?.also { dispatch(Result.Playlist(it)) }
+            Unit
+        }
+
+        private fun playItemFromService(intent: Intent.PlayItemFromService) {
+//            loadItem(intent.item)
+//            // fixme here need to get the item index uodate?
+//            queueConsumer.playlist
+//                ?.also { dispatch(Result.Playlist(it)) }
+            coroutines.mainScope.launch {
+                log.d("playItemFromService: playlistId${intent.playlistAndItem.playlistId} playlistTitle:${intent.playlistAndItem.playlistTitle} itemId:${intent.playlistAndItem.item.id} itemTitle:${intent.playlistAndItem.item.media.title}")
+                queueProducer.playNow(intent.playlistAndItem.playlistId!!, intent.playlistAndItem.item.id)
+            }
+        }
 
         private fun toggleStar(item: PlaylistItemDomain?) = coroutines.mainScope.launch {
             item?.takeIf { it.id != null }

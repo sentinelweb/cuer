@@ -32,18 +32,9 @@ class YoutubeSearchPlayistInteractor constructor(
         cachedOrSearch()
             ?.let { playlistMediaLookupUsecase.lookupPlaylistItemsAndReplace(it) }
             ?.items
-            ?.map { item ->
-                item.playlistId?.let { item } ?: item.copy(
-                    id = guidCreator.create().toIdentifier(MEMORY),
-                    media = item.media.copy(id = guidCreator.create().toIdentifier(MEMORY)),
-                    playlistId = YoutubeSearchIdentifier
-                )
-            }
             ?.let {
                 makeHeader()
-                    .copy(
-                        items = it.mapIndexed { _, playlistItem -> playlistItem.copy() } //i * 1000L
-                    )
+                    .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() } /*i * 1000L*/)
             }
 
     suspend fun cachedOrSearch(): PlaylistDomain? =
@@ -55,6 +46,17 @@ class YoutubeSearchPlayistInteractor constructor(
                     ytInteractor.search(searchTerm)
                         .takeIf { it.isSuccessful }
                         ?.data
+                        ?.let {
+                            it.copy(items = it.items.map { item ->
+                                item.playlistId
+                                    ?.let { item }
+                                    ?: item.copy(
+                                        id = guidCreator.create().toIdentifier(MEMORY),
+                                        media = item.media.copy(id = guidCreator.create().toIdentifier(MEMORY)),
+                                        playlistId = YoutubeSearchIdentifier
+                                    )
+                            })
+                        }
                         ?.also {
                             state.playlist = it
                             state.searchTerm = searchTerm
