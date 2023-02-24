@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.domain.ext.stringMedia
 import kotlin.math.max
 import kotlin.math.min
 
+// todo ditch this and connect to PlayerController
 class YouTubePlayerListener(
     private val state: State,
     private val queue: QueueMediatorContract.Consumer,
@@ -101,7 +102,7 @@ class YouTubePlayerListener(
             ?.apply { livePlaybackController.gotDuration((duration * 1000).toLong()) }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
-        playerUi?.setButtons(buildButtons(queue.currentItem).copy(seekEnabled = true))
+        playerUi?.setButtons(buildButtons(queue.currentItem))
         state.currentMedia
             ?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
     }
@@ -305,7 +306,7 @@ class YouTubePlayerListener(
             ?.run { currentIndex < (queue.playlist?.items?.size ?: 0) - 1 }
             ?: false,
         prevTrackEnabled = queue.playlist?.run { currentIndex > 0 } ?: false,
-        seekEnabled = item == null || (item.media.duration != null && item.media.isLiveOrUpcoming()),
+        seekEnabled = item != null && ((item.media.duration != null) && !item.media.isLiveOrUpcoming()),
     )
 
     private fun setupPlayer(controls: PlayerContract.PlayerControls) {

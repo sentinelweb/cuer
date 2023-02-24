@@ -48,7 +48,7 @@ class PlayerModelMapper constructor(
                 buttons = PlayerContract.View.Model.Buttons(
                     nextTrackEnabled = playlist?.run { currentIndex < playlist.items.size - 1 } ?: false,
                     prevTrackEnabled = playlist?.run { currentIndex > 0 } ?: false,
-                    seekEnabled = item?.media?.duration != null && item.media.isLiveOrUpcoming(),
+                    seekEnabled = item?.media?.duration != null && !item.media.isLiveOrUpcoming(),
                 ),
                 itemImage = item?.media?.thumbNail?.url,
                 playState = playerState,

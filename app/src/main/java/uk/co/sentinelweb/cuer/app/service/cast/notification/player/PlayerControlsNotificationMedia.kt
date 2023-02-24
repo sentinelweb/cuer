@@ -133,7 +133,7 @@ class PlayerControlsNotificationMedia constructor(
             builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
         }
         // #6 star - disabled
-        builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
+        // builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
         return builder.build()
     }
 

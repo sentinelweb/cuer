@@ -14,7 +14,7 @@ internal data class YoutubeVideosDto constructor(
         val id: String,
         val snippet: SnippetDto, // optional field (declared as part)
         val contentDetails: ContentDto? = null,// optional field (declared as part)
-        val liveStreamingDetails: LiveStreamingDetailsDto? = null,// optional field (declared as part)
+        val liveStreamingDetails: LiveStreamingDetailsDto? = null, // optional field (declared as part)
     ) {
         @Serializable
         internal data class SnippetDto constructor(
@@ -35,12 +35,12 @@ internal data class YoutubeVideosDto constructor(
 
         @Serializable
         internal data class LiveStreamingDetailsDto(
-            val actualStartTime: String,
-            val actualEndTime: String,
-            val scheduledStartTime: String,
-            val scheduledEndTime: String,
-            val concurrentViewers: Int,
-            val activeLiveChatId: String
+            val actualStartTime: String? = null,
+            val actualEndTime: String? = null,
+            val scheduledStartTime: String? = null,
+            val scheduledEndTime: String? = null,
+            val concurrentViewers: Int? = null,
+            val activeLiveChatId: String? = null
         )
 
     }
