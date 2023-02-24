@@ -453,7 +453,7 @@ class PlaylistMviStoreFactory(
                     } else if (!canPlayPlaylistItem(itemDomain)) {
                         publish(Message(strings.get(StringResource.playlist_error_please_add)))
                     } else {
-                        playUseCase.playLogic(paiMapper.map(state.playlist!!, itemDomain), intent.start)
+                        playUseCase.playLogic(paiMapper.map(itemDomain.playlistId!!, itemDomain), intent.start)
                     }
                 }
         }

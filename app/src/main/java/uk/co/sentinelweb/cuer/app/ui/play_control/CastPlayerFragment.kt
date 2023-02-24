@@ -49,7 +49,6 @@ class CastPlayerFragment() :
     init {
         log.tag(this)
     }
-
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("CastPlayerViewBinding not bound")
 
@@ -205,6 +204,7 @@ class CastPlayerFragment() :
     }
 
     override fun setSeekEnabled(enabled: Boolean) {
+        //log.e("seekbar enabled: $enabled", Exception())
         binding.castPlayerSeek.isEnabled = enabled
     }
 

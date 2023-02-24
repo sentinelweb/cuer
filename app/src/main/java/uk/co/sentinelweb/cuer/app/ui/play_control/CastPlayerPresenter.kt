@@ -193,14 +193,14 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setPosition("") }
-            state.durationMs = 0L.apply { view.setDuration("") }
+            state.positionMs = 0L.apply { view.setPosition("-:-") }
+            state.durationMs = 0L.apply { view.setDuration("-:-") }
             view.clearImage()
             view.setPaused()
             view.setDurationColors(R.color.text_primary, R.color.transparent)
-            view.setSeekEnabled(false)
             view.updateSeekPosition(0f)
             view.setLiveTime(null)
+            updateButtons()
         }
     }
 
@@ -282,9 +282,14 @@ class CastPlayerPresenter(
 
     override fun getPlaylistItem(): PlaylistItemDomain? = state.playlistItem
     override fun setButtons(buttons: PlayerContract.View.Model.Buttons) {
-        view.setSeekEnabled(buttons.seekEnabled)
-        view.setNextTrackEnabled(buttons.nextTrackEnabled)
-        view.setPrevTrackEnabled(buttons.prevTrackEnabled)
+        state.buttons = buttons
+        updateButtons()
+    }
+
+    private fun updateButtons() {
+        view.setSeekEnabled(state.buttons?.seekEnabled ?: false)
+        view.setNextTrackEnabled(state.buttons?.nextTrackEnabled ?: false)
+        view.setPrevTrackEnabled(state.buttons?.prevTrackEnabled ?: false)
     }
 
     override fun skipSeekTo(target: Long) {

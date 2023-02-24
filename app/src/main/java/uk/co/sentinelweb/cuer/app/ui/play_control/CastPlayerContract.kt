@@ -84,7 +84,8 @@ interface CastPlayerContract {
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
         var isUpcoming: Boolean = false,
-        var playlistName: String? = null
+        var playlistName: String? = null,
+        var buttons: PlayerContract.View.Model.Buttons? = null
     ) : ViewModel()
 
     companion object {

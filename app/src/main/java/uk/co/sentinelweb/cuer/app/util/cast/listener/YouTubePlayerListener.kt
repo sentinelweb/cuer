@@ -306,8 +306,8 @@ class YouTubePlayerListener(
             ?.run { currentIndex < (queue.playlist?.items?.size ?: 0) - 1 }
             ?: false,
         prevTrackEnabled = queue.playlist?.run { currentIndex > 0 } ?: false,
-        seekEnabled = item != null && ((item.media.duration != null) && !item.media.isLiveOrUpcoming()),
-    )
+        seekEnabled = item != null && (item.media.duration != null && !item.media.isLiveOrUpcoming()),
+    )//.also { log.e("buttons: seekbar:${it.seekEnabled} dur: ${item?.media?.duration} live:${item?.media.isLiveOrUpcoming()}") }
 
     private fun setupPlayer(controls: PlayerContract.PlayerControls) {
         controls.apply {
