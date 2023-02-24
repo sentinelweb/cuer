@@ -274,7 +274,7 @@ class PlaylistMviFragment : Fragment(),
                 is Label.Navigate -> navigate(label.model)
                 is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
                 is Label.ShowUndo -> showUndo(label.message) { viewProxy.dispatch(OnUndo(label.undoType)) }
-                is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
+                is Label.HighlightPlayingItem -> highlightPlayingItem(label.playlistItemId)
                 is Label.ScrollToItem -> scrollToItem(label.pos).also { log.d("ScrollToItem: ${label.pos}") }
                 is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
                 is Label.Help -> showHelp()
@@ -310,8 +310,8 @@ class PlaylistMviFragment : Fragment(),
                 diff(get = PlaylistMviContract.View.Model::identifier, set = {
                     it?.also { queueCastConnectionListener.playListId = it }
                 })
-                diff(get = PlaylistMviContract.View.Model::playingIndex, set = {
-                    it?.also { adapter.playingItem = it }
+                diff(get = PlaylistMviContract.View.Model::playingItemId, set = {
+                    it?.also { adapter.playingItemId = it }
                 })
 
                 diff(get = PlaylistMviContract.View.Model::items, set = { items ->
@@ -587,13 +587,13 @@ class PlaylistMviFragment : Fragment(),
         }
     }
 
-    private fun highlightPlayingItem(currentItemIndex: Int?) {
-        adapter.playingItem = currentItemIndex
-        _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemIndex))
+    private fun highlightPlayingItem(currentItemId: Identifier<GUID>?) {
+        adapter.playingItemId = currentItemId
+        _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemId))
     }
 
-    private fun mapPlaylistIndexAndSize(currentItemIndex: Int?) =
-        "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
+    private fun mapPlaylistIndexAndSize(currentItemId: Identifier<GUID>?) =
+        "${adapter.currentItemIndex + 1} / ${adapter.data.size}"
 
     private fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()

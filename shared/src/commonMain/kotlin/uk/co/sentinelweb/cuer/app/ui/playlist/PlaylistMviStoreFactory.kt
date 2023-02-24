@@ -238,25 +238,23 @@ class PlaylistMviStoreFactory(
         }
 
         private fun flowQueuePlaylist(intent: Intent.QueuePlaylistFlow, state: State) {
-//            .filter { isQueuedPlaylist }
-//                .onEach { log.d("q.playlist change id=${it.id} index=${it.currentIndex}") }
-//                .onEach { view.highlightPlayingItem(it.currentIndex) }
-//                .launchIn(coroutines.mainScope)
             if (state.playlistIdentifier == queue.playlistId) {
                 intent.item?.currentIndex
+                    ?.takeIf { it > 0 && it < (state.playlist?.items?.size ?: 0) }
+                    ?.let { state.playlist?.items?.get(it) }
+                    ?.id
                     ?.also { publish(Label.HighlightPlayingItem(it)) }
             }
         }
 
         private fun flowQueueItem(intent: Intent.QueueItemFlow, state: State) {
             state.playlist?.items
-                ?.indexOfFirst { intent.item?.id == it.id }
+                ?.find { intent.item?.id == it.id }
+                ?.id
                 ?.also { publish(Label.HighlightPlayingItem(it)) }
-//                ?.also { view.highlightPlayingItem(it) }
         }
 
         private fun checkToSave(intent: Intent.CheckToSave, state: State) {
-            //if ((state.playlist?.id ?: 0) <= 0 || state.isModified) {
             if (state.playlist?.id?.source == MEMORY || state.isModified) {
                 publish(Label.CheckSaveShowDialog(modelMapper.mapSaveConfirmAlert()))
             } else publish(Label.Navigate(NavigationModel.DONE))

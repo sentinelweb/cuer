@@ -50,7 +50,7 @@ class PlaylistMviModelMapperTest {
         val actual = sut.map(state)
 
         assertNull(actual.items)
-        assertNull(actual.playingIndex)
+        assertNull(actual.playingItemId)
         assertNull(actual.identifier)
         assertFalse(actual.isCards)
         assertEquals("", actual.header.title)
@@ -79,6 +79,6 @@ class PlaylistMviModelMapperTest {
 
         assertEquals(identifier, actual.identifier)
         assertEquals(initial.items.size, actual.items?.size)
-        assertEquals(initial.currentIndex, actual.playingIndex)
+        assertEquals(initial.currentIndex, actual.playingItemId)
     }
 }

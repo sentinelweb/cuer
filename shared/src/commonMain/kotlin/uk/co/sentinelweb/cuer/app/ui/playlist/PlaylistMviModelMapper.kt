@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistTreeDomain
+import uk.co.sentinelweb.cuer.domain.ext.currentItem
 
 class PlaylistMviModelMapper constructor(
     private val itemModelMapper: PlaylistMviItemModelMapper,
@@ -101,7 +102,7 @@ class PlaylistMviModelMapper constructor(
             items = items,
             isCards = multiPlatformPreferences.getBoolean(MultiPlatformPreferences.SHOW_VIDEO_CARDS, true),
             identifier = id,
-            playingIndex = domain.currentIndex
+            playingItemId = domain.currentItem()?.id
         )
     }
 
@@ -191,7 +192,7 @@ class PlaylistMviModelMapper constructor(
             items = null,
             isCards = false,
             identifier = null,
-            playingIndex = null
+            playingItemId = null
         )
     }
 }

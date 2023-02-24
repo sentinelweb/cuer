@@ -34,11 +34,13 @@ class PlaylistAdapter constructor(
     val data: List<PlaylistItemMviContract.Model.Item>
         get() = _data
 
-    var playingItem: Int? = null
+    var playingItemId: Identifier<GUID>? = null
         set(value) {
             field = value
             notifyDataSetChanged()
         }
+    val currentItemIndex: Int
+        get() = _data.indexOfFirst { it.id == playingItemId }
 
     fun setData(data: List<PlaylistItemMviContract.Model.Item>, animate: Boolean = true) {
         if (animate) {
@@ -79,9 +81,10 @@ class PlaylistAdapter constructor(
 
     @Override
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+        val item = _data.get(position)
         holder
             .itemPresenter
-            .update(_data.get(position), position == playingItem)
+            .update(item, item.id == playingItemId)
     }
 
     override fun getItemCount(): Int = _data.size

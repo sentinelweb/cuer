@@ -104,7 +104,7 @@ class PlaylistMviContract {
             data class Navigate(val model: NavigationModel, val view: ItemPassView? = null) : Label()
             data class ItemRemoved(val model: Item) : Label()
             data class ScrollToItem(val pos: Int) : Label()
-            data class HighlightPlayingItem(val pos: Int) : Label()
+            data class HighlightPlayingItem(val playlistItemId: Identifier<GUID>?) : Label()
             data class UpdateModelItem(val model: Item) : Label()
             data class AfterCommit(
                 val type: ObjectTypeDomain,
@@ -131,8 +131,8 @@ class PlaylistMviContract {
             val header: Header,
             val items: List<Item>?,
             val isCards: Boolean,
-            val identifier: Identifier<*>?,
-            val playingIndex: Int?
+            val identifier: Identifier<GUID>?,
+            val playingItemId: Identifier<GUID>?
         )
 
         data class Header(
