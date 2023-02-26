@@ -21,6 +21,8 @@ class YoutubeSearchPlayistInteractor constructor(
     override val hasCustomDeleteAction = false
     override val customResources = null
 
+    private val YoutubeSearchIdentifier = YoutubeSearch.id.toIdentifier(MEMORY)
+
     data class State constructor(
         var playlist: PlaylistDomain? = null,
         var searchTerm: SearchRemoteDomain? = null
@@ -63,8 +65,6 @@ class YoutubeSearchPlayistInteractor constructor(
                         }
                 }
             }
-
-    private val YoutubeSearchIdentifier = YoutubeSearch.id.toIdentifier(MEMORY)
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
         id = YoutubeSearchIdentifier,

@@ -86,7 +86,7 @@ object SharedAppModule {
         factory { PlaylistMediaLookupUsecase(get(), get(), get()) }
         factory { AddLinkUsecase(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaUpdateUsecase(get()) }
-        factory { PlaylistOrDefaultUsecase(get(), get()) }
+        factory { PlaylistOrDefaultUsecase(get(), get(), get()) }
         factory { AddPlaylistUsecase(get(), get(), get(), get()) }
         factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
         factory { MediaUpdateFromPlatformUseCase(get(), get()) }

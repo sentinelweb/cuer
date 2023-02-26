@@ -438,9 +438,7 @@ class PlaylistMviStoreFactory(
         private fun play(intent: Intent.Play, state: State) {
             state.playlist
                 ?.takeIf { it.items.isNotEmpty() }
-                ?.also { pl ->
-                    playUseCase.playLogic(paiMapper.map(pl, pl.currentItemOrStart()!!), false)
-                }
+                ?.also { pl -> playUseCase.playLogic(paiMapper.map(pl, pl.currentItemOrStart()!!), false) }
         }
 
         private fun playItem(intent: Intent.PlayItem, state: State) {

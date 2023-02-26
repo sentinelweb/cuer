@@ -68,7 +68,7 @@ class PlaylistItemEditViewModel constructor(
     private val coroutines: CoroutineContextProvider,
     private val timeProvider: TimeProvider,
     private val paiMapper: PlaylistAndItemMapper,
-    private val mediaUpdateFromPlatformUseCase: MediaUpdateFromPlatformUseCase
+    private val mediaUpdateFromPlatformUseCase: MediaUpdateFromPlatformUseCase,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)

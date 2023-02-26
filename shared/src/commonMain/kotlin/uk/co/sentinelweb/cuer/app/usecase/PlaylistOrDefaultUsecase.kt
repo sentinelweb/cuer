@@ -4,9 +4,11 @@ import kotlinx.coroutines.delay
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.forceDatabaseSuccessNotNull
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
@@ -14,15 +16,20 @@ import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 class PlaylistOrDefaultUsecase constructor(
     private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
+    private val log: LogWrapper
 ) {
 //    suspend fun getPlaylistOrDefault(id: OrchestratorContract.Identifier<GUID>?): PlaylistDomain? =
 //        id?.let { getPlaylistOrDefault(it.id) }
+
+    init {
+        log.tag(this)
+    }
 
     suspend fun getPlaylistOrDefault(
         playlistId: OrchestratorContract.Identifier<GUID>?,
     ): PlaylistDomain? =
         when (playlistId?.source) {
-            OrchestratorContract.Source.MEMORY ->
+            MEMORY ->
                 playlistId.id
                     .takeIf { it != OrchestratorContract.NO_PLAYLIST.id }
                     ?.let { playlistMemoryRepository.load(it, playlistId.source.deepOptions()) }
@@ -46,7 +53,7 @@ class PlaylistOrDefaultUsecase constructor(
 
     suspend fun updateCurrentIndex(input: PlaylistDomain, options: OrchestratorContract.Options): Boolean =
         when (options.source) {
-            OrchestratorContract.Source.MEMORY -> true
+            MEMORY -> true
             OrchestratorContract.Source.LOCAL ->
                 playlistDatabaseRepository.update(
                     PlaylistIndexUpdateDomain(input.id!!, input.currentIndex),
