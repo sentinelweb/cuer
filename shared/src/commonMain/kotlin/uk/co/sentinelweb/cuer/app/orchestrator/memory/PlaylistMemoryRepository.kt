@@ -135,7 +135,7 @@ class PlaylistMemoryRepository constructor(
                 is MediaIdListFilter -> data.values
                     .map { it.items }
                     .flatten()
-                    .filter { filter.ids.contains(it.media.id!!.id) } // todo check -> !! added
+                    .filter { filter.ids.contains(it.media.id?.id) }
                 else -> throw NotImplementedException()
             }
 
