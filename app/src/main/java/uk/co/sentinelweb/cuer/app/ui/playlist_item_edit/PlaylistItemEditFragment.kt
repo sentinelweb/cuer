@@ -176,12 +176,12 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                    _binding?.apply { plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl) }
 
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                    _binding?.apply { plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl) }
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
