@@ -77,7 +77,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                     image = initial.channelData.image?.copy(id = saved.channelData.image?.id)
                 ),
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
-                image = initial.image?.copy(id = saved.image?.id)
+                image = initial.image?.copy(id = saved.image?.id),
+                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -102,7 +103,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                     image = initial.channelData.image?.copy(id = saved.channelData.image?.id)
                 ),
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
-                image = initial.image?.copy(id = saved.image?.id)
+                image = initial.image?.copy(id = saved.image?.id),
+                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -124,7 +126,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 platform = saved.platform,
                 platformId = saved.platformId,
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
-                image = initial.image?.copy(id = saved.image?.id)
+                image = initial.image?.copy(id = saved.image?.id),
+                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -147,7 +150,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 platformId = initialSaved.platformId,
                 channelData = initialSaved.channelData,
                 thumbNail = initialSaved.thumbNail,
-                image = initialSaved.image
+                image = initialSaved.image,
+                broadcastDate = null,
             )
             val updated = sut.save(changed, emit = true, flat = false).data!!
 
@@ -176,7 +180,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                         image = media.channelData.image?.copy(id = saved[i].channelData.image?.id)
                     ),
                     thumbNail = media.thumbNail?.copy(id = saved[i].thumbNail?.id),
-                    image = media.image?.copy(id = saved[i].image?.id)
+                    image = media.image?.copy(id = saved[i].image?.id),
+                    broadcastDate = null,
                 )
             }
 
@@ -204,7 +209,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                     platformId = it.platformId,
                     channelData = it.channelData,
                     thumbNail = it.thumbNail,
-                    image = it.image
+                    image = it.image,
+                    broadcastDate = null,
                 )
             }
             val updated = sut.save(changed, emit = true, flat = false).data!!
