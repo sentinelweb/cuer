@@ -289,7 +289,7 @@ class PlaylistMviFragment : Fragment(),
                     ?.also { lifecycleScope.launch { it.onCommit(label.type, label.objects) } }
 
 
-            }.also { log.d(label.toString()) }
+            }//.also { log.d(label.toString()) }
         }
 
         override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
@@ -707,7 +707,6 @@ class PlaylistMviFragment : Fragment(),
     override fun onLeftSwipe(item: Item) {
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
-        log.d("onLeftSwipe")
         viewProxy.dispatch(OnDeleteItem(item))
     }
 
@@ -807,7 +806,8 @@ class PlaylistMviFragment : Fragment(),
                         idGenerator = get(),
                         shareWrapper = get(),
                         platformLauncher = get(),
-                        paiMapper = get()
+                        paiMapper = get(),
+                        mediaUpdateFromPlatformUseCase = get(),
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

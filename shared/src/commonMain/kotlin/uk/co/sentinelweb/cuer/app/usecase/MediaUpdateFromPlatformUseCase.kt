@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATF
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class MediaUpdateFromPlatformUseCase(
     private val connectivity: ConnectivityWrapper,
@@ -20,4 +21,12 @@ class MediaUpdateFromPlatformUseCase(
                     watched = originalMedia.watched,
                 )
         } else null
+
+    suspend fun checkToUpdateItem(item: PlaylistItemDomain): PlaylistItemDomain =
+        if (item.media.duration == null) {
+            invoke(item.media)
+                ?.let { item.copy(media = it) }
+                ?: item
+        } else item
+
 }

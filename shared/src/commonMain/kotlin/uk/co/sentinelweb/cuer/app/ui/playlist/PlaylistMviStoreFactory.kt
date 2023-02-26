@@ -36,10 +36,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.UndoType.ItemM
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Action.Init
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviStoreFactory.Result.*
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
-import uk.co.sentinelweb.cuer.app.usecase.AddPlaylistUsecase
-import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
+import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -79,6 +76,7 @@ class PlaylistMviStoreFactory(
     private val shareWrapper: ShareWrapper,
     private val platformLauncher: PlatformLaunchWrapper,
     private val paiMapper: PlaylistAndItemMapper,
+    private val mediaUpdateFromPlatformUseCase: MediaUpdateFromPlatformUseCase,
 ) {
     init {
         log.tag(this)
@@ -380,6 +378,10 @@ class PlaylistMviStoreFactory(
                         ?.copy(playlistId = playlist.id!!)
                         ?.apply { dispatch(MovedPlaylistItem(this)) }
                         ?.copy(order = timeProvider.currentTimeMillis())
+//                        ?.let { item -> mediaUpdateFromPlatformUseCase.checkToUpdateItem(item) }
+//                        // ?.also{log.d("media.duration: ${it.media.duration}")}
+//                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.deepOptions()) }
+//                        ?.also { updatePlaylistItemMedia(it, it.media, state) }
                         ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
                         ?.apply {
                             publish(
@@ -700,9 +702,7 @@ class PlaylistMviStoreFactory(
             // todo check if this is needed
             mappedItem
                 .takeIf { coroutines.mainScopeActive }
-                ?.apply {
-                    publish(Label.UpdateModelItem(this))
-                }
+                ?.apply { publish(Label.UpdateModelItem(this)) }
         }
 
         private fun delete(intent: Intent.DeleteItem, state: State) {
