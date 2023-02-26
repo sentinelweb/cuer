@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
+import uk.co.sentinelweb.cuer.domain.ext.currentItem
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 
@@ -70,15 +71,13 @@ class PlaylistMviModelMapperTest {
             itemsIdMapReversed = initial.items.associate { it to it.id!! }.toMutableMap(),
         )
         every {
-            itemModelMapper.mapItem(
-                any(), any(), any(), any(), any(), any(), any(), any(), any()
-            )
+            itemModelMapper.mapItem(any(), any(), any(), any(), any(), any(), any(), any(), any())
         } returns fixture()
 
         val actual = sut.map(state)
 
         assertEquals(identifier, actual.identifier)
         assertEquals(initial.items.size, actual.items?.size)
-        assertEquals(initial.currentIndex, actual.playingItemId)
+        assertEquals(initial.currentItem()?.id, actual.playingItemId)
     }
 }

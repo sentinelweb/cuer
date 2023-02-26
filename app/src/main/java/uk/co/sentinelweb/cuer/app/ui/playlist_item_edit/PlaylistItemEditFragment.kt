@@ -401,11 +401,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"
         private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
-        val TRANS_IMAGE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image)
-        }
-        val TRANS_TITLE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title)
-        }
+        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
+        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
     }
 }

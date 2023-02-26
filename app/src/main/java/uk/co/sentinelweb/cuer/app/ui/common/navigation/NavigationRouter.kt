@@ -86,10 +86,8 @@ class NavigationRouter constructor(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
                     PLAY_NOW.name to (nav.params[PLAY_NOW] ?: false),
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
-//                nav.navOpts,
-//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             PLAYLISTS -> navController?.navigate(
@@ -105,7 +103,7 @@ class NavigationRouter constructor(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
 //                nav.navOpts,
 //                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
@@ -115,7 +113,7 @@ class NavigationRouter constructor(
                 R.id.navigation_playlist_edit,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
                 /*nav.navOpts ?: */
                 navOptions(optionsBuilder = {
