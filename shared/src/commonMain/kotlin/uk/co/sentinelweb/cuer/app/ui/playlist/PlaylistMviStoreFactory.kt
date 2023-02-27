@@ -376,13 +376,13 @@ class PlaylistMviStoreFactory(
                                 .isEmpty()
                         }
                         ?.copy(playlistId = playlist.id!!)
-                        ?.apply { dispatch(MovedPlaylistItem(this)) }
+                        ?.apply { dispatch(MovedPlaylistItem(this)) } // fixme why so early
                         ?.copy(order = timeProvider.currentTimeMillis())
-//                        ?.let { item -> mediaUpdateFromPlatformUseCase.checkToUpdateItem(item) }
-//                        // ?.also{log.d("media.duration: ${it.media.duration}")}
-//                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.deepOptions()) }
-//                        ?.also { updatePlaylistItemMedia(it, it.media, state) }
-                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
+                        ?.let { item -> mediaUpdateFromPlatformUseCase.checkToUpdateItem(item) }
+                        // ?.also{log.d("media.duration: ${it.media.duration}")}
+                        ?.apply { playlistItemOrchestrator.save(this, LOCAL.deepOptions()) }
+                        //?.also { updatePlaylistItemMedia(it, it.media, state) }
+                        //?.apply { playlistItemOrchestrator.save(this, LOCAL.flatOptions()) }
                         ?.apply {
                             publish(
                                 Label.ShowUndo(
@@ -395,11 +395,10 @@ class PlaylistMviStoreFactory(
                             )
                         }
                         ?.also { recentLocalPlaylists.addRecent(playlist) }
-                        ?.also { dispatch(SelectedPlaylistItem(null)) }
-                        ?.also { dispatch(SetModified()) }
-                        ?: apply {
-                            publish(Error(strings.get(StringResource.playlist_error_moveitem_already_exists)))
-                        }
+//                        ?.also { dispatch(SelectedPlaylistItem(null)) }
+//                        ?.also { dispatch(SetModified()) }
+                        ?.also { executeRefresh(animate = true, state = state) }
+                        ?: apply { publish(Error(strings.get(StringResource.playlist_error_moveitem_already_exists))) }
                 }
             }
         }
@@ -765,7 +764,7 @@ class PlaylistMviStoreFactory(
             itemsIdMap.get(itemModel.id)
 
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
-            itemDomain.id?.source == LOCAL || itemDomain.id?.source == MEMORY || itemDomain.id?.source == LOCAL_NETWORK
+            itemDomain.media.id?.source == LOCAL //|| itemDomain.id?.source == MEMORY || itemDomain.id?.source == LOCAL_NETWORK
         // endregion utils
 
         // region loadRefresh

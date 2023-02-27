@@ -43,27 +43,31 @@ class YoutubeSearchPlayistInteractor constructor(
         searchPref()
             ?.let { searchTerm ->
                 if (state.playlist != null && state.searchTerm == searchTerm) {
-                    state.playlist!!
+                    //state.playlist!!
+                    doSearch(searchTerm)
                 } else {
-                    ytInteractor.search(searchTerm)
-                        .takeIf { it.isSuccessful }
-                        ?.data
-                        ?.let {
-                            it.copy(items = it.items.map { item ->
-                                item.playlistId
-                                    ?.let { item }
-                                    ?: item.copy(
-                                        id = guidCreator.create().toIdentifier(MEMORY),
-                                        media = item.media.copy(id = guidCreator.create().toIdentifier(MEMORY)),
-                                        playlistId = YoutubeSearchIdentifier
-                                    )
-                            })
-                        }
-                        ?.also {
-                            state.playlist = it
-                            state.searchTerm = searchTerm
-                        }
+                    doSearch(searchTerm)
                 }
+            }
+
+    private suspend fun doSearch(searchTerm: SearchRemoteDomain): PlaylistDomain? =
+        ytInteractor.search(searchTerm)
+            .takeIf { it.isSuccessful }
+            ?.data
+            ?.let {
+                it.copy(items = it.items.map { item ->
+                    item.playlistId
+                        ?.let { item }
+                        ?: item.copy(
+                            id = guidCreator.create().toIdentifier(MEMORY),
+                            media = item.media.copy(id = guidCreator.create().toIdentifier(MEMORY)),
+                            playlistId = YoutubeSearchIdentifier
+                        )
+                })
+            }
+            ?.also {
+                state.playlist = it
+                state.searchTerm = searchTerm
             }
 
     override fun makeHeader(): PlaylistDomain = PlaylistDomain(
@@ -74,7 +78,7 @@ class YoutubeSearchPlayistInteractor constructor(
         starred = true,
         image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/telescope-122960_640.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
-            playable = true,
+            playable = false,
             editable = false,
             deletableItems = false
         )
