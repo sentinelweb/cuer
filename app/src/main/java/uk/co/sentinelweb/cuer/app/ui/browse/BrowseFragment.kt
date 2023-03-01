@@ -156,7 +156,11 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                                 browseMviView.loading(true)
                                 addBrowsePlaylistUsecase.execute(label.cat, label.parentId)
                                     ?.id
-                                    ?.apply { navRouter.navigate(PlaylistMviFragment.makeNav(this.id, play = true, source = this.source)) }
+                                    ?.apply {
+                                        navRouter.navigate(
+                                            PlaylistMviFragment.makeNav(this.id, play = false, source = this.source)
+                                        )
+                                    }
                                     ?: snackbarWrapper.makeError(res.getString(R.string.browse_add_error, label.cat.title)).show()
                                 browseMviView.loading(false)
                             }
