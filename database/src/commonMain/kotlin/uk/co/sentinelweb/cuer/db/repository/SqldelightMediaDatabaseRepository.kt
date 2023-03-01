@@ -52,8 +52,11 @@ class SqldelightMediaDatabaseRepository(
     override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
+                //log.d("Media save: flat: $flat, media.id=${domain.id}, media.platformId=${domain.platformId} media.duration=${domain.duration}")
                 val id = saveInternal(domain, flat)
                 val loadResult = load(id = id, flat)
+                val result = loadResult.data
+                //log.d("Media load: flat: $flat, media.id=${result?.id}, media.platformId=${result?.platformId} media.duration=${result?.duration}")
                 if (loadResult.isSuccessful)
                     RepoResult.Data(loadResult.data)
                         .also {
@@ -256,7 +259,8 @@ class SqldelightMediaDatabaseRepository(
                     } catch (n: NullPointerException) {
                         null
                     }
-                    if (toSaveDomain.id != null) {
+                    // log.d("platformCheck:${platformCheck?.run{"media.id=${id}, media.platformId=${platform_id} media.duration=${duration}"}}")
+                    if (toSaveDomain.id?.source == source) {
                         val mediaEntity = mediaMapper.map(toSaveDomain)
                         // manual check for platform-platformId duplication
                         // throw ConflictException if id is different for same platform-platformId
@@ -266,13 +270,16 @@ class SqldelightMediaDatabaseRepository(
                                         " existing: ${platformCheck.id}  thisid:${mediaEntity.id}"
                             )
                         }
+                        log.d("update entity: ${mediaEntity.duration}")
                         update(mediaEntity)
                         loadById(toSaveDomain.id!!.id.value).executeAsOne().id.toGUID()
                     } else {
+                        // fixme some logic to add here need to merge the entities or throw conflict
                         if (platformCheck != null) {
                             //throw ConflictException("media already exists: ${toSaveDomain.platform}_${toSaveDomain.platformId}")
                             return platformCheck.id.toGUID()
                         } else {
+                            // log.e("create:${toSaveDomain.apply{"media.id=${id}, media.platformId=${platformId} media.duration=${duration}"}}")
                             guidCreator.create().toIdentifier(source)
                                 .apply { create(mediaMapper.map(toSaveDomain.copy(id = this))) }
                                 .id

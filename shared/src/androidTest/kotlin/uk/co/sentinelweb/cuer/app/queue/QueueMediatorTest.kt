@@ -9,16 +9,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.After
+import org.junit.*
 import org.junit.Assert.assertTrue
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
 import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
@@ -39,15 +37,20 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistModeDomain.SINGLE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.matchesHeader
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 import uk.co.sentinelweb.cuer.domain.mutator.PlaylistMutator
 import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
+import uk.co.sentinelweb.cuer.tools.rule.CoroutineTestRule
 
 // todo uncomment
 @ExperimentalCoroutinesApi
 class QueueMediatorTest {
     private val fixture = kotlinFixtureDefaultConfig
+
+    @get:Rule
+    var rule = CoroutineTestRule()
 
     @MockK
     lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
@@ -66,6 +69,9 @@ class QueueMediatorTest {
 
     @MockK
     lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
+
+    @MockK
+    lateinit var mockPlaylistAndItemMapper: PlaylistAndItemMapper
 
     private val testCoroutineDispatcher = UnconfinedTestDispatcher()
 
@@ -106,7 +112,13 @@ class QueueMediatorTest {
             currentIndex = fixtCurrentCurentIndex,
             mode = SINGLE,
             items = fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(id = guidCreator.create().toIdentifier(fixture()), order = idCounter * 1000, playlistId = fixtCurrentPlaylist.id) })
+                .map {
+                    it.copy(
+                        id = guidCreator.create().toIdentifier(fixture()),
+                        order = idCounter * 1000,
+                        playlistId = fixtCurrentPlaylist.id
+                    )
+                })
 
         fixtPlaylistDefault = generatePlaylist(fixture)
             .copy(currentIndex = fixtDefaultCurentIndex, items = fixture())
@@ -118,13 +130,10 @@ class QueueMediatorTest {
         captureItemFlow = mutableListOf()
 
         every { mockPlaylistOrchestrator.updates } returns fixtPlaylistOrchestratorFlow
-        coEvery {
-            playlistOrDefaultUsecase.getPlaylistOrDefault(fixtCurrentIdentifier)
-        } returns (fixtCurrentPlaylist)
+        coEvery { playlistOrDefaultUsecase.getPlaylistOrDefault(fixtCurrentIdentifier) } returns (fixtCurrentPlaylist)
         every { mockPlaylistItemOrchestrator.updates } returns fixtPlaylistItemOrchestratorFlow
-        every {
-            mockPrefsWrapper.currentPlayingPlaylistId
-        } returns (Identifier(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source))
+        every { mockPrefsWrapper.currentPlayingPlaylistId } returns
+                (Identifier(fixtCurrentIdentifier.id, fixtCurrentIdentifier.source))
     }
 
     private fun createSut(state: QueueMediatorState = QueueMediatorState()) {
@@ -138,7 +147,8 @@ class QueueMediatorTest {
             playlistOrDefaultUsecase,
             mockPrefsWrapper,
             log,
-            mockRecentLocalPlaylists
+            mockRecentLocalPlaylists,
+            mockPlaylistAndItemMapper
         )
         sut.currentItemFlow
             .onEach {
@@ -152,6 +162,20 @@ class QueueMediatorTest {
                 capturePlaylistFlow.add(it)
             }
             .launchIn(coroutines.computationScope)
+    }
+
+    private fun setItemIndexMediaNonMemory(index: Int) {
+        val nonMemorySource: Source = fixture<List<Source>>().filter { it != MEMORY }.first()
+        val item = fixtCurrentPlaylist.items.get(index)
+        val nonMemoryMedia =
+            item!!.media.copy(id = item.media.id!!.copy(source = nonMemorySource), watched = false)
+
+        fixtCurrentPlaylist = fixtCurrentPlaylist.copy(
+            items = fixtCurrentPlaylist.items.toMutableList().let {
+                it.apply { set(index, item.copy(media = nonMemoryMedia)) }
+            }
+        )
+        coEvery { playlistOrDefaultUsecase.getPlaylistOrDefault(fixtCurrentIdentifier) } returns (fixtCurrentPlaylist)
     }
 
     @After
@@ -188,8 +212,7 @@ class QueueMediatorTest {
         val fixChangedHeader = fixtCurrentPlaylist.copy(currentIndex = 1)
 
         // test
-        fixtPlaylistOrchestratorFlow
-            .emit((FLAT to fixtSource then fixChangedHeader))
+        fixtPlaylistOrchestratorFlow.emit((FLAT to fixtSource then fixChangedHeader))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
@@ -209,8 +232,7 @@ class QueueMediatorTest {
             .copy(id = fixtCurrentPlaylist.id, currentIndex = currentIndex, items = fixture())
 
         // test
-        fixtPlaylistOrchestratorFlow
-            .emit((Operation.FULL to fixtSource then fixChanged))
+        fixtPlaylistOrchestratorFlow.emit((Operation.FULL to fixtSource then fixChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixChanged.items.size)
@@ -229,8 +251,7 @@ class QueueMediatorTest {
             order = fixtCurrentPlaylist.items.get(replaceItemIndex).order
         )
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
@@ -248,8 +269,7 @@ class QueueMediatorTest {
             order = fixtCurrentPlaylist.items.get(replaceItemIndex).order
         )
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
@@ -269,8 +289,7 @@ class QueueMediatorTest {
             order = fixtCurrentPlaylist.items.get(targetItemIndex).order
         )
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size)
@@ -291,8 +310,7 @@ class QueueMediatorTest {
         val nextItem = fixtCurrentPlaylist.items.get(replaceItemIndex + 1)
 
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -312,8 +330,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -333,8 +350,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -355,8 +371,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size + 1)
@@ -378,8 +393,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((FLAT to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((FLAT to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size + 1)
@@ -400,8 +414,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((DELETE to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((DELETE to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -421,8 +434,7 @@ class QueueMediatorTest {
         )
         val currentItemBefore = sut.currentItem
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((DELETE to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((DELETE to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -442,8 +454,7 @@ class QueueMediatorTest {
         )
         val expectedPlayingAfter = fixtCurrentPlaylist.items.get(deleteItemIndex + 1)
         // test
-        fixtPlaylistItemOrchestratorFlow
-            .emit((DELETE to fixtSource then fixtChanged))
+        fixtPlaylistItemOrchestratorFlow.emit((DELETE to fixtSource then fixtChanged))
 
         //verify
         assertThat(sut.playlist!!.items.size).isEqualTo(fixtCurrentPlaylist.items.size - 1)
@@ -461,13 +472,15 @@ class QueueMediatorTest {
             id = switchPlaylistId,
             currentIndex = 3,
             items = fixture<List<PlaylistItemDomain>>()
-                .map { it.copy(id = guidCreator.create().toIdentifier(LOCAL), order = idCounter * 1000, playlistId = switchPlaylistId) })
+                .map {
+                    it.copy(
+                        id = guidCreator.create().toIdentifier(LOCAL),
+                        order = idCounter * 1000,
+                        playlistId = switchPlaylistId
+                    )
+                })
         val switchIdentifier = switchPlaylistId
-        coEvery {
-            playlistOrDefaultUsecase.getPlaylistOrDefault(
-                fixtSwitchPlaylist.id
-            )
-        } returns fixtSwitchPlaylist
+        coEvery { playlistOrDefaultUsecase.getPlaylistOrDefault(fixtSwitchPlaylist.id) } returns fixtSwitchPlaylist
         // test
         sut.switchToPlaylist(switchIdentifier)
 
@@ -523,7 +536,9 @@ class QueueMediatorTest {
     @Test
 // todo test force play , reset position
     fun onItemSelected__reset_position() = runTest {
+        setItemIndexMediaNonMemory(fixtCurrentPlaylist.currentIndex)
         createSut()
+
         val currentItemBefore = sut.currentItem!!
         val expectedCurrentItem =
             currentItemBefore.copy(media = currentItemBefore.media.copy(positon = 0, watched = true))
@@ -542,7 +557,7 @@ class QueueMediatorTest {
         )
         coEvery {
             mediaUpdate.updateMedia(
-                fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
+                fixtCurrentPlaylist, mediaPositionUpdate, currentItemBefore.media.id!!.flatOptions(emit = true)
             )
         } returns expectedMediaAfterUpdate
 
@@ -562,12 +577,13 @@ class QueueMediatorTest {
         assertThat(captureItemFlow.size).isEqualTo(2)
     }
 
-
     @Test
 // todo test force play , reset position
     fun onItemSelected__reset_position__different_item__no_force() = runTest {
-        createSut()
         val selectedItemIndex = 4
+        setItemIndexMediaNonMemory(selectedItemIndex)
+        createSut()
+
         val selectedItem = fixtCurrentPlaylist.items.get(selectedItemIndex)
         val fixtUpdatedPlaylist = fixtCurrentPlaylist.copy(currentIndex = selectedItemIndex)
         val expectedSelectedItem = selectedItem.copy(media = selectedItem.media.copy(positon = 0, watched = true))
@@ -586,7 +602,7 @@ class QueueMediatorTest {
         )
         coEvery {
             mediaUpdate.updateMedia(
-                fixtUpdatedPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
+                fixtUpdatedPlaylist, mediaPositionUpdate, selectedItem.media.id!!.flatOptions(emit = true)
             )
         } returns expectedMediaAfterUpdate
 
@@ -619,7 +635,9 @@ class QueueMediatorTest {
 
     @Test
     fun updateCurrentMediaItem() = runTest {
+        setItemIndexMediaNonMemory(fixtCurrentPlaylist.currentIndex)
         createSut()
+
         val fixtUpdateMedia: MediaDomain = fixture()
         val mediaPositionUpdate = MediaPositionUpdateDomain(
             id = sut.currentItem!!.media.id!!,
@@ -636,7 +654,7 @@ class QueueMediatorTest {
         )
         coEvery {
             mediaUpdate.updateMedia(
-                fixtCurrentPlaylist, mediaPositionUpdate, fixtCurrentIdentifier.flatOptions(emit = true)
+                fixtCurrentPlaylist, mediaPositionUpdate, sut.currentItem!!.media.id!!.flatOptions(emit = true)
             )
         } returns expectedMediaAfterUpdate
 
@@ -645,11 +663,14 @@ class QueueMediatorTest {
 
         // verify
         assertThat(sut.currentItemIndex).isEqualTo(fixtCurrentCurentIndex)
-        assertThat(sut.currentItem!!.media).isEqualTo(expectedMediaAfterUpdate) // position changed
+        assertThat(sut.currentItem!!.media).isEqualTo(expectedMediaAfterUpdate)
         coVerify {
-            mediaUpdate.updateMedia(fixtCurrentPlaylist, mediaPositionUpdate, sut.playlistId!!.flatOptions(true))
+            mediaUpdate.updateMedia(
+                fixtCurrentPlaylist,
+                mediaPositionUpdate,
+                sut.currentItem!!.media.id!!.flatOptions(true)
+            )
         }
-        // todo fix
     }
 
     @Test
@@ -660,7 +681,7 @@ class QueueMediatorTest {
         // todo check how to verify
     }
 
-    //////////// flaky tests ////////////////////////////////////////////
+    //////////// flaky/borken tests (after id->guid update) ////////////////////////////////////////////
     @Test
     @Ignore("flaky")
     fun test_flow_playlist_deleted() = runTest {

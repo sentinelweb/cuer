@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.startPosition
@@ -58,23 +59,23 @@ class PlayerStoreFactory(
     }
 
     private object ReducerImpl : Reducer<State, Result> {
-        override fun State.reduce(result: Result): State =
-            when (result) {
-                is Result.State -> copy(playerState = result.state)
+        override fun State.reduce(msg: Result): State =
+            when (msg) {
+                is Result.State -> copy(playerState = msg.state)
                 is Result.SetVideo -> copy(
-                    item = result.item,
-                    playlist = result.playlist ?: playlist
+                    item = msg.item,
+                    playlist = msg.playlist ?: playlist
                 )
 
-                is Result.Playlist -> copy(playlist = result.playlist)
+                is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(screen = result.screen)
+                is Result.Screen -> copy(screen = msg.screen)
                 is Result.SkipTimes -> copy(
-                    skipFwdText = result.fwd ?: skipFwdText,
-                    skipBackText = result.back ?: skipBackText
+                    skipFwdText = msg.fwd ?: skipFwdText,
+                    skipBackText = msg.back ?: skipBackText
                 )
 
-                is Result.Position -> copy(position = result.pos)
+                is Result.Position -> copy(position = msg.pos)
             }
     }
 
@@ -120,45 +121,40 @@ class PlayerStoreFactory(
                 is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
-                is Intent.ChannelOpen ->
-                    getState().item?.media?.channelData
-                        ?.let { publish(Label.ChannelOpen(it)) }
-                        ?: Unit
-
+                is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
                 is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
-                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().item!!))
-                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().item!!))
-                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().item!!))
+                is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()!!))
+                is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()!!))
+                is Intent.PipPlayerOpen -> publish(Label.PipPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.SeekToPosition -> publish(Label.Command(SeekTo(ms = intent.ms)))
-                is Intent.InitFromService -> {
-                    loadItem(intent.item)
-                    queueConsumer.playlist
-                        ?.also { dispatch(Result.Playlist(it)) }
-                    Unit
-                }
-
-                is Intent.PlayItemFromService -> {
-                    loadItem(intent.item)
-                    queueConsumer.playlist
-                        ?.also { dispatch(Result.Playlist(it)) }
-                    Unit
-                }
-
-                Intent.Support -> getState().item
-                    ?.let { publish(Label.ShowSupport(it)) }
-                    ?: Unit
-
+                is Intent.InitFromService -> initFromService(intent)
+                is Intent.PlayItemFromService -> playItemFromService(intent)
+                Intent.Support -> getState().item?.let { publish(Label.ShowSupport(it)) } ?: Unit
                 Intent.StarClick -> toggleStar(getState().item).let { Unit }
-                is Intent.OpenInApp -> getState().item
-                    ?.let { publish(Label.ItemOpen(it)) }
-                    ?: Unit
-
-                is Intent.Share -> getState().item
-                    ?.let { publish(Label.Share(it)) }
-                    ?: Unit
+                is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
+                is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
             }
+
+        private fun openChannel(state: State) =
+            state.item?.media?.channelData
+                ?.let { publish(Label.ChannelOpen(it)) }
+                ?: Unit
+
+        private fun initFromService(intent: Intent.InitFromService) {
+            loadItem(intent.playlistAndItem)
+            queueConsumer.playlist
+                ?.also { dispatch(Result.Playlist(it)) }
+            Unit
+        }
+
+        private fun playItemFromService(intent: Intent.PlayItemFromService) {
+            coroutines.mainScope.launch {
+                log.d("playItemFromService: playlistId${intent.playlistAndItem.playlistId} playlistTitle:${intent.playlistAndItem.playlistTitle} itemId:${intent.playlistAndItem.item.id} itemTitle:${intent.playlistAndItem.item.media.title}")
+                queueProducer.playNow(intent.playlistAndItem.playlistId!!, intent.playlistAndItem.item.id)
+            }
+        }
 
         private fun toggleStar(item: PlaylistItemDomain?) = coroutines.mainScope.launch {
             item?.takeIf { it.id != null }
@@ -174,17 +170,17 @@ class PlayerStoreFactory(
         }
 
         private fun init() {
-            itemLoader.load()?.also { item ->
-                log.d("itemLoader.load(${item.media.title}))")
-                loadItem(item)
+            itemLoader.load()?.also { playlistAndItem ->
+                log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
+                loadItem(playlistAndItem)
             }
         }
 
-        private fun loadItem(item: PlaylistItemDomain) = coroutines.mainScope.launch {
-            item.playlistId
-                ?.apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
-                ?.apply { livePlaybackController.clear(item.media.platformId) }
-                ?.apply { queueProducer.playNow(this, item.id) }
+        private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
+            playlistAndItem
+                .apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
+                .apply { livePlaybackController.clear(item.media.platformId) }
+                .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
 
         private fun playPause(intent: Intent.PlayPause, playerState: PlayerStateDomain) {

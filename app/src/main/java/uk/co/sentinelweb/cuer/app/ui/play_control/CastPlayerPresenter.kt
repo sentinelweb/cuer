@@ -1,12 +1,12 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -25,7 +26,8 @@ class CastPlayerPresenter(
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
     private val res: ResourceWrapper,
-    private val playUseCase: PlayUseCase
+    private val playUseCase: PlayUseCase,
+    private val playlistAndItemMapper: PlaylistAndItemMapper,
 ) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
 
     init {
@@ -69,8 +71,7 @@ class CastPlayerPresenter(
             }
         } ?: run {
             playUseCase.playLogic(
-                state.playlistItem ?: throw IllegalStateException("No playlist item"),
-                null,
+                playlistAndItemMapper.map(state.playlistItem ?: throw IllegalStateException("No playlist item")),
                 false
             )
         }
@@ -192,14 +193,14 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setPosition("") }
-            state.durationMs = 0L.apply { view.setDuration("") }
+            state.positionMs = 0L.apply { view.setPosition("-:-") }
+            state.durationMs = 0L.apply { view.setDuration("-:-") }
             view.clearImage()
             view.setPaused()
             view.setDurationColors(R.color.text_primary, R.color.transparent)
-            view.setSeekEnabled(false)
             view.updateSeekPosition(0f)
             view.setLiveTime(null)
+            updateButtons()
         }
     }
 
@@ -241,7 +242,7 @@ class CastPlayerPresenter(
                 view.setDuration(mapper.formatTime(state.durationMs))
                 view.setDurationColors(R.color.text_primary, R.color.transparent)
             }
-            view.setSeekEnabled(!state.isLiveStream)
+//            view.setSeekEnabled(!state.isLiveStream)
         }
     }
 
@@ -280,11 +281,20 @@ class CastPlayerPresenter(
     }
 
     override fun getPlaylistItem(): PlaylistItemDomain? = state.playlistItem
+    override fun setButtons(buttons: PlayerContract.View.Model.Buttons) {
+        state.buttons = buttons
+        updateButtons()
+    }
+
+    private fun updateButtons() {
+        view.setSeekEnabled(state.buttons?.seekEnabled ?: false)
+        view.setNextTrackEnabled(state.buttons?.nextTrackEnabled ?: false)
+        view.setPrevTrackEnabled(state.buttons?.prevTrackEnabled ?: false)
+    }
 
     override fun skipSeekTo(target: Long) {
         listener?.seekTo(target)
     }
-
 
 
     override fun skipSetBackText(text: String) {

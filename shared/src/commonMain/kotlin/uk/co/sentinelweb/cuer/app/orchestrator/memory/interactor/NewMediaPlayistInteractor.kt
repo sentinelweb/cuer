@@ -47,7 +47,7 @@ class NewMediaPlayistInteractor constructor(
         starred = false,
         image = ImageDomain(url = "https://cuer-275020.web.app/images/headers/pexels-pixabay-40663-600.jpg"),
         config = PlaylistDomain.PlaylistConfigDomain(
-            playable = false,
+            playable = true,
             editable = false,
             deletable = false,
             deletableItems = true

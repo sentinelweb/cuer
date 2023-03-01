@@ -6,7 +6,6 @@ import androidx.navigation.fragment.FragmentNavigator
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
@@ -71,6 +70,8 @@ interface CastPlayerContract {
         fun setSeekEnabled(enabled: Boolean)
         fun setState(state: PlayerStateDomain?)
         fun showSupport(media: MediaDomain)
+        fun setNextTrackEnabled(nextTrackEnabled: Boolean)
+        fun setPrevTrackEnabled(prevTrackEnabled: Boolean)
     }
 
     data class State(
@@ -83,7 +84,8 @@ interface CastPlayerContract {
         var playlistItem: PlaylistItemDomain? = null,
         var isLiveStream: Boolean = false,
         var isUpcoming: Boolean = false,
-        var playlistName: String? = null
+        var playlistName: String? = null,
+        var buttons: PlayerContract.View.Model.Buttons? = null
     ) : ViewModel()
 
     companion object {
@@ -101,7 +103,8 @@ interface CastPlayerContract {
                         log = get(),
                         skipControl = get(),
                         res = get(),
-                        playUseCase = get()
+                        playUseCase = get(),
+                        playlistAndItemMapper = get()
                     )
                 }
                 scoped<SkipContract.External> {

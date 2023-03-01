@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -39,4 +38,5 @@ class EmptyPlayerControls : PlayerContract.PlayerControls {
     override fun seekTo(ms: Long) = Unit
 
     override fun getPlaylistItem(): PlaylistItemDomain? = null
+    override fun setButtons(buttons: PlayerContract.View.Model.Buttons) = Unit
 }

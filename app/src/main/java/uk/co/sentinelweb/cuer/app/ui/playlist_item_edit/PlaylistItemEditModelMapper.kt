@@ -39,8 +39,8 @@ class PlaylistItemEditModelMapper(
                 ),
                 imageUrl = (media.image ?: media.thumbNail)?.url,
                 starred = media.starred,
-                canPlay = media.platformId.isNotEmpty(),
-                showPlay = allowPlay,
+                canPlay = media.platformId.isNotEmpty() && !media.isLiveBroadcastUpcoming,
+                isPlayEnabled = allowPlay,
                 durationText = (
                         if (media.isLiveBroadcast) {
                             if (media.isLiveBroadcastUpcoming) res.getString(R.string.upcoming)
@@ -87,7 +87,7 @@ class PlaylistItemEditModelMapper(
         durationText = null,
         starred = false,
         canPlay = false,
-        showPlay = false,
+        isPlayEnabled = false,
         empty = true,
         isLive = false,
         isUpcoming = false,

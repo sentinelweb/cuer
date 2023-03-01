@@ -2,10 +2,7 @@ package uk.co.sentinelweb.cuer.app.queue
 
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 interface QueueMediatorContract {
 
@@ -16,6 +13,7 @@ interface QueueMediatorContract {
         val playlistId: OrchestratorContract.Identifier<*>?
         val currentItemFlow: Flow<PlaylistItemDomain?>
         val currentPlaylistFlow: Flow<PlaylistDomain>
+        val playlistAndItem: PlaylistAndItemDomain?
     }
 
     interface Producer : Shared {

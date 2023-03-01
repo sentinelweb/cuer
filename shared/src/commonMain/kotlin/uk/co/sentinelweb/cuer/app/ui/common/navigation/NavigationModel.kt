@@ -2,10 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
-import uk.co.sentinelweb.cuer.domain.CategoryDomain
-import uk.co.sentinelweb.cuer.domain.LinkDomain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import kotlin.reflect.KClass
 
 data class NavigationModel constructor(
@@ -34,8 +31,8 @@ data class NavigationModel constructor(
         val requiredParams: List<Param> = listOf(),
         @Suppress("unused") val optionalParams: List<Param> = listOf()
     ) {
-        LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_ITEM)),
-        LOCAL_PLAYER(listOf(Param.PLAYLIST_ITEM)),
+        LOCAL_PLAYER_FULL(listOf(Param.PLAYLIST_AND_ITEM)),
+        LOCAL_PLAYER(listOf(Param.PLAYLIST_AND_ITEM)),
         WEB_LINK(listOf(LINK)),
         SHARE(listOf(LINK)),
         CRYPTO_LINK(listOf(Param.CRYPTO_ADDRESS)),
@@ -71,6 +68,7 @@ data class NavigationModel constructor(
         PLAYLIST_ID(String::class), // guid
         PLAYLIST_ITEM_ID(String::class), // guid
         PLAYLIST_ITEM((PlaylistItemDomain::class)),
+        PLAYLIST_AND_ITEM((PlaylistAndItemDomain::class)),
 
         //FRAGMENT_NAV_EXTRAS(FragmentNavigator.Extras::class),
         SOURCE(OrchestratorContract.Source::class),

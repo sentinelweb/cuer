@@ -31,8 +31,8 @@ class PlaylistMediaLookupUsecase constructor(
             id = null,
             items = playlist.items.map {
                 it.copy(
-                    media = mediaLookup.get(it.media.platformId)
-                        ?: throw IllegalStateException("Media save failed")
+                    media = mediaLookup.get(it.media.platformId) ?: it.media
+                    //?: throw IllegalStateException("Media save failed")
                 )
             })
     }
@@ -57,19 +57,20 @@ class PlaylistMediaLookupUsecase constructor(
             PlatformIdListFilter(playlist.items.map { it.media.platformId }),
             LOCAL.deepOptions(emit = false)
         ).let { existingMedia ->
-            // fixme this crashes where the playlist has duplicate media in the source
-            val existingMediaPlatformIds = existingMedia.map { it.platformId }
+//            val existingMediaPlatformIds = existingMedia.map { it.platformId }
             //log.d("buildMediaLookup: existingMediaPlatformIds: ${existingMedia.map { "${it.id} ${it.platformId}" }}")
-            playlist.items
-                .map { it.media }
-                .toMutableList()
-                .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
-                .map { it.copy(id = null) }
-                .associateBy { it.platformId to it }
-                .values.toList()
-                .let { mediaOrchestrator.save(it, LOCAL.deepOptions(emit = false)) }
-                .toMutableList()
-                .apply { addAll(existingMedia) }
-                .associate { it.platformId to it }
+//            playlist.items
+//                .map { it.media }
+//                .toMutableList()
+//                .apply { removeAll { existingMediaPlatformIds.contains(it.platformId) } }
+//                .map { it.copy(id = null) }
+//                .associateBy { it.platformId to it }
+//                .values
+//                .toList()
+//                .let { mediaOrchestrator.save(it, LOCAL.deepOptions(emit = false)) }
+//                .toMutableList()
+//                .apply { addAll(existingMedia) }
+//                .associate { it.platformId to it }
+            existingMedia.associate { it.platformId to it }
         }
 }

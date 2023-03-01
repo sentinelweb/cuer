@@ -144,7 +144,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        log.d("onViewCreated:" + arguments.toString())
+        //log.d("onViewCreated:" + arguments.toString())
         binding.plieToolbar.let {
             (activity as AppCompatActivity).setSupportActionBar(it)
         }
@@ -176,12 +176,12 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true
                     // only show the menu items for the non-empty state
-                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
+                    _binding?.apply { plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl) }
 
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 } else if (isShow) {
                     isShow = false
-                    binding.plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
+                    _binding?.apply { plieToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl) }
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
                 }
                 menuState.scrolledDown = isShow
@@ -294,7 +294,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         if (model.empty) {
             return
         }
-        binding.pliePlayFab.isVisible = model.showPlay
+        binding.pliePlayFab.isVisible = model.isPlayEnabled
         binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText
@@ -401,11 +401,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         private const val CREATE_PLAYLIST_TAG = "pe_dialog"
         private const val SELECT_PLAYLIST_TAG = "pdf_dialog"
 
-        val TRANS_IMAGE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image)
-        }
-        val TRANS_TITLE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title)
-        }
+        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_image) }
+        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.playlist_item_trans_title) }
     }
 }

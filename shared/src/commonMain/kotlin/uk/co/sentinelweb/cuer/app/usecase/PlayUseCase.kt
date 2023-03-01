@@ -11,8 +11,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
 class PlayUseCase constructor(
     private val queue: QueueMediatorContract.Producer,
@@ -26,7 +25,7 @@ class PlayUseCase constructor(
 
     interface Dialog {
         var playUseCase: PlayUseCase
-        fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?)
+        fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain)
         fun showDialog(model: AlertDialogModel)
     }
 
@@ -35,31 +34,29 @@ class PlayUseCase constructor(
     }
 
     fun playLogic(
-        itemDomain: PlaylistItemDomain?,
-        playlist: PlaylistDomain?,
+        playlistAndItem: PlaylistAndItemDomain,
         resetPos: Boolean
     ) {
-        val item = (itemDomain ?: queue.currentItem)
         if (floatingService.isRunning()) {
-            item?.also { floatingService.playItem(it) }
+            playlistAndItem.also { floatingService.playItem(it) }
         } else if (ytCastContextHolder.isConnected()) {
-            itemDomain
-                ?.let { playItem(it, resetPos) }
+            playlistAndItem
+                .let { playItem(it, resetPos) }
         } else {
-            playDialog.showPlayDialog(itemDomain, playlist?.title)
+            playDialog.showPlayDialog(playlistAndItem)
         }
     }
 
-    private fun playItem(itemDomain: PlaylistItemDomain, resetPos: Boolean) {
+    private fun playItem(itemDomain: PlaylistAndItemDomain, resetPos: Boolean) {
         if (queue.playlistId == itemDomain.playlistId) {
-            queue.onItemSelected(itemDomain, resetPosition = resetPos)
+            queue.onItemSelected(itemDomain.item, resetPosition = resetPos)
         } else {
             playDialog.showDialog(mapChangePlaylistAlert({
 
                 prefsWrapper.currentPlayingPlaylistId = itemDomain.playlistId!!
                 coroutines.computationScope.launch {
                     queue.switchToPlaylist(itemDomain.playlistId!!)
-                    queue.onItemSelected(itemDomain, forcePlay = true, resetPosition = resetPos)
+                    queue.onItemSelected(itemDomain.item, forcePlay = true, resetPosition = resetPos)
                 }
             }, {/*cancel*/ }
             ))
@@ -74,12 +71,12 @@ class PlayUseCase constructor(
             neutral = AlertDialogModel.Button(StringResource.dialog_button_view_info, info)
         )
 
-    fun setQueueItem(item: PlaylistItemDomain) {
+    fun setQueueItem(playlistAndItem: PlaylistAndItemDomain) {
         coroutines.computationScope.launch {
-            val toIdentifier = item.playlistId
+            val toIdentifier = playlistAndItem.playlistId
                 ?: throw IllegalArgumentException("item is not in a playlist")
             queue.switchToPlaylist(toIdentifier)
-            queue.onItemSelected(item, forcePlay = true, resetPosition = false)
+            queue.onItemSelected(playlistAndItem.item, forcePlay = true, resetPosition = false)
         }
     }
 

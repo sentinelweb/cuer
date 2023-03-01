@@ -37,6 +37,9 @@ interface PlayerControlsNotificationContract {
         var media: MediaDomain? = null,
         var bitmap: Bitmap? = null,
         var playlistName: String = "none",
-        var blocked: Boolean = false
+        var blocked: Boolean = false,
+        var seekEnabled: Boolean = true,
+        var nextEnabled: Boolean = true,
+        var prevEnabled: Boolean = true,
     )
 }

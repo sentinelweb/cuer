@@ -38,7 +38,7 @@ interface PlaylistItemEditContract {
         val isLive: Boolean,
         val isUpcoming: Boolean,
         @ColorRes val infoTextColor: Int,
-        val showPlay: Boolean,
+        val isPlayEnabled: Boolean,
         val itemText: CharSequence,
     )
 
@@ -91,7 +91,9 @@ interface PlaylistItemEditContract {
                         recentLocalPlaylists = get(),
                         res = get(),
                         coroutines = get(),
-                        timeProvider = get()
+                        timeProvider = get(),
+                        paiMapper = get(),
+                        mediaUpdateFromPlatformUseCase = get()
                     )
                 }
                 scoped { State() }

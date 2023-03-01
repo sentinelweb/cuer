@@ -232,7 +232,12 @@ class CastPlayerMviFragment() :
                     setDuration(times.durationText)
                     updateSeekPosition(times.seekBarFraction)
                 }
-                setSeekEnabled(!times.isLive)
+                //setSeekEnabled(!times.isLive)
+            })
+            diff(get = Model::buttons, set = { buttons ->
+                binding.castPlayerTrackNext.isEnabled = buttons.nextTrackEnabled
+                binding.castPlayerTrackLast.isEnabled = buttons.prevTrackEnabled
+                binding.castPlayerSeek.isEnabled = buttons.seekEnabled
             })
         }
 

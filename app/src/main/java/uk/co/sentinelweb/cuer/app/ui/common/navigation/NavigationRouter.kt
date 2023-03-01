@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -39,14 +40,14 @@ class NavigationRouter constructor(
         when (nav.target) {
             NAV_NONE -> Unit
             LOCAL_PLAYER_FULL ->
-                (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
+                (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
                     //YoutubeFullScreenActivity.start(activity, it)
                     AytLandActivity.start(activity, it)
                 }
                     ?: throw IllegalArgumentException("$LOCAL_PLAYER_FULL: $PLAYLIST_ITEM param required")
 
             LOCAL_PLAYER -> {
-                (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain?)?.let {
+                (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
                     AytPortraitActivity.start(activity, it)
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }
@@ -85,10 +86,8 @@ class NavigationRouter constructor(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
                     PLAYLIST_ITEM_ID.name to nav.params[PLAYLIST_ITEM_ID],
                     PLAY_NOW.name to (nav.params[PLAY_NOW] ?: false),
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
-//                nav.navOpts,
-//                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
             PLAYLISTS -> navController?.navigate(
@@ -104,7 +103,7 @@ class NavigationRouter constructor(
                 R.id.navigation_playlist_item_edit,
                 bundleOf(
                     PLAYLIST_ITEM.name to (nav.params[PLAYLIST_ITEM] as PlaylistItemDomain).serialise(),
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
 //                nav.navOpts,
 //                nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
@@ -114,7 +113,7 @@ class NavigationRouter constructor(
                 R.id.navigation_playlist_edit,
                 bundleOf(
                     PLAYLIST_ID.name to nav.params[PLAYLIST_ID],
-                    SOURCE.name to nav.params[SOURCE].toString()
+                    SOURCE.name to nav.params[SOURCE].toString() // todo remove source arg
                 ),
                 /*nav.navOpts ?: */
                 navOptions(optionsBuilder = {

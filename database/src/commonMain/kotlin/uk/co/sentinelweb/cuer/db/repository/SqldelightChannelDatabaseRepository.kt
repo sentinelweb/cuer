@@ -65,7 +65,7 @@ class SqldelightChannelDatabaseRepository(
                     }
                     .let { domain ->
                         val id = with(database.channelEntityQueries) {
-                            if (domain.id != null) {
+                            if (domain.id?.source == source) {
                                 val channel = channelMapper.map(domain)
                                 update(channel)
                                 domain.id!!

@@ -44,7 +44,8 @@ object SharedAppModule {
                 prefsWrapper = get(),
                 mediaUpdate = get(),
                 playlistOrDefaultUsecase = get(),
-                recentLocalPlaylists = get()
+                recentLocalPlaylists = get(),
+                playlistAndItemMapper = get()
             )
         }
         single { get<QueueMediatorContract.Producer>() as QueueMediatorContract.Consumer }
@@ -65,7 +66,7 @@ object SharedAppModule {
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
         single { UnfinishedItemsPlayistInteractor(get(), get(), get(), get(named(Unfinished))) }
         single { LocalSearchPlayistInteractor(get(), get(), get()) }
-        single { YoutubeSearchPlayistInteractor(get(), get(), get(), YoutubeSearchPlayistInteractor.State()) }
+        single { YoutubeSearchPlayistInteractor(get(), get(), get(), YoutubeSearchPlayistInteractor.State(), get()) }
         factory {
             mapOf(
                 NewItems.identifier() to get<NewMediaPlayistInteractor>(),
@@ -85,9 +86,10 @@ object SharedAppModule {
         factory { PlaylistMediaLookupUsecase(get(), get(), get()) }
         factory { AddLinkUsecase(get(), get(), get(), get(), get()) }
         factory { PlaylistMediaUpdateUsecase(get()) }
-        factory { PlaylistOrDefaultUsecase(get(), get()) }
+        factory { PlaylistOrDefaultUsecase(get(), get(), get()) }
         factory { AddPlaylistUsecase(get(), get(), get(), get()) }
         factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
+        factory { MediaUpdateFromPlatformUseCase(get(), get()) }
     }
 
     private val objectModule = module {
@@ -118,7 +120,15 @@ object SharedAppModule {
             )
         }
         factory { WifiStartChecker(get(), get()) }
-        factory<RemoteServerContract.AvailableMessageHandler> { AvailableMessageHandler(get(), get(), get(), get(), get()) }
+        factory<RemoteServerContract.AvailableMessageHandler> {
+            AvailableMessageHandler(
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
     }
 
     private val uiModule = module {

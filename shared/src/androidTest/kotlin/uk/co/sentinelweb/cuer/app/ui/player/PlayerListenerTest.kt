@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.player
 import app.cash.turbine.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,7 +27,7 @@ class PlayerListenerTest {
     }
 
     @Test
-    fun seekTo() = rule.dispatcher.runBlockingTest {
+    fun seekTo() = runTest {
         sut.intentFlow.test {
             sut.seekTo(1000)
             assertThat(awaitItem()).isEqualTo(SeekToPosition(1000))

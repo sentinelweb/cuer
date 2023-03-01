@@ -21,7 +21,6 @@ dependencies {
     implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
 
     testImplementation(kotlin("test-js"))
-
 }
 
 kotlin {

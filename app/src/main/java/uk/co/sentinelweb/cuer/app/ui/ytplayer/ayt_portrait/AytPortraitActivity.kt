@@ -19,7 +19,6 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.databinding.ActivityAytPortraitBinding
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
@@ -52,6 +51,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LinkDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.TimecodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -84,7 +84,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
     private lateinit var binding: ActivityAytPortraitBinding
 
-    private var currentItem: PlaylistItemDomain? = null
+    private var currentItem: PlaylistAndItemDomain? = null
 
     init {
         log.tag(this)
@@ -196,15 +196,15 @@ class AytPortraitActivity : AppCompatActivity(),
             override fun onPlaylistChipClick(chipModel: ChipModel) = Unit
 
         }
-        val playlistItem = itemLoader.load()
-            ?: queueConsumer.currentItem
+        val playlistAndItem = itemLoader.load()
+            ?: queueConsumer.playlistAndItem
             ?: throw IllegalArgumentException("Could not get playlist item")
 
         playlistFragment.arguments = bundleOf(
             HEADLESS.name to true,
-            SOURCE.name to OrchestratorContract.Source.LOCAL.toString(),
-            PLAYLIST_ID.name to (playlistItem.playlistId?.id?.value),
-            PLAYLIST_ITEM_ID.name to (playlistItem.id?.id?.value),
+            SOURCE.name to playlistAndItem.playlistId?.source.toString(),
+            PLAYLIST_ID.name to (playlistAndItem.playlistId?.id?.value),
+            PLAYLIST_ITEM_ID.name to (playlistAndItem.item.id?.id?.value),
         )
         log.d("onPostCreate")
     }
@@ -223,9 +223,9 @@ class AytPortraitActivity : AppCompatActivity(),
                 log.d("set description")
                 binding.portraitPlayerDescription.setModel(it)
             })
-            diff(get = PlayerContract.View.Model::playlistItem, set = {
+            diff(get = PlayerContract.View.Model::playlistAndItem, set = {
                 currentItem = it
-                it?.media?.also {
+                it?.item?.media?.also {
                     binding.portraitPlayerDescription.ribbonItems
                         .find { it.item.type == RibbonModel.Type.STAR }
                         ?.isVisible = !it.starred
@@ -310,14 +310,14 @@ class AytPortraitActivity : AppCompatActivity(),
 
     companion object {
 
-        fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
+        fun start(c: Context, playlistAndItem: PlaylistAndItemDomain) = c.startActivity(
             Intent(c, AytPortraitActivity::class.java).apply {
-                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                putExtra(PLAYLIST_AND_ITEM.toString(), playlistAndItem.serialise())
             })
 
-        fun startFromService(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
+        fun startFromService(c: Context, playlistAndItem: PlaylistAndItemDomain) = c.startActivity(
             Intent(c, AytPortraitActivity::class.java).apply {
-                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                putExtra(PLAYLIST_AND_ITEM.toString(), playlistAndItem.serialise())
                 setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             })
     }

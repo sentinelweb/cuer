@@ -17,15 +17,14 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FU
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Options
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.PLATFORM
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.ArgumentDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel.Type.PLAYLIST_ADD
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.SOURCE
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
@@ -33,6 +32,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditViewMode
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract.Companion.ADD_PLAYLIST_DUMMY
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
+import uk.co.sentinelweb.cuer.app.usecase.MediaUpdateFromPlatformUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
@@ -46,6 +46,7 @@ import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.PlaylistItemCreator
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 import uk.co.sentinelweb.cuer.domain.ext.domainJsonSerializer
+import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 
 
 class PlaylistItemEditViewModel constructor(
@@ -65,6 +66,8 @@ class PlaylistItemEditViewModel constructor(
     private val res: ResourceWrapper,
     private val coroutines: CoroutineContextProvider,
     private val timeProvider: TimeProvider,
+    private val paiMapper: PlaylistAndItemMapper,
+    private val mediaUpdateFromPlatformUseCase: MediaUpdateFromPlatformUseCase,
 ) : ViewModel(), DescriptionContract.Interactions {
     init {
         log.tag(this)
@@ -100,7 +103,7 @@ class PlaylistItemEditViewModel constructor(
 
     private fun listen() {
         mediaOrchestrator.updates
-            .onEach { (op, source, newMedia) ->
+            .onEach { (op, _, newMedia) ->
                 //log.d("media changed: $op, $source, id=${newMedia.id} title=${newMedia.title}")
                 when (op) {
                     FLAT, FULL -> {
@@ -151,7 +154,10 @@ class PlaylistItemEditViewModel constructor(
                                 .distinct()
                                 .filterNotNull()
                                 .also {
-                                    playlistOrchestrator.loadList(IdListFilter(it.map { it.id }), state.source.flatOptions())
+                                    playlistOrchestrator.loadList(
+                                        IdListFilter(it.map { it.id }),
+                                        state.source.flatOptions()
+                                    )
                                         .also { state.selectedPlaylists.addAll(it) }
                                 }
                         }
@@ -217,7 +223,8 @@ class PlaylistItemEditViewModel constructor(
     override fun onPlaylistChipClick(chipModel: ChipModel) {
         if (!state.isInShare) {
             val plId = deserialiseGuidIdentifier(chipModel.value!!)
-            _navigateLiveData.value = NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId.id.value, SOURCE to plId.source))
+            _navigateLiveData.value =
+                NavigationModel(PLAYLIST, mapOf(PLAYLIST_ID to plId.id.value, SOURCE to plId.source))
             _navigateLiveData.value = NavigationModel(NAV_NONE)
         }
     }
@@ -227,19 +234,11 @@ class PlaylistItemEditViewModel constructor(
             state.media?.let { originalMedia ->
                 _uiLiveData.value = UiEvent(REFRESHING, true)
                 try {
-                    mediaOrchestrator.loadByPlatformId(originalMedia.platformId, Options(PLATFORM))
-                        ?.let {
-                            it.copy(
-                                id = originalMedia.id,
-                                dateLastPlayed = originalMedia.dateLastPlayed,
-                                starred = originalMedia.starred,
-                                watched = originalMedia.watched,
-                            )
-                                .also { state.media = it }
-                                .also { state.isMediaChanged = true }
-                                .also { checkToAutoSelectPlaylists() }
-                                .also { update() }
-                        }
+                    mediaUpdateFromPlatformUseCase(originalMedia)
+                        ?.also { state.media = it }
+                        ?.also { state.isMediaChanged = true }
+                        ?.also { checkToAutoSelectPlaylists() }
+                        ?.also { update() }
                         ?: also { updateError() }
                 } catch (e: Exception) {
                     log.e("Caught Exception updating media", e)
@@ -252,7 +251,7 @@ class PlaylistItemEditViewModel constructor(
 
     fun onPlayVideo() {
         state.editingPlaylistItem?.let { item ->
-            playUseCase.playLogic(item, state.selectedPlaylists.firstOrNull(), false)
+            playUseCase.playLogic(paiMapper.map(state.selectedPlaylists.firstOrNull(), item), false)
         } ?: run { toast.show("Please save the item first ...") }
     }
 
@@ -388,7 +387,7 @@ class PlaylistItemEditViewModel constructor(
 
     override fun onCryptoClick(cryptoAddress: LinkDomain.CryptoLinkDomain) {
         _navigateLiveData.value =
-            NavigationModel(CRYPTO_LINK, mapOf(NavigationModel.Param.CRYPTO_ADDRESS to cryptoAddress))
+            NavigationModel(CRYPTO_LINK, mapOf(CRYPTO_ADDRESS to cryptoAddress))
     }
 
     override fun onTimecodeClick(timecode: TimecodeDomain) {
@@ -420,7 +419,9 @@ class PlaylistItemEditViewModel constructor(
 
     fun checkToSave() {
         if (!state.isSaved && (state.isMediaChanged || state.isPlaylistsChanged)) {
-            if (state.isOnSharePlaylist) {
+            if (state.media?.id?.source == MEMORY) { // share playlist media ids are null - this is for youtube search (created ids to play)
+                _navigateLiveData.value = NavigationModel(NAV_DONE)
+            } else if (state.isOnSharePlaylist) {
                 doCommitAndReturn()
             } else if (isNew) {
                 _dialogModelLiveData.value = modelMapper.mapSaveConfirmAlert({

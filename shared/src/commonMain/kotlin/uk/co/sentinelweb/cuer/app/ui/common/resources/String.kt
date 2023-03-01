@@ -23,7 +23,8 @@ enum class StringResource(val default: String) {
     // todo move playlists strings here
 
     // playlist
-    playlist_error_please_add("Please add the playlist first"),
+    playlist_error_please_add("Please add the item to a playlist first"),
+    playlist_error_upcoming("This is not live yet .."),
     playlist_empty("Empty"),
     playlist_error_updating("Error updating: %1\$s …"),
     playlist_items_updated("%1\$s new items"),

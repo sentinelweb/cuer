@@ -80,7 +80,8 @@
     <string name="pl_item_move">Move</string>
     <string name="playlist_change_dialog_title">Change playlist?</string>
     <string name="playlist_change_dialog_message">This will change the current playlist …</string>
-    <string name="playlist_error_please_add">Please add the playlist first …</string>
+    <string name="playlist_error_please_add">Please add the item to a playlist first …</string>
+    <string name="playlist_error_upcoming">"This is not live yet …</string>
     <string name="playlist_item_menu_view">View</string>
     <string name="playlist_item_menu_play">Play</string>
     <string name="playlist_item_menu_play_start">Play from start</string>

@@ -9,7 +9,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -194,6 +193,12 @@ class PlayerControlsNotificationController constructor(
     override fun seekTo(ms: Long) = Unit
 
     override fun getPlaylistItem() = null // add pli to state if needed
+    override fun setButtons(buttons: PlayerContract.View.Model.Buttons) {
+        state.nextEnabled = buttons.nextTrackEnabled
+        state.prevEnabled = buttons.prevTrackEnabled
+        state.seekEnabled = buttons.seekEnabled
+        updateNotification()
+    }
 
     override fun initMediaRouteButton() = Unit
 

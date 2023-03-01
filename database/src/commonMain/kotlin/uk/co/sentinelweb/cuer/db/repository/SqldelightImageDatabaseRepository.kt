@@ -41,7 +41,7 @@ class SqldelightImageDatabaseRepository(
             with(database.imageEntityQueries) {
                 try {
 
-                    if (domain.id != null) {
+                    if (domain.id?.source == source) {
                         val entity = imageMapper.map(domain)
                         update(entity)
                         RepoResult.Data(imageMapper.map(entity))
@@ -50,9 +50,6 @@ class SqldelightImageDatabaseRepository(
                             .let { domain.copy(id = it) }
                             .also { create(imageMapper.map(it)) }
                             .let { RepoResult.Data(it) }
-                        //create(entity)
-                        //val insertId = database.imageEntityQueries.getInsertId().executeAsOne()
-                        //RepoResult.Data(imageMapper.map(entity.copy(id = insertId)))
                     }
                 } catch (e: Exception) {
                     val msg = "couldn't save image"
@@ -153,7 +150,7 @@ class SqldelightImageDatabaseRepository(
         }
 
     internal fun checkToSaveImage(domain: ImageDomain): ImageDomain =
-        if (domain.id != null) {
+        if (domain.id?.source == source) {
             imageMapper.map(domain).apply {
                 database.imageEntityQueries.update(this)
             }
@@ -161,17 +158,12 @@ class SqldelightImageDatabaseRepository(
             with(database.imageEntityQueries) {
                 loadByUrl(domain.url)
                     .executeAsOneOrNull()
-//                ?.let { imageEntity.copy(id = it.id) }
                     ?.let { imageMapper.map(domain.copy(id = it.id.toGuidIdentifier(source))) }
                     ?.also { database.imageEntityQueries.update(it) }
                     ?: let {
                         guidCreator.create().toIdentifier(source)
                             .let { imageMapper.map(domain.copy(id = it)) }
                             .also { create(it) }
-
-//                    database.imageEntityQueries
-//                        .create(imageEntity)
-//                        .let { imageEntity.copy(id = database.imageEntityQueries.getInsertId().executeAsOne()) }
                     }
             }
         }.let { imageMapper.map(it) }

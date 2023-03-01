@@ -21,8 +21,7 @@ import uk.co.sentinelweb.cuer.app.databinding.ActivityAytFullsreenBinding
 import uk.co.sentinelweb.cuer.app.databinding.FullscreenControlsOverlayBinding
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.CHANNEL_ID
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.YOUTUBE_CHANNEL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
@@ -43,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
@@ -271,9 +271,9 @@ class AytLandActivity : AppCompatActivity(),
 
     companion object {
 
-        fun start(c: Context, playlistItem: PlaylistItemDomain) = c.startActivity(
+        fun start(c: Context, playlistAndItem: PlaylistAndItemDomain) = c.startActivity(
             Intent(c, AytLandActivity::class.java).apply {
-                putExtra(PLAYLIST_ITEM.toString(), playlistItem.serialise())
+                putExtra(PLAYLIST_AND_ITEM.toString(), playlistAndItem.serialise())
             })
     }
 

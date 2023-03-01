@@ -63,7 +63,6 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -96,7 +95,6 @@ class PlaylistMviFragment : Fragment(),
     private val log: LogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val imageProvider: ImageProvider by inject()
-    private val castDialogWrapper: CastDialogWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val navigationProvider: NavigationProvider by inject()
@@ -276,7 +274,7 @@ class PlaylistMviFragment : Fragment(),
                 is Label.Navigate -> navigate(label.model)
                 is Label.ShowPlaylistsSelector -> showPlaylistSelector(label.config)
                 is Label.ShowUndo -> showUndo(label.message) { viewProxy.dispatch(OnUndo(label.undoType)) }
-                is Label.HighlightPlayingItem -> highlightPlayingItem(label.pos)
+                is Label.HighlightPlayingItem -> highlightPlayingItem(label.playlistItemId)
                 is Label.ScrollToItem -> scrollToItem(label.pos).also { log.d("ScrollToItem: ${label.pos}") }
                 is Label.UpdateModelItem -> updateItemModel(label.model) // todo do i need this?
                 is Label.Help -> showHelp()
@@ -291,7 +289,7 @@ class PlaylistMviFragment : Fragment(),
                     ?.also { lifecycleScope.launch { it.onCommit(label.type, label.objects) } }
 
 
-            }.also { log.d(label.toString()) }
+            }//.also { log.d(label.toString()) }
         }
 
         override val renderer: ViewRenderer<PlaylistMviContract.View.Model> =
@@ -312,8 +310,8 @@ class PlaylistMviFragment : Fragment(),
                 diff(get = PlaylistMviContract.View.Model::identifier, set = {
                     it?.also { queueCastConnectionListener.playListId = it }
                 })
-                diff(get = PlaylistMviContract.View.Model::playingIndex, set = {
-                    it?.also { adapter.playingItem = it }
+                diff(get = PlaylistMviContract.View.Model::playingItemId, set = {
+                    it?.also { adapter.playingItemId = it }
                 })
 
                 diff(get = PlaylistMviContract.View.Model::items, set = { items ->
@@ -481,7 +479,8 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistFabPlay.setIconResource(res.getDrawableResourceId(model.playIcon))
         binding.playlistFabPlay.text = model.playText
         binding.playlistFabPlay.isVisible = model.canPlay
-        binding.playlistFabPlaymode.isVisible = model.canPlay
+        binding.playlistFabPlay.isEnabled = model.playEnabled
+        binding.playlistFabPlaymode.isVisible = model.loopVisible
         binding.playlistFabPlaymode.text = model.loopModeText
         binding.playlistItems.text = model.itemsText
         binding.playlistStarButton.setIconResource(res.getDrawableResourceId(model.starredIcon))
@@ -501,10 +500,11 @@ class PlaylistMviFragment : Fragment(),
         binding.playlistEditButton.isVisible = model.canEdit
         binding.playlistStarButton.isVisible = model.canEdit
         binding.playlistUpdateButton.isVisible = model.canUpdate
-        binding.playlistShareButton.isVisible = true
+        binding.playlistShareButton.isVisible = model.shareVisible
+        binding.playlistShareButton.isEnabled = model.shareEnabled
         binding.playlistLaunchButton.isVisible = model.canUpdate
         binding.playlistAppbar.layoutParams.height = res.getDimensionPixelSize(
-            if (model.canEdit || model.canPlay || model.canUpdate || true) R.dimen.app_bar_header_height_playlist
+            if (model.canEdit || model.canPlay || model.canUpdate || model.shareVisible) R.dimen.app_bar_header_height_playlist
             else R.dimen.app_bar_header_height_playlist_no_actions
         )
         appBarOffsetScrollRange = -1
@@ -587,13 +587,13 @@ class PlaylistMviFragment : Fragment(),
         }
     }
 
-    private fun highlightPlayingItem(currentItemIndex: Int?) {
-        adapter.playingItem = currentItemIndex
-        _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemIndex))
+    private fun highlightPlayingItem(currentItemId: Identifier<GUID>?) {
+        adapter.playingItemId = currentItemId
+        _binding?.playlistItems?.setText(mapPlaylistIndexAndSize(currentItemId))
     }
 
-    private fun mapPlaylistIndexAndSize(currentItemIndex: Int?) =
-        "${currentItemIndex?.let { it + 1 }} / ${adapter.data.size}"
+    private fun mapPlaylistIndexAndSize(currentItemId: Identifier<GUID>?) =
+        "${adapter.currentItemIndex + 1} / ${adapter.data.size}"
 
     private fun showPlaylistSelector(model: PlaylistsMviDialogContract.Config) {
         dialogFragment?.dismissAllowingStateLoss()
@@ -672,10 +672,6 @@ class PlaylistMviFragment : Fragment(),
     private fun showMessage(message: String) {
         toastWrapper.show(message)
     }
-
-    private fun exit() {
-        findNavController().popBackStack()
-    }
     //endregion
 
     // region ItemContract.ItemMoveInteractions
@@ -711,7 +707,6 @@ class PlaylistMviFragment : Fragment(),
     override fun onLeftSwipe(item: Item) {
         val playlistItemModel = item
         adapter.notifyItemRemoved(playlistItemModel.index)
-        log.d("onLeftSwipe")
         viewProxy.dispatch(OnDeleteItem(item))
     }
 
@@ -742,7 +737,7 @@ class PlaylistMviFragment : Fragment(),
 
     // region ShareContract.Committer
     override suspend fun commit(afterCommit: ShareCommitter.AfterCommit) {
-        viewProxy.dispatch(Event.OnCommit(afterCommit))
+        viewProxy.dispatch(OnCommit(afterCommit))
     }
     // endregion
 
@@ -810,7 +805,9 @@ class PlaylistMviFragment : Fragment(),
                         multiPrefs = get(),
                         idGenerator = get(),
                         shareWrapper = get(),
-                        platformLauncher = get()
+                        platformLauncher = get(),
+                        paiMapper = get(),
+                        mediaUpdateFromPlatformUseCase = get(),
                     ).create()
                 }
                 scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }

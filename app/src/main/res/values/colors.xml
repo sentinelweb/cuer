@@ -27,7 +27,6 @@
     <color name="button_fg_tint">@color/default_tint</color>
     <color name="menu_button_icon_tint">@color/default_tint</color>
     <color name="chip_icon_tint">@color/black</color>
-    <color name="player_button_tint">@color/black</color>
     <color name="player_button_background_tint">@color/surface</color>
     <color name="player_button_ripple_tint">@color/grey_400</color>
     <color name="player_button_progress">@color/primary_variant</color>

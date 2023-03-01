@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
@@ -43,7 +44,11 @@ class CastPlayerFragment() :
     private val imageProvider: ImageProvider by inject()
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
+    private val log: LogWrapper by inject()
 
+    init {
+        log.tag(this)
+    }
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("CastPlayerViewBinding not bound")
 
@@ -88,6 +93,14 @@ class CastPlayerFragment() :
 
     override fun showSupport(media: MediaDomain) {
         SupportDialogFragment.show(requireActivity(), media)
+    }
+
+    override fun setNextTrackEnabled(nextTrackEnabled: Boolean) {
+        binding.castPlayerTrackNext.isEnabled = nextTrackEnabled
+    }
+
+    override fun setPrevTrackEnabled(prevTrackEnabled: Boolean) {
+        binding.castPlayerTrackLast.isEnabled = prevTrackEnabled
     }
 
     override fun onAttach(context: Context) {
@@ -191,6 +204,7 @@ class CastPlayerFragment() :
     }
 
     override fun setSeekEnabled(enabled: Boolean) {
+        //log.e("seekbar enabled: $enabled", Exception())
         binding.castPlayerSeek.isEnabled = enabled
     }
 
@@ -213,11 +227,7 @@ class CastPlayerFragment() :
         )
 
     companion object {
-        val TRANS_IMAGE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image)
-        }
-        val TRANS_TITLE by lazy {
-            get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title)
-        }
+        val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
+        val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
     }
 }

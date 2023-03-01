@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 fun MediaDomain.stringMedia(): String = "id=$id title=$title platform=$platform platformId=$platformId"
 
-fun MediaDomain.isLiveOrUpcoming() = isLiveBroadcastUpcoming || isLiveBroadcast
+fun MediaDomain?.isLiveOrUpcoming(): Boolean = (this?.let { isLiveBroadcastUpcoming || isLiveBroadcast } ?: false)
 
 fun MediaDomain.startPosition(): Long {
     val position = positon ?: -1L
