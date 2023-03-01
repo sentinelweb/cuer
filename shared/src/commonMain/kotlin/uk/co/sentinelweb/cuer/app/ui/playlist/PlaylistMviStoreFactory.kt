@@ -449,6 +449,8 @@ class PlaylistMviStoreFactory(
                         publish(Label.PlayItem(playlistItem = itemDomain, start = intent.start))
                     } else if (!canPlayPlaylistItem(itemDomain)) {
                         publish(Message(strings.get(StringResource.playlist_error_please_add)))
+                    } else if (itemDomain.media.isLiveBroadcastUpcoming) {
+                        publish(Message(strings.get(StringResource.playlist_error_upcoming)))
                     } else {
                         playUseCase.playLogic(paiMapper.map(itemDomain.playlistId!!, itemDomain), intent.start)
                     }
@@ -764,7 +766,7 @@ class PlaylistMviStoreFactory(
             itemsIdMap.get(itemModel.id)
 
         private fun canPlayPlaylistItem(itemDomain: PlaylistItemDomain) =
-            itemDomain.media.id?.source == LOCAL //|| itemDomain.id?.source == MEMORY || itemDomain.id?.source == LOCAL_NETWORK
+            itemDomain.media.id?.source == LOCAL//|| itemDomain.id?.source == MEMORY || itemDomain.id?.source == LOCAL_NETWORK
         // endregion utils
 
         // region loadRefresh

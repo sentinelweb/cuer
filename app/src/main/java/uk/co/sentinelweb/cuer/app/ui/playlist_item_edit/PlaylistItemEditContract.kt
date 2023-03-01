@@ -38,7 +38,7 @@ interface PlaylistItemEditContract {
         val isLive: Boolean,
         val isUpcoming: Boolean,
         @ColorRes val infoTextColor: Int,
-        val showPlay: Boolean,
+        val isPlayEnabled: Boolean,
         val itemText: CharSequence,
     )
 

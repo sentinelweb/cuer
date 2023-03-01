@@ -294,7 +294,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         if (model.empty) {
             return
         }
-        binding.pliePlayFab.isVisible = model.showPlay
+        binding.pliePlayFab.isVisible = model.isPlayEnabled
         binding.pliePlayFab.isEnabled = model.canPlay
         binding.plieDescription.setModel(model.description)
         binding.plieDuration.text = model.durationText

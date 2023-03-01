@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
-import android.os.Build
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.BuildConfig
@@ -88,12 +87,12 @@ class PlayerControlsNotificationMedia constructor(
                     .setShowCancelButton(true)
                     .setCancelButtonIntent(disconnectPendingIntent)
                     .run {
-                        // geting index out of bounds 6 on pixel 3a (android 11)- seems to be max 5 actions
-                        if (Build.VERSION.SDK_INT >= 30) {
-                            setShowActionsInCompactView(2, 4) // #2: pause or play button
-                        } else {
-                            setShowActionsInCompactView(2, 3, 4)
+                        val actionIndexes = mutableListOf(2) // #2: pause or play button
+                        if (state.nextEnabled) {
+                            actionIndexes.add(4) // #4: next button
                         }
+                        setShowActionsInCompactView(*actionIndexes.toIntArray())
+
                     }
             )
             .setContentTitle(buildTitle(state))
