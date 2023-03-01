@@ -158,11 +158,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
                                     ?.id
                                     ?.apply {
                                         navRouter.navigate(
-                                            PlaylistMviFragment.makeNav(
-                                                this.id,
-                                                play = false,
-                                                source = this.source
-                                            )
+                                            PlaylistMviFragment.makeNav(this.id, play = false, source = this.source)
                                         )
                                     }
                                     ?: snackbarWrapper.makeError(res.getString(R.string.browse_add_error, label.cat.title)).show()
