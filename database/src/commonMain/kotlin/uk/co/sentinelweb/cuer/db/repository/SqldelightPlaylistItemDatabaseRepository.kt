@@ -52,49 +52,51 @@ class SqldelightPlaylistItemDatabaseRepository(
         try {
             domain
                 .let { item ->
+                    // log.d("Save media check: flat: $flat, media.id=${item.media.id}, media.platformId=${item.media.platformId} media.duration=${item.media.duration}")
                     if (item.media.id?.source != source || !flat) {
-                        log.d("Save media check: ${item.media.platformId}")
+                        //log.d("Save media check: ${item.media.platformId}")
                         val saved = mediaDatabaseRepository.save(item.media, emit = emit, flat = false)
                             .takeIf { it.isSuccessful }
                             ?.data
                             ?: throw IllegalStateException("Save media failed ${item.media.platformId}")
+                        // log.d("Saved media check: flat: $flat, media.id=${saved.id}, media.platformId=${saved.platformId} media.duration=${saved.duration}")
                         item.copy(media = saved)
                     } else item
                 }
-//                .let { item ->
-//                    item to playlistItemMapper.map(item)
-//                }
-                .let { itemDomain ->
+                .let { toSaveDomain ->
                     with(database.playlistItemEntityQueries) {
                         val platformCheck = try {
                             loadItemsByMediaIdAndPlaylistId(
-                                mediaId = itemDomain.media.id!!.id.value, playlistId = itemDomain.playlistId!!.id.value
+                                mediaId = toSaveDomain.media.id!!.id.value,
+                                playlistId = toSaveDomain.playlistId!!.id.value
                             ).executeAsOne()
                         } catch (n: NullPointerException) {
                             null
                         }
-                        itemDomain to if (itemDomain.id?.source == source) {
-                            if (platformCheck != null && platformCheck.id != itemDomain.id!!.id.value) {
+                        toSaveDomain to if (toSaveDomain.id?.source == source) {
+                            if (platformCheck != null && platformCheck.id != toSaveDomain.id!!.id.value) {
                                 throw ConflictException(
-                                    "conflicting playlistitem id for ${itemDomain.media.id}_${itemDomain.playlistId!!.id}" +
-                                            " existing: ${platformCheck.id}  thisid: ${itemDomain.id} "
+                                    "conflicting playlistitem id for ${toSaveDomain.media.id}_${toSaveDomain.playlistId!!.id}" +
+                                            " existing: ${platformCheck.id}  thisid: ${toSaveDomain.id} "
                                 )
                             }
-                            update(playlistItemMapper.map(itemDomain))
-                            load(itemDomain.id!!.id.value).executeAsOne()
+                            update(playlistItemMapper.map(toSaveDomain))
+                            load(toSaveDomain.id!!.id.value).executeAsOne()
                         } else {
+                            // fixme some logic to add here need to merge the entities or throw conflict
                             if (platformCheck != null) {
-                                //throw ConflictException("playlistitem already exists: ${itemDomain.media.id}_${itemDomain.playlistId}")
+                                //throw ConflictException("playlistitem already exists: ${toSaveDomain.media.id}_${toSaveDomain.playlistId}")
                                 platformCheck
                             } else {
                                 guidCreator.create().toIdentifier(source)
-                                    .let { playlistItemMapper.map(itemDomain.copy(id = it)) }
+                                    .let { playlistItemMapper.map(toSaveDomain.copy(id = it)) }
                                     .also { create(it) }
                             }
                         }
                     }
                 }
-                .let { (domain, itemEntity) -> playlistItemMapper.map(itemEntity, domain.media) }
+                .let { (savedDomain, itemEntity) -> playlistItemMapper.map(itemEntity, savedDomain.media) }
+                //.also { log.d("Saved media check: flat: $flat, media.id=${it.media.id}, media.platformId=${it.media.platformId} media.duration=${it.media.duration}") }
                 .let { RepoResult.Data(it) }
                 .also {
                     if (emit) it.data
@@ -297,6 +299,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                             }
                             playlistItemMapper.map(itemDomain).also { update(it) }
                         } else {
+                            // fixme some logic to sort here possibly need to merge the entities
                             if (platformCheck != null) {
                                 //throw ConflictException("playlistitem already exists: ${itemDomain.media.id!!.id.value}_${itemDomain.playlistId!!.id.value}")
                                 platformCheck
