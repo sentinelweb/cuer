@@ -73,8 +73,6 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
     private var _binding: FragmentPlaylistItemEditBinding? = null
 
-    //    private val playMenuItem: MenuItem
-//        get() = binding.plieToolbar.menu.findItem(R.id.plie_play)
     private val helpMenuItem: MenuItem
         get() = binding.plieToolbar.menu.findItem(R.id.plie_help)
 
