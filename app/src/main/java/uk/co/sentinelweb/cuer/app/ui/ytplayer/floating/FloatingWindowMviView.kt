@@ -23,6 +23,7 @@ class FloatingWindowMviView(
     PlayerContract.View {
 
     private var currentItem: PlaylistAndItemDomain? = null
+    private var currentButtons: Model.Buttons? = null
 
     var mainPlayControls: PlayerContract.PlayerControls? = null
         get() = field
@@ -33,6 +34,7 @@ class FloatingWindowMviView(
                 value.addListener(controlsListener)
             }
             field = value
+            currentButtons?.let { value?.setButtons(it) }
         }
 
     fun init() {
@@ -69,6 +71,7 @@ class FloatingWindowMviView(
             }
         })
         diff(get = Model::buttons, set = { buttons ->
+            currentButtons = buttons
             mainPlayControls?.setButtons(buttons)
         })
     }
