@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+        android:layout_height="match_parent"
 >
 
-    <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
-        android:id="@+id/fullscreen_video_wrapper"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    >
+    <!--    <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout-->
+    <!--            android:id="@+id/fullscreen_video_wrapper"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            app:layout_constraintLeft_toLeftOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--    >-->
 
-        <FrameLayout
+    <FrameLayout
             android:id="@+id/player_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -23,86 +23,91 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-        />
-    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>
+    />
+    <!--    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>-->
 
     <FrameLayout
-        android:id="@+id/floating_player_controls"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-    >
-        <View
-            android:id="@+id/floating_player_block_title"
+            android:id="@+id/floating_player_controls"
             android:layout_width="match_parent"
-            android:layout_height="68dp"/>
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+    >
+        <!--        <View-->
+        <!--            android:id="@+id/floating_player_block_title"-->
+        <!--            android:layout_width="match_parent"-->
+        <!--            android:layout_height="68dp"/>-->
+
+        <uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.MultiTouchView
+                android:id="@+id/floating_player_multi_touch"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
         <ImageView
-            android:id="@+id/floating_player_close"
-            android:layout_width="@dimen/floating_player_button_size"
-            android:layout_height="@dimen/floating_player_button_size"
-            android:background="@drawable/circle_gradient_top_left"
-            android:contentDescription="Close"
-            android:paddingStart="@dimen/floating_player_button_inner_padding"
-            android:paddingTop="@dimen/floating_player_button_inner_padding"
-            android:paddingEnd="@dimen/floating_player_button_outer_padding"
-            android:paddingBottom="@dimen/floating_player_button_outer_padding"
-            android:src="@drawable/ic_notif_close_white"
-            app:tint="@color/white"
-            tools:ignore="HardcodedText"
+                android:id="@+id/floating_player_close"
+                android:layout_width="@dimen/floating_player_button_size"
+                android:layout_height="@dimen/floating_player_button_size"
+                android:background="@drawable/circle_gradient_top_left"
+                android:contentDescription="Close"
+                android:paddingStart="@dimen/floating_player_button_inner_padding"
+                android:paddingTop="@dimen/floating_player_button_inner_padding"
+                android:paddingEnd="@dimen/floating_player_button_outer_padding"
+                android:paddingBottom="@dimen/floating_player_button_outer_padding"
+                android:src="@drawable/ic_notif_close_white"
+                app:tint="@color/white"
+                tools:ignore="HardcodedText"
         />
 
         <ImageView
-            android:id="@+id/floating_player_launch"
-            android:layout_width="@dimen/floating_player_button_size"
-            android:layout_height="@dimen/floating_player_button_size"
-            android:layout_gravity="bottom|start"
-            android:background="@drawable/circle_gradient_bottom_left"
-            android:contentDescription="Launch"
-            android:paddingStart="@dimen/floating_player_button_inner_padding"
-            android:paddingBottom="@dimen/floating_player_button_inner_padding"
-            android:paddingEnd="@dimen/floating_player_button_outer_padding"
-            android:paddingTop="@dimen/floating_player_button_outer_padding"
-            android:src="@drawable/ic_portrait"
-            app:tint="@color/white"
-            tools:ignore="HardcodedText"
+                android:id="@+id/floating_player_launch"
+                android:layout_width="@dimen/floating_player_button_size"
+                android:layout_height="@dimen/floating_player_button_size"
+                android:layout_gravity="bottom|start"
+                android:background="@drawable/circle_gradient_bottom_left"
+                android:contentDescription="Launch"
+                android:paddingStart="@dimen/floating_player_button_inner_padding"
+                android:paddingBottom="@dimen/floating_player_button_inner_padding"
+                android:paddingEnd="@dimen/floating_player_button_outer_padding"
+                android:paddingTop="@dimen/floating_player_button_outer_padding"
+                android:src="@drawable/ic_portrait"
+                app:tint="@color/white"
+                tools:ignore="HardcodedText"
         />
 
-        <ImageView
-            android:id="@+id/floating_player_resize"
-            android:layout_width="@dimen/floating_player_button_size"
-            android:layout_height="@dimen/floating_player_button_size"
-            android:layout_gravity="top|end"
-            android:background="@drawable/circle_gradient_top_right"
-            android:contentDescription="Resize"
-            android:paddingStart="@dimen/floating_player_button_outer_padding"
-            android:paddingTop="@dimen/floating_player_button_inner_padding"
-            android:paddingEnd="@dimen/floating_player_button_inner_padding"
-            android:paddingBottom="@dimen/floating_player_button_outer_padding"
-            android:src="@drawable/ic_resize"
-            app:tint="@color/white"
-            tools:ignore="HardcodedText"
-        />
+        <!--        <ImageView-->
+        <!--            android:id="@+id/floating_player_resize"-->
+        <!--            android:layout_width="@dimen/floating_player_button_size"-->
+        <!--            android:layout_height="@dimen/floating_player_button_size"-->
+        <!--            android:layout_gravity="top|end"-->
+        <!--            android:background="@drawable/circle_gradient_top_right"-->
+        <!--            android:contentDescription="Resize"-->
+        <!--            android:paddingStart="@dimen/floating_player_button_outer_padding"-->
+        <!--            android:paddingTop="@dimen/floating_player_button_inner_padding"-->
+        <!--            android:paddingEnd="@dimen/floating_player_button_inner_padding"-->
+        <!--            android:paddingBottom="@dimen/floating_player_button_outer_padding"-->
+        <!--            android:src="@drawable/ic_resize"-->
+        <!--            app:tint="@color/white"-->
+        <!--            tools:ignore="HardcodedText"-->
+        <!--        />-->
 
-        <ImageView
-            android:id="@+id/floating_player_move"
-            android:layout_width="@dimen/floating_player_button_size"
-            android:layout_height="@dimen/floating_player_button_size"
-            android:layout_gravity="bottom|end"
-            android:background="@drawable/circle_gradient_bottom_right"
-            android:contentDescription="Move"
-            android:paddingStart="@dimen/floating_player_button_outer_padding"
-            android:paddingTop="@dimen/floating_player_button_outer_padding"
-            android:paddingEnd="@dimen/floating_player_button_inner_padding"
-            android:paddingBottom="@dimen/floating_player_button_inner_padding"
-            android:src="@drawable/ic_move"
-            app:tint="@color/white"
-            tools:ignore="HardcodedText"
-        />
+        <!--        <ImageView-->
+        <!--            android:id="@+id/floating_player_move"-->
+        <!--            android:layout_width="@dimen/floating_player_button_size"-->
+        <!--            android:layout_height="@dimen/floating_player_button_size"-->
+        <!--            android:layout_gravity="bottom|end"-->
+        <!--            android:background="@drawable/circle_gradient_bottom_right"-->
+        <!--            android:contentDescription="Move"-->
+        <!--            android:paddingStart="@dimen/floating_player_button_outer_padding"-->
+        <!--            android:paddingTop="@dimen/floating_player_button_outer_padding"-->
+        <!--            android:paddingEnd="@dimen/floating_player_button_inner_padding"-->
+        <!--            android:paddingBottom="@dimen/floating_player_button_inner_padding"-->
+        <!--            android:src="@drawable/ic_move"-->
+        <!--            app:tint="@color/white"-->
+        <!--            tools:ignore="HardcodedText"-->
+        <!--        />-->
 
     </FrameLayout>
 

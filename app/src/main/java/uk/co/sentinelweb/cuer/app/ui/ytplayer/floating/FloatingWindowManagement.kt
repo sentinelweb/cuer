@@ -3,25 +3,19 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 import android.app.Service
 import android.content.Context
 import android.graphics.PixelFormat
+import android.graphics.PointF
 import android.graphics.Rect
 import android.os.Build
 import android.util.DisplayMetrics
-import android.view.*
-import android.view.View.OnTouchListener
+import android.view.Gravity
+import android.view.LayoutInflater
+import android.view.WindowManager
 import androidx.core.view.ViewCompat
-import androidx.core.view.isVisible
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.WindowAytFloatBinding
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
-import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.FLOATING_PLAYER_RECT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import kotlin.math.max
 
 class FloatingWindowManagement(
     private val service: Service,
@@ -41,8 +35,8 @@ class FloatingWindowManagement(
     private var _windowManager: WindowManager? = null
     lateinit var callbacks: Callbacks
 
-    val binding: WindowAytFloatBinding?
-        get() = _binding
+    val binding: WindowAytFloatBinding
+        get() = _binding!!
 
     fun makeWindowWithView() {
         // The screen height and width are calculated, cause
@@ -66,108 +60,146 @@ class FloatingWindowManagement(
         // problem with this flag is key inputs can't be given to the EditText.
         // This problem is solved later.
         // 5) Next parameter is Layout_Format. System chooses a format that supports translucency by PixelFormat.TRANSLUCENT
-        _floatWindowLayoutParam = loadWindowParams() ?: defaultWindowParams(displayWidth, displayHeight)
+        _floatWindowLayoutParam = /*loadWindowParams() ?:*/ defaultWindowParams(displayWidth, displayHeight)
 
         // The ViewGroup that inflates the floating_layout.xml is
         // added to the WindowManager with all the parameters
         _windowManager?.addView(_binding!!.root, _floatWindowLayoutParam)
 
-        addMoveTouchListener()
-        addResizeTouchListener()
-        binding?.floatingPlayerClose?.setOnClickListener {
+//        addMoveTouchListener()
+//        addResizeTouchListener()
+        binding.floatingPlayerClose.setOnClickListener {
             callbacks.onClose()
         }
-        binding?.floatingPlayerLaunch?.setOnClickListener {
+        binding.floatingPlayerLaunch.setOnClickListener {
             callbacks.onLaunch()
         }
 
-        binding?.floatingPlayerBlockTitle?.setOnClickListener { callbacks.onPlayPause() }
-
-        binding?.fullscreenVideoWrapper?.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
-            override fun touched() {
-                binding?.floatingPlayerControls?.apply {
-                    if (!isVisible) {
-                        coroutineContextProvider.mainScope.launch {
-                            delay(2000)
-                            fadeOut()
-                        }
-                    }
-                    if (isVisible) fadeOut() else fadeIn()
-                }
-            }
-        }
+        //binding?.floatingPlayerBlockTitle?.setOnClickListener { callbacks.onPlayPause() }
+        listenMutliTouch()
+//        binding.fullscreenVideoWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
+//            override fun touched() {
+//                binding.floatingPlayerControls.apply {
+//                    if (!isVisible) {
+//                        coroutineContextProvider.mainScope.launch {
+//                            delay(2000)
+//                            fadeOut()
+//                        }
+//                    }
+//                    if (isVisible) fadeOut() else fadeIn()
+//                }
+//            }
+//        }
         updateGestureExclusion()
     }
 
-    private fun addMoveTouchListener() {
-        binding?.floatingPlayerMove?.setOnTouchListener(object : OnTouchListener {
-            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
-            var x = 0.0
-            var y = 0.0
-            var sx = 0.0
-            var sy = 0.0
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        x = floatWindowLayoutUpdateParam.x.toDouble()
-                        y = floatWindowLayoutUpdateParam.y.toDouble()
-                        sx = event.rawX.toDouble()
-                        sy = event.rawY.toDouble()
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        floatWindowLayoutUpdateParam.x = (x + event.rawX - sx).toInt()
-                        floatWindowLayoutUpdateParam.y = (y + event.rawY - sy).toInt()
+    // listen for multitouch view
+    private fun listenMutliTouch() {
+        binding.floatingPlayerMultiTouch.callbacks = object : MultiTouchView.Callbacks {
+            private lateinit var floatWindowLayoutUpdateParam: WindowManager.LayoutParams
+            private var initialSize: PointF? = null
 
-                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
-                        saveWindowParams()
-                        updateGestureExclusion()
-                    }
-                }
-                return true
+            override fun onDown() {
+                floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
+                initialSize =
+                    PointF(_floatWindowLayoutParam!!.width.toFloat(), _floatWindowLayoutParam!!.height.toFloat())
             }
-        })
+
+            override fun onResize(currentScale: Float) {
+                floatWindowLayoutUpdateParam.width = (initialSize!!.x * currentScale).toInt()
+                floatWindowLayoutUpdateParam.height = (initialSize!!.y * currentScale).toInt()
+                _windowManager!!.updateViewLayout(binding.root, floatWindowLayoutUpdateParam)
+            }
+
+            override fun onMove(dx: Float, dy: Float) {
+                floatWindowLayoutUpdateParam.x += dx.toInt();
+                floatWindowLayoutUpdateParam.y += dy.toInt();
+                _windowManager!!.updateViewLayout(binding.root, floatWindowLayoutUpdateParam)
+            }
+
+            override fun onClick() {
+                callbacks.onPlayPause()
+            }
+
+            override fun onCommit() {
+                initialSize = null
+                _floatWindowLayoutParam = floatWindowLayoutUpdateParam
+                saveWindowParams()
+                updateGestureExclusion()
+            }
+        }
     }
 
-    private fun addResizeTouchListener() {
-        _binding?.floatingPlayerResize?.setOnTouchListener(object : OnTouchListener {
-            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
-            var w = 0.0
-            var h = 0.0
-            var sx = 0.0
-            var sy = 0.0
-            var minSize = res.getDimensionPixelSize(R.dimen.min_floating_window_size).toDouble()
-            override fun onTouch(v: View, event: MotionEvent): Boolean {
-                when (event.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        w = floatWindowLayoutUpdateParam.width.toDouble()
-                        h = floatWindowLayoutUpdateParam.height.toDouble()
-                        sx = event.rawX.toDouble()
-                        sy = event.rawY.toDouble()
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        floatWindowLayoutUpdateParam.width = max(w + (event.rawX - sx), minSize).toInt()
-                        floatWindowLayoutUpdateParam.height = max(h - (event.rawY - sy), minSize).toInt()
 
-                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
-                        saveWindowParams()
-                        updateGestureExclusion()
-                    }
-                }
-                return true
-            }
-        })
-    }
+//    private fun addMoveTouchListener() {
+//        binding?.floatingPlayerMove?.setOnTouchListener(object : OnTouchListener {
+//            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
+//            var x = 0.0
+//            var y = 0.0
+//            var sx = 0.0
+//            var sy = 0.0
+//            override fun onTouch(v: View, event: MotionEvent): Boolean {
+//                when (event.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        x = floatWindowLayoutUpdateParam.x.toDouble()
+//                        y = floatWindowLayoutUpdateParam.y.toDouble()
+//                        sx = event.rawX.toDouble()
+//                        sy = event.rawY.toDouble()
+//                    }
+//                    MotionEvent.ACTION_MOVE -> {
+//                        floatWindowLayoutUpdateParam.x = (x + event.rawX - sx).toInt()
+//                        floatWindowLayoutUpdateParam.y = (y + event.rawY - sy).toInt()
+//
+//                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
+//                    }
+//                    MotionEvent.ACTION_UP -> {
+//                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
+//                        saveWindowParams()
+//                        updateGestureExclusion()
+//                    }
+//                }
+//                return true
+//            }
+//        })
+//    }
+//
+//    private fun addResizeTouchListener() {
+//        _binding?.floatingPlayerResize?.setOnTouchListener(object : OnTouchListener {
+//            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
+//            var w = 0.0
+//            var h = 0.0
+//            var sx = 0.0
+//            var sy = 0.0
+//            var minSize = res.getDimensionPixelSize(R.dimen.min_floating_window_size).toDouble()
+//            override fun onTouch(v: View, event: MotionEvent): Boolean {
+//                when (event.action) {
+//                    MotionEvent.ACTION_DOWN -> {
+//                        w = floatWindowLayoutUpdateParam.width.toDouble()
+//                        h = floatWindowLayoutUpdateParam.height.toDouble()
+//                        sx = event.rawX.toDouble()
+//                        sy = event.rawY.toDouble()
+//                    }
+//                    MotionEvent.ACTION_MOVE -> {
+//                        floatWindowLayoutUpdateParam.width = max(w + (event.rawX - sx), minSize).toInt()
+//                        floatWindowLayoutUpdateParam.height = max(h - (event.rawY - sy), minSize).toInt()
+//
+//                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
+//                    }
+//                    MotionEvent.ACTION_UP -> {
+//                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
+//                        saveWindowParams()
+//                        updateGestureExclusion()
+//                    }
+//                }
+//                return true
+//            }
+//        })
+//    }
 
     private fun updateGestureExclusion() {
         if (Build.VERSION.SDK_INT < 29) return
-        val rect = _floatWindowLayoutParam!!.run{Rect(x, y, x + width, y + height)}
-        ViewCompat.setSystemGestureExclusionRects(binding!!.root, listOf(rect))
+        val rect = _floatWindowLayoutParam!!.run { Rect(x, y, x + width, y + height) }
+        ViewCompat.setSystemGestureExclusionRects(binding.root, listOf(rect))
     }
 
     fun saveWindowParams() {
