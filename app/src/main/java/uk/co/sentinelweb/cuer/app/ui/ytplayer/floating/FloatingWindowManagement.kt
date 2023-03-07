@@ -186,9 +186,9 @@ class FloatingWindowManagement(
         when (it) {
             PlayerStateDomain.PLAYING -> setPlayIndicator(R.drawable.ic_player_play)
             PlayerStateDomain.PAUSED -> setPlayIndicator(R.drawable.ic_player_pause)
-            PlayerStateDomain.BUFFERING,
-            PlayerStateDomain.UNKNOWN,
-            PlayerStateDomain.VIDEO_CUED -> setPlayIndicator(R.drawable.ic_refresh)
+//            PlayerStateDomain.BUFFERING,
+//            PlayerStateDomain.UNKNOWN,
+//            PlayerStateDomain.VIDEO_CUED -> setPlayIndicator(R.drawable.ic_refresh)
 
             else -> binding.floatingPlayerPause.isVisible = false
         }
