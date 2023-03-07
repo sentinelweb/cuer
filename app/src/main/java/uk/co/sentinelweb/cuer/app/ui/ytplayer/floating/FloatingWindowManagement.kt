@@ -119,11 +119,16 @@ class FloatingWindowManagement(
                 _windowManager!!.updateViewLayout(binding.root, floatWindowLayoutUpdateParam)
             }
 
-            override fun onResize(currentScale: Float) {
+            override fun onResize(currentScale: PointF) {
+//                floatWindowLayoutUpdateParam.width =
+//                    min(max((initialSize!!.x * currentScale).toInt(), minSize), maxWidth)
+//                floatWindowLayoutUpdateParam.height =
+//                    min(max((initialSize!!.y * currentScale).toInt(), minSize), maxHeight)
+                val scaleFactor = 0.70
                 floatWindowLayoutUpdateParam.width =
-                    min(max((initialSize!!.x * currentScale).toInt(), minSize), maxWidth)
+                    min(max((initialSize!!.x * currentScale.x * scaleFactor).toInt(), minSize), maxWidth)
                 floatWindowLayoutUpdateParam.height =
-                    min(max((initialSize!!.y * currentScale).toInt(), minSize), maxHeight)
+                    min(max((initialSize!!.y * currentScale.y * scaleFactor).toInt(), minSize), maxHeight)
                 _windowManager!!.updateViewLayout(binding.root, floatWindowLayoutUpdateParam)
             }
 
