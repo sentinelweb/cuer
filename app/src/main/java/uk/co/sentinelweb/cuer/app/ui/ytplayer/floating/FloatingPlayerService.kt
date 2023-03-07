@@ -128,7 +128,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                     ).create()
                 }
                 scoped { FloatingWindowMviView(get(), get(), get(), get()) }
-                scoped { FloatingWindowManagement(get(), get(), get(), get()) }
+                scoped { FloatingWindowManagement(get(), get(), get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = EmptySkipView(),
