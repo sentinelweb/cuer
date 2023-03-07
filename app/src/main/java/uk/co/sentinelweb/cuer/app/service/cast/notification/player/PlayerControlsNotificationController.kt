@@ -3,19 +3,15 @@ package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import android.os.Build
-import androidx.core.graphics.scale
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_DISCONNECTED
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
-import uk.co.sentinelweb.cuer.app.util.extension.cropShapedBitmap
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -109,20 +105,7 @@ class PlayerControlsNotificationController constructor(
 
     inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
         override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap?>?) {
-            state.bitmap = if (Build.VERSION.SDK_INT >= 30) {
-                try {
-                    val targetWidth = res.getDimensionPixelSize(R.dimen.notif_image_size_sdk_31)
-                    val aspect = bitmap.height / bitmap.width
-                    bitmap
-                        .scale(targetWidth, targetWidth * aspect)
-                        .cropShapedBitmap(res)
-                } catch (e: Exception) {
-                    log.e("Exception resizing bitmap", e)
-                    bitmap
-                }
-            } else {
-                bitmap
-            }
+            state.bitmap = bitmap
             view.showNotification(state)
         }
 
