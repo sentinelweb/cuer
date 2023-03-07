@@ -6,14 +6,6 @@
         android:layout_height="match_parent"
 >
 
-    <!--    <uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout-->
-    <!--            android:id="@+id/fullscreen_video_wrapper"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--            app:layout_constraintTop_toTopOf="parent"-->
-    <!--    >-->
-
     <FrameLayout
             android:id="@+id/player_container"
             android:layout_width="match_parent"
@@ -24,7 +16,6 @@
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
     />
-    <!--    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>-->
 
     <uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.MultiTouchView
             android:id="@+id/floating_player_multi_touch"
@@ -41,10 +32,22 @@
             app:layout_constraintStart_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
     >
-        <!--        <View-->
-        <!--            android:id="@+id/floating_player_block_title"-->
-        <!--            android:layout_width="match_parent"-->
-        <!--            android:layout_height="68dp"/>-->
+
+        <ImageView
+                android:id="@+id/floating_player_pause"
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_gravity="center"
+                android:background="@drawable/circle_gradient"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp"
+                android:src="@drawable/ic_play"
+                android:tint="@color/white"
+                app:tint="@color/white"
+                tools:ignore="ContentDescription,HardcodedText,UseAppTint"
+        />
 
         <ImageView
                 android:id="@+id/floating_player_close"
@@ -76,38 +79,6 @@
                 app:tint="@color/white"
                 tools:ignore="HardcodedText"
         />
-
-        <!--        <ImageView-->
-        <!--            android:id="@+id/floating_player_resize"-->
-        <!--            android:layout_width="@dimen/floating_player_button_size"-->
-        <!--            android:layout_height="@dimen/floating_player_button_size"-->
-        <!--            android:layout_gravity="top|end"-->
-        <!--            android:background="@drawable/circle_gradient_top_right"-->
-        <!--            android:contentDescription="Resize"-->
-        <!--            android:paddingStart="@dimen/floating_player_button_outer_padding"-->
-        <!--            android:paddingTop="@dimen/floating_player_button_inner_padding"-->
-        <!--            android:paddingEnd="@dimen/floating_player_button_inner_padding"-->
-        <!--            android:paddingBottom="@dimen/floating_player_button_outer_padding"-->
-        <!--            android:src="@drawable/ic_resize"-->
-        <!--            app:tint="@color/white"-->
-        <!--            tools:ignore="HardcodedText"-->
-        <!--        />-->
-
-        <!--        <ImageView-->
-        <!--            android:id="@+id/floating_player_move"-->
-        <!--            android:layout_width="@dimen/floating_player_button_size"-->
-        <!--            android:layout_height="@dimen/floating_player_button_size"-->
-        <!--            android:layout_gravity="bottom|end"-->
-        <!--            android:background="@drawable/circle_gradient_bottom_right"-->
-        <!--            android:contentDescription="Move"-->
-        <!--            android:paddingStart="@dimen/floating_player_button_outer_padding"-->
-        <!--            android:paddingTop="@dimen/floating_player_button_outer_padding"-->
-        <!--            android:paddingEnd="@dimen/floating_player_button_inner_padding"-->
-        <!--            android:paddingBottom="@dimen/floating_player_button_inner_padding"-->
-        <!--            android:src="@drawable/ic_move"-->
-        <!--            app:tint="@color/white"-->
-        <!--            tools:ignore="HardcodedText"-->
-        <!--        />-->
 
     </FrameLayout>
 

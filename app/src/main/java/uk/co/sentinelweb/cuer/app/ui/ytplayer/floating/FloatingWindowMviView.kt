@@ -40,7 +40,7 @@ class FloatingWindowMviView(
     fun init() {
 //        notification.setIcon(R.drawable.ic_picture_in_picture)
         notification.setIcon(R.drawable.ic_play_yang_combined)
-        aytViewHolder.addView(service.baseContext, windowManagement.binding!!.playerContainer, this, false)
+        aytViewHolder.addView(service.baseContext, windowManagement.binding.playerContainer, this, false)
     }
 
 
@@ -53,6 +53,7 @@ class FloatingWindowMviView(
             notification.setPlayerState(it)
             mainPlayControls
                 ?.apply { setPlayerState(it) }
+            windowManagement.setPlayerState(it)
         })
         diff(get = Model::texts, set = {
             it.playlistTitle

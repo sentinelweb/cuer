@@ -9,6 +9,9 @@ import android.os.Build
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.WindowManager
+import android.view.WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+import android.view.WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
+import androidx.annotation.DrawableRes
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
 import kotlinx.coroutines.delay
@@ -22,6 +25,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import kotlin.math.max
 import kotlin.math.min
 
@@ -51,21 +55,18 @@ class FloatingWindowManagement(
         get() = _binding!!
 
     fun makeWindowWithView() {
-        //val metrics: DisplayMetrics = service.getApplicationContext().getResources().getDisplayMetrics()
-        val displayWidth = res.screenWidth //metrics.widthPixels
-        val displayHeight = res.screenHeight //metrics.heightPixels
+        val displayWidth = res.screenWidth
+        val displayHeight = res.screenHeight
 
         _windowManager = service.getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
         val layoutInflater = service.baseContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         _binding = WindowAytFloatBinding.inflate(layoutInflater)
 
-        _floatWindowLayoutParam = /*loadWindowParams() ?:*/ defaultWindowParams(displayWidth, displayHeight)
+        _floatWindowLayoutParam = loadWindowParams() ?: defaultWindowParams(displayWidth, displayHeight)
 
         _windowManager?.addView(_binding!!.root, _floatWindowLayoutParam)
 
-//        addMoveTouchListener()
-//        addResizeTouchListener()
         binding.floatingPlayerClose.setOnClickListener {
             callbacks.onClose()
         }
@@ -73,25 +74,10 @@ class FloatingWindowManagement(
             callbacks.onLaunch()
         }
 
-        //binding?.floatingPlayerBlockTitle?.setOnClickListener { callbacks.onPlayPause() }
         listenMutliTouch()
-//        binding.fullscreenVideoWrapper.listener = object : InterceptorFrameLayout.OnTouchInterceptListener {
-//            override fun touched() {
-//                binding.floatingPlayerControls.apply {
-//                    if (!isVisible) {
-//                        coroutineContextProvider.mainScope.launch {
-//                            delay(2000)
-//                            fadeOut()
-//                        }
-//                    }
-//                    if (isVisible) fadeOut() else fadeIn()
-//                }
-//            }
-//        }
         updateGestureExclusion()
     }
 
-    // listen for multitouch view
     private fun listenMutliTouch() {
         binding.floatingPlayerMultiTouch.callbacks = object : MultiTouchView.Callbacks {
             private lateinit var floatWindowLayoutUpdateParam: WindowManager.LayoutParams
@@ -105,7 +91,7 @@ class FloatingWindowManagement(
                 floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
                 initialSize = _floatWindowLayoutParam!!.run { PointF(width.toFloat(), height.toFloat()) }
                 initialPosition = _floatWindowLayoutParam!!.run { PointF(x.toFloat(), y.toFloat()) }
-                showControls() // todo check this works on device
+                showControls()
             }
 
             override fun onMove(dx: Float, dy: Float) {
@@ -120,10 +106,6 @@ class FloatingWindowManagement(
             }
 
             override fun onResize(currentScale: PointF) {
-//                floatWindowLayoutUpdateParam.width =
-//                    min(max((initialSize!!.x * currentScale).toInt(), minSize), maxWidth)
-//                floatWindowLayoutUpdateParam.height =
-//                    min(max((initialSize!!.y * currentScale).toInt(), minSize), maxHeight)
                 val scaleFactor = 0.70
                 floatWindowLayoutUpdateParam.width =
                     min(max((initialSize!!.x * currentScale.x * scaleFactor).toInt(), minSize), maxWidth)
@@ -133,7 +115,6 @@ class FloatingWindowManagement(
             }
 
             override fun onClick() {
-                // fixme this is not working
                 callbacks.onPlayPause()
             }
 
@@ -159,71 +140,6 @@ class FloatingWindowManagement(
         }
     }
 
-//    private fun addMoveTouchListener() {
-//        binding?.floatingPlayerMove?.setOnTouchListener(object : OnTouchListener {
-//            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
-//            var x = 0.0
-//            var y = 0.0
-//            var sx = 0.0
-//            var sy = 0.0
-//            override fun onTouch(v: View, event: MotionEvent): Boolean {
-//                when (event.action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        x = floatWindowLayoutUpdateParam.x.toDouble()
-//                        y = floatWindowLayoutUpdateParam.y.toDouble()
-//                        sx = event.rawX.toDouble()
-//                        sy = event.rawY.toDouble()
-//                    }
-//                    MotionEvent.ACTION_MOVE -> {
-//                        floatWindowLayoutUpdateParam.x = (x + event.rawX - sx).toInt()
-//                        floatWindowLayoutUpdateParam.y = (y + event.rawY - sy).toInt()
-//
-//                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
-//                    }
-//                    MotionEvent.ACTION_UP -> {
-//                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
-//                        saveWindowParams()
-//                        updateGestureExclusion()
-//                    }
-//                }
-//                return true
-//            }
-//        })
-//    }
-//
-//    private fun addResizeTouchListener() {
-//        _binding?.floatingPlayerResize?.setOnTouchListener(object : OnTouchListener {
-//            val floatWindowLayoutUpdateParam = _floatWindowLayoutParam!!
-//            var w = 0.0
-//            var h = 0.0
-//            var sx = 0.0
-//            var sy = 0.0
-//            var minSize = res.getDimensionPixelSize(R.dimen.min_floating_window_size).toDouble()
-//            override fun onTouch(v: View, event: MotionEvent): Boolean {
-//                when (event.action) {
-//                    MotionEvent.ACTION_DOWN -> {
-//                        w = floatWindowLayoutUpdateParam.width.toDouble()
-//                        h = floatWindowLayoutUpdateParam.height.toDouble()
-//                        sx = event.rawX.toDouble()
-//                        sy = event.rawY.toDouble()
-//                    }
-//                    MotionEvent.ACTION_MOVE -> {
-//                        floatWindowLayoutUpdateParam.width = max(w + (event.rawX - sx), minSize).toInt()
-//                        floatWindowLayoutUpdateParam.height = max(h - (event.rawY - sy), minSize).toInt()
-//
-//                        _windowManager!!.updateViewLayout(_binding?.root, floatWindowLayoutUpdateParam)
-//                    }
-//                    MotionEvent.ACTION_UP -> {
-//                        _floatWindowLayoutParam = floatWindowLayoutUpdateParam
-//                        saveWindowParams()
-//                        updateGestureExclusion()
-//                    }
-//                }
-//                return true
-//            }
-//        })
-//    }
-
     private fun updateGestureExclusion() {
         if (Build.VERSION.SDK_INT < 29) return
         val rect = _floatWindowLayoutParam!!.run { Rect(x, y, x + width, y + height) }
@@ -242,8 +158,8 @@ class FloatingWindowManagement(
             WindowManager.LayoutParams(
                 split[2].toInt(),
                 split[3].toInt(),
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
+                TYPE_APPLICATION_OVERLAY,
+                FLAG_NOT_FOCUSABLE,
                 PixelFormat.TRANSLUCENT
             ).apply {
                 gravity = Gravity.START or Gravity.TOP
@@ -254,24 +170,33 @@ class FloatingWindowManagement(
 
     private fun defaultWindowParams(dWidth: Int, dHeight: Int): WindowManager.LayoutParams {
         val width = (dWidth * 0.55f).toInt()
-        val height = (width * 3f / 4).toInt()
+        val height = (width * 9f / 16).toInt()
         val top = 0
         val left = dWidth - width
         return WindowManager.LayoutParams(
-            width,
-            height,
-            WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
-            PixelFormat.TRANSLUCENT
-        ).apply {
-            gravity = Gravity.START or Gravity.TOP
-            x = left
-            y = top
-        }
+            width, height, TYPE_APPLICATION_OVERLAY, FLAG_NOT_FOCUSABLE, PixelFormat.TRANSLUCENT
+        ).apply { gravity = Gravity.START or Gravity.TOP; x = left; y = top }
     }
 
     fun cleanup() {
         _windowManager?.removeView(_binding!!.root)
     }
 
+    fun setPlayerState(it: PlayerStateDomain) {
+        when (it) {
+            PlayerStateDomain.PLAYING -> setPlayIndicator(R.drawable.ic_player_play)
+            PlayerStateDomain.PAUSED -> setPlayIndicator(R.drawable.ic_player_pause)
+            PlayerStateDomain.BUFFERING,
+            PlayerStateDomain.UNKNOWN,
+            PlayerStateDomain.VIDEO_CUED -> setPlayIndicator(R.drawable.ic_refresh)
+
+            else -> binding.floatingPlayerPause.isVisible = false
+        }
+    }
+
+    private fun setPlayIndicator(@DrawableRes drawable: Int) {
+        binding.floatingPlayerPause.isVisible = true
+        binding.floatingPlayerPause.setImageResource(drawable)
+        showControls()
+    }
 }

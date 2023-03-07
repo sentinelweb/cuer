@@ -38,7 +38,6 @@ class MultiTouchView @JvmOverloads constructor(
                 MotionEvent.ACTION_DOWN -> {
                     if (event.pointerCount == 1) {
                         startPoint.set(event.x, event.y)
-                        // log.d("ACTION_DOWN: $startPoint")
                         callbacks?.onDown()
                     }
                 }
@@ -48,13 +47,11 @@ class MultiTouchView @JvmOverloads constructor(
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    log.d("ACTION_MOVE: ${event.pointerCount} ${event.x} ${event.y} ${event.pointerCount}}")
                     when {
                         event.pointerCount == 1 -> {
                             val dx = event.x - startPoint.x
                             val dy = event.y - startPoint.y
                             isDragging = isDragging || dx > 0 || dy > 0
-                            // log.d("move: $dx, $dy")
                             if (currentScale == null) {
                                 callbacks?.onMove(dx, dy)
                             }
@@ -103,13 +100,11 @@ class MultiTouchView @JvmOverloads constructor(
         val x = event.getX(0) - event.getX(1)
         val y = event.getY(0) - event.getY(1)
         return PointF(x, y)
-        //return Math.sqrt((x * x + y * y).toDouble()).toFloat()
     }
 
     override fun performClick(): Boolean {
         super.performClick()
         callbacks?.onClick()
-        log.d("click: ")
         return true
     }
 }
