@@ -16,9 +16,9 @@ class MultiTouchView @JvmOverloads constructor(
 ) : View(context, attrs, defStyleAttr), KoinComponent {
 
     private val startPoint = PointF()
-    private var dragPoint: PointF? = null
     private var lastDistance = 0f
     private var currentScale = 1f
+    private var isDragging = false
     private val log: LogWrapper by inject()
 
     var callbacks: Callbacks? = null
@@ -38,8 +38,7 @@ class MultiTouchView @JvmOverloads constructor(
                 MotionEvent.ACTION_DOWN -> {
                     if (event.pointerCount == 1) {
                         startPoint.set(event.x, event.y)
-                        log.d("ACTION_DOWN: $startPoint")
-//                    dragPoint.set(event.x, event.y)
+                        // log.d("ACTION_DOWN: $startPoint")
                         callbacks?.onDown()
                     }
                 }
@@ -54,11 +53,9 @@ class MultiTouchView @JvmOverloads constructor(
                         event.pointerCount == 1 -> {
                             val dx = event.x - startPoint.x
                             val dy = event.y - startPoint.y
-                            log.d("move: $dx, $dy")
-                            dragPoint = PointF(event.x, event.y)
+                            isDragging = isDragging || dx > 0 || dy > 0
+                            // log.d("move: $dx, $dy")
                             callbacks?.onMove(dx, dy)
-//                            translationX += dx
-//                            translationY += dy
                         }
 
                         event.pointerCount == 2 -> {
@@ -66,12 +63,9 @@ class MultiTouchView @JvmOverloads constructor(
                             val scale = distance / lastDistance
                             lastDistance = distance
                             val newScale = currentScale * scale
-                            log.d("scale: $currentScale")
                             if (newScale > 0.5f && newScale < 5f) {
                                 currentScale = newScale
                                 callbacks?.onResize(currentScale)
-//                                scaleX = currentScale
-//                                scaleY = currentScale
                             }
                         }
                     }
@@ -79,12 +73,12 @@ class MultiTouchView @JvmOverloads constructor(
 
                 MotionEvent.ACTION_UP -> {
                     if (event.pointerCount == 1) {
-                        if (dragPoint == null && currentScale == 1f) {
+                        if (!isDragging && currentScale == 1f) {
                             performClick()
                         } else {
                             callbacks?.onCommit()
                         }
-                        dragPoint = null
+                        isDragging = false
                         currentScale = 1f
                     }
                 }

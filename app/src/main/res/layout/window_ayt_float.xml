@@ -26,11 +26,16 @@
     />
     <!--    </uk.co.sentinelweb.cuer.app.ui.ytplayer.InterceptorFrameLayout>-->
 
+    <uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.MultiTouchView
+            android:id="@+id/floating_player_multi_touch"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
     <FrameLayout
             android:id="@+id/floating_player_controls"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="parent"
@@ -40,11 +45,6 @@
         <!--            android:id="@+id/floating_player_block_title"-->
         <!--            android:layout_width="match_parent"-->
         <!--            android:layout_height="68dp"/>-->
-
-        <uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.MultiTouchView
-                android:id="@+id/floating_player_multi_touch"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
 
         <ImageView
                 android:id="@+id/floating_player_close"
