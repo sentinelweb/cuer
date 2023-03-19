@@ -132,12 +132,13 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
             if (scrollRange == -1) {
                 scrollRange = appBarLayout.getTotalScrollRange()
             }
-            if (scrollRange + verticalOffset == 0) {
+            val shouldCollapse = scrollRange + verticalOffset == 0
+            if (shouldCollapse && !isShow) {
                 isShow = true
                 // only show the menu items for the non-empty state
                 binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
                 edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-            } else if (isShow) {
+            } else if (!shouldCollapse && isShow) {
                 isShow = false
                 binding.peToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                 edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())

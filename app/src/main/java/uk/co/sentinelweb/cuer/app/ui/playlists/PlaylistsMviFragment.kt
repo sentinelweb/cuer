@@ -151,11 +151,12 @@ class PlaylistsMviFragment :
                 if (scrollRange == -1) {
                     scrollRange = appBarLayout.getTotalScrollRange()
                 }
-                if (scrollRange + verticalOffset == 0) {
+                val shouldCollapse = scrollRange + verticalOffset == 0
+                if (shouldCollapse && !isShow) {
                     isShow = true
                     binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_collapsed_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-                } else if (isShow) {
+                } else if (!shouldCollapse && isShow) {
                     isShow = false
                     binding.playlistsToolbar.menu.setMenuItemsColor(R.color.actionbar_icon_expanded_csl)
                     edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
