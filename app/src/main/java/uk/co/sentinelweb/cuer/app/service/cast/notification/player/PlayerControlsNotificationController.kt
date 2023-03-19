@@ -105,7 +105,9 @@ class PlayerControlsNotificationController constructor(
 
     inner class BitmapLoadTarget : CustomTarget<Bitmap?>() {
         override fun onResourceReady(bitmap: Bitmap, transition: Transition<in Bitmap?>?) {
-            state.bitmap = bitmap
+            if (bitmap.width > 0) {
+                state.bitmap = bitmap
+            }
             view.showNotification(state)
         }
 
