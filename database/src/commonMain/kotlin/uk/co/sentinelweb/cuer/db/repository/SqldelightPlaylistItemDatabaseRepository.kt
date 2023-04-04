@@ -162,6 +162,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                     is NewMediaFilter -> loadAllPlaylistItemsWithNewMedia(filter.limit.toLong())
                     is RecentMediaFilter -> loadAllPlaylistItemsRecent(filter.limit.toLong())
                     is StarredMediaFilter -> loadAllPlaylistItemsStarred(filter.limit.toLong())
+                    is LiveUpcomingMediaFilter -> loadAllPlaylistItemsLiveAndUpcoming(filter.limit.toLong())
                     is UnfinishedMediaFilter -> loadAllPlaylistItemsUnfinished(
                         min_percent = filter.minPercent.toLong(),
                         max_percent = filter.maxPercent.toLong(),

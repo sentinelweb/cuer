@@ -436,10 +436,11 @@ class PlaylistsMviFragment :
                         recentLocalPlaylists = get(),
                         starredItems = get(),
                         unfinishedItems = get(),
+                        liveUpcomingItems = get(),
                         strings = get(),
                         platformLauncher = get(),
                         shareWrapper = get(),
-                        merge = get()
+                        merge = get(),
                     ).create()
                 }
                 scoped<PlaylistsMviContract.Strings> { PlaylistsMviStrings(get()) }

@@ -60,6 +60,7 @@ interface OrchestratorContract<Domain> {
         data class NewMediaFilter(val limit: Int) : Filter()
         data class RecentMediaFilter(val limit: Int) : Filter()
         data class StarredMediaFilter(val limit: Int) : Filter()
+        data class LiveUpcomingMediaFilter(val limit: Int) : Filter()
         data class UnfinishedMediaFilter(val minPercent: Int, val maxPercent: Int, val limit: Int) : Filter()
         data class TitleFilter(val title: String) : Filter()
         data class SearchFilter(
