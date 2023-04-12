@@ -41,5 +41,4 @@ sealed class NetResult<R> constructor(
     class NotConnectedError<R>(
     ) : Error<R>(null, "Not connected", "NOT_CONNECTED")
 
-
 }

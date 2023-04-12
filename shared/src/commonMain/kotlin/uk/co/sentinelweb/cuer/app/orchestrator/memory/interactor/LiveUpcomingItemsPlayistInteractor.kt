@@ -7,7 +7,6 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMOR
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.Unfinished
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -20,7 +19,7 @@ class LiveUpcomingItemsPlayistInteractor constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
     private val log: LogWrapper
-) : AppPlaylistInteractor {
+) : AppPlaylistInteractor, AppPlaylistInteractor.Updateable {
 
     init {
         log.tag(this)
@@ -57,10 +56,14 @@ class LiveUpcomingItemsPlayistInteractor constructor(
     )
 
     override fun makeStats(): PlaylistStatDomain = PlaylistStatDomain(
-        playlistId = Unfinished.id.toIdentifier(MEMORY),
+        playlistId = LiveUpcoming.id.toIdentifier(MEMORY),
         itemCount = -1, // todo log in a background process and save to pref
         watchedItemCount = -1 // todo log in a background process and save to pref
     )
 
     override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) = Unit
+
+    override fun update() {
+
+    }
 }

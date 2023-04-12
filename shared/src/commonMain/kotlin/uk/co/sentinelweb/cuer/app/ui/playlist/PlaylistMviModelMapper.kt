@@ -91,7 +91,7 @@ class PlaylistMviModelMapper constructor(
                 canEditItems = domain.config.editableItems,
                 canDeleteItems = domain.config.deletableItems,
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
-                canUpdate = domain.platformId != null && domain.platform == YOUTUBE,
+                canUpdate = (domain.platformId != null && domain.platform == YOUTUBE),
                 shareVisible = true,
                 shareEnabled = domain.items.isNotEmpty(),
                 itemsText = domain.items
