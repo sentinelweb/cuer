@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.LiveUpcomingMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.usecase.MediaUpdateFromPlatformUseCase
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -30,9 +31,9 @@ class UpdateServiceController(
     }
 
     override fun update() = coroutines.ioScope.launch {
-        try { // fixme since broadcast date isnt saved need to update every run - no need to do update after broadcast date is saved
+        try { // fixme since broadcast date isn't saved need to update every run - no need to do update after broadcast date is saved
             playlistItemOrchestrator
-                .loadList(OrchestratorContract.Filter.LiveUpcomingMediaFilter(50), LOCAL.deepOptions())
+                .loadList(LiveUpcomingMediaFilter(50), LOCAL.deepOptions())
                 .map { it.media }
                 .let { mediaUpdateFromPlatformUseCase.updateMediaList(it) }
                 .apply { mediaOrchestrator.save(this, LOCAL.flatOptions()) }
@@ -47,4 +48,12 @@ class UpdateServiceController(
             log.e(e.message ?: "NetException(no message)", e)
         }
     }.ignoreJob()
+
+    override fun destroy() {
+
+    }
+
+    override fun handleAction(action: String?) {
+        update()
+    }
 }

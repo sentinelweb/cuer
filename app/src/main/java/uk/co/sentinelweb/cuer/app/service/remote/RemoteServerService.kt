@@ -50,7 +50,7 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
 
     override fun onDestroy() {
         super.onDestroy()
-        log.d("Service destroyed")
+        log.d("Remote Service destroyed")
         controller.destroy()
         scope.close()
         _instance = null
