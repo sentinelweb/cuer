@@ -129,12 +129,13 @@ android {
     }
 }
 
+// generate schema ./gradlew generateCommonMainDatabaseSchema
+// verify schema ./gradlew verifySqlDelightMigration
 sqldelight {
     database("Database") { // This will be the name of the generated database class.
         packageName = "uk.co.sentinelweb.cuer.app.db"
         sourceFolders = listOf("sqldelight")
-        schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/app/database")
+        schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/database/verify")
         verifyMigrations = true
-        // dialect = "sqlite:3.24"
     }
 }
