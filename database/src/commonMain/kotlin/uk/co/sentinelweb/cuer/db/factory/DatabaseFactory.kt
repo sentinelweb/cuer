@@ -38,7 +38,7 @@ class DatabaseFactory {
         ).apply {
             Database.Schema.migrate(
                 driver = driver,
-                oldVersion = 0,
+                oldVersion = 1,
                 newVersion = 2,
             )
         }
