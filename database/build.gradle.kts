@@ -137,5 +137,6 @@ sqldelight {
         sourceFolders = listOf("sqldelight")
         schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/database/verify")
         verifyMigrations = true
+        deriveSchemaFromMigrations = true
     }
 }
