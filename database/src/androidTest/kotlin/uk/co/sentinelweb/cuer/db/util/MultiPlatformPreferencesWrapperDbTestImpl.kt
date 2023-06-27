@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 
 // used for testing DatabaseFactory
-class MultiPlatformPreferencesWrapperTestImpl : MultiPlatformPreferencesWrapper {
+class MultiPlatformPreferencesWrapperDbTestImpl : MultiPlatformPreferencesWrapper {
     private val map: MutableMap<MultiPlatformPreferences, Any> = mutableMapOf()
     override fun getLong(field: MultiPlatformPreferences, def: Long): Long {
         TODO("Not yet implemented")

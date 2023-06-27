@@ -34,7 +34,7 @@ class DatabaseFactory(
                 date_last_playedAdapter = InstantAdapter(),
                 platformAdapter = EnumColumnAdapter(),
                 publishedAdapter = LocalDatetimeAdapter(),
-//                broadcast_dateAdapter = LocalDatetimeAdapter(),
+                broadcast_dateAdapter = LocalDatetimeAdapter(),
             ),
             Playlist.Adapter(
                 modeAdapter = EnumColumnAdapter(),
@@ -46,15 +46,17 @@ class DatabaseFactory(
                 date_addedAdapter = InstantAdapter()
             )
         ).apply {
-            Database.Schema.migrate(
-                driver = driver,
-                oldVersion = prefs.dbVersion,
-                newVersion = Database.Schema.version,
-            )
+            log.d("Database.Schema.version ${Database.Schema.version} prefs.dbVersion ${prefs.dbVersion}")
+//        }.apply {
+//            Database.Schema.migrate(
+//                driver = driver,
+//                oldVersion = prefs.dbVersion,
+//                newVersion = Database.Schema.version,
+//            )
         }.also {
             prefs.dbVersion = Database.Schema.version
         }.apply {
-            log.d("Database.Schema.version ${Database.Schema.version}")
+            log.d("Database.Schema.version ${Database.Schema.version} prefs.dbVersion ${prefs.dbVersion}")
         }
     }
 }

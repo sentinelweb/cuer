@@ -29,7 +29,7 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
     }
 
     private val prefsModule = module {
-        single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperTestImpl() }
+        single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperDbTestImpl() }
     }
 
     val modules = listOf(driverModule, dbTestModule, utilTestModule, prefsModule)
