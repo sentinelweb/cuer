@@ -6,6 +6,7 @@ import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -27,7 +28,11 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
         factory { GuidCreator() }
     }
 
-    val modules = listOf(driverModule, dbTestModule, utilTestModule)
+    private val prefsModule = module {
+        single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperTestImpl() }
+    }
+
+    val modules = listOf(driverModule, dbTestModule, utilTestModule, prefsModule)
         .plus(DatabaseCommonModule.modules)
 
     override fun starting(description: Description) {
