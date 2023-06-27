@@ -78,7 +78,6 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 ),
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
                 image = initial.image?.copy(id = saved.image?.id),
-                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -104,7 +103,6 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 ),
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
                 image = initial.image?.copy(id = saved.image?.id),
-                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -127,7 +125,6 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                 platformId = saved.platformId,
                 thumbNail = initial.thumbNail?.copy(id = saved.thumbNail?.id),
                 image = initial.image?.copy(id = saved.image?.id),
-                broadcastDate = null,
             )
 
             assertEquals(expected, saved)
@@ -181,7 +178,6 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
                     ),
                     thumbNail = media.thumbNail?.copy(id = saved[i].thumbNail?.id),
                     image = media.image?.copy(id = saved[i].image?.id),
-                    broadcastDate = null,
                 )
             }
 
@@ -390,6 +386,8 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         }
 
         val actual = sut.save(duplicatePlatformId, flat = false, emit = false)
+        // conflict error
+        assertFalse(actual.isSuccessful)
 //        println("--- to save")
 //        println(duplicatePlatformId.summarise())
 //        println("--- actual")
@@ -399,9 +397,9 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
 //        println(sut.loadList(AllFilter()).data?.map { it.summarise() }?.joinToString("\n"))
 
         val load = sut.load(duplicatePlatformId.id!!.id, flat = false).data!!
-        // The item won't save as it do nothing - but the db record won't be changed
-//        assertFalse(actual.isSuccessful)
-//        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
+        // fixme item isnt loadded from db - should be initial value
+//        assertTrue(actual.isSuccessful)
+//        assertEquals(initialSaved[2], load)
 //        assertNotEquals(load, duplicatePlatformId)
     }
 

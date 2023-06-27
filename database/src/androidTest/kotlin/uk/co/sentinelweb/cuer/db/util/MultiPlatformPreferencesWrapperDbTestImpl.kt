@@ -1,11 +1,32 @@
 package uk.co.sentinelweb.cuer.db.util
 
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.DATABASE_VERSION
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 
 // used for testing DatabaseFactory
 class MultiPlatformPreferencesWrapperDbTestImpl : MultiPlatformPreferencesWrapper {
     private val map: MutableMap<MultiPlatformPreferences, Any> = mutableMapOf()
+    override fun getInt(field: MultiPlatformPreferences, def: Int): Int =
+        if (DATABASE_VERSION == field) {
+            map.get(field) as? Int ?: def
+        } else throw IllegalStateException("not implemented")
+
+    override fun getInt(field: MultiPlatformPreferences): Int? =
+        if (DATABASE_VERSION == field) {
+            map.get(field) as? Int
+        } else throw IllegalStateException("not implemented")
+
+    override fun putInt(field: MultiPlatformPreferences, value: Int) {
+        if (DATABASE_VERSION == field) {
+            map.put(field, value)
+        } else throw IllegalStateException("not implemented")
+    }
+
+    override fun getString(field: MultiPlatformPreferences, def: String?): String? {
+        TODO("Not yet implemented")
+    }
+
     override fun getLong(field: MultiPlatformPreferences, def: Long): Long {
         TODO("Not yet implemented")
     }
@@ -15,21 +36,6 @@ class MultiPlatformPreferencesWrapperDbTestImpl : MultiPlatformPreferencesWrappe
     }
 
     override fun putLong(field: MultiPlatformPreferences, value: Long) {
-        TODO("Not yet implemented")
-    }
-
-    override fun getInt(field: MultiPlatformPreferences, def: Int): Int =
-        map.get(field) as? Int ?: def
-
-
-    override fun getInt(field: MultiPlatformPreferences): Int? =
-        map.get(field) as? Int
-
-    override fun putInt(field: MultiPlatformPreferences, value: Int) {
-        map.put(field, value)
-    }
-
-    override fun getString(field: MultiPlatformPreferences, def: String?): String? {
         TODO("Not yet implemented")
     }
 
