@@ -37,6 +37,7 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     LAST_SEARCH_TYPE("lastSearchType"),
     DB_INITIALISED("dbInitialised"),
     LAST_BOTTOM_TAB("lastBottomNavTab"),
+    DATABASE_VERSION("db.version"),
     ONBOARDED_PREFIX("onboarded_"),
     ;
 
@@ -48,6 +49,10 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
 
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences> {
+    var dbVersion: Int
+        get() = getInt(DATABASE_VERSION, 0)
+        set(value) = putInt(DATABASE_VERSION, value)
+
     var playerAutoFloat: Boolean
         get() = getBoolean(PLAYER_AUTO_FLOAT, PLAYER_AUTO_FLOAT_DEFAULT)
         set(value) = putBoolean(PLAYER_AUTO_FLOAT, value)

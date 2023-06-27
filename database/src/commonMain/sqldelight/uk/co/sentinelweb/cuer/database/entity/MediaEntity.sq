@@ -16,7 +16,7 @@ CREATE TABLE media (
     channel_id TEXT,
     thumb_id TEXT,
     image_id TEXT,
---    broadcast_date TEXT AS kotlinx.datetime.LocalDateTime,
+--     broadcast_date TEXT AS kotlinx.datetime.LocalDateTime DEFAULT NULL,
     FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
 
