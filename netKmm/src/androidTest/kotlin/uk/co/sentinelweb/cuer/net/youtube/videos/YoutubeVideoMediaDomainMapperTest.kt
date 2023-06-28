@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
+import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain
@@ -91,7 +92,7 @@ class YoutubeVideoMediaDomainMapperTest {
             every { mockImageMapper.mapThumb(it.snippet.thumbnails) } returns fixtMediumDomain
             every { mockImageMapper.mapImage(it.snippet.thumbnails) } returns fixMaxResDomain
         }
-        sut = YoutubeVideoMediaDomainMapper(mockStampMapper, mockImageMapper)
+        sut = YoutubeVideoMediaDomainMapper(mockStampMapper, mockImageMapper, SystemLogWrapper())
     }
 
     @Test

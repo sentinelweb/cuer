@@ -66,7 +66,7 @@ class YoutubeVideosKtorInteractorApiTest {
         sut = YoutubeKtorInteractor(
             service = service,
             keyProvider = keyProvider,
-            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper(log), imageMapper),
+            videoMapper = YoutubeVideoMediaDomainMapper(TimeStampMapper(log), imageMapper, log),
             channelMapper = channelMapper,
             coContext = CoroutineContextProvider(),
             errorMapper = ErrorMapper(SystemLogWrapper()),
