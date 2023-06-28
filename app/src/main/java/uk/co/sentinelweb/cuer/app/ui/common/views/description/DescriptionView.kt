@@ -172,6 +172,7 @@ class DescriptionView @JvmOverloads constructor(
         pidInfo.text = """
             ID: ${model.info.platformId} (${model.info.platform})
             DBID: ${model.info.dbId}
+            Broadcast: ${model.info.broadcastDate}
         """.trimIndent()
     }
 

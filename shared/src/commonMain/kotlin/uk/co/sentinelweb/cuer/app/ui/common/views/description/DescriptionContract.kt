@@ -25,7 +25,8 @@ interface DescriptionContract {
         data class Info(
             val platform: PlatformDomain,
             val platformId: String,
-            val dbId: OrchestratorContract.Identifier<GUID>? = null
+            val dbId: OrchestratorContract.Identifier<GUID>? = null,
+            val broadcastDate: String,
         )
     }
 

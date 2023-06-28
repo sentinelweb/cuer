@@ -36,7 +36,8 @@ class DescriptionMapper constructor(
         info = DescriptionModel.Info(
             platform = domain.platform,
             platformId = domain.platformId,
-            dbId = domain.id
+            dbId = domain.id,
+            broadcastDate = domain.broadcastDate?.let { dateTimeFormater.formatDateTime(it) } ?: "No broadcast date"
         )
     )
 
@@ -59,7 +60,8 @@ class DescriptionMapper constructor(
         ribbonActions = listOf(),
         info = DescriptionModel.Info(
             platform = PlatformDomain.OTHER,
-            platformId = "???"
+            platformId = "???",
+            broadcastDate = "None"
         )
     )
 }

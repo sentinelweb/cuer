@@ -74,7 +74,7 @@ object NetModule {
     }
 
     private val mapperModule = module {
-        factory { YoutubeVideoMediaDomainMapper(get(), get()) }
+        factory { YoutubeVideoMediaDomainMapper(get(), get(), get()) }
         factory { YoutubeChannelDomainMapper(get(), get()) }
         factory { YoutubePlaylistDomainMapper(get(), get(), get(), get(), get()) }
         factory { YoutubeSearchMapper(get(), get(), get(), get(), get(), get()) }
