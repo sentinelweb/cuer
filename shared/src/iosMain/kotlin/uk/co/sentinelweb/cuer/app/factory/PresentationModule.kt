@@ -31,7 +31,7 @@ import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
 object PresentationModule {
 
@@ -100,7 +100,8 @@ object PresentationModule {
                 strings = get(),
                 platformLauncher = get(),
                 shareWrapper = get(),
-                merge = get()
+                merge = get(),
+                liveUpcomingItems = get()
             ).create()
         }
         factory { PlaylistsMviContract.Strings() }
@@ -172,7 +173,9 @@ object PresentationModule {
                 multiPrefs = get(),
                 idGenerator = get(),
                 shareWrapper = get(),
-                platformLauncher = get()
+                platformLauncher = get(),
+                paiMapper = get(),
+                mediaUpdateFromPlatformUseCase = get()
             ).create()
         }
         factory {
@@ -226,11 +229,13 @@ object PresentationModule {
                     get() = get()
                     set(value) {}
 
-                override fun showPlayDialog(item: PlaylistItemDomain?, playlistTitle: String?) {
-                    log.d("showPlayDialog: title: $playlistTitle item: ${item?.summarise()}")
-                    item?.media?.platformId
-                        ?.also { platformLauncher.launchVideoSystem(it) }
-                        ?: log.d("showPlayDialog: cannot launch")
+                override fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain) {
+                    log.d("showPlayDialog: title: ${playlistAndItem.playlistTitle} item: ${playlistAndItem.item}?.summarise()}")
+                    playlistAndItem
+                        .item
+                        .media
+                        .platformId
+                        .also { platformLauncher.launchVideoSystem(it) }
                 }
 
                 override fun showDialog(model: AlertDialogModel) {
@@ -288,8 +293,8 @@ object PresentationModule {
 
                 override fun isRunning(): Boolean = false
 
-                override fun playItem(item: PlaylistItemDomain) {
-                    log.d("playItem: ${item.summarise()}")
+                override fun playItem(item: PlaylistAndItemDomain) {
+                    log.d("playItem: ${item.item.summarise()}")
                 }
             }
         }

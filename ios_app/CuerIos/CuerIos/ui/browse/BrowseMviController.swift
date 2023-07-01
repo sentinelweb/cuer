@@ -85,16 +85,16 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
         self.model = model
     }
     
-    func processLabel(label: BrowseContractMviStoreLabel) {
-        switch(label) {
+    func processLabel(label___: BrowseContractMviStoreLabel) {
+        switch(label___) {
         case is BrowseContractMviStoreLabel.AddPlaylist:
-            let addLabel = label as! BrowseContractMviStoreLabel.AddPlaylist
+            let addLabel = label___ as! BrowseContractMviStoreLabel.AddPlaylist
             
             addPlaylist(cat: addLabel.cat, parentId: addLabel.parentId)
         case let openPlaylist as BrowseContractMviStoreLabel.OpenLocalPlaylist:
             self.dependencies.mainCoordinator.navigate(route: .playlist(plId: openPlaylist.id))
             
-        default: debugPrint(label)
+        default: debugPrint(label___)
         }
     }
     

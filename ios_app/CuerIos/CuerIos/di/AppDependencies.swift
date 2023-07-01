@@ -55,7 +55,10 @@ class AppDependencies:
         isDebug: isDebug,
         cuerRemoteEnabled: false,
         versionCode: 1,
-        version: "0.77")
+        version: "0.77",
+        device: "Ios",
+        deviceType:DomainNodeDomain.DeviceType.ios
+    )
     
     lazy var shared: SharedAppDependencies = SharedAppDependencies(
         config: self.buildConfig,
