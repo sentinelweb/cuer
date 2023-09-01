@@ -20,14 +20,15 @@ interface DescriptionContract {
         val channelDescription: String?,
         val pubDate: String?,
         val ribbonActions: List<RibbonModel>,
-        val info: Info
+        val info: Info,
+        val broadcastDate: String? = null,
     ) {
         data class Info(
             val platform: PlatformDomain,
             val platformId: String,
             val dbId: OrchestratorContract.Identifier<GUID>? = null,
-            val broadcastDate: String,
         )
+
     }
 
     interface Interactions {
