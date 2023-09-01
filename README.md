@@ -58,6 +58,14 @@ Using
   - Coroutines test
 - Github Actions (Build / Test)
 
+## Migrations
+
+- make schema changes in entity `.sq` files
+- make migration script to update database : `old_dbVersion.sqm` - if the new db version is 2 -> use `1.sqm`
+- `./gradlew database:generateCommonMainDatabaseSchema`
+- `./gradlew --info database:verifySqlDelightMigration`
+
+
 ## Screenshots
 
 ### Browse

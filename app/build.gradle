@@ -32,6 +32,9 @@ android {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
+//            compileOptions {
+//                arguments += ["-Xdebug":true]
+//            }
         }
     }
 
