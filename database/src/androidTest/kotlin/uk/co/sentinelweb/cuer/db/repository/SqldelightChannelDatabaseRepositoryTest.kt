@@ -23,7 +23,7 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-class SqldelightChannelDatabaseRepositoryTest : KoinTest {
+class  SqldelightChannelDatabaseRepositoryTest : KoinTest {
 
     private val fixture = kotlinFixtureDefaultConfig
 

@@ -68,7 +68,7 @@ class MainCoordinator: ObservableObject {
         case .main:
             self.playlistController = createPlaylistController()
             self.playlistsController = createPlaylistsController()
-            self.browseController = dependencies.createBrowseHolder()
+            self.browseController = createBrowseController() //dependencies.createBrowseHolder()
             self.screen = Parent.main
         case .browse:
             self.currentTab = MainTab.browse
