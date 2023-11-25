@@ -3,6 +3,7 @@
 
 plugins {
     kotlin("multiplatform")
+//    kotlin("com.android.application")
     application
     kotlin("plugin.serialization")
 }
@@ -41,6 +42,8 @@ kotlin {
         binaries.executable()
     }
     jvm {
+    }
+    androidTarget {
     }
     sourceSets {
 
@@ -104,23 +107,23 @@ kotlin {
     }
 }
 
-val runServer by tasks.creating(JavaExec::class) {
-    group = "application"
-    main = "uk.co.sentinelweb.cuer.remote.server.MainKt"
-    kotlin {
-        val main = targets["jvm"].compilations["main"]
-        dependsOn(main.compileAllTaskName)
-        dependsOn("jsBrowserDevelopmentWebpack")
-        val jarTaskName = "jvmJar"
-        dependsOn(jarTaskName)
-        val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
-        classpath(
-            { jvmJarTask.outputs.files },
-            { configurations["jvmRuntimeClasspath"] }
-        )
-        println("runServer:" + main.output.allOutputs.files)
-    }
-}
+//val runServer by tasks.creating(JavaExec::class) {
+//    group = "application"
+//    main = "uk.co.sentinelweb.cuer.remote.server.MainKt"
+//    kotlin {
+//        val main = targets["jvm"].compilations["main"]
+//        dependsOn(main.compileAllTaskName)
+//        dependsOn("jsBrowserDevelopmentWebpack")
+//        val jarTaskName = "jvmJar"
+//        dependsOn(jarTaskName)
+//        val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
+//        classpath(
+//            { jvmJarTask.outputs.files },
+//            { configurations["jvmRuntimeClasspath"] }
+//        )
+//        println("runServer:" + main.output.allOutputs.files)
+//    }
+//}
 
 // include JS artifacts in any JAR we generate
 //tasks.getByName<Jar>("jvmJar") {

@@ -6,9 +6,9 @@ import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
+import com.google.android.material.composethemeadapter.R.style.Widget_AppCompat_ImageButton
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.ShapeAppearancePathProvider
-import uk.co.sentinelweb.cuer.app.R
 
 /**
  * A Image view that clips the content of any shape
@@ -23,7 +23,7 @@ class MaskedImageView @JvmOverloads constructor(
     private val path: Path = Path()
     private val shapeAppearance: ShapeAppearanceModel =
         ShapeAppearanceModel.builder(
-            context, attrs, defStyle, R.style.Widget_AppCompat_ImageButton
+            context, attrs, defStyle, Widget_AppCompat_ImageButton
         ).build()
 
     private val rectF = RectF(0f, 0f, 0f, 0f)

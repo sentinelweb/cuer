@@ -8,15 +8,17 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion project.properties.app_compileSdkVersion as int
-
+    compileSdkVersion app_compileSdkVersion as int
+    namespace app_applicationId
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     useLibrary 'android.test.mock'
 
+    android.buildFeatures.buildConfig true
+
     defaultConfig {
-        applicationId project.properties.app_applicationId
-        minSdkVersion project.properties.app_minSdkVersion as int
+        applicationId app_applicationId
+        minSdkVersion app_minSdkVersion as int
         targetSdkVersion app_targetSdkVersion as int
         versionCode app_versionCode as int
         versionName app_versionName
@@ -68,8 +70,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
@@ -126,7 +128,7 @@ android {
 dependencies {
     implementation project(":shared")
     implementation project(":netKmm")
-    implementation project(":remote")
+//    implementation project(":remote")
     implementation project(":database")// todo: remove get through shared
     implementation project(":domain")
 
