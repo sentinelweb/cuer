@@ -85,7 +85,7 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
         self.model = model
     }
     
-    func processLabel(label___: BrowseContractMviStoreLabel) {
+    func processLabel(label label___: BrowseContractMviStoreLabel) {
         switch(label___) {
         case is BrowseContractMviStoreLabel.AddPlaylist:
             let addLabel = label___ as! BrowseContractMviStoreLabel.AddPlaylist
