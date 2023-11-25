@@ -2,6 +2,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+//    kotlin("com.android.application")
     kotlin("plugin.serialization")
 //    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
     kotlin("native.cocoapods")
@@ -21,6 +22,7 @@ val ver_kotlin_fixture: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -33,7 +35,11 @@ kotlin {
     js(IR) {
         browser()
     }
-    android()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -77,7 +83,7 @@ kotlin {
                 implementation("app.cash.turbine:turbine:$ver_turbine")
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("io.mockk:mockk:$ver_mockk")
                 implementation("com.google.truth:truth:$ver_truth")
@@ -104,7 +110,7 @@ kotlin {
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
-            dependsOn(commonMain)
+            //dependsOn(commonMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
@@ -116,7 +122,7 @@ kotlin {
         val iosArm64Test by getting
         val iosSimulatorArm64Test by getting
         val iosTest by creating {
-            dependsOn(commonTest)
+            //dependsOn(commonTest)
             iosX64Test.dependsOn(this)
             iosArm64Test.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
@@ -126,9 +132,14 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
         targetSdk = app_targetSdkVersion.toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }

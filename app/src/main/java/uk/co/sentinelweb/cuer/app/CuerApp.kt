@@ -6,6 +6,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import org.koin.core.module.Module
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
@@ -47,7 +48,7 @@ class CuerApp : Application() {
             // use the Android context given there
             androidContext(this@CuerApp)
 
-            modules(Modules.allModules)
+            modules(Modules.allModules as List<Module>)
         }
         castSessionListener.listen()
         stethoWrapper.init()

@@ -1,15 +1,16 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // build swift: ./gradlew shared:updatePackageSwift
-val ver_native_coroutines: String by project
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+//    kotlin("com.android.application")
     kotlin("plugin.serialization")
     id("co.touchlab.faktory.kmmbridge") version "0.3.4"
     kotlin("native.cocoapods")
     id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
 }
 
+val ver_native_coroutines: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_kotlinx_datetime: String by project
@@ -25,9 +26,12 @@ val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
+
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
+
 val ver_kotlin_fixture: String by project
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -121,7 +125,7 @@ kotlin {
 
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
@@ -142,7 +146,7 @@ kotlin {
         val iosArm64Main by getting
         val iosSimulatorArm64Main by getting
         val iosMain by creating {
-            dependsOn(commonMain)
+//            dependsOn(commonMain)
             iosX64Main.dependsOn(this)
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
@@ -156,7 +160,7 @@ kotlin {
         val iosArm64Test by getting
         val iosSimulatorArm64Test by getting
         val iosTest by creating {
-            dependsOn(commonTest)
+//            dependsOn(commonTest)
             iosX64Test.dependsOn(this)
             iosArm64Test.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
@@ -166,11 +170,19 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
         targetSdk = app_targetSdkVersion.toInt()
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     packagingOptions {
         exclude("META-INF/ASL-2.0.txt")
         exclude("draftv4/schema")
