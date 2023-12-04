@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.receiver.WifiStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
+import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
@@ -139,6 +140,7 @@ object Modules {
         OnboardingFragment.fragmentModule,
         RemotesFragment.fragmentModule,
         LocalFragment.fragmentModule,
+        UpdateService.serviceModule,
     )
 
     private val uiModule = module {

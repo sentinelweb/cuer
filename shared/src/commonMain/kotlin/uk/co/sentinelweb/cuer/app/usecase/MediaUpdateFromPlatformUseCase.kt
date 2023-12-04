@@ -40,7 +40,12 @@ class MediaUpdateFromPlatformUseCase(
                     dateLastPlayed = originalMedia.dateLastPlayed,
                     starred = originalMedia.starred,
                     watched = originalMedia.watched,
+                    // todo check why this isn't needed above when refreshing the item on PlaylistItemEditViewModel
+                    channelData = if (media.channelData.platformId == originalMedia.channelData.platformId) {
+                        originalMedia.channelData
+                    } else {
+                        media.channelData /* todo lookup */
+                    },// todo test
                 )
             }
-
 }

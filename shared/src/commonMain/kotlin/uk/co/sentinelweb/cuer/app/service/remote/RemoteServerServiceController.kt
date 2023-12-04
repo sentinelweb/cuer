@@ -93,6 +93,7 @@ class RemoteServerServiceController constructor(
     }
 
     override fun destroy() {
+        // fixme ?? cancel coroutines
         log.d("Controller destroy")
         wakeLockManager.releaseWakeLock()
         webServer.stop()

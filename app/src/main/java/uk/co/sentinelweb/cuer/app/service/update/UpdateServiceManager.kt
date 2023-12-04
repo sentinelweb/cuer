@@ -8,20 +8,20 @@ class UpdateServiceManager constructor(
 ) : UpdateServiceContract.Manager {
 
     override fun start() {
-        if (!isRunning()) {
+//        if (!isRunning()) {
             app.startForegroundService(intent())
-        }
+//        }
     }
 
     override fun stop() {
-        if (isRunning()) {
+//        if (isRunning()) {
             app.stopService(intent())
-        }
+//        }
     }
 
-    override fun getService(): UpdateServiceContract.Service? = UpdateService.instance()
-
-    override fun isRunning(): Boolean = UpdateService.instance() != null
+//    override fun getService(): UpdateServiceContract.Service? = UpdateService.instance()
+//
+//    override fun isRunning(): Boolean = UpdateService.instance() != null
 
     private fun intent() = Intent(app, UpdateService::class.java)
 

@@ -173,6 +173,10 @@
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
         </service>
+        <service
+            android:name="uk.co.sentinelweb.cuer.app.service.update.UpdateService"
+            android:exported="false">
+        </service>
         <!-- media button receiver -->
         <receiver
             android:name="androidx.media.session.MediaButtonReceiver"

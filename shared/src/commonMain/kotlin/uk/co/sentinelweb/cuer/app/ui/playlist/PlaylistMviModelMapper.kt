@@ -9,11 +9,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.Icon
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.View.Header
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.APP
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -27,7 +27,8 @@ class PlaylistMviModelMapper constructor(
     private val appPlaylistInteractors: Map<Identifier<GUID>, AppPlaylistInteractor>,
     private val util: PlaylistMviUtil,
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val playlistUpdateUsecase: PlaylistUpdateUsecase
 ) {
     init {
         log.tag(this)
@@ -91,7 +92,7 @@ class PlaylistMviModelMapper constructor(
                 canEditItems = domain.config.editableItems,
                 canDeleteItems = domain.config.deletableItems,
                 hasChildren = playlists?.get(domain.id)?.chidren?.size ?: 0,
-                canUpdate = (domain.platformId != null && domain.platform == YOUTUBE),
+                canUpdate = playlistUpdateUsecase.canUpdate(domain),
                 shareVisible = true,
                 shareEnabled = domain.items.isNotEmpty(),
                 itemsText = domain.items

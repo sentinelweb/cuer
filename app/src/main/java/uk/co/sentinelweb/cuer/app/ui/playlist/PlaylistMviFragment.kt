@@ -810,7 +810,7 @@ class PlaylistMviFragment : Fragment(),
                         mediaUpdateFromPlatformUseCase = get(),
                     ).create()
                 }
-                scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
+                scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get(), get()) }
                 scoped { PlaylistMviItemModelMapper(get(), get(), get(), get(), get()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }

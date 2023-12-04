@@ -18,9 +18,4 @@ interface AppPlaylistInteractor {
     interface CustomisationResources {
         val customDelete: ActionResources?
     }
-
-    interface Updateable {
-        fun update()
-    }
-
 }

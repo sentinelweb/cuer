@@ -66,10 +66,6 @@ class YoutubeVideoMediaDomainMapperTest {
     @Before
     fun setUp() {
         MockKAnnotations.init(this, relaxUnitFun = true)
-//        val fixture = JFixture()
-//        fixture.customise().lazyInstance(Identifier::class.java) { Identifier(GuidCreator().create(), LOCAL) }
-//
-//        FixtureAnnotations.initFixtures(this, fixture)
         dto = fixture()
         fixtMedium = fixture()
         fixMaxRes = fixture()

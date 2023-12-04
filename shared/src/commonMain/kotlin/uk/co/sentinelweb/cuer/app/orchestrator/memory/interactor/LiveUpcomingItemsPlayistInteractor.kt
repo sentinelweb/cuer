@@ -18,8 +18,8 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 class LiveUpcomingItemsPlayistInteractor constructor(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val mediaOrchestrator: MediaOrchestrator,
-    private val log: LogWrapper
-) : AppPlaylistInteractor, AppPlaylistInteractor.Updateable {
+    private val log: LogWrapper,
+) : AppPlaylistInteractor {
 
     init {
         log.tag(this)
@@ -62,8 +62,4 @@ class LiveUpcomingItemsPlayistInteractor constructor(
     )
 
     override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) = Unit
-
-    override fun update() {
-
-    }
 }

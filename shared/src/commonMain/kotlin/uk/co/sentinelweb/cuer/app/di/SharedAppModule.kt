@@ -82,7 +82,7 @@ object SharedAppModule {
     }
 
     private val usecaseModule = module {
-        factory { PlaylistUpdateUsecase(get(), get(), get(), get(), get(), get(), get()) }
+        factory { PlaylistUpdateUsecase(get(), get(), get(), get(), get(), get(), get(), get()) }
         factory<PlaylistUpdateUsecase.UpdateCheck> { PlaylistUpdateUsecase.PlatformUpdateCheck() }
         factory { PlaylistMergeUsecase(get(), get()) }
         factory { PlaylistMediaLookupUsecase(get(), get(), get()) }
