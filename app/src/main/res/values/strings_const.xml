@@ -25,6 +25,7 @@
     <string name="prefs_backup_restore_key">manual_restore</string>
     <string name="prefs_player_auto_float_key">player_auto_float</string>
     <string name="prefs_player_restart_after_unlock_key">player_restart_after_unlock</string>
+    <string name="prefs_player_upcoming_notify_key">player_upcoming_notify</string>
     <string name="prefs_backup_clear_auto_key">backup_auto_clear</string>
     <string name="prefs_backup_summary_auto_key">backup_auto_summary</string>
     <string name="prefs_backup_set_auto_key">backup_auto_set</string>

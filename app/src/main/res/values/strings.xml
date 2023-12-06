@@ -169,6 +169,10 @@
         lock - autoplay after unlock
     </string>
     <string name="prefs_player_restart_after_unlock_title">Restart after unlock</string>
+    <string name="prefs_player_upcoming_notify_title">Notify upcoming videos</string>
+    <string name="prefs_player_upcoming_notify_summary">Show a notification when and upcoming live stream is about to
+        start (20 min before)
+    </string>
     <string name="prefs_root_feedback_title">Feedback</string>
     <!--    https://www.cognology.com.au/49-best-quotes-on-feedback/-->
     <string name="prefs_root_feedback_summary_how">How are we doing?</string>

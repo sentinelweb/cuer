@@ -117,7 +117,7 @@ class PlaylistMviModelMapper constructor(
         return domain.items
 //            .also { log.d("state.items: ${it.size}") }
 //            .also { log.d("guids: ${it.map { it.id }.joinToString(", ")}") }
-            .filter { blockItem == null || blockItem.id == null || it.id != blockItem.id }
+            .filter { blockItem?.id == null || it.id != blockItem.id }
 //            .also { log.d("state.items.filtered: ${it.size}, blockItem: $blockItem") }
             .mapIndexedNotNull { index, item ->
                 reverseLookup.get(item)?.let { modelId ->

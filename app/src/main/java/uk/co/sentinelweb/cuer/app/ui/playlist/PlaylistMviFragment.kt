@@ -263,7 +263,6 @@ class PlaylistMviFragment : Fragment(),
     inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),
         PlaylistMviContract.View {
 
-        @Suppress("IMPLICIT_CAST_TO_ANY")
         override fun processLabel(label: Label) {
             when (label) {
                 is Label.Error -> showError(label.message)
@@ -354,6 +353,7 @@ class PlaylistMviFragment : Fragment(),
     private fun createAdapter() =
         PlaylistAdapter(get(), this, isCards, get())
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
