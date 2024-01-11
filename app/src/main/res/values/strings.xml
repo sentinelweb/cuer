@@ -386,6 +386,11 @@
     <!-- onboarding -->
     <string name="onboarding_title">Onboarding</string>
 
+    <!-- upcoming -->
+    <string name="upcoming">Upcoming</string>
+    <string name="upcoming_notif_title">Episode starts in %1$s mins</string>
+
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -395,7 +400,6 @@
     <string name="dash">-</string>
     <string name="chip_select">Select playlist&#8230;</string>
     <string name="live">LIVE</string>
-    <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
     <string name="playlist_empty">No items in playlist</string>
     <string name="action_unpin">UNPIN</string>

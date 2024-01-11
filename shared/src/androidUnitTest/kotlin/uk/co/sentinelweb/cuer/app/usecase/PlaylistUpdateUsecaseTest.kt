@@ -18,8 +18,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECONDS
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -55,8 +57,11 @@ class PlaylistUpdateUsecaseTest {
     @MockK
     lateinit var updateChecker: PlaylistUpdateUsecase.UpdateCheck
 
+    @MockK
+    lateinit var updateServiceManager: UpdateServiceContract.Manager
+
     private val log = SystemLogWrapper()
-    private val timeProviderTest: TimeProvider = TimeProvider()
+    private val timeProviderTest: TimeProvider = TimeProviderImpl()
 
     private lateinit var sut: PlaylistUpdateUsecase
 
@@ -70,7 +75,8 @@ class PlaylistUpdateUsecaseTest {
             playlistMediaLookupUsecase,
             timeProvider,
             log,
-            updateChecker
+            updateChecker,
+            updateServiceManager
         )
     }
 

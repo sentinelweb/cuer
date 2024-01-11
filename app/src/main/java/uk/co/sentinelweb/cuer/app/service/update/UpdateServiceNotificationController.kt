@@ -6,9 +6,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 class UpdateServiceNotificationController constructor(
     private val view: UpdateServiceContract.Notification.View,
 ) : UpdateServiceContract.Notification.External, UpdateServiceContract.Notification.Controller {
-    //    init{
-//        log.tag(this)
-//    }
+
     override fun updateNotification(mediaDomains: List<MediaDomain>) {
         view.showNotification(mediaDomains
             .let {

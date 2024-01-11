@@ -2,15 +2,16 @@ package uk.co.sentinelweb.cuer.app.ui.upcoming
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface UpcomingContract {
 
     interface Presenter {
-        fun checkForUpcomingEpisodes(withinFutureMs: Int)
+        fun checkForUpcomingEpisodes(withinFutureMins: Int)
     }
 
     interface View {
-        fun showNotification()
+        fun showNotification(item: PlaylistItemDomain)
     }
 
     data class Model(

@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInte
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
@@ -28,6 +29,7 @@ class PlaylistMviModelMapperTest {
     private val util: PlaylistMviUtil = mockk(relaxed = true)
     private val multiPlatformPreferences: MultiPlatformPreferencesWrapper = mockk(relaxed = true)
     private val log: LogWrapper = mockk(relaxed = true)
+    private val playlistUpdateUsecase: PlaylistUpdateUsecase = mockk(relaxed = true)
 
     private lateinit var sut: PlaylistMviModelMapper
 
@@ -40,7 +42,8 @@ class PlaylistMviModelMapperTest {
             appPlaylistInteractors,
             util,
             multiPlatformPreferences,
-            log
+            log,
+            playlistUpdateUsecase,
         )
     }
 
