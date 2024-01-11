@@ -1,13 +1,13 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
-import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.LocalRepositoryContract
 
 class WifiStartChecker(
     private val manager: RemoteServerContract.Manager,
-    private val localRepository: LocalRepository,
-) {
-    fun checkToStartServer(wifiState: WifiStateProvider.WifiState) {
+    private val localRepository: LocalRepositoryContract,
+) : WifiStartCheckerContract {
+    override fun checkToStartServer(wifiState: WifiStateProvider.WifiState) {
         val localNode = localRepository.getLocalNode()
 
         val shouldStartOnWifi =
