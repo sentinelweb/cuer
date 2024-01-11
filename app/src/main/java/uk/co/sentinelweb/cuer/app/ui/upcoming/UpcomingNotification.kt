@@ -6,6 +6,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
@@ -47,7 +48,7 @@ class UpcomingNotification(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        val built: Any = builder.build()
+        val built = builder.build()
         val nm = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         nm.notify(0, built)
     }
