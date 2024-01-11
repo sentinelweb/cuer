@@ -8,8 +8,8 @@ import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistMediaUpdateUsecase constructor(
     private val mediaOrchestrator: MediaOrchestrator
-) {
-    suspend fun updateMedia(
+) : PlaylistMediaUpdateUsecaseContract {
+    override suspend fun updateMedia(
         playlist: PlaylistDomain,
         update: UpdateDomain<MediaDomain>,
         options: OrchestratorContract.Options

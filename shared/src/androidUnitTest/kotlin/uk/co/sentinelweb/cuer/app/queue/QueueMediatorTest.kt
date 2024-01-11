@@ -12,19 +12,18 @@ import kotlinx.coroutines.test.runTest
 import org.junit.*
 import org.junit.Assert.assertTrue
 import summarise
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecaseContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecaseContract
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylistsContract
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
@@ -53,22 +52,22 @@ class QueueMediatorTest {
     var rule = CoroutineTestRule()
 
     @MockK
-    lateinit var mockPlaylistOrchestrator: PlaylistOrchestrator
+    lateinit var mockPlaylistOrchestrator: OrchestratorContract<PlaylistDomain>
 
     @MockK
-    lateinit var mockPlaylistItemOrchestrator: PlaylistItemOrchestrator
+    lateinit var mockPlaylistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>
 
     @MockK
     lateinit var mockPrefsWrapper: MultiPlatformPreferencesWrapper
 
     @MockK
-    lateinit var mediaUpdate: PlaylistMediaUpdateUsecase
+    lateinit var mediaUpdate: PlaylistMediaUpdateUsecaseContract
 
     @MockK
-    lateinit var playlistOrDefaultUsecase: PlaylistOrDefaultUsecase
+    lateinit var playlistOrDefaultUsecase: PlaylistOrDefaultUsecaseContract
 
     @MockK
-    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
+    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylistsContract
 
     @MockK
     lateinit var mockPlaylistAndItemMapper: PlaylistAndItemMapper
