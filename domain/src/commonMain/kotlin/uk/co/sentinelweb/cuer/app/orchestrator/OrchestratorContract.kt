@@ -15,6 +15,8 @@ import kotlin.reflect.KClass
 
 interface OrchestratorContract<Domain> {
 
+    // to support generic orchestrator injection via koin
+    enum class Inject { PlaylistOrch, PlaylistStatsOrch, PlaylistItemOrch, MediaOrch, ChannelOrch }
     enum class Source { MEMORY, LOCAL, LOCAL_NETWORK, REMOTE, PLATFORM }
 
     val updates: Flow<Triple<Operation, Source, Domain>>

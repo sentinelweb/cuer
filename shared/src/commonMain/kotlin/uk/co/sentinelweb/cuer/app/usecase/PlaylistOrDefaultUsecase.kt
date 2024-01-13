@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
-import uk.co.sentinelweb.cuer.app.db.repository.DatabaseRepository
+import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.DefaultFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
@@ -11,14 +11,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 import uk.co.sentinelweb.cuer.domain.update.PlaylistIndexUpdateDomain
 
 class PlaylistOrDefaultUsecase constructor(
-    private val playlistDatabaseRepository: DatabaseRepository<PlaylistDomain, PlaylistStatDomain>,
+    private val playlistDatabaseRepository: PlaylistDatabaseRepository,
     private val playlistMemoryRepository: PlaylistMemoryRepository,
     private val log: LogWrapper
-) : PlaylistOrDefaultUsecaseContract {
+) {
 //    suspend fun getPlaylistOrDefault(id: OrchestratorContract.Identifier<GUID>?): PlaylistDomain? =
 //        id?.let { getPlaylistOrDefault(it.id) }
 
@@ -26,7 +25,7 @@ class PlaylistOrDefaultUsecase constructor(
         log.tag(this)
     }
 
-    override suspend fun getPlaylistOrDefault(
+    suspend fun getPlaylistOrDefault(
         playlistId: OrchestratorContract.Identifier<GUID>?,
     ): PlaylistDomain? =
         when (playlistId?.source) {
@@ -52,7 +51,7 @@ class PlaylistOrDefaultUsecase constructor(
                     ?.data?.get(0)
             })
 
-    override suspend fun updateCurrentIndex(input: PlaylistDomain, options: OrchestratorContract.Options): Boolean =
+    suspend fun updateCurrentIndex(input: PlaylistDomain, options: OrchestratorContract.Options): Boolean =
         when (options.source) {
             MEMORY -> true
             OrchestratorContract.Source.LOCAL ->

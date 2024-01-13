@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.init.JsonDatabaseInitializer
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
 import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Inject.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
@@ -30,14 +31,15 @@ import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
+import uk.co.sentinelweb.cuer.domain.*
 
 object SharedAppModule {
     private val queueModule = module {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
-                playlistOrchestrator = get(),
-                playlistItemOrchestrator = get(),
+                playlistOrchestrator = get(named(PlaylistOrch)),
+                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
                 coroutines = get(),
                 playlistMutator = get(),
                 log = get(),
@@ -57,10 +59,16 @@ object SharedAppModule {
 
     private val orchestratorModule = module {
         single { PlaylistOrchestrator(get(), get()) }
+        single<OrchestratorContract<PlaylistDomain>>(named(PlaylistOrch)) { get<PlaylistOrchestrator>() }
         single { PlaylistItemOrchestrator(get(), get()) }
+        single<OrchestratorContract<PlaylistItemDomain>>(named(PlaylistItemOrch)) { get<PlaylistItemOrchestrator>() }
         single { MediaOrchestrator(get(), get()) }
+        single<OrchestratorContract<MediaDomain>>(named(MediaOrch)) { get<MediaOrchestrator>() }
         single { ChannelOrchestrator(get(), get()) }
+        single<OrchestratorContract<ChannelDomain>>(named(ChannelOrch)) { get<ChannelOrchestrator>() }
         single { PlaylistStatsOrchestrator(get()) }
+        single<OrchestratorContract<PlaylistStatDomain>>(named(PlaylistStatsOrch)) { get<PlaylistStatsOrchestrator>() }
+
         single { NewMediaPlayistInteractor(get(), get(), get(), get(named(NewItems))) }
         single { RecentItemsPlayistInteractor(get(), get()) }
         single { StarredItemsPlayistInteractor(get(), get(), get(), get(named(Starred))) }
@@ -82,7 +90,18 @@ object SharedAppModule {
     }
 
     private val usecaseModule = module {
-        factory { PlaylistUpdateUsecase(get(), get(), get(), get(), get(), get(), get(), get()) }
+        factory {
+            PlaylistUpdateUsecase(
+                get(named(PlaylistOrch)),
+                get(named(PlaylistItemOrch)),
+                get(named(MediaOrch)),
+                get(),
+                get(),
+                get(),
+                get(),
+                get()
+            )
+        }
         factory<PlaylistUpdateUsecase.UpdateCheck> { PlaylistUpdateUsecase.PlatformUpdateCheck() }
         factory { PlaylistMergeUsecase(get(), get()) }
         factory { PlaylistMediaLookupUsecase(get(), get(), get()) }

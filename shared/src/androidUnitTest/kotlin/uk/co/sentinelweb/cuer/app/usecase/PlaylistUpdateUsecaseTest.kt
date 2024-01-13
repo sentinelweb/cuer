@@ -14,16 +14,20 @@ import kotlinx.datetime.toLocalDateTime
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
-import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECONDS
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -40,13 +44,13 @@ class PlaylistUpdateUsecaseTest {
     }
 
     @MockK
-    lateinit var playlistOrchestrator: PlaylistOrchestrator
+    lateinit var playlistOrchestrator: OrchestratorContract<PlaylistDomain>
 
     @MockK
-    lateinit var playlistItemOrchestrator: PlaylistItemOrchestrator
+    lateinit var playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>
 
     @MockK
-    lateinit var mediaOrchestrator: MediaOrchestrator
+    lateinit var mediaOrchestrator: OrchestratorContract<MediaDomain>
 
     @MockK
     lateinit var playlistMediaLookupUsecase: PlaylistMediaLookupUsecase
@@ -134,8 +138,8 @@ class PlaylistUpdateUsecaseTest {
                 items = existingPlaylist.items.plus(pl.items)
             )
         }
-        //log.d("updatedPlatformPlaylist: ${updatedPlatformPlaylist.items.size}")
-        //log.d(updatedPlatformPlaylist.items.map { it.media.platformId }.joinToString(","))
+        log.d("updatedPlatformPlaylist: ${updatedPlatformPlaylist.items.size}")
+        log.d(updatedPlatformPlaylist.items.map { it.media.platformId }.joinToString(","))
 
         coEvery {
             playlistOrchestrator.loadByPlatformId(platformId, Source.PLATFORM.deepOptions())
@@ -155,7 +159,7 @@ class PlaylistUpdateUsecaseTest {
 
         val actual = sut.update(existingPlaylist)
 
-        //log.d("actual; ${actual.success} ${actual.newItems?.size}")
+        log.d("actual; ${actual.success} ${actual.newItems?.size}")
         assertTrue(actual.success)
         assertEquals(6, actual.newItems?.size)
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false

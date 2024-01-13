@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import uk.co.sentinelweb.cuer.app.service.remote.WifiStartCheckerContract
+import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -25,7 +25,7 @@ class WifiStateReceiverTest {
 
     private val connectivityWrapper = mockk<ConnectivityWrapper>(relaxed = true)
     private val log: LogWrapper = SystemLogWrapper()
-    private val wifiStartChecker = mockk<WifiStartCheckerContract>(relaxed = true)
+    private val wifiStartChecker = mockk<WifiStartChecker>(relaxed = true)
 
     private lateinit var sut: WifiStateReceiver
 

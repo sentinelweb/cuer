@@ -19,10 +19,10 @@ class LocalRepository(
     private val coroutineContext: CoroutineContextProvider,
     private val guidCreator: GuidCreator,
     private val buildConfigDomain: BuildConfigDomain,
-) : LocalRepositoryContract {
+) {
 
     private val _node: MutableStateFlow<LocalNodeDomain> = MutableStateFlow(getLocalNode())
-    override val node: Flow<LocalNodeDomain>
+    val node: Flow<LocalNodeDomain>
         get() = _node
 
     fun saveLocalNode(node: LocalNodeDomain) {
@@ -32,7 +32,7 @@ class LocalRepository(
         }
     }
 
-    override fun getLocalNode(): LocalNodeDomain =
+    fun getLocalNode(): LocalNodeDomain =
         fileInteractor
             .takeIf { it.exists() }
             ?.loadJson()

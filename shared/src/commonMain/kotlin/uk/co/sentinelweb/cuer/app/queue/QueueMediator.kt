@@ -11,10 +11,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecaseContract
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecaseContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylistsContract
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -31,11 +31,11 @@ class QueueMediator constructor(
     private val playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>,
     private val coroutines: CoroutineContextProvider,
     private val playlistMutator: PlaylistMutator,
-    private val mediaUpdate: PlaylistMediaUpdateUsecaseContract,
-    private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecaseContract,
+    private val mediaUpdate: PlaylistMediaUpdateUsecase,
+    private val playlistOrDefaultUsecase: PlaylistOrDefaultUsecase,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper,
-    private val recentLocalPlaylists: RecentLocalPlaylistsContract,
+    private val recentLocalPlaylists: RecentLocalPlaylists,
     private val playlistAndItemMapper: PlaylistAndItemMapper,
 ) : QueueMediatorContract.Producer, QueueMediatorContract.Consumer {
 

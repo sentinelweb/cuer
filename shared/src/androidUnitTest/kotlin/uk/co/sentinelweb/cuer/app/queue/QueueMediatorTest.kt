@@ -20,10 +20,10 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecaseContract
-import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecaseContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
-import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylistsContract
+import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.core.ntuple.then
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextTestProvider
@@ -61,13 +61,13 @@ class QueueMediatorTest {
     lateinit var mockPrefsWrapper: MultiPlatformPreferencesWrapper
 
     @MockK
-    lateinit var mediaUpdate: PlaylistMediaUpdateUsecaseContract
+    lateinit var mediaUpdate: PlaylistMediaUpdateUsecase
 
     @MockK
-    lateinit var playlistOrDefaultUsecase: PlaylistOrDefaultUsecaseContract
+    lateinit var playlistOrDefaultUsecase: PlaylistOrDefaultUsecase
 
     @MockK
-    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylistsContract
+    lateinit var mockRecentLocalPlaylists: RecentLocalPlaylists
 
     @MockK
     lateinit var mockPlaylistAndItemMapper: PlaylistAndItemMapper
@@ -511,6 +511,7 @@ class QueueMediatorTest {
 
 
     @Test
+//    @Ignore
     fun onItemSelected_same_force_play() = runTest {
         createSut()
         val currentItem = sut.currentItem!!

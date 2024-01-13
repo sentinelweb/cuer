@@ -1,14 +1,17 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
-import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -17,9 +20,9 @@ import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
 import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 class PlaylistUpdateUsecase constructor(
-    private val playlistOrchestrator: PlaylistOrchestrator,
-    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistOrchestrator: OrchestratorContract<PlaylistDomain>,
+    private val playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>,
+    private val mediaOrchestrator: OrchestratorContract<MediaDomain>,
     private val playlistMediaLookupUsecase: PlaylistMediaLookupUsecase,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,

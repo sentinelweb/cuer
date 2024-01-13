@@ -13,22 +13,22 @@ class RecentLocalPlaylists constructor(
     private val prefs: MultiPlatformPreferencesWrapper,
     private val log: LogWrapper,
 //    private val localSearch: LocalSearchPlayistInteractor,
-) : RecentLocalPlaylistsContract {
+) {
     init {
         log.tag(this)
     }
 
-    override fun getRecent(): List<GUID> = prefs.recentIds
+    fun getRecent(): List<GUID> = prefs.recentIds
         ?.split(",")
         ?.map { it.toGUID() }
         ?.toMutableList()
         ?: mutableListOf()
 
-    override fun addRecent(pl: PlaylistDomain) {
+    fun addRecent(pl: PlaylistDomain) {
         pl.id?.apply { addPlaylistId(id) }
     }
 
-    override fun addRecentId(id: GUID) {
+    fun addRecentId(id: GUID) {
         addPlaylistId(id)
     }
 
@@ -42,7 +42,7 @@ class RecentLocalPlaylists constructor(
         }
     }
 
-    override fun buildRecentSelectionList(): List<Identifier<GUID>> {
+    fun buildRecentSelectionList(): List<Identifier<GUID>> {
         val recent = mutableListOf<Identifier<GUID>>()
 
 //        prefs.lastAddedPlaylistId
