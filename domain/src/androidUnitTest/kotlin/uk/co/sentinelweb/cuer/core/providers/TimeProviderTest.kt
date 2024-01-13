@@ -10,7 +10,7 @@ import org.junit.Test
 
 class TimeProviderTest {
 
-    private val sut: TimeProvider = TimeProvider()
+    private val sut: TimeProvider = TimeProviderImpl()
 
     @Before
     fun setUp() {

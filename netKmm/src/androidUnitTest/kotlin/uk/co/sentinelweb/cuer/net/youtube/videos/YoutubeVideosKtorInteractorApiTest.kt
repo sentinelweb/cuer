@@ -7,7 +7,7 @@ import org.junit.Ignore
 import org.junit.Test
 import uk.co.sentinelweb.cuer.core.mappers.TimeStampMapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -73,15 +73,15 @@ class YoutubeVideosKtorInteractorApiTest {
             connectivity = connectivityWrapper,
             playlistMapper = YoutubePlaylistDomainMapper(
                 TimeStampMapper(log),
-                PlaylistItemCreator(TimeProvider()),
+                PlaylistItemCreator(TimeProviderImpl()),
                 imageMapper,
                 channelMapper,
                 SystemLogWrapper()
             ),
             searchMapper = YoutubeSearchMapper(
                 timeStampMapper = TimeStampMapper(log),
-                timeProvider = TimeProvider(),
-                itemCreator = PlaylistItemCreator(TimeProvider()),
+                timeProvider = TimeProviderImpl(),
+                itemCreator = PlaylistItemCreator(TimeProviderImpl()),
                 imageMapper = imageMapper,
                 channelMapper = channelMapper,
                 escapeEntityMapper = EscapeEntityMapper()

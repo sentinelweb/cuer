@@ -115,7 +115,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test:$ver_koin")
-                implementation("io.mockk:mockk:$ver_mockk")
+                //implementation("io.mockk:mockk:$ver_mockk")
             }
         }
         val androidMain by getting {
@@ -135,6 +135,8 @@ kotlin {
                 implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation("org.mock-server:mockserver-netty:$ver_mockserver")
                 implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val jsMain by getting {
@@ -205,5 +207,9 @@ kmmbridge {
     githubReleaseVersions()
     spm()
     //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
-    versionPrefix.set("0.6")//fixme do i need this?
+    versionPrefix.set("0.6") //fixme do i need this?
 }
+
+//tasks.withType<Test>().configureEach {
+//    jvmArgs("-javaagent:${classpath.find { it.name.contains("mockk") }?.absolutePath}")
+//}

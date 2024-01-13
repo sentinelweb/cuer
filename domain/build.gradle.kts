@@ -85,11 +85,12 @@ kotlin {
         }
         val androidUnitTest by getting {
             dependencies {
-                implementation("io.mockk:mockk:$ver_mockk")
+                //implementation("io.mockk:mockk:$ver_mockk")
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val jvmMain by getting {

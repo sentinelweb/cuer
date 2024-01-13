@@ -17,6 +17,7 @@ val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
+val ver_mockk: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
@@ -71,7 +72,6 @@ kotlin {
 //                implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
-
             }
         }
         val androidMain by getting {
@@ -87,7 +87,8 @@ kotlin {
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val iosX64Main by getting

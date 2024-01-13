@@ -8,6 +8,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
@@ -24,7 +25,7 @@ class DatabaseTestRule : TestWatcher(), KoinComponent {
     }
 
     private val utilTestModule = module {
-        factory { TimeProvider() }
+        factory<TimeProvider> { TimeProviderImpl() }
         factory { GuidCreator() }
     }
 

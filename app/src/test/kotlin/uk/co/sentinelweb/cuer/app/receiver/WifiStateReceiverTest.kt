@@ -10,7 +10,6 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.service.remote.WifiStartCheckerContract
@@ -29,10 +28,6 @@ class WifiStateReceiverTest {
     private val wifiStartChecker = mockk<WifiStartCheckerContract>(relaxed = true)
 
     private lateinit var sut: WifiStateReceiver
-
-    @Before
-    fun setUp() {
-    }
 
     @Test
     fun onReceive() = runTest {
