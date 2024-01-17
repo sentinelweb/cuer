@@ -56,35 +56,38 @@ class PlaylistUpdateUsecase constructor(
     }
 
     suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
-        return playlistDomain
-            .takeIf { canUpdate(it) }
-            ?.let {
-                if (it.id == LiveUpcoming.identifier()) {
-                    updateServiceManager.start()
-                    it
-                } else if (it.platform == null) {
-                    playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
-                } else it
-            }
-            ?.let { playlist ->
-                when (playlist.platform ?: false) {
-                    YOUTUBE -> playlist.platformId
-                        ?.run {
-                            playlistOrchestrator
-                                .loadByPlatformId(this, Source.PLATFORM.deepOptions())
-                                ?.let { removeExistingItems(it, playlist) }
-                                ?.takeIf { it.items.size > 0 }
-                                ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
-                                ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                                ?.let { UpdateResult(true, numberItems = it.size, newItems = it) }
-                                ?: UpdateResult(true, numberItems = 0)
-                        }
-                        ?: UpdateResult(false, reason = "No platform id")
-
-                    else -> UpdateResult(false, reason = "Unsupported platform type")
+        return if (playlistDomain.id == LiveUpcoming.identifier()) {
+            // divert LiveUpcoming playlist to service - but actually all updates should goto the service
+            updateServiceManager.start()
+            UpdateResult(true, "Updating liveUpcoming ..")
+        } else {
+            playlistDomain
+                .takeIf { canUpdate(it) }
+                ?.let {
+                    if (it.platform == null) {
+                        playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
+                    } else it
                 }
-            }
-            ?: UpdateResult(false, reason = "Cannot update this playlist")
+                ?.let { playlist ->
+                    when (playlist.platform ?: false) {
+                        YOUTUBE -> playlist.platformId
+                            ?.let { id ->
+                                playlistOrchestrator
+                                    .loadByPlatformId(id, Source.PLATFORM.deepOptions())
+                                    ?.let { removeExistingItems(it, playlist) }
+                                    ?.takeIf { it.items.size > 0 }
+                                    ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
+                                    ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
+                                    ?.let { UpdateResult(true, numberItems = it.size, newItems = it) }
+                                    ?: UpdateResult(true, numberItems = 0)
+                            }
+                            ?: UpdateResult(false, reason = "No platform id")
+
+                        else -> UpdateResult(false, reason = "Unsupported platform type")
+                    }
+                }
+                ?: UpdateResult(false, reason = "Cannot update this playlist")
+        }
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
@@ -124,15 +127,13 @@ class PlaylistUpdateUsecase constructor(
 
     class PlatformUpdateCheck : UpdateCheck {
         override fun shouldUpdate(p: PlaylistDomain): Boolean =
-            p.type == PLATFORM || p.id == LiveUpcoming.identifier()
+            p.type == PLATFORM
 
         override fun canUpdate(p: PlaylistDomain): Boolean =
-            (p.platformId != null && p.platform == YOUTUBE && p.type == PLATFORM)
-                    || p.id == LiveUpcoming.identifier()
+            p.platformId != null && p.platform == YOUTUBE && p.type == PLATFORM
     }
 
     companion object {
-        private val UPDATE_INTERVAL_DEFAULT = 1000 * 60 * 60
         val SECONDS = 1000L
     }
 }

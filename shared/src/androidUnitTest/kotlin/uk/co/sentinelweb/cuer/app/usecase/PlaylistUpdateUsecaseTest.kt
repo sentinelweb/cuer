@@ -5,7 +5,7 @@ import com.appmattus.kotlinfixture.decorator.nullability.nullabilityStrategy
 import com.appmattus.kotlinfixture.kotlinFixture
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
-import io.mockk.every
+import io.mockk.coVerify
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.TimeZone
@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECONDS
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -28,8 +29,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
@@ -58,8 +58,7 @@ class PlaylistUpdateUsecaseTest {
     @MockK
     lateinit var timeProvider: TimeProvider
 
-    @MockK
-    lateinit var updateChecker: PlaylistUpdateUsecase.UpdateCheck
+    val updateChecker: PlaylistUpdateUsecase.UpdateCheck = PlaylistUpdateUsecase.PlatformUpdateCheck()
 
     @MockK
     lateinit var updateServiceManager: UpdateServiceContract.Manager
@@ -85,20 +84,6 @@ class PlaylistUpdateUsecaseTest {
     }
 
     @Test
-    fun checkToUpdate_true() {
-        every { updateChecker.shouldUpdate(any()) } returns true
-
-        assertTrue(updateChecker.shouldUpdate(fixture()))
-    }
-
-    @Test
-    fun checkToUpdate_false() {
-        every { updateChecker.shouldUpdate(any()) } returns false
-
-        assertFalse(updateChecker.shouldUpdate(fixture()))
-    }
-
-    @Test
     fun update_must_be_platform() = runTest {
         val playlist = generatePlaylist(fixture).copy(type = USER)
 
@@ -106,6 +91,7 @@ class PlaylistUpdateUsecaseTest {
 
         assertFalse(actual.success)
     }
+
 
     @Test
     fun update_descending_playlist_must_add_at_top_in_reverse_order() = runTest {
@@ -176,11 +162,9 @@ class PlaylistUpdateUsecaseTest {
         val localtime = timeProviderTest.localDateTime()
         val existingPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
-                //id = 1,
                 type = PLATFORM,
                 platform = PlatformDomain.YOUTUBE,
                 platformId = platformId,
-                //items = pl.items.mapIndexed { i, item -> item.copy(order = i * 1000L) }
                 items = pl.items.mapIndexed { i, item ->
                     item.copy(
                         order = i * SECONDS,
@@ -189,7 +173,7 @@ class PlaylistUpdateUsecaseTest {
                 }
             )
         }
-        //log.d("existingPlaylist: ${existingPlaylist.items.size}")
+        log.d("canupdate: ${sut.canUpdate(existingPlaylist)}")
         val updatedPlatformPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
                 id = null,
@@ -220,7 +204,7 @@ class PlaylistUpdateUsecaseTest {
 
         val actual = sut.update(existingPlaylist)
 
-        //log.d("actual; ${actual.success} ${actual.newItems?.size}")
+        log.d("actual; $actual")
         assertTrue(actual.success)
         assertEquals(6, actual.newItems?.size)
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
@@ -228,6 +212,28 @@ class PlaylistUpdateUsecaseTest {
         actual.newItems?.forEachIndexed { i, item ->
             assertEquals(5 * SECONDS + ((i + 1) * SECONDS), item.order)
         }
+    }
+
+    @Test
+    fun update_liveupcoming_starts_service() = runTest {
+        val platformId = "update_platformId"
+        val tz = TimeZone.UTC
+        val localtime = timeProviderTest.localDateTime()
+        val existingPlaylist = generatePlaylist(fixture).let { pl ->
+            pl.copy(
+                id = PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming.identifier(),
+                type = APP,
+                platform = null,
+                platformId = null,
+            )
+        }
+
+        val actual = sut.update(existingPlaylist)
+
+        log.d("actual; ${actual.success} ${actual.newItems?.size}")
+        assertTrue(actual.success)
+        assertEquals(-1, actual.numberItems)
+        coVerify { updateServiceManager.start() }
     }
 
 }
