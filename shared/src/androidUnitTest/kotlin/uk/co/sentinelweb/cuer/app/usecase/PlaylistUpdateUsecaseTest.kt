@@ -216,9 +216,6 @@ class PlaylistUpdateUsecaseTest {
 
     @Test
     fun update_liveupcoming_starts_service() = runTest {
-        val platformId = "update_platformId"
-        val tz = TimeZone.UTC
-        val localtime = timeProviderTest.localDateTime()
         val existingPlaylist = generatePlaylist(fixture).let { pl ->
             pl.copy(
                 id = PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming.identifier(),

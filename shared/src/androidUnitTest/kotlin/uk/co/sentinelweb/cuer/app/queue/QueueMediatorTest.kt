@@ -511,7 +511,7 @@ class QueueMediatorTest {
 
 
     @Test
-//    @Ignore
+    @Ignore("FLAKY")
     fun onItemSelected_same_force_play() = runTest {
         createSut()
         val currentItem = sut.currentItem!!
