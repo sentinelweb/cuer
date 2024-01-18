@@ -42,14 +42,17 @@ import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.tools.rule.CoroutineTestRule
+import uk.co.sentinelweb.cuer.tools.rule.FlakyTestRule
 
-// todo uncomment
 @ExperimentalCoroutinesApi
 class QueueMediatorTest {
     private val fixture = kotlinFixtureDefaultConfig
 
     @get:Rule
     var rule = CoroutineTestRule()
+
+    @get:Rule
+    var flakyTestRule = FlakyTestRule(5)
 
     @MockK
     lateinit var mockPlaylistOrchestrator: OrchestratorContract<PlaylistDomain>
@@ -511,7 +514,7 @@ class QueueMediatorTest {
 
 
     @Test
-    @Ignore("FLAKY")
+    //@Ignore("FLAKY")
     fun onItemSelected_same_force_play() = runTest {
         createSut()
         val currentItem = sut.currentItem!!
@@ -683,7 +686,7 @@ class QueueMediatorTest {
 
     //////////// flaky/borken tests (after id->guid update) ////////////////////////////////////////////
     @Test
-    @Ignore("flaky")
+    //@Ignore("flaky")
     fun test_flow_playlist_deleted() = runTest {
         createSut()
         coEvery { playlistOrDefaultUsecase.getPlaylistOrDefault(fixtCurrentIdentifier) } returns (fixtPlaylistDefault)
@@ -701,7 +704,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    @Ignore("flaky")
+    //@Ignore("flaky")
     fun onItemSelected_simple() = runTest {
         // QueueMediatorState(playlist = fixtCurrentPlaylist, playlistIdentifier = fixtCurrentIdentifier)
         createSut()
@@ -738,7 +741,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    @Ignore("flaky")
+    //@Ignore("flaky")
     fun nextItem() = runTest {
         createSut()
         val expectedIndex = fixtCurrentCurentIndex + 1
@@ -760,7 +763,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    @Ignore("flaky")
+    // @Ignore("flaky")
     fun onTrackEnded() = runTest {
         createSut()
         val expectedIndex = fixtCurrentCurentIndex + 1
@@ -781,7 +784,7 @@ class QueueMediatorTest {
     }
 
     @Test
-    @Ignore("flaky")
+    // @Ignore("flaky")
     fun previousItem() = runTest {
         createSut()
         val expectedIndex = fixtCurrentCurentIndex - 1
@@ -802,7 +805,8 @@ class QueueMediatorTest {
     }
 
     @Test
-    @Ignore("flaky")
+    @Ignore("issure here")
+    // fixme check what is wrong with this test
     fun test_flow_playlistitem_replace_same_item__no_change__does_not_emit() = runTest {
         createSut()
         val sameItemIndex = fixtCurrentCurentIndex - 1
