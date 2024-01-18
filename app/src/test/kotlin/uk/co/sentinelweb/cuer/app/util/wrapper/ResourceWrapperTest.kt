@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.tools.ext.build
 import uk.co.sentinelweb.cuer.tools.ext.buildCollection
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = intArrayOf(28), application = CuerTestApp::class)
+@Config(sdk = intArrayOf(34), application = CuerTestApp::class)
 class ResourceWrapperTest {
 
     @Mock

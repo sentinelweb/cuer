@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain.MEDIA
 
 @RunWith(AndroidJUnit4::class)
-@Config(sdk = intArrayOf(28), application = CuerTestApp::class)
+@Config(sdk = intArrayOf(34), application = CuerTestApp::class)
 class AndroidLinkScannerTest {
     @MockK
     lateinit var mockUrlMediaMapper: UrlMediaMapper
