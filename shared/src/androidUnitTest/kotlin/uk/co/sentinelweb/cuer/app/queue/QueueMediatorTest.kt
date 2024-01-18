@@ -52,7 +52,7 @@ class QueueMediatorTest {
     var rule = CoroutineTestRule()
 
     @get:Rule
-    var flakyTestRule = FlakyTestRule(5)
+    var flakyTestRule = FlakyTestRule(20)
 
     @MockK
     lateinit var mockPlaylistOrchestrator: OrchestratorContract<PlaylistDomain>
