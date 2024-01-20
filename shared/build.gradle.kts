@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-// build swift: ./gradlew shared:updatePackageSwift
+
+// build swift: ./gradlew :shared:spmDevBuild
 plugins {
     kotlin("multiplatform")
     id("com.android.library")

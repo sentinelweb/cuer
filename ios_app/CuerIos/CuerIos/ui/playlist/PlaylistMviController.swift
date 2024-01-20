@@ -84,7 +84,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
         self.model = model
     }
     
-    func processLabel(label__: PlaylistMviContractMviStoreLabel) {
+    func processLabel(label____ label__: PlaylistMviContractMviStoreLabel) {
         //let _ = debugPrint("playlist label received", label_)
         switch(label__) {
 //        case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:

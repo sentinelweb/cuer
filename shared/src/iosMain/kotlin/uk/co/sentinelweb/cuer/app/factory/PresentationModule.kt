@@ -187,6 +187,7 @@ object PresentationModule {
                 util = get(),
                 multiPlatformPreferences = get(),
                 log = get(),
+                playlistUpdateUsecase = get()
             )
         }
         factory {
