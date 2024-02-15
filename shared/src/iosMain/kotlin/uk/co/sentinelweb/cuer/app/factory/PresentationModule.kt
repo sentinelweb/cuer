@@ -231,7 +231,7 @@ object PresentationModule {
                     set(value) {}
 
                 override fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain) {
-                    log.d("showPlayDialog: title: ${playlistAndItem.playlistTitle} item: ${playlistAndItem.item}?.summarise()}")
+                    log.d("showPlayDialog: title: ${playlistAndItem.playlistTitle} item: ${playlistAndItem.item?.summarise()}")
                     playlistAndItem
                         .item
                         .media
