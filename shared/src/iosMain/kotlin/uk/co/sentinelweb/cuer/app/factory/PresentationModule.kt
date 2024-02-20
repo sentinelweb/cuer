@@ -9,6 +9,7 @@ import summarise
 import uk.co.sentinelweb.cuer.app.impl.IosStringDecoder
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
+import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.ui.browse.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -301,5 +302,21 @@ object PresentationModule {
         }
     }
 
-    val modules = listOf(browserModule, playlistsModule, resourcesModule, playlistsDialogModule, playlistModule)
+    private val updateModule = module {
+        factory<UpdateServiceContract.Manager> {
+            object : UpdateServiceContract.Manager {
+                override fun start() = Unit
+                override fun stop() = Unit
+            }
+        }
+    }
+
+    val modules = listOf(
+        browserModule,
+        playlistsModule,
+        resourcesModule,
+        playlistsDialogModule,
+        playlistModule,
+        updateModule
+    )
 }

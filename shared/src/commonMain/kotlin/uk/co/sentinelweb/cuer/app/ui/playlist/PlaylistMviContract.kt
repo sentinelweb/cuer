@@ -125,7 +125,7 @@ class PlaylistMviContract {
 
     interface View : MviView<View.Model, View.Event> {
 
-        fun processLabel(label: Label)
+        fun processLabel(labelPlaylist: Label) // unique param name needed for ios linking
 
         data class Model(
             val header: Header,

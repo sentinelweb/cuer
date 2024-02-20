@@ -47,8 +47,5 @@ class UpdateServiceContract {
     interface Manager {
         fun start()
         fun stop()
-//        fun getService(): Service?
-//        fun isRunning(): Boolean
     }
-
 }
