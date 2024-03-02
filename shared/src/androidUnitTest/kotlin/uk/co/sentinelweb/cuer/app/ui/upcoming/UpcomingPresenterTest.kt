@@ -7,9 +7,9 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.koin.test.KoinTest
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.LiveUpcomingMediaFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
@@ -28,7 +28,7 @@ class UpcomingPresenterTest : KoinTest {
     var rule = CoroutineTestRule()
 
     private val view: UpcomingContract.View = mockk(relaxed = true)
-    private val playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain> = mockk(relaxed = true)
+    private val playlistItemOrchestrator: PlaylistItemOrchestrator = mockk(relaxed = true)//
     private val timeProvider: TimeProvider = mockk(relaxed = true)
     private val log: LogWrapper = SystemLogWrapper()
     private val testCoroutines = TestCoroutineContextProvider(rule.dispatcher)
