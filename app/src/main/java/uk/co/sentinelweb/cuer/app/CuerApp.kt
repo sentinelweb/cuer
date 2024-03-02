@@ -6,7 +6,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
-import org.koin.core.module.Module
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
@@ -19,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper.Companion.SERVICE_NOT_FOUND
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
+import uk.co.sentinelweb.cuer.app.work.WorkManagerLauncher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import kotlin.time.ExperimentalTime
@@ -37,6 +37,7 @@ class CuerApp : Application() {
     private val queue: QueueMediatorContract.Producer by inject()
     private val screenStateReceiver: ScreenStateReceiver by inject()
     private val wifiReceiver: WifiStateProvider by inject()
+    private val workManagerLauncher: WorkManagerLauncher by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -48,7 +49,7 @@ class CuerApp : Application() {
             // use the Android context given there
             androidContext(this@CuerApp)
 
-            modules(Modules.allModules as List<Module>)
+            modules(Modules.allModules)
         }
         castSessionListener.listen()
         stethoWrapper.init()
@@ -66,6 +67,7 @@ class CuerApp : Application() {
         setDefaultExceptionHander()
         screenStateReceiver.register(this)
         wifiReceiver.register()
+        workManagerLauncher.startUpcomingVideosChecker(this)
     }
 
     override fun onTerminate() {

@@ -21,6 +21,8 @@
     <string name="prefs_root_onboard_key">root_onboard</string>
     <string name="prefs_root_usability_key">root_usability</string>
     <string name="prefs_root_bymc_key">root_donate_bymc</string>
+    <string name="prefs_root_test_key">root_test</string>
+
     <string name="prefs_backup_backup_key">manual_backup</string>
     <string name="prefs_backup_restore_key">manual_restore</string>
     <string name="prefs_player_auto_float_key">player_auto_float</string>

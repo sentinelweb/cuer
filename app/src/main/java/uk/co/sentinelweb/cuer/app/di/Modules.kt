@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.di
 
+//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import android.os.Build
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import io.ktor.client.*
@@ -57,6 +58,8 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingNotification
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
@@ -83,6 +86,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
+import uk.co.sentinelweb.cuer.app.work.WorkManagerLauncher
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -100,7 +104,6 @@ import uk.co.sentinelweb.cuer.net.di.NetModule
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
-//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
@@ -157,6 +160,7 @@ object Modules {
                 get()
             )
         }
+        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get()) }
     }
 
     private val receiverModule = module {
@@ -266,6 +270,10 @@ object Modules {
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication(), get()) }
     }
 
+    private val workModule = module {
+        factory { WorkManagerLauncher(get()) }
+    }
+
     val allModules = listOf(utilModule)
         .plus(uiModule)
         .plus(wrapperModule)
@@ -273,6 +281,7 @@ object Modules {
         .plus(appNetModule)
         .plus(receiverModule)
         .plus(usecaseModule)
+        .plus(workModule)
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.modules)

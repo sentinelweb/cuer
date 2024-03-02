@@ -80,6 +80,12 @@
             app:title="@string/prefs_root_onboard_title"
             app:summary="@string/prefs_root_onboard_summary"
         />
+        <Preference
+                app:icon="@drawable/ic_play_yang"
+                app:key="@string/prefs_root_test_key"
+                app:title="@string/prefs_root_test_title"
+                app:summary="@string/prefs_root_test_summary"
+        />
     </PreferenceCategory>
 
 </PreferenceScreen>

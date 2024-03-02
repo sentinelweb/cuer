@@ -194,6 +194,8 @@
     <string name="prefs_root_version_title">Version</string>
     <string name="prefs_root_version_summary">Version will appear here</string>
     <string name="prefs_root_info_cat_contact">Communications</string>
+    <string name="prefs_root_test_title">Testing</string>
+    <string name="prefs_root_test_summary">Test something</string>
 
 
     <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->

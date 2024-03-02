@@ -25,6 +25,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
@@ -150,6 +152,7 @@ object SharedAppModule {
                 get()
             )
         }
+        factory<UpcomingContract.Presenter> { UpcomingPresenter(get(), get(), get(), get(), get()) }
     }
 
     private val uiModule = module {
