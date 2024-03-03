@@ -10,7 +10,7 @@ import BackgroundTasks
 
 // NOTE: need a real device to test this - simulator won't run bg tasks
 // ideally should be analogus to android class of same name: WorkManagerLauncher
-class WorkManagerLauncher {
+class WorkManagerInteractor {
     // from this video: https://www.youtube.com/watch?v=Lb7OShyNSdM
     // register background task handler
     // todo extract work id to a structure

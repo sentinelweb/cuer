@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.work.worker.UpcomingVideosCheckWorker
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import java.util.concurrent.TimeUnit
 
-class WorkManagerLauncher(private val log: LogWrapper) {
+class WorkManagerInteractor(private val log: LogWrapper) {
     init {
         log.tag(this)
     }
@@ -17,7 +17,7 @@ class WorkManagerLauncher(private val log: LogWrapper) {
             UpcomingVideosCheckWorker::class.java,
             UpcomingVideosCheckWorker.MINS_CHECK.toLong(),
             TimeUnit.MINUTES
-        ) // todo MINS
+        )
             .build()
 
         WorkManager.getInstance(c).enqueueUniquePeriodicWork(

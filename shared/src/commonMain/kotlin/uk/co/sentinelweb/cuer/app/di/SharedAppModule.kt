@@ -94,14 +94,14 @@ object SharedAppModule {
     private val usecaseModule = module {
         factory {
             PlaylistUpdateUsecase(
-                get(named(PlaylistOrch)),
-                get(named(PlaylistItemOrch)),
-                get(named(MediaOrch)),
-                get(),
-                get(),
-                get(),
-                get(),
-                get()
+                playlistOrchestrator = get(named(PlaylistOrch)),
+                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
+                mediaOrchestrator = get(named(MediaOrch)),
+                playlistMediaLookupUsecase = get(),
+                timeProvider = get(),
+                log = get(),
+                updateChecker = get(),
+                updateServiceManager = get()
             )
         }
         factory<PlaylistUpdateUsecase.UpdateCheck> { PlaylistUpdateUsecase.PlatformUpdateCheck() }
@@ -117,7 +117,18 @@ object SharedAppModule {
 
     private val objectModule = module {
         factory { ParserFactory() }
-        single { PlaylistMemoryRepository(get(), get(), get(), get(), get(), get(), get(), get()) }
+        single {
+            PlaylistMemoryRepository(
+                coroutines = get(),
+                newItemsInteractor = get(),
+                recentItemsInteractor = get(),
+                localSearchInteractor = get(),
+                starredItemsInteractor = get(),
+                remoteSearchOrchestrator = get(),
+                unfinishedItemsInteractor = get(),
+                liveUpcomingItemsPlayistInteractor = get()
+            )
+        }
         single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
@@ -145,14 +156,23 @@ object SharedAppModule {
         factory { WifiStartChecker(get(), get()) }
         factory<RemoteServerContract.AvailableMessageHandler> {
             AvailableMessageHandler(
-                get(),
-                get(),
-                get(),
-                get(),
-                get()
+                remoteRepo = get(),
+                availableMessageMapper = get(),
+                remoteInteractor = get(),
+                localRepo = get(),
+                log = get()
             )
         }
-        factory<UpcomingContract.Presenter> { UpcomingPresenter(get(), get(), get(), get(), get()) }
+        factory<UpcomingContract.Presenter> {
+            UpcomingPresenter(
+                view = get(),
+                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
+                mediaOrchestrator = get(named(MediaOrch)),
+                coroutines = get(),
+                timeProvider = get(),
+                log = get()
+            )
+        }
     }
 
     private val uiModule = module {

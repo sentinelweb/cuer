@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class UpcomingNotification(
@@ -20,9 +21,11 @@ class UpcomingNotification(
     private val appState: CuerAppState,
     private val appContext: Application,
     private val timeProvider: TimeProvider,
-    private val res: ResourceWrapper
+    private val res: ResourceWrapper,
+    private val log: LogWrapper,
 ) : UpcomingContract.View {
     init {
+        log.tag(this)
         appState.upcomingNotificationChannelId = notificationWrapper.createChannelId(
             CHANNEL_ID,
             CHANNEL_NAME
@@ -30,6 +33,7 @@ class UpcomingNotification(
     }
 
     override fun showNotification(item: PlaylistItemDomain) {
+        // todo add routing to show playlistItemEdit
         val contentIntent = Intent(appContext, MainActivity::class.java)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(appContext, 0, contentIntent, PendingIntent.FLAG_IMMUTABLE)

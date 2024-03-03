@@ -57,7 +57,8 @@ class PlaylistUpdateUsecase constructor(
 
     suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
         return if (playlistDomain.id == LiveUpcoming.identifier()) {
-            // divert LiveUpcoming playlist to service - but actually all updates should goto the service
+            // divert LiveUpcoming playlist to service
+            // todo actually all updates should goto the service .. eventually
             updateServiceManager.start()
             UpdateResult(true, "Updating liveUpcoming ..")
         } else {

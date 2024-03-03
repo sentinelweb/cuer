@@ -126,7 +126,7 @@ class MainActivity :
             )
         }
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
-            log.d("navigation change: dest: $navDestination bundle:$bundle")
+            log.d("navigation change: dest: $navDestination|")
         }
 
         volumeControl.controlView = binding.castPlayerVolume

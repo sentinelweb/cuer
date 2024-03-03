@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper.Companion.SERVICE_NOT_FOUND
 import uk.co.sentinelweb.cuer.app.util.wrapper.StethoWrapper
-import uk.co.sentinelweb.cuer.app.work.WorkManagerLauncher
+import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import kotlin.time.ExperimentalTime
@@ -37,7 +37,7 @@ class CuerApp : Application() {
     private val queue: QueueMediatorContract.Producer by inject()
     private val screenStateReceiver: ScreenStateReceiver by inject()
     private val wifiReceiver: WifiStateProvider by inject()
-    private val workManagerLauncher: WorkManagerLauncher by inject()
+    private val workManagerInteractor: WorkManagerInteractor by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -67,7 +67,7 @@ class CuerApp : Application() {
         setDefaultExceptionHander()
         screenStateReceiver.register(this)
         wifiReceiver.register()
-        workManagerLauncher.startUpcomingVideosChecker(this)
+        workManagerInteractor.startUpcomingVideosChecker(this)
     }
 
     override fun onTerminate() {

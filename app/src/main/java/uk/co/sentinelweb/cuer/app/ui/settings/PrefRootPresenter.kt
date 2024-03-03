@@ -6,10 +6,11 @@ import org.koin.core.component.KoinComponent
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
-import uk.co.sentinelweb.cuer.app.work.WorkManagerLauncher
+import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
 import uk.co.sentinelweb.cuer.app.work.worker.UpcomingVideosCheckWorker
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -80,7 +81,8 @@ class PrefRootPresenter constructor(
     }
 
     override fun test() {
-        getKoin().get<WorkManagerLauncher>()
+        getKoin().get<WorkManagerInteractor>()
             .checkStatus(getKoin().get<Context>(), UpcomingVideosCheckWorker.WORK_NAME)
+        getKoin().get<UpcomingContract.Presenter>().checkForUpcomingEpisodes(30)
     }
 }

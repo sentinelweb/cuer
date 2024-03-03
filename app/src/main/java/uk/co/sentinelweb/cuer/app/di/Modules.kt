@@ -86,7 +86,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
-import uk.co.sentinelweb.cuer.app.work.WorkManagerLauncher
+import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -160,7 +160,7 @@ object Modules {
                 get()
             )
         }
-        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get()) }
+        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get(), get()) }
     }
 
     private val receiverModule = module {
@@ -271,7 +271,7 @@ object Modules {
     }
 
     private val workModule = module {
-        factory { WorkManagerLauncher(get()) }
+        factory { WorkManagerInteractor(get()) }
     }
 
     val allModules = listOf(utilModule)
