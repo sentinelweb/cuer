@@ -224,7 +224,7 @@ class MainActivity :
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
@@ -235,7 +235,6 @@ class MainActivity :
         super.onStart()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
-        //checkIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
 

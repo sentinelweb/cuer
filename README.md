@@ -65,7 +65,6 @@ Using
 - `./gradlew database:generateCommonMainDatabaseSchema`
 - `./gradlew --info database:verifySqlDelightMigration`
 
-
 ## Screenshots
 
 ### Browse

@@ -42,7 +42,6 @@ class UpdateServiceNotification(
                     .setStyle(inboxStyle)
                     .setContentIntent(intent)
                     .build()
-
             }
 
             Model.Type.STATUS -> {
