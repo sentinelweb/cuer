@@ -51,6 +51,7 @@ class QueueMediatorTest {
     @get:Rule
     var rule = CoroutineTestRule()
 
+    // todo fix flakiness (from fixture)
     @get:Rule
     var flakyTestRule = FlakyTestRule(20)
 
