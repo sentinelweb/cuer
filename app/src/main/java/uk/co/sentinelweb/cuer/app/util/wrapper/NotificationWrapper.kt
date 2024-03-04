@@ -17,7 +17,7 @@ class NotificationWrapper constructor(private val app: Application) {
         val chan = NotificationChannel(
             channelId,
             channelName,
-            NotificationManager.IMPORTANCE_NONE
+            NotificationManager.IMPORTANCE_LOW
         )
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE

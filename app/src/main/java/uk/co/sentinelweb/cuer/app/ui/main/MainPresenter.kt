@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.cast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
@@ -15,6 +16,7 @@ class MainPresenter(
     private val castListener: FloatingPlayerCastListener,
     private val log: LogWrapper,
     private val autoBackupFileExporter: AutoBackupFileExporter,
+    private val notificationPermissionCheckDialog: NotificationPermissionCheckDialog
 ) : MainContract.Presenter {
 
     init {
@@ -64,6 +66,8 @@ class MainPresenter(
         autoBackupFileExporter.attemptAutoBackup { result ->
             view.promptToBackup(result)
         }
+
+        notificationPermissionCheckDialog.checkToShow()
     }
 
     override fun onStop() {

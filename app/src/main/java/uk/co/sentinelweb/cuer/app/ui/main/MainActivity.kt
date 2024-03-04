@@ -237,7 +237,6 @@ class MainActivity :
         presenter.onStart()
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
-
         hideShowPlayerIfOnboarding()
     }
 

@@ -9,16 +9,12 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, AndroidScopeComponent {
 
     override val scope: Scope by serviceScopeWithSource()
     private val controller: YoutubeCastServiceContract.Controller by scope.inject()
-    private val toastWrapper: ToastWrapper by inject()
-    private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
 
@@ -27,7 +23,6 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         log.tag(this)
         _instance = this
         log.d("Service created")
-        appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
 
     }
@@ -54,8 +49,8 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
     override fun onBind(p0: Intent?): IBinder? = null
 
     companion object {
-        private const val CHANNEL_ID: String = "cuer_yt_service"
-        private const val CHANNEL_NAME: String = "Cuer Youtube Service"
+        const val CHANNEL_ID: String = "cuer_yt_service"
+        const val CHANNEL_NAME: String = "Cuer Youtube Service"
 
         private var _instance: YoutubeCastService? = null
         fun instance(): YoutubeCastService? = _instance

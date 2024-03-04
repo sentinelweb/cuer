@@ -26,12 +26,7 @@ class UpdateService() : Service(), UpdateServiceContract.Service, AndroidScopeCo
     override fun onCreate() {
         super.onCreate()
         log.tag(this)
-        //_instance = this
         log.d("Update Service created")
-        appState.updateNotificationChannelId = notificationWrapper.createChannelId(
-            CHANNEL_ID,
-            CHANNEL_NAME
-        )
         controller.initialise()
     }
 
@@ -40,11 +35,9 @@ class UpdateService() : Service(), UpdateServiceContract.Service, AndroidScopeCo
         log.d("Update Service destroyed")
         controller.destroy()
         scope.close()
-        //_instance = null
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // this routes media buttons to the MediaSessionCompat
         controller.handleAction(intent?.action)
         return START_NOT_STICKY
     }
@@ -52,10 +45,8 @@ class UpdateService() : Service(), UpdateServiceContract.Service, AndroidScopeCo
     override fun onBind(p0: Intent?): IBinder? = null
 
     companion object {
-        //private var _instance: UpdateService? = null
-        private const val CHANNEL_ID: String = "cuer_update_service"
-        private const val CHANNEL_NAME: String = "Cuer Update Service"
-        //fun instance(): UpdateService? = _instance
+        const val CHANNEL_ID: String = "cuer_update_service"
+        const val CHANNEL_NAME: String = "Cuer Update Service"
 
         val serviceModule = module {
             single<UpdateServiceContract.Manager> { UpdateServiceManager(androidApplication()) }

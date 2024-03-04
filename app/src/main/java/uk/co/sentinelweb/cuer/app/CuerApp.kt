@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationChannelCreator
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ServiceWrapper.Companion.SERVICE_NOT_FOUND
@@ -38,6 +39,7 @@ class CuerApp : Application() {
     private val screenStateReceiver: ScreenStateReceiver by inject()
     private val wifiReceiver: WifiStateProvider by inject()
     private val workManagerInteractor: WorkManagerInteractor by inject()
+    private val notificationChannelCreator: NotificationChannelCreator by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -68,6 +70,8 @@ class CuerApp : Application() {
         screenStateReceiver.register(this)
         wifiReceiver.register()
         workManagerInteractor.startUpcomingVideosChecker(this)
+
+        notificationChannelCreator.create()
     }
 
     override fun onTerminate() {

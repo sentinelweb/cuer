@@ -31,8 +31,8 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
-import uk.co.sentinelweb.cuer.app.util.permission.LocaltionPermissionOpener
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
+import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionOpener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -182,7 +182,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }
-                scoped<LocationPermissionLaunch> { LocaltionPermissionOpener(this.getFragmentActivity()) }
+                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity()) }
             }
         }
     }

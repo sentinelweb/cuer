@@ -44,7 +44,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
         log.tag(this)
         _instance = this
         log.d("Remote Service created")
-        appState.remoteNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
         controller.initialise()
     }
 
@@ -68,8 +67,8 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
     override fun onBind(p0: Intent?): IBinder? = null
 
     companion object {
-        private const val CHANNEL_ID: String = "cuer_remote_service"
-        private const val CHANNEL_NAME: String = "Cuer Remote Service"
+        const val CHANNEL_ID: String = "cuer_remote_service"
+        const val CHANNEL_NAME: String = "Cuer Remote Service"
 
         private var _instance: RemoteServerService? = null
         fun instance(): RemoteServerService? = _instance

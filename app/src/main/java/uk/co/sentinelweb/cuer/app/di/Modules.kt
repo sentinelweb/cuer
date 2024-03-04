@@ -75,6 +75,8 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationChannelCreator
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheck
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.remote.AndroidWakeLockManager
@@ -160,7 +162,7 @@ object Modules {
                 get()
             )
         }
-        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get(), get()) }
+        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get()) }
     }
 
     private val receiverModule = module {
@@ -242,6 +244,8 @@ object Modules {
         }
         factory { ContentUriUtil(androidApplication()) }
         factory { BitmapSizer() }
+        factory { NotificationChannelCreator(get(), get()) }
+        factory { NotificationPermissionCheck(get(), get()) }
     }
 
     private val wrapperModule = module {
