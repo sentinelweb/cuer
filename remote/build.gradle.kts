@@ -1,11 +1,14 @@
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpack
+
+// run
 // ./gradlew :remote:jsBrowserRun --continue
 // ./gradlew :remote:runServer
 
 plugins {
     kotlin("multiplatform")
-//    kotlin("com.android.application")
-    application
+    id("com.android.library")
     kotlin("plugin.serialization")
+    kotlin("native.cocoapods")
 }
 
 val ver_kotlin: String by project
@@ -22,12 +25,21 @@ val ver_truth: String by project
 val isProduction: String by project
 val ver_logback = "1.2.3"
 
+val app_compileSdkVersion: String by project
+val app_targetSdkVersion: String by project
+val app_minSdkVersion: String by project
+val app_base: String by project
+
+val ver_swift_tools: String by project
+val ver_ios_deploy_target: String by project
+
 val outputJsLibName = "cuer_remote.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
 version = "1.0"
 
 kotlin {
+    jvm()
     js(IR) {
         useCommonJs()
         browser {
@@ -41,10 +53,20 @@ kotlin {
         }
         binaries.executable()
     }
-    jvm {
+    androidTarget()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
+
+    cocoapods {
+        framework {
+            isStatic = true //or false
+        }
+        summary = "remote"
+        homepage = "https://sentinelweb.co.uk"
+        ios.deploymentTarget = ver_ios_deploy_target
     }
-    androidTarget {
-    }
+
     sourceSets {
 
         val commonMain by getting {
@@ -74,7 +96,17 @@ kotlin {
                 implementation("io.ktor:ktor-server-compression:$ver_ktor")
                 implementation("io.ktor:ktor-server-call-logging:$ver_ktor")
                 implementation("io.ktor:ktor-server-auth:$ver_ktor")
-                implementation("io.ktor:ktor-server-auth-jwt:$ver_ktor")
+                implementation("io.ktor:ktor-server-auth-jwt:$ver_ktor") {
+                    // stops dep conflict with guava listenablefuture use in android runtime
+                    exclude(group = "com.google.guava", module = "guava")
+                }
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(jvmMain)
+            dependencies {
+
             }
         }
 
@@ -107,35 +139,49 @@ kotlin {
     }
 }
 
-//val runServer by tasks.creating(JavaExec::class) {
-//    group = "application"
-//    main = "uk.co.sentinelweb.cuer.remote.server.MainKt"
-//    kotlin {
-//        val main = targets["jvm"].compilations["main"]
-//        dependsOn(main.compileAllTaskName)
-//        dependsOn("jsBrowserDevelopmentWebpack")
-//        val jarTaskName = "jvmJar"
-//        dependsOn(jarTaskName)
-//        val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
-//        classpath(
-//            { jvmJarTask.outputs.files },
-//            { configurations["jvmRuntimeClasspath"] }
-//        )
-//        println("runServer:" + main.output.allOutputs.files)
-//    }
-//}
+android {
+    compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdk = app_minSdkVersion.toInt()
+        targetSdk = app_targetSdkVersion.toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+val runServer by tasks.creating(JavaExec::class) {
+    group = "application"
+    mainClass = "uk.co.sentinelweb.cuer.remote.server.MainKt"
+    kotlin {
+        val main = targets["jvm"].compilations["main"]
+        dependsOn(main.compileAllTaskName)
+        dependsOn("jsBrowserDevelopmentWebpack")
+        val jarTaskName = "jvmJar"
+        dependsOn(jarTaskName)
+        val jvmJarTask = tasks.getByName<Jar>(jarTaskName)
+        classpath(
+            { jvmJarTask.outputs.files },
+            { configurations["jvmRuntimeClasspath"] }
+        )
+        println("runServer:" + main.output.allOutputs.files)
+    }
+}
 
 // include JS artifacts in any JAR we generate
-//tasks.getByName<Jar>("jvmJar") {
-//    val taskName = if (project.property("isProduction") == "true") {
-//        "jsBrowserProductionWebpack"
-//    } else {
-//        "jsBrowserDevelopmentWebpack"
-//    }
-//    val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
-//    dependsOn(webpackTask) // make sure JS gets compiled first
-//    from(File(webpackTask.destinationDirectory, outputJsLibName))
-//}
+tasks.getByName<Jar>("jvmJar") {
+    val taskName = if (project.property("isProduction") == "true") {
+        "jsBrowserProductionWebpack"
+    } else {
+        "jsBrowserDevelopmentWebpack"
+    }
+    val webpackTask = tasks.getByName<KotlinWebpack>(taskName)
+    dependsOn(webpackTask) // make sure JS gets compiled first
+    from(File(webpackTask.destinationDirectory, outputJsLibName))
+}
 
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {

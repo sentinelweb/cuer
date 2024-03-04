@@ -2,7 +2,6 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-//    kotlin("com.android.application")
     kotlin("plugin.serialization")
     kotlin("native.cocoapods")
 }

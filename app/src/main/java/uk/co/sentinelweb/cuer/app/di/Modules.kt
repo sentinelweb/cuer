@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.di
 
-//import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import android.os.Build
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import io.ktor.client.*
@@ -104,6 +103,7 @@ import uk.co.sentinelweb.cuer.net.di.NetModule
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
+import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 
 //import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
@@ -291,7 +291,7 @@ object Modules {
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
         .plus(FirebaseModule.fbModule)
-        //.plus(RemoteModule.objectModule)
+        .plus(RemoteModule.objectModule)
         .plus(remoteModule)
         .plus(PlayerModule.localPlayerModule)
         .plus(SharedAppAndroidModule.modules)
