@@ -23,6 +23,10 @@ class UpdateServiceNotificationController constructor(
         view.showNotification(Model(type = Model.Type.STATUS, status = status, itemsUpdated = -1, items = emptyList()))
     }
 
+    override fun updateNotificationError(status: String) {
+        view.showNotification(Model(type = Model.Type.ERROR, status = status, itemsUpdated = -1, items = emptyList()))
+    }
+
     override fun hideNotification() {
         view.stopSelf()
     }

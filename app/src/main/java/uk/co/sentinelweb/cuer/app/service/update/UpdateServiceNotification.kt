@@ -30,6 +30,11 @@ class UpdateServiceNotification(
                     buildNotificationStatus(summary)
                 )
             }
+
+            Type.ERROR -> {
+                val nm = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                nm.notify(0, buildNotificationError(summary))
+            }
         }
     }
 
@@ -39,6 +44,13 @@ class UpdateServiceNotification(
             .setContentTitle(model.status)
             .setContentText("Updating ...")
             .setOngoing(true)
+            .build()
+
+    private fun buildNotificationError(model: Model) =
+        NotificationCompat.Builder(service, appState.updateNotificationChannelId!!)
+            .setSmallIcon(R.drawable.ic_refresh)
+            .setContentTitle(model.status)
+            .setContentText("Check the error and try again")
             .build()
 
     private fun buildNotificationResult(model: Model): Notification {

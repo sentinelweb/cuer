@@ -9,9 +9,7 @@ import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 
@@ -20,8 +18,6 @@ class UpdateService() : Service(), UpdateServiceContract.Service, AndroidScopeCo
     override val scope: Scope by serviceScopeWithSource()
     private val controller: UpdateServiceContract.Controller by scope.inject()
     private val log: LogWrapper by inject()
-    private val notificationWrapper: NotificationWrapper by inject()
-    private val appState: CuerAppState by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -60,7 +56,8 @@ class UpdateService() : Service(), UpdateServiceContract.Service, AndroidScopeCo
                         playlistItemOrchestrator = get(),
                         mediaOrchestrator = get(),
                         timeProvider = get(),
-                        notification = get()
+                        notification = get(),
+                        connectivityWrapper = get()
                     )
                 }
                 scoped<UpdateServiceContract.Notification.External> {

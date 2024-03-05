@@ -20,6 +20,7 @@ class UpdateServiceContract {
         interface External {
             fun updateNotificationResult(mediaDomains: List<MediaDomain>)
             fun updateNotificationStatus(status: String)
+            fun updateNotificationError(status: String)
             fun hideNotification()
             fun handleAction(action: String?)
             fun destroy()
@@ -38,7 +39,7 @@ class UpdateServiceContract {
             val itemsUpdated: Int,
             val items: List<Item>
         ) {
-            enum class Type { STATUS, RESULT }
+            enum class Type { STATUS, RESULT, ERROR }
             data class Item(
                 val title: String
             )
