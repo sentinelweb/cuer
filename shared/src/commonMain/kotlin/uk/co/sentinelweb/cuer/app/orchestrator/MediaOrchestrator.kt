@@ -51,7 +51,7 @@ class MediaOrchestrator constructor(
                 is PlatformIdListFilter ->
                     ytInteractor
                         .videos(filter.ids, listOf(ID, SNIPPET, CONTENT_DETAILS, LIVE_BROADCAST_DETAILS))
-                        .forceNetListResultNotEmpty("Youtube ${filter.ids} does not exist")
+                        .allowNetListResultEmpty()
 
                 else -> throw InvalidOperationException(this::class, filter, options)
             }

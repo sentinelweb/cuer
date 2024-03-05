@@ -12,13 +12,14 @@ class UpdateServiceContract {
     }
 
     interface Service {
+        fun stopSelf()
     }
 
     interface Notification {
 
         interface External {
-            fun updateNotification(mediaDomains: List<MediaDomain>)
-            fun updateNotification(status: String)
+            fun updateNotificationResult(mediaDomains: List<MediaDomain>)
+            fun updateNotificationStatus(status: String)
             fun hideNotification()
             fun handleAction(action: String?)
             fun destroy()

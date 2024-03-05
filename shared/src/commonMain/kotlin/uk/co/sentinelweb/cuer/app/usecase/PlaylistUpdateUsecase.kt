@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.UpdateResult.Result
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
@@ -34,24 +35,28 @@ class PlaylistUpdateUsecase constructor(
         log.tag(this)
     }
 
+
     data class UpdateResult(
-        val success: Boolean,
+        val status: Result,
         val reason: String = "",
         val numberItems: Int = -1,
         val newItems: List<PlaylistItemDomain>? = null
-    )
+    ) {
+        enum class Result{Success, Failure, Pending}
+    }
 
-    fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
+    fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.checkToUpdate(p)
     fun canUpdate(p: PlaylistDomain): Boolean = updateChecker.canUpdate(p)
 
     suspend fun update(id: OrchestratorContract.Identifier<GUID>): UpdateResult {
         return if (id == LiveUpcoming.identifier()) {
+            log.d("Update service liveupcoming")
             updateServiceManager.start()
-            UpdateResult(true, "Updating liveUpcoming ..")
+            UpdateResult(Result.Pending, "Updating liveUpcoming ..")
         } else {
             playlistOrchestrator.loadById(id.id, id.source.deepOptions())
                 ?.let { update(it) }
-                ?: UpdateResult(false, "Playlist not found")
+                ?: UpdateResult(Result.Failure, "Playlist not found")
         }
     }
 
@@ -59,8 +64,9 @@ class PlaylistUpdateUsecase constructor(
         return if (playlistDomain.id == LiveUpcoming.identifier()) {
             // divert LiveUpcoming playlist to service
             // todo actually all updates should goto the service .. eventually
+            log.d("Update service liveupcoming")
             updateServiceManager.start()
-            UpdateResult(true, "Updating liveUpcoming ..")
+            UpdateResult(Result.Pending, "Updating liveUpcoming ..")
         } else {
             playlistDomain
                 .takeIf { canUpdate(it) }
@@ -79,15 +85,14 @@ class PlaylistUpdateUsecase constructor(
                                     ?.takeIf { it.items.size > 0 }
                                     ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
                                     ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                                    ?.let { UpdateResult(true, numberItems = it.size, newItems = it) }
-                                    ?: UpdateResult(true, numberItems = 0)
+                                    ?.let { UpdateResult(Result.Success, numberItems = it.size, newItems = it) }
+                                    ?: UpdateResult(Result.Success, numberItems = 0)
                             }
-                            ?: UpdateResult(false, reason = "No platform id")
-
-                        else -> UpdateResult(false, reason = "Unsupported platform type")
+                            ?: UpdateResult(Result.Failure, reason = "No platformId")
+                        else -> UpdateResult(Result.Failure, reason = "Unsupported platform type")
                     }
                 }
-                ?: UpdateResult(false, reason = "Cannot update this playlist")
+                ?: UpdateResult(Result.Failure, reason = "Cannot update this playlist")
         }
     }
 
@@ -122,16 +127,17 @@ class PlaylistUpdateUsecase constructor(
     }
 
     interface UpdateCheck {
-        fun shouldUpdate(p: PlaylistDomain): Boolean
+        fun checkToUpdate(p: PlaylistDomain): Boolean
         fun canUpdate(p: PlaylistDomain): Boolean
     }
 
     class PlatformUpdateCheck : UpdateCheck {
-        override fun shouldUpdate(p: PlaylistDomain): Boolean =
-            p.type == PLATFORM
+        override fun checkToUpdate(p: PlaylistDomain): Boolean =
+            p.type == PLATFORM || p.id == LiveUpcoming.identifier()
 
         override fun canUpdate(p: PlaylistDomain): Boolean =
-            p.platformId != null && p.platform == YOUTUBE && p.type == PLATFORM
+            (p.platformId != null && p.platform == YOUTUBE && p.type == PLATFORM)
+                    || p.id == LiveUpcoming.identifier()
     }
 
     companion object {

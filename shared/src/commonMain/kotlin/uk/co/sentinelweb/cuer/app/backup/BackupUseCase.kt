@@ -46,13 +46,13 @@ class BackupUseCase(
                     backupFileModel.medias.chunked(CHUNK_SIZE)
                         .map { mediaRepository.save(it, flat = false, emit = false) }
                         .takeIf { it.isNotEmpty() }
-                        ?.reduce { acc: RepoResult<List<MediaDomain>>, result: RepoResult<List<MediaDomain>> ->
-                            RepoResult.Composite<List<MediaDomain>>(
+                        ?.reduce { acc: DbResult<List<MediaDomain>>, result: DbResult<List<MediaDomain>> ->
+                            DbResult.Composite<List<MediaDomain>>(
                                 acc.isSuccessful && result.isSuccessful,
                                 result.data?.let { acc.data?.plus(it) }
                             )
                         }
-                        ?: RepoResult.Data(emptyList())
+                        ?: DbResult.Data(emptyList())
                 }
                 ?.takeIf { it.isSuccessful }
                 ?.data

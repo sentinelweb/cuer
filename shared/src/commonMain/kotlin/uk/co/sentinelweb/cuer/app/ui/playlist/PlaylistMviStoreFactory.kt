@@ -14,7 +14,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFi
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.YoutubeSearch
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
@@ -551,14 +552,18 @@ class PlaylistMviStoreFactory(
                         ?.takeIf { playlistUpdateUsecase.checkToUpdate(it) }
                         ?.let { playlistUpdateUsecase.update(it) }
                         ?.also {
-                            if (it.success) {
-                                publish(
-                                    Message(
-                                        strings.get(playlist_items_updated, listOf(it.numberItems.toString()))
+                            when (it.status) {
+                                PlaylistUpdateUsecase.UpdateResult.Result.Success ->
+                                    publish(
+                                        Message(
+                                            strings.get(playlist_items_updated, listOf(it.numberItems.toString()))
+                                        )
                                     )
-                                )
-                            } else {
-                                publish(Error(strings.get(playlist_error_updating, listOf(it.reason))))
+
+                                PlaylistUpdateUsecase.UpdateResult.Result.Failure ->
+                                    publish(Error(strings.get(playlist_error_updating, listOf(it.reason))))
+                                PlaylistUpdateUsecase.UpdateResult.Result.Pending ->
+                                    publish(Message(it.reason))
                             }
                         }
                         ?.also { publish(Label.Loaded) }

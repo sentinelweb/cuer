@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
@@ -51,16 +51,16 @@ class SqldelightPlaylistDatabaseRepository(
         domain: PlaylistDomain,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
-        database.playlistItemEntityQueries.transactionWithResult<RepoResult<PlaylistDomain>> {
+    ): DbResult<PlaylistDomain> = withContext(coProvider.IO) {
+        database.playlistItemEntityQueries.transactionWithResult<DbResult<PlaylistDomain>> {
             try {
                 saveInternal(domain, flat)
-                    .let { RepoResult.Data(loadPlaylistInternal(id = it, flat).data) }
+                    .let { DbResult.Data(loadPlaylistInternal(id = it, flat).data) }
 
             } catch (e: Exception) {
                 val msg = "couldn't save playlist: ${domain.summarise()}"
                 log.e(msg, e)
-                rollback(RepoResult.Error<PlaylistDomain>(e, msg))
+                rollback(DbResult.Error<PlaylistDomain>(e, msg))
             }
         }.also {
             it
@@ -74,16 +74,16 @@ class SqldelightPlaylistDatabaseRepository(
         domains: List<PlaylistDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
-        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistDomain>>> {
+    ): DbResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
+        database.playlistItemEntityQueries.transactionWithResult<DbResult<List<PlaylistDomain>>> {
             try {
                 domains
                     .map { saveInternal(it, flat) }
-                    .let { RepoResult.Data(it.map { loadPlaylistInternal(id = it, flat).data!! }) }
+                    .let { DbResult.Data(it.map { loadPlaylistInternal(id = it, flat).data!! }) }
             } catch (e: Exception) {
                 val msg = "couldn't save playlists: ${domains.map { it.summarise() }}"
                 log.e(msg, e)
-                rollback(RepoResult.Error<List<PlaylistDomain>>(e, msg))
+                rollback(DbResult.Error<List<PlaylistDomain>>(e, msg))
             }
         }.also {
             it
@@ -93,12 +93,12 @@ class SqldelightPlaylistDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: GUID, flat: Boolean): RepoResult<PlaylistDomain> = loadPlaylist(id, flat)
+    override suspend fun load(id: GUID, flat: Boolean): DbResult<PlaylistDomain> = loadPlaylist(id, flat)
 
     override suspend fun loadList(
         filter: Filter,
         flat: Boolean
-    ): RepoResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
+    ): DbResult<List<PlaylistDomain>> = withContext(coProvider.IO) {
         database.playlistItemEntityQueries.transactionWithResult {
             try {
                 with(database.playlistEntityQueries) {
@@ -119,22 +119,22 @@ class SqldelightPlaylistDatabaseRepository(
                             else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id.toGUID())
                         )
                     }
-                    .let { RepoResult.Data(it) }
+                    .let { DbResult.Data(it) }
             } catch (e: Exception) {
                 val msg = "couldn't load playlists: ${filter}"
                 log.e(msg, e)
-                RepoResult.Error<List<PlaylistDomain>>(e, msg)
+                DbResult.Error<List<PlaylistDomain>>(e, msg)
             }
         }
     }
 
-    override suspend fun loadStatsList(filter: Filter): RepoResult<List<PlaylistStatDomain>> =
+    override suspend fun loadStatsList(filter: Filter): DbResult<List<PlaylistStatDomain>> =
         withContext(coProvider.IO) {
             database.playlistItemEntityQueries.transactionWithResult {
                 try {
                     when (filter) {
                         is IdListFilter ->
-                            RepoResult.Data(
+                            DbResult.Data(
                                 filter.ids.map {
                                     PlaylistStatDomain(
                                         playlistId = it.toIdentifier(source),
@@ -151,23 +151,23 @@ class SqldelightPlaylistDatabaseRepository(
                 } catch (e: Throwable) {
                     val msg = "couldn't load playlist stats "
                     log.e(msg, e)
-                    RepoResult.Error<List<PlaylistStatDomain>>(e, msg)
+                    DbResult.Error<List<PlaylistStatDomain>>(e, msg)
                 }
             }
         }
 
-    override suspend fun count(filter: Filter): RepoResult<Int> =
+    override suspend fun count(filter: Filter): DbResult<Int> =
         try {
             withContext(coProvider.IO) {
                 database.playlistEntityQueries.count().executeAsOne().toInt()
-            }.let { RepoResult.Data(it) }
+            }.let { DbResult.Data(it) }
         } catch (e: Exception) {
             val msg = "couldn't count playlists ${filter}"
             log.e(msg, e)
-            RepoResult.Error<Int>(e, msg)
+            DbResult.Error<Int>(e, msg)
         }
 
-    override suspend fun delete(domain: PlaylistDomain, emit: Boolean): RepoResult<Boolean> =
+    override suspend fun delete(domain: PlaylistDomain, emit: Boolean): DbResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -178,22 +178,22 @@ class SqldelightPlaylistDatabaseRepository(
                             _updatesFlow.emit(Operation.DELETE to domain)
                         }
                     }
-                RepoResult.Data.Empty(true)
+                DbResult.Data.Empty(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
+    override suspend fun deleteAll(): DbResult<Boolean> = withContext(coProvider.IO) {
         try {
             database.playlistEntityQueries.deleteAll()
-            RepoResult.Data.Empty(true)
+            DbResult.Data.Empty(true)
         } catch (e: Exception) {
             val msg = "couldn't delete all media"
             log.e(msg, e)
-            RepoResult.Error<Boolean>(e, msg)
+            DbResult.Error<Boolean>(e, msg)
         }
     }
 
@@ -202,7 +202,7 @@ class SqldelightPlaylistDatabaseRepository(
         update: UpdateDomain<PlaylistDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
+    ): DbResult<PlaylistDomain> = withContext(coProvider.IO) {
         try {
             when (update) {
                 is PlaylistIndexUpdateDomain -> updateCurrentIndex(update, emit)
@@ -211,14 +211,14 @@ class SqldelightPlaylistDatabaseRepository(
         } catch (e: Throwable) {
             val msg = "couldn't update playlist $update"
             log.e(msg, e)
-            RepoResult.Error<PlaylistDomain>(e, msg)
+            DbResult.Error<PlaylistDomain>(e, msg)
         }
     }
 
     private suspend fun updateCurrentIndex(
         update: PlaylistIndexUpdateDomain,
         emit: Boolean = true
-    ): RepoResult<PlaylistDomain> = withContext(coProvider.IO) {
+    ): DbResult<PlaylistDomain> = withContext(coProvider.IO) {
         try {
             update.id
                 .let {
@@ -234,11 +234,11 @@ class SqldelightPlaylistDatabaseRepository(
         } catch (e: Exception) {
             val msg = "couldn't update current index $update"
             log.e(msg, e)
-            RepoResult.Error<PlaylistDomain>(e, msg)
+            DbResult.Error<PlaylistDomain>(e, msg)
         }
     }
 
-    private suspend fun loadPlaylist(id: GUID, flat: Boolean): RepoResult<PlaylistDomain> =
+    private suspend fun loadPlaylist(id: GUID, flat: Boolean): DbResult<PlaylistDomain> =
         withContext(coProvider.IO) {
             loadPlaylistInternal(id, flat)
         }
@@ -255,11 +255,11 @@ class SqldelightPlaylistDatabaseRepository(
                         else itemDatabaseRepository.loadPlaylistItemsInternal(entity.id.toGUID())
                     )
                 }
-                .let { domain: PlaylistDomain -> RepoResult.Data(domain) }
+                .let { domain: PlaylistDomain -> DbResult.Data(domain) }
         } catch (e: Throwable) {
             val msg = "couldn't load playlist: $id"
             log.e(msg, e)
-            RepoResult.Error<PlaylistDomain>(e, msg)
+            DbResult.Error<PlaylistDomain>(e, msg)
         }
 
 

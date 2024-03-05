@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.update
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toInstant
@@ -36,26 +37,30 @@ class UpdateServiceController(
      * maybe eliminate PlaylistUpdateUsecase or integrate it here.
      */
     override fun update() = coroutines.ioScope.launch {
-        notification.updateNotification("Updating Live Items")
+        notification.updateNotificationStatus("Updating Live Items")
         // todo connectivity check
         try { // fixme ??? since broadcast date isn't saved need to update every run - no need to do update after broadcast date is saved
+            delay(3000)
             playlistItemOrchestrator
                 .loadList(LiveUpcomingMediaFilter(50), LOCAL.deepOptions())
                 .map { it.media }
-                .also { log.d("media.platformId: ${it.map { it.platformId }}") }
+                //.also { log.d("media.platformId: ${it.map { it.platformId }}") }
                 .let { mediaUpdateFromPlatformUseCase.updateMediaList(it) }
-                .also { log.d("channels: ${it.map { it.channelData.id }}") }
+                //.also { log.d("channels: ${it.map { it.channelData.id }}") }
                 .apply { mediaOrchestrator.save(this, LOCAL.flatOptions()) }
                 .filter {
                     it.broadcastDate?.let {
-                        it.toInstant(TimeZone.UTC).toEpochMilliseconds() > timeProvider.currentTimeMillis() - 60 * 60 * 1000
+                        it.toInstant(TimeZone.UTC)
+                            .toEpochMilliseconds() > timeProvider.currentTimeMillis() - 60 * 60 * 1000
                     } ?: false // true?
                 }
                 .takeIf { it.size > 0 }
-                ?.apply { notification.updateNotification(this) }
+                ?.apply { notification.updateNotificationResult(this) }
+                ?:apply { notification.updateNotificationResult(emptyList()) }
         } catch (e: OrchestratorContract.NetException) {
             log.e(e.message ?: "NetException(no message)", e)
         }
+        service.stopSelf()
     }.ignoreJob()
 
     override fun destroy() {

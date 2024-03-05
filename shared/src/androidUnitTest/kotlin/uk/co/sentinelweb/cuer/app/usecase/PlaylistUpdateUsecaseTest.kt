@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.Companion.SECONDS
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.UpdateResult.Result
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -89,7 +90,7 @@ class PlaylistUpdateUsecaseTest {
 
         val actual = sut.update(playlist)
 
-        assertFalse(actual.success)
+        assertEquals(actual.status, Result.Failure)
     }
 
 
@@ -145,8 +146,8 @@ class PlaylistUpdateUsecaseTest {
 
         val actual = sut.update(existingPlaylist)
 
-        log.d("actual; ${actual.success} ${actual.newItems?.size}")
-        assertTrue(actual.success)
+        log.d("actual; ${actual.status} ${actual.newItems?.size}")
+        assertEquals(actual.status, Result.Success)
         assertEquals(6, actual.newItems?.size)
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
         // so least recent is 7000 and most recent is 2000
@@ -205,7 +206,7 @@ class PlaylistUpdateUsecaseTest {
         val actual = sut.update(existingPlaylist)
 
         log.d("actual; $actual")
-        assertTrue(actual.success)
+        assertEquals(actual.status, Result.Success)
         assertEquals(6, actual.newItems?.size)
         // existing order is:: minOrder: 8000 maxOrder: 13000 orderIsAscending: false
         // so least recent is 7000 and most recent is 2000
@@ -227,8 +228,8 @@ class PlaylistUpdateUsecaseTest {
 
         val actual = sut.update(existingPlaylist)
 
-        log.d("actual; ${actual.success} ${actual.newItems?.size}")
-        assertTrue(actual.success)
+        log.d("actual; ${actual.status} ${actual.newItems?.size}")
+        assertEquals(actual.status, Result.Pending)
         assertEquals(-1, actual.numberItems)
         coVerify { updateServiceManager.start() }
     }

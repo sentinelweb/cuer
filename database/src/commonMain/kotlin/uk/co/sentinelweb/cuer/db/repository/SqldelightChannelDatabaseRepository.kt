@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -41,7 +41,7 @@ class SqldelightChannelDatabaseRepository(
     override val stats: Flow<Pair<Operation, Nothing>>
         get() = TODO("Not yet implemented")
 
-    override suspend fun save(domain: ChannelDomain, flat: Boolean, emit: Boolean): RepoResult<ChannelDomain> =
+    override suspend fun save(domain: ChannelDomain, flat: Boolean, emit: Boolean): DbResult<ChannelDomain> =
         withContext(coProvider.IO) {
             saveInternal(domain)
                 .also {
@@ -51,7 +51,7 @@ class SqldelightChannelDatabaseRepository(
                 }
         }
 
-    private fun saveInternal(domain: ChannelDomain): RepoResult<ChannelDomain> =
+    private fun saveInternal(domain: ChannelDomain): DbResult<ChannelDomain> =
         database.channelEntityQueries.transactionWithResult {
             try {
                 domain
@@ -79,11 +79,11 @@ class SqldelightChannelDatabaseRepository(
                         //domain.copy(id = id)
                         loadChannelInternal(id.id).data!!
                     }
-                    .let { channel: ChannelDomain -> RepoResult.Data(channel) }
+                    .let { channel: ChannelDomain -> DbResult.Data(channel) }
             } catch (e: Throwable) {
                 val msg = "couldn't save channel $domain"
                 log.e(msg, e)
-                rollback(RepoResult.Error<ChannelDomain>(e, msg))
+                rollback(DbResult.Error<ChannelDomain>(e, msg))
             }
         }
 
@@ -92,16 +92,16 @@ class SqldelightChannelDatabaseRepository(
         domains: List<ChannelDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<List<ChannelDomain>> = withContext(coProvider.IO) {
-        database.channelEntityQueries.transactionWithResult<RepoResult<List<ChannelDomain>>> {
+    ): DbResult<List<ChannelDomain>> = withContext(coProvider.IO) {
+        database.channelEntityQueries.transactionWithResult<DbResult<List<ChannelDomain>>> {
             try {
                 domains
                     .map { saveInternal(it).data!! }
-                    .let { RepoResult.Data(it) }
+                    .let { DbResult.Data(it) }
             } catch (e: Exception) {
                 val msg = "couldn't save channels"
                 log.e(msg, e)
-                rollback(RepoResult.Error<List<ChannelDomain>>(e, msg))
+                rollback(DbResult.Error<List<ChannelDomain>>(e, msg))
             }
         }.also {
             it.takeIf { it.isSuccessful && emit }
@@ -110,23 +110,23 @@ class SqldelightChannelDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: GUID, flat: Boolean): RepoResult<ChannelDomain> = loadChannel(id)
+    override suspend fun load(id: GUID, flat: Boolean): DbResult<ChannelDomain> = loadChannel(id)
 
     override suspend fun loadList(
         filter: Filter,
         flat: Boolean
-    ): RepoResult<List<ChannelDomain>> {
+    ): DbResult<List<ChannelDomain>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): DbResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): DbResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter -> RepoResult.Data(
+                is AllFilter -> DbResult.Data(
                     database.channelEntityQueries.count().executeAsOne().toInt()
                 )
 
@@ -135,11 +135,11 @@ class SqldelightChannelDatabaseRepository(
         } catch (e: Exception) {
             val msg = "couldn't count channels"
             log.e(msg, e)
-            RepoResult.Error<Int>(e, msg)
+            DbResult.Error<Int>(e, msg)
         }
     }
 
-    override suspend fun delete(domain: ChannelDomain, emit: Boolean): RepoResult<Boolean> {
+    override suspend fun delete(domain: ChannelDomain, emit: Boolean): DbResult<Boolean> {
         TODO("Not yet implemented")
     }
 
@@ -147,27 +147,27 @@ class SqldelightChannelDatabaseRepository(
         update: UpdateDomain<ChannelDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<ChannelDomain> {
+    ): DbResult<ChannelDomain> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
-        var result: RepoResult<Boolean> = RepoResult.Data(false)
+    override suspend fun deleteAll(): DbResult<Boolean> = withContext(coProvider.IO) {
+        var result: DbResult<Boolean> = DbResult.Data(false)
         database.channelEntityQueries.transaction {
             result = try {
                 database.channelEntityQueries
                     .deleteAll()
-                RepoResult.Data(true)
+                DbResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't deleteAll channels"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
         result
     }
 
-    internal suspend fun loadChannel(id: GUID): RepoResult<ChannelDomain> =
+    internal suspend fun loadChannel(id: GUID): DbResult<ChannelDomain> =
         withContext(coProvider.IO) {
             loadChannelInternal(id)
         }
@@ -183,11 +183,11 @@ class SqldelightChannelDatabaseRepository(
                     imageDatabaseRepository.loadEntity(channel.image_id?.toGUID()),
                 )
             }
-            .let { channel: ChannelDomain -> RepoResult.Data(channel) }
+            .let { channel: ChannelDomain -> DbResult.Data(channel) }
     } catch (e: Throwable) {
         val msg = "couldn't load channel: $id"
         log.e(msg, e)
-        RepoResult.Error<ChannelDomain>(e, msg)
+        DbResult.Error<ChannelDomain>(e, msg)
     }
 
     internal suspend fun checkToSaveChannel(domain: ChannelDomain): ChannelDomain = withContext(coProvider.IO) {

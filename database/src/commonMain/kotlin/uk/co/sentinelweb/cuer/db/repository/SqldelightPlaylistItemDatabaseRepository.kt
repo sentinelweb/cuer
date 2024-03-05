@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
@@ -48,7 +48,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         domain: PlaylistItemDomain,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistItemDomain> = withContext(coProvider.IO) {
+    ): DbResult<PlaylistItemDomain> = withContext(coProvider.IO) {
         try {
             domain
                 .let { item ->
@@ -97,7 +97,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                 }
                 .let { (savedDomain, itemEntity) -> playlistItemMapper.map(itemEntity, savedDomain.media) }
                 //.also { log.d("Saved media check: flat: $flat, media.id=${it.media.id}, media.platformId=${it.media.platformId} media.duration=${it.media.duration}") }
-                .let { RepoResult.Data(it) }
+                .let { DbResult.Data(it) }
                 .also {
                     if (emit) it.data
                         ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
@@ -105,7 +105,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         } catch (e: Throwable) {
             val msg = "couldn't save playlist item"
             log.e(msg, e)
-            RepoResult.Error<PlaylistItemDomain>(e, msg)
+            DbResult.Error<PlaylistItemDomain>(e, msg)
         }
     }
 
@@ -113,14 +113,14 @@ class SqldelightPlaylistItemDatabaseRepository(
         domains: List<PlaylistItemDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
-        database.playlistItemEntityQueries.transactionWithResult<RepoResult<List<PlaylistItemDomain>>> {
+    ): DbResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
+        database.playlistItemEntityQueries.transactionWithResult<DbResult<List<PlaylistItemDomain>>> {
             try {
                 saveListInternal(domains, flat)
             } catch (e: Throwable) {
                 val msg = "Couldn't save playlist items"
                 log.e(msg, e)
-                rollback(RepoResult.Error<List<PlaylistItemDomain>>(e, msg))
+                rollback(DbResult.Error<List<PlaylistItemDomain>>(e, msg))
             }
         }.also {
             it.takeIf { it.isSuccessful && emit }
@@ -129,7 +129,7 @@ class SqldelightPlaylistItemDatabaseRepository(
         }
     }
 
-    override suspend fun load(id: GUID, flat: Boolean): RepoResult<PlaylistItemDomain> =
+    override suspend fun load(id: GUID, flat: Boolean): DbResult<PlaylistItemDomain> =
         withContext(coProvider.IO) {
             try {
                 database.playlistItemEntityQueries.load(id.value)
@@ -140,18 +140,18 @@ class SqldelightPlaylistItemDatabaseRepository(
                             mediaDatabaseRepository.load(it.media_id.toGUID(), flat = false).data!!
                         )
                     }
-                    .let { RepoResult.Data(it) }
+                    .let { DbResult.Data(it) }
             } catch (e: Throwable) {
                 val msg = "couldn't load playlist item $id"
                 log.e(msg, e)
-                RepoResult.Error<PlaylistItemDomain>(e, msg)
+                DbResult.Error<PlaylistItemDomain>(e, msg)
             }
         }
 
     override suspend fun loadList(
         filter: Filter,
         flat: Boolean
-    ): RepoResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
+    ): DbResult<List<PlaylistItemDomain>> = withContext(coProvider.IO) {
         try {
             with(database.playlistItemEntityQueries) {
                 when (filter) {
@@ -188,33 +188,33 @@ class SqldelightPlaylistItemDatabaseRepository(
                             mediaDatabaseRepository.load(it.media_id.toGUID(), false).data!!
                         )
                     }
-                    .let { RepoResult.Data(it) }
+                    .let { DbResult.Data(it) }
             }
         } catch (e: Throwable) {
             val msg = "couldn't load playlist item list for: $filter"
             log.e(msg, e)
-            RepoResult.Error<List<PlaylistItemDomain>>(e, msg)
+            DbResult.Error<List<PlaylistItemDomain>>(e, msg)
         }
     }
 
-    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): DbResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): DbResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter -> RepoResult.Data(database.playlistItemEntityQueries.count().executeAsOne().toInt())
+                is AllFilter -> DbResult.Data(database.playlistItemEntityQueries.count().executeAsOne().toInt())
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {
             val msg = "couldn't count medias"
             log.e(msg, e)
-            RepoResult.Error<Int>(e, msg)
+            DbResult.Error<Int>(e, msg)
         }
     }
 
-    override suspend fun delete(domain: PlaylistItemDomain, emit: Boolean): RepoResult<Boolean> =
+    override suspend fun delete(domain: PlaylistItemDomain, emit: Boolean): DbResult<Boolean> =
         withContext(coProvider.IO) {
             try {
                 domain
@@ -225,25 +225,25 @@ class SqldelightPlaylistItemDatabaseRepository(
                             _updatesFlow.emit(Operation.DELETE to domain)
                         }
                     }
-                RepoResult.Data.Empty(true)
+                DbResult.Data.Empty(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete ${domain.id}"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
-        var result: RepoResult<Boolean> = RepoResult.Data(false)
+    override suspend fun deleteAll(): DbResult<Boolean> = withContext(coProvider.IO) {
+        var result: DbResult<Boolean> = DbResult.Data(false)
         database.playlistItemEntityQueries.transaction {
             result = try {
                 database.playlistItemEntityQueries
                     .deleteAll()
-                RepoResult.Data(true)
+                DbResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't deleteAll medias"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
         result
@@ -253,14 +253,14 @@ class SqldelightPlaylistItemDatabaseRepository(
         update: UpdateDomain<PlaylistItemDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<PlaylistItemDomain> {
+    ): DbResult<PlaylistItemDomain> {
         TODO("Not yet implemented")
     }
 
     internal fun saveListInternal(
         domains: List<PlaylistItemDomain>,
         flat: Boolean
-    ): RepoResult<List<PlaylistItemDomain>> {
+    ): DbResult<List<PlaylistItemDomain>> {
         return domains
             .let { itemDomains ->
                 itemDomains
@@ -323,7 +323,7 @@ class SqldelightPlaylistItemDatabaseRepository(
                     )
                 }
             }
-            .let { RepoResult.Data(it) }
+            .let { DbResult.Data(it) }
     }
 
     internal fun loadPlaylistItemsInternal(

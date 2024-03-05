@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
@@ -16,7 +16,7 @@ import kotlin.reflect.KClass
 interface OrchestratorContract<Domain> {
 
     // to support generic orchestrator injection via koin
-    enum class Inject { PlaylistOrch, PlaylistStatsOrch, PlaylistItemOrch, MediaOrch, ChannelOrch }
+    enum class Inject { Playlist, PlaylistStats, PlaylistItem, Media, Channel }
     enum class Source { MEMORY, LOCAL, LOCAL_NETWORK, REMOTE, PLATFORM }
 
     val updates: Flow<Triple<Operation, Source, Domain>>
@@ -84,7 +84,7 @@ interface OrchestratorContract<Domain> {
 
     class NotImplementedException(msg: String? = null) : Exception(msg)
     class DoesNotExistException(msg: String? = null) : Exception(msg)
-    class DatabaseException(result: RepoResult<*>) : Exception((result as RepoResult.Error<*>).msg, result.t)
+    class DatabaseException(result: DbResult<*>) : Exception((result as DbResult.Error<*>).msg, result.t)
     class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
     class MemoryException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 

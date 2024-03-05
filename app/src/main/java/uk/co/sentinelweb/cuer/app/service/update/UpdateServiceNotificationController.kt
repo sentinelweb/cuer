@@ -7,7 +7,7 @@ class UpdateServiceNotificationController constructor(
     private val view: UpdateServiceContract.Notification.View,
 ) : UpdateServiceContract.Notification.External, UpdateServiceContract.Notification.Controller {
 
-    override fun updateNotification(mediaDomains: List<MediaDomain>) {
+    override fun updateNotificationResult(mediaDomains: List<MediaDomain>) {
         view.showNotification(mediaDomains
             .let {
                 Model(
@@ -19,7 +19,7 @@ class UpdateServiceNotificationController constructor(
         )
     }
 
-    override fun updateNotification(status: String) {
+    override fun updateNotificationStatus(status: String) {
         view.showNotification(Model(type = Model.Type.STATUS, status = status, itemsUpdated = -1, items = emptyList()))
     }
 

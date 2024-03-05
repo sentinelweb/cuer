@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.db.repository
 
-sealed class RepoResult<R> constructor(
+sealed class DbResult<R> constructor(
     val isSuccessful: Boolean,
     val data: R? = null
 ) {
-    open class Data<R>(data: R?) : RepoResult<R>(true, data = data) {
+    open class Data<R>(data: R?) : DbResult<R>(true, data = data) {
         class Empty<R>(data: R? = null) : Data<R>(data)
 
         companion object {
@@ -23,8 +23,8 @@ sealed class RepoResult<R> constructor(
         val t: Throwable,
         val msg: String? = null,
         val code: String? = null
-    ) : RepoResult<R>(false)
+    ) : DbResult<R>(false)
 
 
-    class Composite<R>(isSuccessful: Boolean, data: R?) : RepoResult<R>(isSuccessful, data = data)
+    class Composite<R>(isSuccessful: Boolean, data: R?) : DbResult<R>(isSuccessful, data = data)
 }

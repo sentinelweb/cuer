@@ -40,8 +40,8 @@ object SharedAppModule {
         single<QueueMediatorContract.Producer> {
             QueueMediator(
                 state = QueueMediatorState(),
-                playlistOrchestrator = get(named(PlaylistOrch)),
-                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
+                playlistOrchestrator = get(named(Playlist)),
+                playlistItemOrchestrator = get(named(PlaylistItem)),
                 coroutines = get(),
                 playlistMutator = get(),
                 log = get(),
@@ -61,15 +61,15 @@ object SharedAppModule {
 
     private val orchestratorModule = module {
         single { PlaylistOrchestrator(get(), get()) }
-        single<OrchestratorContract<PlaylistDomain>>(named(PlaylistOrch)) { get<PlaylistOrchestrator>() }
+        single<OrchestratorContract<PlaylistDomain>>(named(Playlist)) { get<PlaylistOrchestrator>() }
         single { PlaylistItemOrchestrator(get(), get()) }
-        single<OrchestratorContract<PlaylistItemDomain>>(named(PlaylistItemOrch)) { get<PlaylistItemOrchestrator>() }
+        single<OrchestratorContract<PlaylistItemDomain>>(named(PlaylistItem)) { get<PlaylistItemOrchestrator>() }
         single { MediaOrchestrator(get(), get()) }
-        single<OrchestratorContract<MediaDomain>>(named(MediaOrch)) { get<MediaOrchestrator>() }
+        single<OrchestratorContract<MediaDomain>>(named(Media)) { get<MediaOrchestrator>() }
         single { ChannelOrchestrator(get(), get()) }
-        single<OrchestratorContract<ChannelDomain>>(named(ChannelOrch)) { get<ChannelOrchestrator>() }
+        single<OrchestratorContract<ChannelDomain>>(named(Channel)) { get<ChannelOrchestrator>() }
         single { PlaylistStatsOrchestrator(get()) }
-        single<OrchestratorContract<PlaylistStatDomain>>(named(PlaylistStatsOrch)) { get<PlaylistStatsOrchestrator>() }
+        single<OrchestratorContract<PlaylistStatDomain>>(named(PlaylistStats)) { get<PlaylistStatsOrchestrator>() }
 
         single { NewMediaPlayistInteractor(get(), get(), get(), get(named(NewItems))) }
         single { RecentItemsPlayistInteractor(get(), get()) }
@@ -94,9 +94,9 @@ object SharedAppModule {
     private val usecaseModule = module {
         factory {
             PlaylistUpdateUsecase(
-                playlistOrchestrator = get(named(PlaylistOrch)),
-                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
-                mediaOrchestrator = get(named(MediaOrch)),
+                playlistOrchestrator = get(named(Playlist)),
+                playlistItemOrchestrator = get(named(PlaylistItem)),
+                mediaOrchestrator = get(named(Media)),
                 playlistMediaLookupUsecase = get(),
                 timeProvider = get(),
                 log = get(),
@@ -166,8 +166,8 @@ object SharedAppModule {
         factory<UpcomingContract.Presenter> {
             UpcomingPresenter(
                 view = get(),
-                playlistItemOrchestrator = get(named(PlaylistItemOrch)),
-                mediaOrchestrator = get(named(MediaOrch)),
+                playlistItemOrchestrator = get(named(PlaylistItem)),
+                mediaOrchestrator = get(named(Media)),
                 coroutines = get(),
                 timeProvider = get(),
                 log = get()

@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.DELETE
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FULL
@@ -421,7 +421,7 @@ class SqldelightMediaDatabaseRepositoryTest : KoinTest {
         val load = sut.load(duplicatePlatformId[0].id!!.id, flat = false).data!!
         // The item won't save as it do nothing - but the db record won't be changed
         assertFalse(actual.isSuccessful)
-        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
+        assertEquals((actual as DbResult.Error<*>).t::class, ConflictException::class)
         assertNotEquals(load, duplicatePlatformId[0])
     }
 }

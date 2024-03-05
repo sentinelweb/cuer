@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
 import uk.co.sentinelweb.cuer.app.db.repository.PlaylistItemDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -371,7 +371,7 @@ class SqldelightPlaylistItemDatabaseRepositoryTest : KoinTest {
                 )
         val actual = sut.save(itemConflict, flat = false, emit = false)
         assertFalse(actual.isSuccessful)
-        assertEquals((actual as RepoResult.Error<*>).t::class, ConflictException::class)
+        assertEquals((actual as DbResult.Error<*>).t::class, ConflictException::class)
     }
 
     @Test
