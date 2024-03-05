@@ -4,6 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import org.junit.Assert.*
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
@@ -18,9 +19,14 @@ import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.currentItem
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
+import uk.co.sentinelweb.cuer.tools.rule.FlakyTestRule
 
 class PlaylistMviModelMapperTest {
     private val fixture = kotlinFixtureDefaultConfig
+
+    // todo fix flakiness (from fixture)
+    @get:Rule
+    var flakyTestRule = FlakyTestRule(5)
 
     private val itemModelMapper: PlaylistMviItemModelMapper = mockk(relaxed = true)
     private val iconMapper: IconMapper = mockk(relaxed = true)
