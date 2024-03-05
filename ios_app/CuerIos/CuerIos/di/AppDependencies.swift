@@ -64,18 +64,11 @@ class AppDependencies:
         config: self.buildConfig,
         ytApiKey: CuerYoutubeApiKeyProvider(),
         pixabayApiKey: CuerPixabayApiKeyProvider(),
-        shareWrapper: {IosShareWrapper(mainCoordinator: mainCoordinator)}(),
-        platformLaunchWrapper: {IosPlatformLauncher(mainCoordinator: mainCoordinator)}(),
-        upcomingView: {UCV()}()
+        shareWrapper: { IosShareWrapper(mainCoordinator: mainCoordinator) }(),
+        platformLaunchWrapper: { IosPlatformLauncher(mainCoordinator: mainCoordinator) }(),
+        // move to a new object
+        upcomingView: { UpcomingNotification() }()
     )
-    
-    class UCV:UpcomingContractView {
-        func showNotification(item: DomainPlaylistItemDomain) {
-            debugPrint("showNotification: \(item.media.title ?? "No title")")
-        }
-        
-        
-    }
     
     // todo lazy create
     var sharedFactories = SharedFactories()
