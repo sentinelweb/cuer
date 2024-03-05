@@ -37,7 +37,7 @@ class LiveUpcomingItemsPlayistInteractor constructor(
                         .copy(items = it.mapIndexed { _, playlistItem -> playlistItem.copy() })
                 }
         } catch (e: Exception) {
-            log.e("Couldn't load nee items playlist", e)
+            log.e("Couldn't load new items playlist", e)
             null
         }
 
