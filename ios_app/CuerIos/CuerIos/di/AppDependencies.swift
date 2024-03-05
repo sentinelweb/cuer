@@ -65,10 +65,21 @@ class AppDependencies:
         ytApiKey: CuerYoutubeApiKeyProvider(),
         pixabayApiKey: CuerPixabayApiKeyProvider(),
         shareWrapper: {IosShareWrapper(mainCoordinator: mainCoordinator)}(),
-        platformLaunchWrapper: {IosPlatformLauncher(mainCoordinator: mainCoordinator)}()
+        platformLaunchWrapper: {IosPlatformLauncher(mainCoordinator: mainCoordinator)}(),
+        upcomingView: {UCV()}()
     )
     
+    class UCV:UpcomingContractView {
+        func showNotification(item: DomainPlaylistItemDomain) {
+            debugPrint("showNotification: \(item.media.title ?? "No title")")
+        }
+        
+        
+    }
+    
+    // todo lazy create
     var sharedFactories = SharedFactories()
+    lazy var workManager = WorkManagerInteractor(dependencies: self)
     
     lazy var mainCoordinator: MainCoordinator = {MainCoordinator(dependencies: self)}()
 

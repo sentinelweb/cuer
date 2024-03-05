@@ -21,6 +21,8 @@ class AppDelegate: NSObject, UIApplicationDelegate {
         if !dbInit.isInitialized() {
             dbInit.doInitDatabase(path: "default-dbinit")
         }
+        dependencies.workManager.registerUpcomingTask(taskId: WorkManagerInteractor.WM_UPCOMING_TASK_ID)
+        dependencies.workManager.scheduleUpcomingTaskDelayed(taskId: WorkManagerInteractor.WM_UPCOMING_TASK_ID, timeSeconds: 0.5)
         return true
     }
 }

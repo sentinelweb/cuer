@@ -32,6 +32,6 @@ class UpcomingVideosCheckWorker(
 
     companion object {
         val WORK_NAME = "UpcomingVideosCheck"
-        val MINS_CHECK = 20
+        val MINS_CHECK = 30
     }
 }
