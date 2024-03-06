@@ -10,6 +10,7 @@ plugins {
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
+val ver_jvm: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_sqldelight: String by project
@@ -28,7 +29,11 @@ val ver_ios_deploy_target: String by project
 
 kotlin {
     jvm()
-    androidTarget()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()

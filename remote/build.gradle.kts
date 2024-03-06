@@ -53,7 +53,11 @@ kotlin {
         }
         binaries.executable()
     }
-    androidTarget()
+    androidTarget() {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()

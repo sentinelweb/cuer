@@ -46,7 +46,11 @@ kotlin {
     js(IR) {
         browser()
     }
-    android()
+    android {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
