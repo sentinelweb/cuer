@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
+// todo test
 class MediaUpdateFromPlatformUseCase(
     private val connectivity: ConnectivityWrapper,
     private val mediaOrchestrator: MediaOrchestrator,
@@ -45,7 +46,7 @@ class MediaUpdateFromPlatformUseCase(
                         originalMedia.channelData
                     } else {
                         media.channelData /* todo lookup */
-                    },// todo test
+                    },
                 )
             }
 }

@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
+@Suppress("LongParameterList")
 class UpdateServiceController(
     private val service: UpdateServiceContract.Service,
     private val mediaUpdateFromPlatformUseCase: MediaUpdateFromPlatformUseCase,
@@ -23,7 +24,6 @@ class UpdateServiceController(
     private val log: LogWrapper,
     private val notification: UpdateServiceContract.Notification.External,
     private val connectivityWrapper: ConnectivityWrapper,
-
 ) : UpdateServiceContract.Controller {
 
     init {

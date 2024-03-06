@@ -36,7 +36,7 @@ class UpcomingPresenter(
         val now = timeProvider.instant()
         val limit = now.plus(UPCOMING_LIMIT_MINS.minutes)
         playlistItemOrchestrator
-            .loadList(LiveUpcomingMediaFilter(100), LOCAL.deepOptions())
+            .loadList(LiveUpcomingMediaFilter(MAX_RECORDS), LOCAL.deepOptions())
             .let { loadList ->
                 loadList
                     .filter { it.media.broadcastDate?.toInstant()?.let { limit > it && now < it } ?: false }
@@ -50,4 +50,8 @@ class UpcomingPresenter(
                     .apply { mediaOrchestrator.save(this, LOCAL.flatOptions()) }
             }
     }.ignoreJob()
+
+    companion object {
+        const val MAX_RECORDS = 50
+    }
 }

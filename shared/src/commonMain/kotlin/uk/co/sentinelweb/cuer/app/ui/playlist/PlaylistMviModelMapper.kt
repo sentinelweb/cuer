@@ -59,7 +59,6 @@ class PlaylistMviModelMapper constructor(
         itemsIdMapReversed: MutableMap<PlaylistItemDomain, Identifier<GUID>>,
         blockItem: PlaylistItemDomain?
     ): PlaylistMviContract.View.Model {
-        // log.d("map")
         val items = if (isMapItems) {
             mapItems(domain, itemsIdMapReversed, playlists, appPlaylist, blockItem)
         } else null
@@ -115,10 +114,7 @@ class PlaylistMviModelMapper constructor(
         blockItem: PlaylistItemDomain?
     ): List<PlaylistItemMviContract.Model.Item> {
         return domain.items
-//            .also { log.d("state.items: ${it.size}") }
-//            .also { log.d("guids: ${it.map { it.id }.joinToString(", ")}") }
             .filter { blockItem?.id == null || it.id != blockItem.id }
-//            .also { log.d("state.items.filtered: ${it.size}, blockItem: $blockItem") }
             .mapIndexedNotNull { index, item ->
                 reverseLookup.get(item)?.let { modelId ->
                     itemModelMapper.mapItem(
