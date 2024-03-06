@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.receiver.WifiStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
+import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
@@ -56,6 +57,8 @@ import uk.co.sentinelweb.cuer.app.ui.settings.PrefPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.settings.PrefRootContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingNotification
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandContract
@@ -72,6 +75,8 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaMetadataMapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionManager
 import uk.co.sentinelweb.cuer.app.util.mediasession.PlaybackStateMapper
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationChannelCreator
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheck
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.remote.AndroidWakeLockManager
@@ -82,6 +87,7 @@ import uk.co.sentinelweb.cuer.app.util.share.scan.urlMediaMappers
 import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
+import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -139,6 +145,7 @@ object Modules {
         OnboardingFragment.fragmentModule,
         RemotesFragment.fragmentModule,
         LocalFragment.fragmentModule,
+        UpdateService.serviceModule,
     )
 
     private val uiModule = module {
@@ -155,6 +162,7 @@ object Modules {
                 get()
             )
         }
+        factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get()) }
     }
 
     private val receiverModule = module {
@@ -236,6 +244,8 @@ object Modules {
         }
         factory { ContentUriUtil(androidApplication()) }
         factory { BitmapSizer() }
+        factory { NotificationChannelCreator(get(), get()) }
+        factory { NotificationPermissionCheck(get(), get()) }
     }
 
     private val wrapperModule = module {
@@ -264,6 +274,10 @@ object Modules {
         factory<ConnectivityWrapper> { AndroidConnectivityWrapper(androidApplication(), get()) }
     }
 
+    private val workModule = module {
+        factory { WorkManagerInteractor(get()) }
+    }
+
     val allModules = listOf(utilModule)
         .plus(uiModule)
         .plus(wrapperModule)
@@ -271,6 +285,7 @@ object Modules {
         .plus(appNetModule)
         .plus(receiverModule)
         .plus(usecaseModule)
+        .plus(workModule)
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.modules)

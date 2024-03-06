@@ -6,11 +6,12 @@ import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 
 object SharedCoreModule {
     val objectModule = module {
         factory { CoroutineContextProvider() }
-        factory { TimeProvider() }
+        factory<TimeProvider> { TimeProviderImpl() }
         factory { TimeSinceFormatter(get(), get()) }
         factory { TimeFormatter() }
         factory { DateTimeFormatter() }

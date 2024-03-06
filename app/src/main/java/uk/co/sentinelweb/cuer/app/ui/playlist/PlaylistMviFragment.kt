@@ -264,7 +264,6 @@ class PlaylistMviFragment : Fragment(),
     inner class ViewProxy : BaseMviView<PlaylistMviContract.View.Model, Event>(),
         PlaylistMviContract.View {
 
-        @Suppress("IMPLICIT_CAST_TO_ANY")
         override fun processLabel(label: Label) {
             when (label) {
                 is Label.Error -> showError(label.message)
@@ -355,6 +354,7 @@ class PlaylistMviFragment : Fragment(),
     private fun createAdapter() =
         PlaylistAdapter(get(), this, isCards, get())
 
+    @Deprecated("Deprecated in Java")
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
 
@@ -811,7 +811,7 @@ class PlaylistMviFragment : Fragment(),
                         mediaUpdateFromPlatformUseCase = get(),
                     ).create()
                 }
-                scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get()) }
+                scoped { PlaylistMviModelMapper(get(), get(), get(), get(), get(), get(), get(), get()) }
                 scoped { PlaylistMviItemModelMapper(get(), get(), get(), get(), get()) }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
                 scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }

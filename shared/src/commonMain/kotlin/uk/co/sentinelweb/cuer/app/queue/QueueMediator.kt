@@ -5,10 +5,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import summarise
-import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistOrDefaultUsecase
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -25,8 +27,8 @@ import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
 // fixme: note some tests are flaky - run them manually when modifying this class (or fIx them!!!)
 class QueueMediator constructor(
     private val state: QueueMediatorState,
-    private val playlistOrchestrator: PlaylistOrchestrator,
-    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val playlistOrchestrator: OrchestratorContract<PlaylistDomain>,
+    private val playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>,
     private val coroutines: CoroutineContextProvider,
     private val playlistMutator: PlaylistMutator,
     private val mediaUpdate: PlaylistMediaUpdateUsecase,

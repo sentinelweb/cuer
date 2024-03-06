@@ -4,6 +4,7 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
 import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
@@ -32,7 +33,10 @@ private fun initKoinInternal(
             factory<ApiKeyProvider>(named(ServiceType.PIXABAY)) { dependencies.pixabayApiKey }
             single { dependencies.platformLaunchWrapper }
             single { dependencies.shareWrapper }
+            single<UpcomingContract.View> { dependencies.upcomingView }
         }
+
+
         modules(
             listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
                 .plus(configModule)
@@ -48,10 +52,13 @@ private fun initKoinInternal(
 @Suppress("unused")
 fun initKoin(dependencies: SharedAppDependencies) = initKoinInternal(dependencies) { }
 
+// these object are created in Swift and passed in at application start
 data class SharedAppDependencies(
     val config: BuildConfigDomain,
     val ytApiKey: ApiKeyProvider,
     val pixabayApiKey: ApiKeyProvider,
     val shareWrapper: ShareWrapper,
     val platformLaunchWrapper: PlatformLaunchWrapper,
+    // not a great place for this - remove hack later
+    val upcomingView: UpcomingContract.View,
 )

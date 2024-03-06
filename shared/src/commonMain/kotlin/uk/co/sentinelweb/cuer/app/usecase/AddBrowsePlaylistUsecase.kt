@@ -31,23 +31,18 @@ class AddBrowsePlaylistUsecase(
 
         if (!connectivityWrapper.isConnected()) return null
 
-        return try {
-            playlistOrchestrator.loadByPlatformId(platformId, PLATFORM.deepOptions(false))
-                ?.also { log.d("${it.platformId}: ${it.title}") }
-                ?.let {
-                    it.copy(
-                        image = category.image ?: it.image,
-                        thumb = category.image ?: it.thumb,
-                        parentId = parentId,
-                        config = it.config.copy(
-                            description = category.description
-                        )
+        return playlistOrchestrator.loadByPlatformId(platformId, PLATFORM.deepOptions(false))
+            ?.also { log.d("${it.platformId}: ${it.title}") }
+            ?.let {
+                it.copy(
+                    image = category.image ?: it.image,
+                    thumb = category.image ?: it.thumb,
+                    parentId = parentId,
+                    config = it.config.copy(
+                        description = category.description
                     )
+                )
                 }
                 ?.let { addPlaylistUsecase.addPlaylist(it, null) }
-        } catch (e: Exception) {
-            log.e("Couldnt load playlist: $category", e)
-            null
-        }
     }
 }

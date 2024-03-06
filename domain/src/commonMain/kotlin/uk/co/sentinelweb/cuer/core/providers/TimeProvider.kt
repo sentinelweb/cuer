@@ -1,27 +1,17 @@
 package uk.co.sentinelweb.cuer.core.providers
 
 import kotlinx.datetime.*
-import kotlin.time.Duration.Companion.seconds
 
-//import java.time.Instant
-//import java.time.LocalDateTime
-//import java.time.OffsetDateTime
+interface TimeProvider {
+    fun instant(): Instant
 
-class TimeProvider {
-    fun instant() = Clock.System.now()
+    fun localDateTime(): LocalDateTime
+    fun currentTimeMillis(): Long
+    fun timeZoneOffsetSecs(): UtcOffset
+    fun getOffsetTime(millis: Long): LocalDateTime
 
-    fun localDateTime() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-
-    fun currentTimeMillis() = Clock.System.now().toEpochMilliseconds()
-
-    fun timeZomeOffsetSecs() =
-        TimeZone.currentSystemDefault().offsetAt(instant()) // todo might be broken
-
-    fun getOffsetTime(millis: Long): LocalDateTime {
-        val timeZone = TimeZone.currentSystemDefault()
-        val now = localDateTime().toInstant(timeZone)
-        val duration = (millis / 1000L).seconds
-        return now.minus(duration).toLocalDateTime(timeZone)
+    companion object {
+        fun LocalDateTime.toInstant() = this.toInstant(TimeZone.currentSystemDefault())
+        fun Instant.toLocalDateTime() = this.toLocalDateTime(TimeZone.currentSystemDefault())
     }
-
 }

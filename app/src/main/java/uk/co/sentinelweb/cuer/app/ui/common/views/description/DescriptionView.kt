@@ -84,6 +84,8 @@ class DescriptionView @JvmOverloads constructor(
         binding.pidAuthorTitle.text = model.channelTitle
         binding.pidAuthorDesc.text = model.channelDescription
         binding.pidAuthorImage.isVisible = true
+        binding.pidUpcomingBanner.isVisible = model.broadcastDate != null
+        binding.pidUpcomingText.text = model.broadcastDate
         setInfo(model, binding.pidInfo)
         model.channelThumbUrl
             ?.also { url ->
@@ -172,6 +174,7 @@ class DescriptionView @JvmOverloads constructor(
         pidInfo.text = """
             ID: ${model.info.platformId} (${model.info.platform})
             DBID: ${model.info.dbId}
+            Broadcast: ${model.broadcastDate ?: "N/A"}
         """.trimIndent()
     }
 

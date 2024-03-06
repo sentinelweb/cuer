@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
     id("com.android.library")
+//    kotlin("com.android.application")
     id("com.squareup.sqldelight")
     kotlin("plugin.serialization")
 }
@@ -9,6 +10,7 @@ plugins {
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
+val ver_jvm: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_sqldelight: String by project
@@ -16,16 +18,22 @@ val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
+val ver_mockk: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
 
 kotlin {
     jvm()
-    android()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -69,7 +77,6 @@ kotlin {
 //                implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
-
             }
         }
         val androidMain by getting {
@@ -79,13 +86,14 @@ kotlin {
                 implementation("io.insert-koin:koin-android:$ver_koin")
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation(project(":domain"))
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val iosX64Main by getting
@@ -122,19 +130,25 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }
 
+// generate schema ./gradlew generateCommonMainDatabaseSchema
+// verify schema ./gradlew verifySqlDelightMigration
 sqldelight {
     database("Database") { // This will be the name of the generated database class.
         packageName = "uk.co.sentinelweb.cuer.app.db"
         sourceFolders = listOf("sqldelight")
-        schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/app/database")
+        schemaOutputDirectory = file("src/commonMain/sqldelight/uk/co/sentinelweb/cuer/database/verify")
         verifyMigrations = true
-        // dialect = "sqlite:3.24"
+//        deriveSchemaFromMigrations = true
     }
 }

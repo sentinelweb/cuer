@@ -19,6 +19,7 @@ val ver_kotlin_fixture: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -31,7 +32,11 @@ kotlin {
     js(IR) {
         browser()
     }
-    android()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -79,10 +84,12 @@ kotlin {
 
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test:$ver_koin")
-                implementation("io.mockk:mockk:$ver_mockk")
+                //implementation("io.mockk:mockk:$ver_mockk")
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
             }
@@ -129,9 +136,13 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }

@@ -46,6 +46,11 @@ class MainCoordinator: ObservableObject {
     
     init(dependencies: AppDependencies) {
         self.dependencies = dependencies
+        
+        // todo move this somewhere else
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            NotificationPermissionCheck().askPermissionCheck()
+        }
     }
     
     @Published var screen: Parent = Parent.launch // navigate called in view onAppear
@@ -68,7 +73,7 @@ class MainCoordinator: ObservableObject {
         case .main:
             self.playlistController = createPlaylistController()
             self.playlistsController = createPlaylistsController()
-            self.browseController = dependencies.createBrowseHolder()
+            self.browseController = createBrowseController() //dependencies.createBrowseHolder()
             self.screen = Parent.main
         case .browse:
             self.currentTab = MainTab.browse

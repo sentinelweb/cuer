@@ -141,13 +141,14 @@ object OnboardingComposables {
             MutableTransitionState(false)
         }
         LaunchedEffect(line) {
-            delay(seq * 300L)
+            delay(seq * 100L)
             state.targetState = true
         }
+        val fadeTime = 300
         AnimatedVisibility(
             state,
-            enter = fadeIn(animationSpec = tween(durationMillis = 500)),
-            exit = fadeOut(animationSpec = tween(durationMillis = 500))
+            enter = fadeIn(animationSpec = tween(durationMillis = fadeTime)),
+            exit = fadeOut(animationSpec = tween(durationMillis = fadeTime))
         ) {
             block()
         }

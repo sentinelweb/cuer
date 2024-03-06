@@ -1,12 +1,18 @@
 package uk.co.sentinelweb.cuer.app.usecase
 
-import uk.co.sentinelweb.cuer.app.orchestrator.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.PlatformIdListFilter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.LiveUpcoming
+import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
+import uk.co.sentinelweb.cuer.app.usecase.PlaylistUpdateUsecase.UpdateResult.Result
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain.YOUTUBE
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
@@ -15,61 +21,79 @@ import uk.co.sentinelweb.cuer.domain.ext.orderIsAscending
 import uk.co.sentinelweb.cuer.domain.ext.summarise
 
 class PlaylistUpdateUsecase constructor(
-    private val playlistOrchestrator: PlaylistOrchestrator,
-    private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-    private val mediaOrchestrator: MediaOrchestrator,
+    private val playlistOrchestrator: OrchestratorContract<PlaylistDomain>,
+    private val playlistItemOrchestrator: OrchestratorContract<PlaylistItemDomain>,
+    private val mediaOrchestrator: OrchestratorContract<MediaDomain>,
     private val playlistMediaLookupUsecase: PlaylistMediaLookupUsecase,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
-    private val updateChecker: UpdateCheck
+    private val updateChecker: UpdateCheck,
+    private val updateServiceManager: UpdateServiceContract.Manager
 ) {
 
     init {
         log.tag(this)
     }
 
+
     data class UpdateResult(
-        val success: Boolean,
+        val status: Result,
         val reason: String = "",
         val numberItems: Int = -1,
         val newItems: List<PlaylistItemDomain>? = null
-    )
+    ) {
+        enum class Result{Success, Failure, Pending}
+    }
 
-    fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.shouldUpdate(p)
+    fun checkToUpdate(p: PlaylistDomain): Boolean = updateChecker.checkToUpdate(p)
+    fun canUpdate(p: PlaylistDomain): Boolean = updateChecker.canUpdate(p)
 
     suspend fun update(id: OrchestratorContract.Identifier<GUID>): UpdateResult {
-        return playlistOrchestrator.loadById(id.id, id.source.deepOptions())
-            ?.let { update(it) }
-            ?: UpdateResult(false, "Playlist not found")
+        return if (id == LiveUpcoming.identifier()) {
+            log.d("Update service liveupcoming")
+            updateServiceManager.start()
+            UpdateResult(Result.Pending, "Updating liveUpcoming ..")
+        } else {
+            playlistOrchestrator.loadById(id.id, id.source.deepOptions())
+                ?.let { update(it) }
+                ?: UpdateResult(Result.Failure, "Playlist not found")
+        }
     }
 
     suspend fun update(playlistDomain: PlaylistDomain): UpdateResult {
-        return playlistDomain
-            .takeIf { playlistDomain.type == PLATFORM }
-            ?.let {
-                if (it.platform == null) {
-                    playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
-                } else it
-            }
-            ?.let { playlist ->
-                when (playlist.platform) {
-                    YOUTUBE -> playlist.platformId
-                        ?.run {
-                            playlistOrchestrator
-                                .loadByPlatformId(this, Source.PLATFORM.deepOptions())
-                                ?.let { removeExistingItems(it, playlist) }
-                                ?.takeIf { it.items.size > 0 }
-                                ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
-                                ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
-                                ?.let { UpdateResult(true, numberItems = it.size, newItems = it) }
-                                ?: UpdateResult(true, numberItems = 0)
-                        }
-                        ?: UpdateResult(false, reason = "No platform id")
-
-                    else -> UpdateResult(false, reason = "Unsupported platform type")
+        return if (playlistDomain.id == LiveUpcoming.identifier()) {
+            // divert LiveUpcoming playlist to service
+            // todo actually all updates should goto the service .. eventually
+            log.d("Update service liveupcoming")
+            updateServiceManager.start()
+            UpdateResult(Result.Pending, "Updating liveUpcoming ..")
+        } else {
+            playlistDomain
+                .takeIf { canUpdate(it) }
+                ?.let {
+                    if (it.platform == null) {
+                        playlistOrchestrator.save(it.copy(platform = YOUTUBE), LOCAL.flatOptions())
+                    } else it
                 }
-            }
-            ?: UpdateResult(false, reason = "Not of PLATFORM type")
+                ?.let { playlist ->
+                    when (playlist.platform ?: false) {
+                        YOUTUBE -> playlist.platformId
+                            ?.let { id ->
+                                playlistOrchestrator
+                                    .loadByPlatformId(id, Source.PLATFORM.deepOptions())
+                                    ?.let { removeExistingItems(it, playlist) }
+                                    ?.takeIf { it.items.size > 0 }
+                                    ?.let { playlistMediaLookupUsecase.lookupMediaAndReplace(it) }
+                                    ?.let { playlistItemOrchestrator.save(it.items, LOCAL.deepOptions()) }
+                                    ?.let { UpdateResult(Result.Success, numberItems = it.size, newItems = it) }
+                                    ?: UpdateResult(Result.Success, numberItems = 0)
+                            }
+                            ?: UpdateResult(Result.Failure, reason = "No platformId")
+                        else -> UpdateResult(Result.Failure, reason = "Unsupported platform type")
+                    }
+                }
+                ?: UpdateResult(Result.Failure, reason = "Cannot update this playlist")
+        }
     }
 
     private suspend fun removeExistingItems(platform: PlaylistDomain, existing: PlaylistDomain): PlaylistDomain {
@@ -103,16 +127,20 @@ class PlaylistUpdateUsecase constructor(
     }
 
     interface UpdateCheck {
-        fun shouldUpdate(p: PlaylistDomain): Boolean
+        fun checkToUpdate(p: PlaylistDomain): Boolean
+        fun canUpdate(p: PlaylistDomain): Boolean
     }
 
     class PlatformUpdateCheck : UpdateCheck {
-        override fun shouldUpdate(p: PlaylistDomain): Boolean =
-            p.type == PLATFORM
+        override fun checkToUpdate(p: PlaylistDomain): Boolean =
+            p.type == PLATFORM || p.id == LiveUpcoming.identifier()
+
+        override fun canUpdate(p: PlaylistDomain): Boolean =
+            (p.platformId != null && p.platform == YOUTUBE && p.type == PLATFORM)
+                    || p.id == LiveUpcoming.identifier()
     }
 
     companion object {
-        private val UPDATE_INTERVAL_DEFAULT = 1000 * 60 * 60
         val SECONDS = 1000L
     }
 }

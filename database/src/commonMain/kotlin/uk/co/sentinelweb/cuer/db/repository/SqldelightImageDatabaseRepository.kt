@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ImageDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.AllFilter
@@ -36,7 +36,7 @@ class SqldelightImageDatabaseRepository(
     override val stats: Flow<Pair<OrchestratorContract.Operation, Nothing>>
         get() = throw NotImplementedError("Not used")
 
-    override suspend fun save(domain: ImageDomain, flat: Boolean, emit: Boolean): RepoResult<ImageDomain> =
+    override suspend fun save(domain: ImageDomain, flat: Boolean, emit: Boolean): DbResult<ImageDomain> =
         withContext(coProvider.IO) {
             with(database.imageEntityQueries) {
                 try {
@@ -44,64 +44,64 @@ class SqldelightImageDatabaseRepository(
                     if (domain.id?.source == source) {
                         val entity = imageMapper.map(domain)
                         update(entity)
-                        RepoResult.Data(imageMapper.map(entity))
+                        DbResult.Data(imageMapper.map(entity))
                     } else {
                         guidCreator.create().toIdentifier(source)
                             .let { domain.copy(id = it) }
                             .also { create(imageMapper.map(it)) }
-                            .let { RepoResult.Data(it) }
+                            .let { DbResult.Data(it) }
                     }
                 } catch (e: Exception) {
                     val msg = "couldn't save image"
                     log.e(msg, e)
-                    RepoResult.Error<ImageDomain>(e, msg)
+                    DbResult.Error<ImageDomain>(e, msg)
                 }
             }
         }
 
 
-    override suspend fun save(domains: List<ImageDomain>, flat: Boolean, emit: Boolean): RepoResult<List<ImageDomain>> =
+    override suspend fun save(domains: List<ImageDomain>, flat: Boolean, emit: Boolean): DbResult<List<ImageDomain>> =
         withContext(coProvider.IO) {
             database.imageEntityQueries.transactionWithResult {
                 try {
                     domains
                         .map { checkToSaveImage(it) }
-                        .let { RepoResult.Data(it) }
+                        .let { DbResult.Data(it) }
                 } catch (e: Exception) {
                     val msg = "couldn't save images"
                     log.e(msg, e)
-                    RepoResult.Error<List<ImageDomain>>(e, msg)
+                    DbResult.Error<List<ImageDomain>>(e, msg)
                 }
             }
         }
 
-    override suspend fun load(id: GUID, flat: Boolean): RepoResult<ImageDomain> =
+    override suspend fun load(id: GUID, flat: Boolean): DbResult<ImageDomain> =
         withContext(coProvider.IO) {
             try {
                 database.imageEntityQueries
                     .load(id.value)
                     .executeAsOneOrNull()!!
                     .let { image: Image -> imageMapper.map(image) }
-                    .let { image: ImageDomain -> RepoResult.Data(image) }
+                    .let { image: ImageDomain -> DbResult.Data(image) }
             } catch (e: Throwable) {
                 val msg = "couldn't load image $id"
                 log.e(msg, e)
-                RepoResult.Error<ImageDomain>(e, msg)
+                DbResult.Error<ImageDomain>(e, msg)
             }
         }
 
-    override suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<ImageDomain>> {
+    override suspend fun loadList(filter: Filter, flat: Boolean): DbResult<List<ImageDomain>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): DbResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): DbResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter -> RepoResult.Data(
+                is AllFilter -> DbResult.Data(
                     database.imageEntityQueries.count().executeAsOne().toInt()
                 )
 
@@ -110,25 +110,25 @@ class SqldelightImageDatabaseRepository(
         } catch (e: Exception) {
             val msg = "couldn't count images"
             log.e(msg, e)
-            RepoResult.Error<Int>(e, msg)
+            DbResult.Error<Int>(e, msg)
         }
     }
 
-    override suspend fun delete(domain: ImageDomain, emit: Boolean): RepoResult<Boolean> {
+    override suspend fun delete(domain: ImageDomain, emit: Boolean): DbResult<Boolean> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
-        var result: RepoResult<Boolean> = RepoResult.Data(false)
+    override suspend fun deleteAll(): DbResult<Boolean> = withContext(coProvider.IO) {
+        var result: DbResult<Boolean> = DbResult.Data(false)
         database.imageEntityQueries.transaction {
             result = try {
                 database.imageEntityQueries
                     .deleteAll()
-                RepoResult.Data(true)
+                DbResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't deleteAll images"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
         result
@@ -138,7 +138,7 @@ class SqldelightImageDatabaseRepository(
         update: UpdateDomain<ImageDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<ImageDomain> {
+    ): DbResult<ImageDomain> {
         throw NotImplementedError("Not used")
     }
 
@@ -168,16 +168,16 @@ class SqldelightImageDatabaseRepository(
             }
         }.let { imageMapper.map(it) }
 
-    internal suspend fun delete(id: GUID?): RepoResult<Boolean> = withContext(coProvider.IO) {
+    internal suspend fun delete(id: GUID?): DbResult<Boolean> = withContext(coProvider.IO) {
         id?.let {
             try {
                 database.imageEntityQueries.delete(id.value)
-                RepoResult.Data(true)
+                DbResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't delete image: $id"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
-        } ?: RepoResult.Data(false)
+        } ?: DbResult.Data(false)
     }
 }

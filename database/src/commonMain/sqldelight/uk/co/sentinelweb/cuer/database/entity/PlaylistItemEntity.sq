@@ -91,6 +91,12 @@ WHERE media.flags & 2 == 2
     AND media.id = playlist_item.media_id
 ORDER BY playlist_item.date_added DESC LIMIT :limit;
 
+loadAllPlaylistItemsLiveAndUpcoming:
+SELECT playlist_item.* FROM playlist_item, media
+WHERE (media.flags & 4 == 4 OR media.flags & 8 == 8 )
+    AND media.id = playlist_item.media_id
+ORDER BY playlist_item.date_added DESC LIMIT :limit;
+
 loadAllPlaylistItemsUnfinished:
 SELECT playlist_item.* FROM playlist_item, media
 WHERE media.duration>0 AND media.position>0

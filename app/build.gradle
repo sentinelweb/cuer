@@ -8,15 +8,17 @@ apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    compileSdkVersion project.properties.app_compileSdkVersion as int
-
+    compileSdkVersion app_compileSdkVersion as int
+    namespace app_applicationId
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
     useLibrary 'android.test.mock'
 
+    android.buildFeatures.buildConfig true
+
     defaultConfig {
-        applicationId project.properties.app_applicationId
-        minSdkVersion project.properties.app_minSdkVersion as int
+        applicationId app_applicationId
+        minSdkVersion app_minSdkVersion as int
         targetSdkVersion app_targetSdkVersion as int
         versionCode app_versionCode as int
         versionName app_versionName
@@ -32,6 +34,9 @@ android {
             annotationProcessorOptions {
                 arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
             }
+//            compileOptions {
+//                arguments += ["-Xdebug":true]
+//            }
         }
     }
 
@@ -65,8 +70,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
@@ -145,6 +150,18 @@ dependencies {
     implementation "androidx.recyclerview:recyclerview:$ver_recyclerview"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:$ver_swipe_refresh"
     implementation "androidx.preference:preference-ktx:$ver_preference"
+
+    // WorkManager
+    // Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$ver_workmanager"
+    // optional - RxJava2 support
+    implementation "androidx.work:work-rxjava2:$ver_workmanager"
+    // optional - GCMNetworkManager support
+    implementation "androidx.work:work-gcm:$ver_workmanager"
+    // optional - Test helpers
+    androidTestImplementation "androidx.work:work-testing:$ver_workmanager"
+    // optional - Multiprocess support
+    implementation "androidx.work:work-multiprocess:$ver_workmanager"
 
     // Compose
     implementation "androidx.compose.animation:animation:$ver_compose"

@@ -55,17 +55,24 @@ class AppDependencies:
         isDebug: isDebug,
         cuerRemoteEnabled: false,
         versionCode: 1,
-        version: "0.77")
+        version: "0.77",
+        device: "Ios",
+        deviceType:DomainNodeDomain.DeviceType.ios
+    )
     
     lazy var shared: SharedAppDependencies = SharedAppDependencies(
         config: self.buildConfig,
         ytApiKey: CuerYoutubeApiKeyProvider(),
         pixabayApiKey: CuerPixabayApiKeyProvider(),
-        shareWrapper: {IosShareWrapper(mainCoordinator: mainCoordinator)}(),
-        platformLaunchWrapper: {IosPlatformLauncher(mainCoordinator: mainCoordinator)}()
+        shareWrapper: { IosShareWrapper(mainCoordinator: mainCoordinator) }(),
+        platformLaunchWrapper: { IosPlatformLauncher(mainCoordinator: mainCoordinator) }(),
+        // move to a new object
+        upcomingView: { UpcomingNotification() }()
     )
     
+    // todo lazy create
     var sharedFactories = SharedFactories()
+    lazy var workManager = WorkManagerInteractor(dependencies: self)
     
     lazy var mainCoordinator: MainCoordinator = {MainCoordinator(dependencies: self)}()
 

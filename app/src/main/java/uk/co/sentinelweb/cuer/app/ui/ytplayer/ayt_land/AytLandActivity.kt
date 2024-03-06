@@ -113,7 +113,7 @@ class AytLandActivity : AppCompatActivity(),
         }
         mviView = MviViewImpl(aytViewHolder)
         aytViewHolder.playerView
-            ?.apply { getLifecycle().addObserver(this) }
+            ?.apply { lifecycle.addObserver(this) }
             ?: throw IllegalStateException("Player is not created")
         controller.onViewCreated(
             listOf(mviView),

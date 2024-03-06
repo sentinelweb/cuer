@@ -160,6 +160,11 @@ class NavigationRouter constructor(
                         intent.removeExtra(PLAY_NOW.toString())
                         intent.removeExtra(SOURCE.name)
                     }
+                    NavigationModel.Target.PLAYLIST_ITEM -> {
+                        intent.removeExtra(KEY)
+                        intent.removeExtra(PLAYLIST_ITEM.name)
+                        intent.removeExtra(SOURCE.name)
+                    }
 
                     else -> Unit
                 }

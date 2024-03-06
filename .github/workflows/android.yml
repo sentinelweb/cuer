@@ -26,10 +26,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: set up JDK 11
+      - name: set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Decode google-services file
@@ -48,7 +48,7 @@ jobs:
           CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
           CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
       - name: Test
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD shared:test shared:jvmTest netKmm:test domain:test database:test app:testDebugUnitTest
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD database:verifyCommonMainDatabaseMigration shared:test shared:jvmTest netKmm:test domain:test database:test app:testDebugUnitTest
         # https://issuetracker.google.com/issues/192927707
         #        app:testDebugUnitTest
         env:

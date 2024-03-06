@@ -1,15 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-// build swift: ./gradlew shared:updatePackageSwift
-val ver_native_coroutines: String by project
+
+// build swift release: ./gradlew :shared:updatePackageSwift
+// build swift dev: ./gradlew :shared:spmDevBuild
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+//    kotlin("com.android.application")
     kotlin("plugin.serialization")
     id("co.touchlab.faktory.kmmbridge") version "0.3.4"
     kotlin("native.cocoapods")
     id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
 }
 
+val ver_native_coroutines: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_kotlinx_datetime: String by project
@@ -25,9 +28,12 @@ val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
+
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
+
 val ver_kotlin_fixture: String by project
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -40,7 +46,11 @@ kotlin {
     js(IR) {
         browser()
     }
-    android()
+    android {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -111,7 +121,7 @@ kotlin {
         val commonTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test:$ver_koin")
-                implementation("io.mockk:mockk:$ver_mockk")
+                //implementation("io.mockk:mockk:$ver_mockk")
             }
         }
         val androidMain by getting {
@@ -121,7 +131,7 @@ kotlin {
 
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
                 implementation("io.insert-koin:koin-test-junit4:$ver_koin")
                 implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
@@ -131,6 +141,8 @@ kotlin {
                 implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation("org.mock-server:mockserver-netty:$ver_mockserver")
                 implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val jsMain by getting {
@@ -166,11 +178,18 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     packagingOptions {
         exclude("META-INF/ASL-2.0.txt")
         exclude("draftv4/schema")
@@ -193,5 +212,9 @@ kmmbridge {
     githubReleaseVersions()
     spm()
     //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
-    versionPrefix.set("0.6")//fixme do i need this?
+    versionPrefix.set("0.6") //fixme do i need this?
 }
+
+//tasks.withType<Test>().configureEach {
+//    jvmArgs("-javaagent:${classpath.find { it.name.contains("mockk") }?.absolutePath}")
+//}

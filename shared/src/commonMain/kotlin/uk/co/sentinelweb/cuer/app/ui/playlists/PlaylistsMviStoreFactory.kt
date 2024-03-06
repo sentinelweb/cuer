@@ -52,6 +52,7 @@ class PlaylistsMviStoreFactory(
     private val recentLocalPlaylists: RecentLocalPlaylists,
     private val starredItems: StarredItemsPlayistInteractor,
     private val unfinishedItems: UnfinishedItemsPlayistInteractor,
+    private val liveUpcomingItems: LiveUpcomingItemsPlayistInteractor,
     private val strings: PlaylistsMviContract.Strings,
     private val platformLauncher: PlatformLaunchWrapper,
     private val shareWrapper: ShareWrapper,
@@ -382,7 +383,7 @@ class PlaylistsMviStoreFactory(
                     .loadList(OrchestratorContract.Filter.IdListFilter(ids), LOCAL.flatOptions())
                     .toMutableList()
 
-                val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems)
+                val appLists = mutableListOf(newMedia, recentItems, starredItems, unfinishedItems, liveUpcomingItems)
                     .apply { if (prefsWrapper.hasLocalSearch) add(localSearch) }
                     .apply { if (prefsWrapper.hasRemoteSearch) add(remoteSearch) }
                     .map { it.makeHeader() to it.makeStats() }

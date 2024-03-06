@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.db.Database
 import uk.co.sentinelweb.cuer.app.db.repository.ConflictException
 import uk.co.sentinelweb.cuer.app.db.repository.MediaDatabaseRepository
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.FLAT
@@ -49,7 +49,7 @@ class SqldelightMediaDatabaseRepository(
     override val stats: Flow<Pair<Operation, Nothing>>
         get() = TODO("Not yet implemented")
 
-    override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): RepoResult<MediaDomain> =
+    override suspend fun save(domain: MediaDomain, flat: Boolean, emit: Boolean): DbResult<MediaDomain> =
         withContext(coProvider.IO) {
             try {
                 //log.d("Media save: flat: $flat, media.id=${domain.id}, media.platformId=${domain.platformId} media.duration=${domain.duration}")
@@ -58,7 +58,7 @@ class SqldelightMediaDatabaseRepository(
                 val result = loadResult.data
                 //log.d("Media load: flat: $flat, media.id=${result?.id}, media.platformId=${result?.platformId} media.duration=${result?.duration}")
                 if (loadResult.isSuccessful)
-                    RepoResult.Data(loadResult.data)
+                    DbResult.Data(loadResult.data)
                         .also {
                             if (emit) it.data
                                 ?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) }
@@ -67,20 +67,20 @@ class SqldelightMediaDatabaseRepository(
             } catch (e: Exception) {
                 val msg = "couldn't save media: ${domain}"
                 log.e(msg, e)
-                RepoResult.Error<MediaDomain>(e, msg)
+                DbResult.Error<MediaDomain>(e, msg)
             }
         }
 
-    override suspend fun save(domains: List<MediaDomain>, flat: Boolean, emit: Boolean): RepoResult<List<MediaDomain>> =
+    override suspend fun save(domains: List<MediaDomain>, flat: Boolean, emit: Boolean): DbResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
-            database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
+            database.mediaEntityQueries.transactionWithResult<DbResult<List<MediaDomain>>> {
                 try {
                     saveMediasInternal(domains, flat)
-                        .let { RepoResult.Data(it) }
+                        .let { DbResult.Data(it) }
                 } catch (e: Exception) {
                     val msg = "couldn't save medias"
                     log.e(msg, e)
-                    rollback(RepoResult.Error<List<MediaDomain>>(e, msg))
+                    rollback(DbResult.Error<List<MediaDomain>>(e, msg))
                 }
             }.also {
                 it.takeIf { it.isSuccessful && emit }
@@ -89,11 +89,11 @@ class SqldelightMediaDatabaseRepository(
             }
         }
 
-    override suspend fun load(id: GUID, flat: Boolean): RepoResult<MediaDomain> = loadMedia(id)
+    override suspend fun load(id: GUID, flat: Boolean): DbResult<MediaDomain> = loadMedia(id)
 
-    override suspend fun loadList(filter: Filter, flat: Boolean): RepoResult<List<MediaDomain>> =
+    override suspend fun loadList(filter: Filter, flat: Boolean): DbResult<List<MediaDomain>> =
         withContext(coProvider.IO) {
-            database.mediaEntityQueries.transactionWithResult<RepoResult<List<MediaDomain>>> {
+            database.mediaEntityQueries.transactionWithResult<DbResult<List<MediaDomain>>> {
                 try {
                     with(database.mediaEntityQueries) {
                         when (filter) {
@@ -116,58 +116,58 @@ class SqldelightMediaDatabaseRepository(
                             else -> throw IllegalArgumentException("$filter not implemented")
                         }
                             .map { fillAndMapEntity(it) }
-                            .let { RepoResult.Data.dataOrEmpty(it) }
+                            .let { DbResult.Data.dataOrEmpty(it) }
                     }
                 } catch (e: Exception) {
                     val msg = "couldn't load medias"
                     log.e(msg, e)
-                    RepoResult.Error<List<MediaDomain>>(e, msg)
+                    DbResult.Error<List<MediaDomain>>(e, msg)
                 }
             }
         }
 
-    override suspend fun loadStatsList(filter: Filter): RepoResult<List<Nothing>> {
+    override suspend fun loadStatsList(filter: Filter): DbResult<List<Nothing>> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun count(filter: Filter): RepoResult<Int> = withContext(coProvider.IO) {
+    override suspend fun count(filter: Filter): DbResult<Int> = withContext(coProvider.IO) {
         try {
             when (filter) {
-                is AllFilter -> RepoResult.Data(database.mediaEntityQueries.count().executeAsOne().toInt())
+                is AllFilter -> DbResult.Data(database.mediaEntityQueries.count().executeAsOne().toInt())
                 else -> throw IllegalArgumentException("$filter not implemented")
             }
         } catch (e: Exception) {
             val msg = "couldn't count medias"
             log.e(msg, e)
-            RepoResult.Error<Int>(e, msg)
+            DbResult.Error<Int>(e, msg)
         }
     }
 
-    override suspend fun delete(domain: MediaDomain, emit: Boolean): RepoResult<Boolean> = withContext(coProvider.IO) {
+    override suspend fun delete(domain: MediaDomain, emit: Boolean): DbResult<Boolean> = withContext(coProvider.IO) {
         try {
             domain.id
                 ?.let { database.mediaEntityQueries.delete(it.id.value) }
-                ?.let { RepoResult.Data(true) }
+                ?.let { DbResult.Data(true) }
                 ?.also { if (emit) _updatesFlow.emit(Operation.DELETE to domain) }
-                ?: let { RepoResult.Data(false) }
+                ?: let { DbResult.Data(false) }
         } catch (e: Exception) {
             val msg = "couldn't delete medias"
             log.e(msg, e)
-            RepoResult.Error<Boolean>(e, msg)
+            DbResult.Error<Boolean>(e, msg)
         }
     }
 
-    override suspend fun deleteAll(): RepoResult<Boolean> = withContext(coProvider.IO) {
-        var result: RepoResult<Boolean> = RepoResult.Data(false)
+    override suspend fun deleteAll(): DbResult<Boolean> = withContext(coProvider.IO) {
+        var result: DbResult<Boolean> = DbResult.Data(false)
         database.mediaEntityQueries.transaction {
             result = try {
                 database.mediaEntityQueries
                     .deleteAll()
-                RepoResult.Data(true)
+                DbResult.Data(true)
             } catch (e: Throwable) {
                 val msg = "couldn't deleteAll medias"
                 log.e(msg, e)
-                RepoResult.Error<Boolean>(e, msg)
+                DbResult.Error<Boolean>(e, msg)
             }
         }
         result
@@ -177,7 +177,7 @@ class SqldelightMediaDatabaseRepository(
         update: UpdateDomain<MediaDomain>,
         flat: Boolean,
         emit: Boolean
-    ): RepoResult<MediaDomain> = withContext(coProvider.IO) {
+    ): DbResult<MediaDomain> = withContext(coProvider.IO) {
         try {
             when (update as? MediaUpdateDomain) {
                 is MediaPositionUpdateDomain ->
@@ -193,7 +193,7 @@ class SqldelightMediaDatabaseRepository(
                                 flags = it.flags
                             )
                         }
-                        .let { RepoResult.Data(load(id = it.id, flat).data) }
+                        .let { DbResult.Data(load(id = it.id, flat).data) }
                         .also { if (emit) it.data?.also { _updatesFlow.emit((if (flat) FLAT else FULL) to it) } }
 
                 else -> throw IllegalArgumentException("update object not valid: $update")
@@ -201,11 +201,11 @@ class SqldelightMediaDatabaseRepository(
         } catch (e: Throwable) {
             val msg = "couldn't update media: $update"
             log.e(msg, e)
-            RepoResult.Error<MediaDomain>(e, msg)
+            DbResult.Error<MediaDomain>(e, msg)
         }
     }
 
-    private suspend fun loadMedia(id: GUID): RepoResult<MediaDomain> =
+    private suspend fun loadMedia(id: GUID): DbResult<MediaDomain> =
         withContext(coProvider.IO) {
             loadMediaInternal(id)
         }
@@ -215,11 +215,11 @@ class SqldelightMediaDatabaseRepository(
             .loadById(id.value)
             .executeAsOne()
             .let { media: Media -> fillAndMapEntity(media) }
-            .let { media: MediaDomain -> RepoResult.Data(media) }
+            .let { media: MediaDomain -> DbResult.Data(media) }
     } catch (e: Throwable) {
         val msg = "couldn't load media:$id"
         log.e(msg, e)
-        RepoResult.Error<MediaDomain>(e, msg)
+        DbResult.Error<MediaDomain>(e, msg)
     }
 
     private fun fillAndMapEntity(media: Media): MediaDomain = mediaMapper.map(

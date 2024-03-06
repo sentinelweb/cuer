@@ -38,7 +38,8 @@ class MediaMapper(
             starred = entity.flags.hasFlag(FLAG_STARRED),
             isLiveBroadcast = entity.flags.hasFlag(FLAG_LIVE),
             isLiveBroadcastUpcoming = entity.flags.hasFlag(FLAG_LIVE_UPCOMING),
-            playFromStart = entity.flags.hasFlag(FLAG_PLAY_FROM_START)
+            playFromStart = entity.flags.hasFlag(FLAG_PLAY_FROM_START),
+            broadcastDate = entity.broadcast_date
         )
 
     fun map(domain: MediaDomain): Media = Media(
@@ -56,7 +57,8 @@ class MediaMapper(
         channel_id = domain.channelData.id!!.id.value,
         thumb_id = domain.thumbNail?.id?.id?.value,
         image_id = domain.image?.id?.id?.value,
-        flags = mapFlags(domain)
+        flags = mapFlags(domain),
+        broadcast_date = domain.broadcastDate
     )
 
     private fun mapFlags(domain: MediaDomain):Long =

@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.orchestrator
 
-import uk.co.sentinelweb.cuer.app.db.repository.RepoResult
+import uk.co.sentinelweb.cuer.app.db.repository.DbResult
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.net.NetResult
 
-inline fun <reified T> RepoResult<List<T>>.forceDatabaseListResultNotEmpty(msg: String): List<T> = this.let {
+inline fun <reified T> DbResult<List<T>>.forceDatabaseListResultNotEmpty(msg: String): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw DatabaseException(it))
         .takeIf { (it.data?.size ?: 0) > 0 }
@@ -20,7 +20,7 @@ inline fun <reified T> NetResult<List<T>>.forceNetListResultNotEmpty(msg: String
         ?: throw DoesNotExistException(msg)
 }
 
-inline fun <reified T> RepoResult<List<T>>.allowDatabaseListResultEmpty(): List<T> = this.let {
+inline fun <reified T> DbResult<List<T>>.allowDatabaseListResultEmpty(): List<T> = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw DatabaseException(it))
         .data
@@ -41,14 +41,14 @@ inline fun <reified T> NetResult<T>.forceNetSuccessNotNull(msg: String): T = thi
         ?: throw DoesNotExistException(msg)
 }
 
-inline fun <reified T> RepoResult<T>.forceDatabaseSuccessNotNull(msg: String): T = this.let {
+inline fun <reified T> DbResult<T>.forceDatabaseSuccessNotNull(msg: String): T = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw DatabaseException(it))
         .data
         ?: throw DoesNotExistException(msg)
 }
 
-inline fun <reified T> RepoResult<T>.forceDatabaseSuccess(): T? = this.let {
+inline fun <reified T> DbResult<T>.forceDatabaseSuccess(): T? = this.let {
     (it.takeIf { it.isSuccessful }
         ?: throw DatabaseException(it))
         .data

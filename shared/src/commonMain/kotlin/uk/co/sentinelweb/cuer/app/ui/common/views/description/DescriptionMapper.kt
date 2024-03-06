@@ -33,6 +33,7 @@ class DescriptionMapper constructor(
             },
         pubDate = dateTimeFormater.formatDateTimeNullable(domain.published),
         ribbonActions = ribbonActions,
+        broadcastDate = domain.broadcastDate?.let { "Airs on : " + dateTimeFormater.formatDateTime(it) },
         info = DescriptionModel.Info(
             platform = domain.platform,
             platformId = domain.platformId,
@@ -59,7 +60,7 @@ class DescriptionMapper constructor(
         ribbonActions = listOf(),
         info = DescriptionModel.Info(
             platform = PlatformDomain.OTHER,
-            platformId = "???"
+            platformId = "???",
         )
     )
 }

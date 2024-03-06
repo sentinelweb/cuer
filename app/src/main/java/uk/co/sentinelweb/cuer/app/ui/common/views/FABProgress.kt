@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import com.google.android.material.composethemeadapter.R.attr.floatingActionButtonStyle
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.ObsoleteCoroutinesApi
@@ -21,10 +22,10 @@ class FABProgress(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
     FloatingActionButton(context, attrs, defStyleAttr), KoinComponent {
 
     constructor(context: Context, attrs: AttributeSet?) :
-            this(context, attrs, R.attr.floatingActionButtonStyle)
+            this(context, attrs, floatingActionButtonStyle)
 
     constructor(context: Context) :
-            this(context, null, R.attr.floatingActionButtonStyle)
+            this(context, null, floatingActionButtonStyle)
 
     private val res: ResourceWrapper by inject()
     private val contextProvider: CoroutineContextProvider by inject()
@@ -62,7 +63,7 @@ class FABProgress(context: Context, attrs: AttributeSet?, defStyleAttr: Int) :
         }
     }
 
-    override fun draw(canvas: Canvas?) {
+    override fun draw(canvas: Canvas) {
         super.draw(canvas)
 
         if (showProgress) {

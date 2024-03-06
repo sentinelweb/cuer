@@ -126,7 +126,7 @@ class MainActivity :
             )
         }
         navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
-            log.d("navigation change: dest: $navDestination bundle:$bundle")
+            log.d("navigation change: dest: $navDestination|")
         }
 
         volumeControl.controlView = binding.castPlayerVolume
@@ -224,7 +224,7 @@ class MainActivity :
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
@@ -235,10 +235,8 @@ class MainActivity :
         super.onStart()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(this)
         presenter.onStart()
-        //checkIntent(intent)
         navigationProvider.checkForPendingNavigation(null)
             ?.apply { navRouter.navigate(this) }
-
         hideShowPlayerIfOnboarding()
     }
 

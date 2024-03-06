@@ -55,7 +55,7 @@ class BrowseContract {
 
     interface View : MviView<View.Model, View.Event> {
 
-        fun processLabel(label: MviStore.Label)
+        fun processLabel(labelBrowse: MviStore.Label) // unique param name needed for ios linking
 
         data class Model(
             val title: String,

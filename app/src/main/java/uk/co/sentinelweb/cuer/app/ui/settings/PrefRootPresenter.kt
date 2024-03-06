@@ -1,12 +1,17 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import android.content.Context
 import kotlinx.datetime.toJavaInstant
+import org.koin.core.component.KoinComponent
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
+import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
+import uk.co.sentinelweb.cuer.app.work.worker.UpcomingVideosCheckWorker
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -20,7 +25,7 @@ class PrefRootPresenter constructor(
 //    private val coroutines: CoroutineContextProvider,
     private val emailUseCase: EmailUseCase,
     private val shareUseCase: ShareUseCase,
-) : PrefRootContract.Presenter {
+) : PrefRootContract.Presenter, KoinComponent {
 
     override fun sendDebugReports() {
         if (firebaseWrapper.hasUnsentReports()) {
@@ -73,5 +78,11 @@ class PrefRootPresenter constructor(
 
     override fun launchBymcDonate() {
         view.launchLink(StringResource.url_bymc_donate_form.default)
+    }
+
+    override fun test() {
+        getKoin().get<WorkManagerInteractor>()
+            .checkStatus(getKoin().get<Context>(), UpcomingVideosCheckWorker.WORK_NAME)
+        getKoin().get<UpcomingContract.Presenter>().checkForUpcomingEpisodes(30)
     }
 }

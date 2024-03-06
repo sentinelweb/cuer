@@ -31,7 +31,7 @@ function YouTubePlayer(communicationConstants, communicationChannel) {
                 onApiChange: () => YouTubePlayerBridge.sendApiChange()
             },
             playerVars: {
-                autoplay: 0,
+                autoplay: 1,
                 autohide: 1,
                 controls: 0,
                 enablejsapi: 1,

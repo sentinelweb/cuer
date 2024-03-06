@@ -169,6 +169,10 @@
         lock - autoplay after unlock
     </string>
     <string name="prefs_player_restart_after_unlock_title">Restart after unlock</string>
+    <string name="prefs_player_upcoming_notify_title">Notify upcoming videos</string>
+    <string name="prefs_player_upcoming_notify_summary">Show a notification when and upcoming live stream is about to
+        start (20 min before)
+    </string>
     <string name="prefs_root_feedback_title">Feedback</string>
     <!--    https://www.cognology.com.au/49-best-quotes-on-feedback/-->
     <string name="prefs_root_feedback_summary_how">How are we doing?</string>
@@ -190,6 +194,8 @@
     <string name="prefs_root_version_title">Version</string>
     <string name="prefs_root_version_summary">Version will appear here</string>
     <string name="prefs_root_info_cat_contact">Communications</string>
+    <string name="prefs_root_test_title">Testing</string>
+    <string name="prefs_root_test_summary">Test something</string>
 
 
     <!--    https://www.shareable.net/coworking-is-awesome-lets-keep-it-that-way/-->
@@ -247,7 +253,7 @@
     <string name="browse_error_no_category">No category with that id = %1$s</string>
     <string name="browse_recent">Recently viewed</string>
     <string name="browse_all_cats_title">All categories</string>
-    <string name="browse_add_error">Couldn\'t add playlist: %1$s</string>
+    <string name="browse_add_error">Couldn\'t add playlist: %1$s - %2$s</string>
     
     <!-- player -->
     <string name="player_fab_fullscreen">Fullscreen</string>
@@ -382,6 +388,11 @@
     <!-- onboarding -->
     <string name="onboarding_title">Onboarding</string>
 
+    <!-- upcoming -->
+    <string name="upcoming">Upcoming</string>
+    <string name="upcoming_notif_title">Episode starts in %1$s mins</string>
+
+
     <!-- misc -->
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
@@ -391,7 +402,6 @@
     <string name="dash">-</string>
     <string name="chip_select">Select playlist&#8230;</string>
     <string name="live">LIVE</string>
-    <string name="upcoming">Upcoming</string>
     <string name="clear">Clear</string>
     <string name="playlist_empty">No items in playlist</string>
     <string name="action_unpin">UNPIN</string>

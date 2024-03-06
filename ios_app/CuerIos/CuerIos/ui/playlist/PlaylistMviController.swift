@@ -84,9 +84,9 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
         self.model = model
     }
     
-    func processLabel(label_: PlaylistMviContractMviStoreLabel) {
+    func processLabel(labelPlaylist labelPlaylist: PlaylistMviContractMviStoreLabel) {
         //let _ = debugPrint("playlist label received", label_)
-        switch(label_) {
+        switch(labelPlaylist) {
 //        case let messageLabel as PlaylistsMviContractMviStoreLabel.Message:
 //            debugPrint("Message: \(messageLabel.message))")
 //
@@ -99,7 +99,7 @@ class PlaylistMviViewProxy : UtilsUBaseView<PlaylistMviContractViewModel, Playli
         case let model as PlaylistMviContractMviStoreLabel.ShowUndo:
             showSnackbar(model)
             
-        default: debugPrint(label_)
+        default: debugPrint(labelPlaylist)
         }
     }
 

@@ -21,6 +21,7 @@ interface PrefRootContract {
         fun resetOnboarding()
         fun launchUsability()
         fun launchBymcDonate()
+        fun test()
     }
 
     interface View {

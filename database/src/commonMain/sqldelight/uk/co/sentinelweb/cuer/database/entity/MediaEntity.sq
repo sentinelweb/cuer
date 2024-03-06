@@ -16,6 +16,7 @@ CREATE TABLE media (
     channel_id TEXT,
     thumb_id TEXT,
     image_id TEXT,
+    broadcast_date TEXT AS kotlinx.datetime.LocalDateTime DEFAULT NULL,
     FOREIGN KEY (channel_id) REFERENCES channel(id)
 );
 
@@ -33,7 +34,7 @@ CREATE INDEX media_description_index ON media(description);
 
 create:
 INSERT INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
-published, channel_id, thumb_id, image_id ) VALUES ?
+published, channel_id, thumb_id, image_id, broadcast_date ) VALUES ?
 --ON CONFLICT (platform, platform_id) DO NOTHING
 ;
 
@@ -42,7 +43,7 @@ published, channel_id, thumb_id, image_id ) VALUES ?
 
 update:
 REPLACE INTO media ( id, flags, type, url, title, duration, position, date_last_played, description, platform, platform_id,
-published, channel_id, thumb_id, image_id ) VALUES ?
+published, channel_id, thumb_id, image_id, broadcast_date ) VALUES ?
 --   ON CONFLICT (platform, platform_id) DO NOTHING
 ;
 

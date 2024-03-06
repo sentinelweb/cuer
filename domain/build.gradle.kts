@@ -2,6 +2,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+//    kotlin("com.android.application")
     kotlin("plugin.serialization")
 //    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
     kotlin("native.cocoapods")
@@ -21,6 +22,7 @@ val ver_kotlin_fixture: String by project
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
 val app_minSdkVersion: String by project
+val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -33,7 +35,11 @@ kotlin {
     js(IR) {
         browser()
     }
-    android()
+    androidTarget {
+        compilations.all {
+            kotlinOptions.jvmTarget = ver_jvm
+        }
+    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -77,13 +83,14 @@ kotlin {
                 implementation("app.cash.turbine:turbine:$ver_turbine")
             }
         }
-        val androidTest by getting {
+        val androidUnitTest by getting {
             dependencies {
-                implementation("io.mockk:mockk:$ver_mockk")
+                //implementation("io.mockk:mockk:$ver_mockk")
                 implementation("com.google.truth:truth:$ver_truth")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
                 implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-
+                implementation("io.mockk:mockk-android:$ver_mockk")
+                implementation("io.mockk:mockk-agent:$ver_mockk")
             }
         }
         val jvmMain by getting {
@@ -126,9 +133,13 @@ kotlin {
 
 android {
     compileSdk = app_compileSdkVersion.toInt()
+    namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 }

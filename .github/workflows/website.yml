@@ -13,7 +13,7 @@ jobs:
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
 
       # Check out current repository
       - name: Fetch Sources
@@ -34,10 +34,11 @@ jobs:
       # If main branch update, deploy to gh-pages
       - name: Deploy
 #        if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/main'
-        uses: JamesIves/github-pages-deploy-action@4.1.4
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           BRANCH: gh-pages # The branch the action should deploy to.
-          FOLDER: website/build/distributions # The folder the action should deploy.
+          # FOLDER: website/build/distributions # The folder the action should deploy.
+          FOLDER: website/build/processedResources/js/main # The folder from which the action should deploy content.
           CLEAN: true # Automatically remove deleted files from the deploy branch
 

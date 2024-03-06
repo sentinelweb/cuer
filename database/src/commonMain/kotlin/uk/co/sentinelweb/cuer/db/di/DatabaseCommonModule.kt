@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.db.update.MediaUpdateMapper
 object DatabaseCommonModule {
 
     private val dataBaseModule = module {
-        single { DatabaseFactory().createDatabase(get()) }
+        single { DatabaseFactory(get(), get()).createDatabase(get()) }
     }
 
     private val mapperModule = module {

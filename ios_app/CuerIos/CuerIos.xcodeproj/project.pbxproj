@@ -76,6 +76,9 @@
 		BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */; };
 		BD3F9EA92927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
 		BD3F9EAA2927D0DA00380350 /* BrowseMviController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */; };
+		BD4B0D632B93AA1C00030AA6 /* WorkManagerInteractor.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD4B0D622B93AA1C00030AA6 /* WorkManagerInteractor.swift */; };
+		BD6268A12B979020005E4EEB /* UpcomingNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6268A02B979020005E4EEB /* UpcomingNotification.swift */; };
+		BD6268A32B979580005E4EEB /* NotificationPermissionCheck.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD6268A22B979580005E4EEB /* NotificationPermissionCheck.swift */; };
 		BDA559B829264018008C07E1 /* ApiKeys.plist in Resources */ = {isa = PBXBuildFile; fileRef = BDA559B729264017008C07E1 /* ApiKeys.plist */; };
 		BDA559BB29264124008C07E1 /* ApiKeyProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */; };
 		BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDA559BE292675A8008C07E1 /* Snippets.swift */; };
@@ -163,6 +166,9 @@
 		BD3F9E97292695BF00380350 /* browse_categories.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; name = browse_categories.json; path = ../../app/src/main/assets/browse_categories.json; sourceTree = "<group>"; };
 		BD3F9EA52927C2EE00380350 /* FirstAppearModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstAppearModifier.swift; sourceTree = "<group>"; };
 		BD3F9EA82927D0DA00380350 /* BrowseMviController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowseMviController.swift; sourceTree = "<group>"; };
+		BD4B0D622B93AA1C00030AA6 /* WorkManagerInteractor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkManagerInteractor.swift; sourceTree = "<group>"; };
+		BD6268A02B979020005E4EEB /* UpcomingNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpcomingNotification.swift; sourceTree = "<group>"; };
+		BD6268A22B979580005E4EEB /* NotificationPermissionCheck.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionCheck.swift; sourceTree = "<group>"; };
 		BDA559B729264017008C07E1 /* ApiKeys.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = ApiKeys.plist; sourceTree = "<group>"; };
 		BDA559BA29264124008C07E1 /* ApiKeyProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApiKeyProvider.swift; sourceTree = "<group>"; };
 		BDA559BE292675A8008C07E1 /* Snippets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Snippets.swift; sourceTree = "<group>"; };
@@ -282,6 +288,16 @@
 			path = views;
 			sourceTree = "<group>";
 		};
+		BD4B0D612B93A98100030AA6 /* background */ = {
+			isa = PBXGroup;
+			children = (
+				BD4B0D622B93AA1C00030AA6 /* WorkManagerInteractor.swift */,
+				BD6268A02B979020005E4EEB /* UpcomingNotification.swift */,
+				BD6268A22B979580005E4EEB /* NotificationPermissionCheck.swift */,
+			);
+			path = background;
+			sourceTree = "<group>";
+		};
 		BDA559B929264106008C07E1 /* net */ = {
 			isa = PBXGroup;
 			children = (
@@ -316,6 +332,7 @@
 		BDBEDF8D29221FD20004AEF4 /* CuerIos */ = {
 			isa = PBXGroup;
 			children = (
+				BD4B0D612B93A98100030AA6 /* background */,
 				5513229E292BB22800212FF5 /* Info.plist */,
 				BDBEE01029241FE10004AEF4 /* shared */,
 				BDBEDFF62923CBB50004AEF4 /* app */,
@@ -648,6 +665,7 @@
 				BDBEDFD0292291EE0004AEF4 /* AppDependencies.swift in Sources */,
 				BDBEDFD5292295F70004AEF4 /* SafariView.swift in Sources */,
 				55B8622F29303A2300972AD6 /* PlaylistsDialogView.swift in Sources */,
+				BD4B0D632B93AA1C00030AA6 /* WorkManagerInteractor.swift in Sources */,
 				BDA559BF292675A8008C07E1 /* Snippets.swift in Sources */,
 				BD3F9EA62927C2EE00380350 /* FirstAppearModifier.swift in Sources */,
 				55724FB2292E65E20014B547 /* IosPlatformLauncher.swift in Sources */,
@@ -668,6 +686,8 @@
 				55B862342930ED7F00972AD6 /* TitleNavView.swift in Sources */,
 				551ADC8F2992A19D009A3DBE /* ButtonViews.swift in Sources */,
 				BDBEDFBE2922212B0004AEF4 /* MainCoordinator.swift in Sources */,
+				BD6268A32B979580005E4EEB /* NotificationPermissionCheck.swift in Sources */,
+				BD6268A12B979020005E4EEB /* UpcomingNotification.swift in Sources */,
 				5536355729918BD200E2148B /* PlaylistMviController.swift in Sources */,
 				551322A0292BB44500212FF5 /* Typeface.swift in Sources */,
 				55724FB7292EBCEC0014B547 /* PlaylistsViews.swift in Sources */,

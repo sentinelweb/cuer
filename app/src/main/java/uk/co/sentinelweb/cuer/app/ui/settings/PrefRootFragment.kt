@@ -69,6 +69,10 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
         get() = findPreference(R.string.prefs_root_usability_key)
             ?: throw IllegalArgumentException("Couldn't get: prefs_root_by_m_c_key")
 
+    private val testPreference
+        get() = findPreference(R.string.prefs_root_test_key)
+            ?: throw IllegalArgumentException("Couldn't get: prefs_root_by_m_c_key")
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val view = super.onCreateView(inflater, container, savedInstanceState)
         (layoutInflater.inflate(R.layout.settings_toolbar, container, false) as Toolbar).also {
@@ -117,6 +121,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
             getString(R.string.prefs_root_onboard_key) -> presenter.resetOnboarding()
             getString(R.string.prefs_root_usability_key) -> presenter.launchUsability()
             getString(R.string.prefs_root_bymc_key) -> presenter.launchBymcDonate()
+            getString(R.string.prefs_root_test_key) -> presenter.test()
         }
         return super.onPreferenceTreeClick(preference)
     }

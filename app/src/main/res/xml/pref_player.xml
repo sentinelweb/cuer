@@ -16,4 +16,11 @@
         app:title="@string/prefs_player_restart_after_unlock_title"
     />
 
+    <CheckBoxPreference
+        app:icon="@drawable/ic_upcoming"
+        app:key="@string/prefs_player_upcoming_notify_key"
+        app:summary="@string/prefs_player_upcoming_notify_summary"
+        app:title="@string/prefs_player_upcoming_notify_title"
+    />
+
 </PreferenceScreen>

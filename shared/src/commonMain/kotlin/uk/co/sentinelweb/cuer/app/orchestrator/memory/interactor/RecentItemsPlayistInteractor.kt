@@ -61,14 +61,5 @@ class RecentItemsPlayistInteractor constructor(
         watchedItemCount = -1 // todo log in a background process and save to pref
     )
 
-    override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) {
-//        mediaOrchestrator.update(
-//            MediaPositionUpdateDomain(
-//                id = item.media.id!!,
-//                duration = item.media.duration,
-//                positon = item.media.positon,
-//                dateLastPlayed = item.media.dateLastPlayed,
-//                watched = false,
-//            ), LOCAL.flatOptions())
-    }
+    override suspend fun performCustomDeleteAction(item: PlaylistItemDomain) = Unit
 }

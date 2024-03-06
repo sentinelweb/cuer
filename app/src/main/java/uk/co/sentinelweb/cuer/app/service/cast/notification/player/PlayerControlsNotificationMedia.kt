@@ -32,6 +32,9 @@ class PlayerControlsNotificationMedia constructor(
     private val launchClass: Class<out Activity>,
 ) : PlayerControlsNotificationContract.View {
 
+    init {
+        log.tag(this)
+    }
     @DrawableRes
     private var icon: Int = -1
 
@@ -122,7 +125,7 @@ class PlayerControlsNotificationMedia constructor(
                     builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
 
                 else -> {
-                    log.d("state: $state")
+                    log.e("state: ${state.playState} title: ${state.media?.title}")
                     builder.addAction(R.drawable.ic_error, "Unknown", contentPendingIntent)
                 }
             }

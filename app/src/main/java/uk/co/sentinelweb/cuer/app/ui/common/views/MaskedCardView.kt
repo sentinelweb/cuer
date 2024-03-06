@@ -6,12 +6,10 @@ import android.graphics.Canvas
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
-import android.widget.TextView
-import androidx.appcompat.widget.AppCompatTextView
+import com.google.android.material.R.style.Widget_MaterialComponents_CardView
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.shape.ShapeAppearanceModel
 import com.google.android.material.shape.ShapeAppearancePathProvider
-import uk.co.sentinelweb.cuer.app.R
 
 /**
  * A text view that clips the content of any shape
@@ -26,7 +24,7 @@ class MaskedCardView @JvmOverloads constructor(
     private val path: Path = Path()
     private val shapeAppearance: ShapeAppearanceModel =
         ShapeAppearanceModel.builder(
-            context, attrs, defStyle, R.style.Widget_MaterialComponents_CardView
+            context, attrs, defStyle, Widget_MaterialComponents_CardView
         ).build()
 
     private val rectF = RectF(0f, 0f, 0f, 0f)

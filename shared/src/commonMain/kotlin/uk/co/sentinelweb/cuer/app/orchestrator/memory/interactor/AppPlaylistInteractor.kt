@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistStatDomain
 interface AppPlaylistInteractor {
     val hasCustomDeleteAction: Boolean
     val customResources: CustomisationResources?
+
     suspend fun getPlaylist(): PlaylistDomain?
     fun makeHeader(): PlaylistDomain
     fun makeStats(): PlaylistStatDomain
@@ -17,5 +18,4 @@ interface AppPlaylistInteractor {
     interface CustomisationResources {
         val customDelete: ActionResources?
     }
-
 }

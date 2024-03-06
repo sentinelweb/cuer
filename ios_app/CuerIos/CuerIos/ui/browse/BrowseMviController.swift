@@ -84,17 +84,18 @@ class BrowseViewProxy : UtilsUBaseView<BrowseContractViewModel, BrowseContractVi
     override func render(model: BrowseContractViewModel) {
         self.model = model
     }
-    
-    func processLabel(label: BrowseContractMviStoreLabel) {
-        switch(label) {
+//    /Users/robmunro/repos/cuer/ios_app/CuerIos/CuerIos/ui/browse/BrowseMviController.swift:88:10 Instance method 'processLabel(label:)' has different argument labels from those required by protocol 'BrowseContractView' ('processLabel(label___:)')
+
+    func processLabel(labelBrowse: BrowseContractMviStoreLabel) {
+        switch(labelBrowse) {
         case is BrowseContractMviStoreLabel.AddPlaylist:
-            let addLabel = label as! BrowseContractMviStoreLabel.AddPlaylist
+            let addLabel = labelBrowse as! BrowseContractMviStoreLabel.AddPlaylist
             
             addPlaylist(cat: addLabel.cat, parentId: addLabel.parentId)
         case let openPlaylist as BrowseContractMviStoreLabel.OpenLocalPlaylist:
             self.dependencies.mainCoordinator.navigate(route: .playlist(plId: openPlaylist.id))
             
-        default: debugPrint(label)
+        default: debugPrint(labelBrowse)
         }
     }
     

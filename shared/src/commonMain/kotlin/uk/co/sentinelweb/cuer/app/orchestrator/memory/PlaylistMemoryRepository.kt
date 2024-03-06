@@ -23,8 +23,9 @@ class PlaylistMemoryRepository constructor(
     private val recentItemsInteractor: RecentItemsPlayistInteractor,
     private val localSearchInteractor: LocalSearchPlayistInteractor,
     private val starredItemsInteractor: StarredItemsPlayistInteractor,
+    private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor,
     private val unfinishedItemsInteractor: UnfinishedItemsPlayistInteractor,
-    private val remoteSearchOrchestrator: YoutubeSearchPlayistInteractor
+    private val liveUpcomingItemsPlayistInteractor: LiveUpcomingItemsPlayistInteractor
 ) : MemoryRepository<PlaylistDomain> {
 
     enum class MemoryPlaylist(val id: GUID) {
@@ -34,7 +35,8 @@ class PlaylistMemoryRepository constructor(
         LocalSearch(GUID("aa4f2c64-bc51-4fab-8846-78093fd2562a")),
         YoutubeSearch(GUID("9ac7d9bf-32c1-4efe-a2a2-d0cd9ad6263b")),
         Starred(GUID("f54f43f7-3ad8-43cb-99f7-115d7868b20b")),
-        Unfinished(GUID("0430c6c0-5153-4910-8306-562f21d6bbcc"));
+        Unfinished(GUID("0430c6c0-5153-4910-8306-562f21d6bbcc")),
+        LiveUpcoming(GUID("cb9bafba-db2f-4b77-a598-1ccc1d50130c"));
 
         fun identifier() = Identifier(id, Source.MEMORY)
     }
@@ -63,6 +65,7 @@ class PlaylistMemoryRepository constructor(
         YoutubeSearch.id -> remoteSearchOrchestrator.getPlaylist()
         Starred.id -> starredItemsInteractor.getPlaylist()
         Unfinished.id -> unfinishedItemsInteractor.getPlaylist()
+        LiveUpcoming.id -> liveUpcomingItemsPlayistInteractor.getPlaylist()
         Shared.id -> data[id]
         else -> throw NotImplementedException("$id is invalid memory playlist")
     }

@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
+import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
@@ -68,7 +69,8 @@ interface MainContract {
                         log = get(),
                         floatingPlayerServiceManager = get(),
                         castListener = get(),
-                        autoBackupFileExporter = get()
+                        autoBackupFileExporter = get(),
+                        notificationPermissionCheckDialog = get(),
                     )
                 }
                 scoped {
@@ -91,6 +93,7 @@ interface MainContract {
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { ShareNavigationHack() }
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
+                scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get()) }
             }
         }
     }

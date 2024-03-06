@@ -169,6 +169,7 @@ struct PlaylistViews_Previews: PreviewProvider {
                 loopModeIndex: 0,
                 loopModeIcon: .icPlaymodeShuffle,
                 loopModeText: "Shuffle",
+                loopVisible: false,
                 playIcon: .icPlaylistPlay,
                 playText: "Play",
                 starredIcon: .icStarred,
@@ -179,11 +180,14 @@ struct PlaylistViews_Previews: PreviewProvider {
                 isPinned: true,
                 isSaved: true,
                 canPlay: true,
+                playEnabled: false,
                 canEdit: true,
                 canUpdate: true,
                 canDelete: true,
                 canEditItems: true,
                 canDeleteItems: true,
+                shareVisible: true,
+                shareEnabled: true,
                 hasChildren: 0,
                 itemsText: "3/30"
             ), action: {x in })

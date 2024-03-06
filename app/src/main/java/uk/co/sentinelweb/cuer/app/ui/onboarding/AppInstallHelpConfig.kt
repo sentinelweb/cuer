@@ -84,7 +84,7 @@ class AppInstallHelpConfig(val res: ResourceWrapper) : OnboardingContract.Config
                     icon = null,
                     color = R.color.white
                 ),
-                subtitle = "We have some big plans for Cuer, and we want to get it good ...",
+                subtitle = "Can you let us know how we are doing ?",
                 lines = listOf(
                     ActionResources(
                         label = "There is a user feedback form in the settings",
