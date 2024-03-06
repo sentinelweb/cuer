@@ -140,7 +140,6 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

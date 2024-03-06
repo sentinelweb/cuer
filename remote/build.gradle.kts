@@ -88,7 +88,9 @@ kotlin {
             }
         }
 
-        val jvmMain by getting {
+        val jvmAndAndroidMain by creating {
+            kotlin.srcDir("src/jvmAndAndroid/kotlin")
+            dependsOn(commonMain)
             dependencies {
                 implementation("ch.qos.logback:logback-classic:$ver_logback")
                 implementation("io.ktor:ktor-server-core:$ver_ktor")
@@ -107,8 +109,13 @@ kotlin {
             }
         }
 
+        val jvmMain by getting {
+            dependsOn(jvmAndAndroidMain)
+
+        }
+
         val androidMain by getting {
-            dependsOn(jvmMain)
+            dependsOn(jvmAndAndroidMain)
             dependencies {
 
             }
@@ -149,7 +156,6 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = app_minSdkVersion.toInt()
-        targetSdk = app_targetSdkVersion.toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
