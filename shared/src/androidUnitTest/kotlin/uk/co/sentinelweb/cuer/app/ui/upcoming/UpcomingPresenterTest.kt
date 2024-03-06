@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Filter.LiveU
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
+import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter.Companion.MAX_RECORDS
 import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider.Companion.toLocalDateTime
@@ -25,6 +26,10 @@ import kotlin.time.Duration.Companion.minutes
 
 class UpcomingPresenterTest : KoinTest {
     private val fixture = kotlinFixtureDefaultConfig
+
+    // todo fix flakiness (from fixture)
+//    @get:Rule
+//    var flakyTestRule = FlakyTestRule(5)
 
     @get:Rule
     var rule = CoroutineTestRule()
@@ -70,7 +75,7 @@ class UpcomingPresenterTest : KoinTest {
                     )
                 }
             coEvery {
-                playlistItemOrchestrator.loadList(LiveUpcomingMediaFilter(100), LOCAL.deepOptions())
+                playlistItemOrchestrator.loadList(LiveUpcomingMediaFilter(MAX_RECORDS), LOCAL.deepOptions())
             } returns allUpcomingList
             allUpcomingList.forEachIndexed { i, item -> log.d("$i - ${item.media.broadcastDate}") }
             sut.checkForUpcomingEpisodes(30)
@@ -93,7 +98,7 @@ class UpcomingPresenterTest : KoinTest {
                 )
             }
         coEvery {
-            playlistItemOrchestrator.loadList(LiveUpcomingMediaFilter(100), LOCAL.deepOptions())
+            playlistItemOrchestrator.loadList(LiveUpcomingMediaFilter(MAX_RECORDS), LOCAL.deepOptions())
         } returns allUpcomingList
         allUpcomingList.forEachIndexed { i, item -> log.d("$i - ${item.media.broadcastDate}") }
         sut.checkForUpcomingEpisodes(30)
