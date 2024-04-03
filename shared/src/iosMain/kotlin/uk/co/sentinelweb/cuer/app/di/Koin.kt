@@ -7,7 +7,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
-import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
+import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseIosModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
@@ -38,7 +38,7 @@ private fun initKoinInternal(
 
 
         modules(
-            listOf(SharedCoreModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
+            listOf(DomainModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
                 .plus(configModule)
                 .plus(SharedAppModule.modules)
                 .plus(SharedAppIosModule.modules)
@@ -59,6 +59,6 @@ data class SharedAppDependencies(
     val pixabayApiKey: ApiKeyProvider,
     val shareWrapper: ShareWrapper,
     val platformLaunchWrapper: PlatformLaunchWrapper,
-    // not a great place for this - remove hack later
+    // fixme not a great place for this - remove hack later
     val upcomingView: UpcomingContract.View,
 )

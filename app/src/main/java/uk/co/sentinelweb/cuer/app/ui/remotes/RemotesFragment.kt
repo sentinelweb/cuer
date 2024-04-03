@@ -159,6 +159,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         log = get(),
                         wifiStateProvider = get(),
                         remotesRepository = get(),
+                        coroutines = get()
                     )
                 }
                 scoped {

@@ -6,12 +6,12 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import summarise
-import uk.co.sentinelweb.cuer.app.impl.IosStringDecoder
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.service.update.UpdateServiceContract
 import uk.co.sentinelweb.cuer.app.ui.browse.*
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
+import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.*
@@ -113,7 +113,7 @@ object PresentationModule {
         factory<CustomisationResources>(named(MemoryPlaylist.NewItems)) { NewPlaylistCustomisationResources() }
         factory<CustomisationResources>(named(MemoryPlaylist.Starred)) { StarredPlaylistCustomisationResources() }
         factory<CustomisationResources>(named(MemoryPlaylist.Unfinished)) { UnfinishedPlaylistCustomisationResources() }
-        factory<StringDecoder> { IosStringDecoder() }
+        factory<StringDecoder> { DefaultStringDecoder() }
     }
 
     val playlistsDialogModule = module {

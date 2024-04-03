@@ -1,9 +1,6 @@
-package uk.co.sentinelweb.cuer.app.impl
+package uk.co.sentinelweb.cuer.app.ui.common.resources
 
-import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
-import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
-
-class IosStringDecoder : StringDecoder {
+class DefaultStringDecoder : StringDecoder {
     override fun get(res: StringResource): String = res.default
 
     override fun get(res: StringResource, params: List<String>): String = res.default.run {

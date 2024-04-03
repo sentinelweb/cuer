@@ -154,14 +154,6 @@ dependencies {
     // WorkManager
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$ver_workmanager"
-    // optional - RxJava2 support
-    implementation "androidx.work:work-rxjava2:$ver_workmanager"
-    // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$ver_workmanager"
-    // optional - Test helpers
-    androidTestImplementation "androidx.work:work-testing:$ver_workmanager"
-    // optional - Multiprocess support
-    implementation "androidx.work:work-multiprocess:$ver_workmanager"
 
     // Compose
     implementation "androidx.compose.animation:animation:$ver_compose"
@@ -219,7 +211,6 @@ dependencies {
     // korlin serialization
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core"
-
 
     // glide
     implementation "com.github.bumptech.glide:glide:$ver_glide"
@@ -292,6 +283,9 @@ dependencies {
     androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$ver_espresso_core"
     androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$ver_espresso_core"
     androidTestImplementation "org.robolectric:annotations:$ver_robolectric"
+
+    // optional - WorkManager Test helpers
+    //androidTestImplementation "androidx.work:work-testing:$ver_workmanager"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {

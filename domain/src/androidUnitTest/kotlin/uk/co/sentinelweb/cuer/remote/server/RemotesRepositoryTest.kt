@@ -10,7 +10,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
+import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -29,7 +29,7 @@ class RemotesRepositoryTest {
 
     private val localNode: LocalNodeDomain = fixture()
 
-    private val fileInteractor = mockk<FileInteractor>(relaxed = true)
+    private val jsonFileInteractor = mockk<JsonFileInteractor>(relaxed = true)
     private val localNodeRepo = mockk<LocalRepository>(relaxed = true) {
         coEvery { getLocalNode() } returns localNode
     }
@@ -45,8 +45,8 @@ class RemotesRepositoryTest {
     @Test
     fun loadAll() = runTest {
         val initialNodes = remoteNodeDomains()
-        coEvery { fileInteractor.loadJson() } returns initialNodes.serialise()
-        sut = RemotesRepository(fileInteractor, localNodeRepo, coroutines, log)
+        coEvery { jsonFileInteractor.loadJson() } returns initialNodes.serialise()
+        sut = RemotesRepository(jsonFileInteractor, localNodeRepo, coroutines, log)
         sut.updatesFlow.test {
             assertEquals(initialNodes, awaitItem())
             cancelAndIgnoreRemainingEvents()
@@ -56,14 +56,14 @@ class RemotesRepositoryTest {
     @Test
     fun addUpdateNode() = runTest {
         val initialNodes = remoteNodeDomains()
-        coEvery { fileInteractor.loadJson() } returns initialNodes.serialise()
-        sut = RemotesRepository(fileInteractor, localNodeRepo, coroutines, log)
+        coEvery { jsonFileInteractor.loadJson() } returns initialNodes.serialise()
+        sut = RemotesRepository(jsonFileInteractor, localNodeRepo, coroutines, log)
 
         sut.updatesFlow.test {
             assertEquals(initialNodes, awaitItem())
             val updated = initialNodes[0].copy(isAvailable = true)
             sut.addUpdateNode(updated)
-            coVerify { fileInteractor.saveJson(any()) }
+            coVerify { jsonFileInteractor.saveJson(any()) }
             val updatedList = awaitItem()
             // assert the first item is the updated one
             assertEquals(updated, updatedList[0])
@@ -76,14 +76,14 @@ class RemotesRepositoryTest {
     @Test
     fun removeNode() = runTest {
         val initialNodes = remoteNodeDomains()
-        coEvery { fileInteractor.loadJson() } returns initialNodes.serialise()
-        sut = RemotesRepository(fileInteractor, localNodeRepo, coroutines, log)
+        coEvery { jsonFileInteractor.loadJson() } returns initialNodes.serialise()
+        sut = RemotesRepository(jsonFileInteractor, localNodeRepo, coroutines, log)
 
         sut.updatesFlow.test {
             assertEquals(initialNodes, awaitItem())
             val toRemove = initialNodes[0]
             sut.removeNode(toRemove)
-            coVerify { fileInteractor.saveJson(any()) }
+            coVerify { jsonFileInteractor.saveJson(any()) }
             val updatedList = awaitItem()
             assertEquals(5, updatedList.size)
             assertEquals(initialNodes.subList(1, 5), updatedList.subList(0, 4))
@@ -95,8 +95,8 @@ class RemotesRepositoryTest {
     @Test
     fun setDisconnected() = runTest {
         val initialNodes = remoteNodeDomains()
-        coEvery { fileInteractor.loadJson() } returns initialNodes.serialise()
-        sut = RemotesRepository(fileInteractor, localNodeRepo, coroutines, log)
+        coEvery { jsonFileInteractor.loadJson() } returns initialNodes.serialise()
+        sut = RemotesRepository(jsonFileInteractor, localNodeRepo, coroutines, log)
 
         sut.updatesFlow.test {
             assertEquals(initialNodes, awaitItem())

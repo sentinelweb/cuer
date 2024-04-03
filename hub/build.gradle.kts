@@ -7,6 +7,7 @@ plugins {
 
 val ver_jvm: String by project
 val ver_koin: String by project
+val ver_coroutines: String by project
 
 group = "uk.co.sentinlweb.cuer"
 version = "1.0-SNAPSHOT"
@@ -17,11 +18,21 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(project(":shared"))
+    implementation(project(":domain"))
+    implementation(project(":remote"))
+    implementation(project(":netKmm"))
     implementation(compose.desktop.currentOs)
 
     // koin
     implementation("io.insert-koin:koin-core:$ver_koin")
+
+
 //    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
+
+    // kotlin coroutines
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
+    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
 }
 
 compose.desktop {

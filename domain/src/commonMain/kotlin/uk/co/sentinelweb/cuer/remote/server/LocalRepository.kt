@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.remote.server
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
+import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.WEB_SERVER_PORT_DEF
 
 class LocalRepository(
-    private val fileInteractor: FileInteractor,
+    private val jsonFileInteractor: JsonFileInteractor,
     private val coroutineContext: CoroutineContextProvider,
     private val guidCreator: GuidCreator,
     private val buildConfigDomain: BuildConfigDomain,
@@ -27,13 +27,13 @@ class LocalRepository(
 
     fun saveLocalNode(node: LocalNodeDomain) {
         coroutineContext.mainScope.launch {
-            fileInteractor.saveJson(node.serialise())
+            jsonFileInteractor.saveJson(node.serialise())
             _node.emit(node)
         }
     }
 
     fun getLocalNode(): LocalNodeDomain =
-        fileInteractor
+        jsonFileInteractor
             .takeIf { it.exists() }
             ?.loadJson()
             ?.takeIf { it.isNotEmpty() }

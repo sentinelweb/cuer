@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProviderImpl
 
-object SharedCoreModule {
+object DomainModule {
     val objectModule = module {
         factory { CoroutineContextProvider() }
         factory<TimeProvider> { TimeProviderImpl() }

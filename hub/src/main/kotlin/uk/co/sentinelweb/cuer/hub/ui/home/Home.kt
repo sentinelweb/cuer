@@ -1,35 +1,39 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 
-fun home() = application {
+fun home(coordinator: HomeUiCoordinator) = application {
     val windowState = rememberWindowState()
+
+    fun onExit() {
+        coordinator.destroy()
+        exitApplication()
+    }
+
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = ::onExit,
         state = windowState,
         title = "Cuer Hub"
     ) {
-        Home()
+        Home(coordinator)
     }
 }
 
+
 @Composable
 @Preview
-fun Home() {
+fun Home(coordinator: HomeUiCoordinator) {
     var text by remember { mutableStateOf("Hello, World!") }
+    val state = remember { mutableStateOf(HomeModel(1)) }
+    coordinator.observeModel { newModel -> state.value = newModel }
 
     MaterialTheme {
-        Button(onClick = {
-            text = "Hello, Desktop!"
-        }) {
-            Text(text)
-        }
+        RemotesUi(coordinator.remotes)
     }
 }

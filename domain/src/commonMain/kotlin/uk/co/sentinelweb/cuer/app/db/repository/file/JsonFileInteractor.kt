@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
-class FileInteractor(
+class JsonFileInteractor(
     private val file: AFile,
     private val operation: PlatformFileOperation
 ) {

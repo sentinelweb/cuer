@@ -1,19 +1,21 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
-import com.arkivanov.essenty.lifecycle.Lifecycle
-import com.arkivanov.essenty.lifecycle.doOnDestroy
+import com.arkivanov.essenty.lifecycle.*
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
 import com.arkivanov.mvikotlin.extensions.coroutines.events
 import com.arkivanov.mvikotlin.extensions.coroutines.labels
 import com.arkivanov.mvikotlin.extensions.coroutines.states
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
@@ -24,18 +26,27 @@ class RemotesController constructor(
     private val wifiStateProvider: WifiStateProvider,
     private val remotesRepository: RemotesRepository,
     lifecycle: Lifecycle?,
-    log: LogWrapper,
+    private val log: LogWrapper,
+    private val coroutines: CoroutineContextProvider,
 ) {
     private val store = storeFactory.create()
     private var binder: Binder? = null
 
     init {
         log.tag(this)
-        lifecycle?.doOnDestroy { store.dispose() }
+        lifecycle?.doOnDestroy {
+            store.dispose()
+            coroutines.cancel()
+        }
+        lifecycle?.doOnCreate { log.d("creating") }
+        lifecycle?.doOnStart { log.d("staring") }
+        lifecycle?.doOnResume { log.d("resuming") }
+        lifecycle?.doOnPause { log.d("pausing") }
+        lifecycle?.doOnStop { log.d("stopping") }
     }
 
     fun onRefresh() {
-        CoroutineScope(Dispatchers.Main).launch {
+        coroutines.mainScope.launch {
             delay(300)
             store.accept(Intent.Refresh)
         }
@@ -62,7 +73,8 @@ class RemotesController constructor(
     @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<RemotesContract.View>, viewLifecycle: Lifecycle) {
         if (binder != null) throw IllegalStateException("Already bound")
-        binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
+        binder =
+            bind(viewLifecycle, BinderLifecycleMode.START_STOP, mainContext = coroutines.mainScope.coroutineContext) {
             views.forEach { view ->
                 // store -> view
                 store.states.mapNotNull { modelMapper.map(it) } bindTo view
@@ -78,8 +90,10 @@ class RemotesController constructor(
 
                 remotesRepository.updatesFlow
                     .map { Intent.RemoteUpdate(it) } bindTo store
+
+                log.d("binding")
             }
         }
-    }
 
+    }
 }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 
 
 interface DispatcherProvider {
+    val Main: CoroutineDispatcher
     val IO: CoroutineDispatcher
     val Computation: CoroutineDispatcher
 }
@@ -12,9 +13,9 @@ interface DispatcherProvider {
 expect object PlatformDispatcherProvider : DispatcherProvider
 
 open class CoroutineContextProvider constructor(
-    val Main: CoroutineDispatcher = Dispatchers.Main,
+    val Main: CoroutineDispatcher = PlatformDispatcherProvider.Main,
     val IO: CoroutineDispatcher = PlatformDispatcherProvider.IO,
-    val Default: CoroutineDispatcher = Dispatchers.Default,// todo remove
+    val Default: CoroutineDispatcher = Dispatchers.Default,
     val Computation: CoroutineDispatcher = PlatformDispatcherProvider.Computation
 ) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {

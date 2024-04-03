@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper.Companion.blankM
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class RemotesMviViewProxy constructor(
+class RemotesMviViewProxy(
     private val log: LogWrapper,
     private val res: ResourceWrapper,
 ) : BaseMviView<Model, Event>(), RemotesContract.View {
@@ -23,9 +23,6 @@ class RemotesMviViewProxy constructor(
     }
 
     var observableModel: Model by mutableStateOf(blankModel())
-        private set
-
-    var observableLoading: Boolean by mutableStateOf(false)
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
@@ -41,6 +38,6 @@ class RemotesMviViewProxy constructor(
     }
 
     fun loading(isLoading: Boolean) {
-        observableLoading = isLoading
+
     }
 }

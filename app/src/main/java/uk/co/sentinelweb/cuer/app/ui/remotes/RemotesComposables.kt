@@ -75,74 +75,7 @@ object RemotesComposables {
                             .verticalScroll(rememberScrollState())
                             .padding(bottom = 128.dp)
                     ) {
-                        Box(modifier = Modifier.height(160.dp)) {
-                            model.imageUrl
-                                ?.also { url ->
-                                    Image(
-                                        painter = rememberGlidePainter(request = url, fadeIn = true),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(160.dp)
-                                            .wrapContentHeight(),
-                                        contentScale = ContentScale.Crop
-                                    )
-                                }
-                            model.wifiState
-                                .takeIf { it.isConnected }
-                                ?.run {
-                                    Text(
-                                        text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
-                                        color = colorResource(R.color.white),
-                                        modifier = Modifier
-                                            .align(Alignment.BottomStart)
-                                            .padding(16.dp)
-                                            .clickable {
-                                                if (isObscured) {
-                                                    view.dispatch(OnActionObscuredPermClicked)
-                                                }
-                                            },
-                                    )
-                                }
-                        }
-                        Row(
-                            modifier = Modifier.padding(
-                                start = dimensionResource(R.dimen.app_bar_header_margin_start),
-                                top = 16.dp,
-                            )
-                        ) {
-                            when (model.serverState) {
-                                STOPPED, INITIAL -> HeaderButton(
-                                    if (model.wifiState.isConnected) "Start" else "No WiFi",
-                                    R.drawable.ic_play,
-                                    enabled = model.wifiState.isConnected
-                                ) { view.dispatch(OnActionStartServerClicked) }
-
-                                STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
-                            }
-                            if (model.serverState == STARTED) {
-                                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingMulticastClicked) }
-                            }
-                            HeaderButton("Config", R.drawable.ic_menu_settings) { view.dispatch(OnActionConfigClicked) }
-                        }
-                        model.address?.also {
-                            Text(
-                                text = it,
-                                style = MaterialTheme.typography.h3,
-                                modifier = Modifier.padding(
-                                    start = dimensionResource(R.dimen.app_bar_header_margin_start),
-                                    top = 8.dp,
-                                    bottom = 0.dp
-                                )
-                            )
-                        }
-                        model.localNode.apply {
-                            Text(
-                                text = "$hostname : $deviceType : ${authType}",
-                                style = MaterialTheme.typography.body2,
-                                modifier = Modifier.padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 8.dp)
-                            )
-                        }
+                        Header(model, view)
                         LazyColumn(
                             modifier = Modifier.height(300.dp),
                             contentPadding = PaddingValues(top = 4.dp)
@@ -157,6 +90,81 @@ object RemotesComposables {
                     }
                 }
             }
+        }
+    }
+
+    @Composable
+    private fun Header(
+        model: Model,
+        view: BaseMviView<Model, Event>
+    ) {
+        Box(modifier = Modifier.height(160.dp)) {
+            model.imageUrl
+                ?.also { url ->
+                    Image(
+                        painter = rememberGlidePainter(request = url, fadeIn = true),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(160.dp)
+                            .wrapContentHeight(),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+            model.wifiState
+                .takeIf { it.isConnected }
+                ?.run {
+                    Text(
+                        text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
+                        color = colorResource(R.color.white),
+                        modifier = Modifier
+                            .align(Alignment.BottomStart)
+                            .padding(16.dp)
+                            .clickable {
+                                if (isObscured) {
+                                    view.dispatch(OnActionObscuredPermClicked)
+                                }
+                            },
+                    )
+                }
+        }
+        Row(
+            modifier = Modifier.padding(
+                start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                top = 16.dp,
+            )
+        ) {
+            when (model.serverState) {
+                STOPPED, INITIAL -> HeaderButton(
+                    if (model.wifiState.isConnected) "Start" else "No WiFi",
+                    R.drawable.ic_play,
+                    enabled = model.wifiState.isConnected
+                ) { view.dispatch(OnActionStartServerClicked) }
+
+                STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
+            }
+            if (model.serverState == STARTED) {
+                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingMulticastClicked) }
+            }
+            HeaderButton("Config", R.drawable.ic_menu_settings) { view.dispatch(OnActionConfigClicked) }
+        }
+        model.address?.also {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.h3,
+                modifier = Modifier.padding(
+                    start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                    top = 8.dp,
+                    bottom = 0.dp
+                )
+            )
+        }
+        model.localNode.apply {
+            Text(
+                text = "$hostname : $deviceType : ${authType}",
+                style = MaterialTheme.typography.body2,
+                modifier = Modifier.padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 8.dp)
+            )
         }
     }
 
@@ -183,7 +191,9 @@ object RemotesComposables {
                     painter = painterResource(R.drawable.ic_wifi_tethering),
                     tint = contentColor,
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp).padding(4.dp)
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(4.dp)
                 )
                 Column { // todo use textview
                     Text(
@@ -215,7 +225,10 @@ object RemotesComposables {
                     painter = painterResource(R.drawable.ic_more_vert),
                     tint = colorResource(R.color.grey_500),
                     contentDescription = null,
-                    modifier = Modifier.size(48.dp).padding(8.dp).clickable { expanded = !expanded },
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                        .clickable { expanded = !expanded },
                 )
                 DropdownMenu(
                     expanded = expanded,
