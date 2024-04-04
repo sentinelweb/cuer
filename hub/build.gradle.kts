@@ -8,6 +8,7 @@ plugins {
 val ver_jvm: String by project
 val ver_koin: String by project
 val ver_coroutines: String by project
+val ver_ktor: String by project
 
 group = "uk.co.sentinlweb.cuer"
 version = "1.0-SNAPSHOT"
@@ -33,6 +34,9 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
+
+    implementation("io.ktor:ktor-client-core:$ver_ktor") // Use the latest version
+    implementation("io.ktor:ktor-client-cio:$ver_ktor") // Use the latest version
 }
 
 compose.desktop {
