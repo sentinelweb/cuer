@@ -4,6 +4,7 @@ import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
@@ -25,15 +26,14 @@ class RemotesUiCoordinator :
     BaseMviView<RemotesContract.View.Model, RemotesContract.View.Event>(),
     RemotesContract.View {
 
+    override var modelObservable = MutableStateFlow(RemotesModelMapper.blankModel())
+        private set
+
     override val scope: Scope = desktopScopeWithSource(this)
-
     private val controller: RemotesController by scope.inject()
+
     private val log: LogWrapper by inject()
-
     private val lifecycle: LifecycleRegistry by inject()
-
-    private var model: RemotesContract.View.Model? = null
-    private var modelObserver: ((RemotesContract.View.Model) -> Unit)? = null
 
     init {
         log.tag(this)
@@ -53,22 +53,13 @@ class RemotesUiCoordinator :
         scope.close()
     }
 
-    override fun observeModel(updater: (RemotesContract.View.Model) -> Unit) {
-        log.d("observeModel: ${model?.title}")
-        this.modelObserver = updater
-        // todo hack - find a better state device for storing model before observer is set
-        // possibly just push an update event to the controller.
-        this.model?.also { this.modelObserver?.invoke(it) }
-    }
-
     override fun processLabel(label: RemotesContract.MviStore.Label) {
 
     }
 
     override fun render(model: RemotesContract.View.Model) {
         log.d("render: ${model.title}")
-        this.model = model
-        this.modelObserver?.invoke(model)
+        this.modelObservable.value = model
     }
 
     fun loading(isLoading: Boolean) {

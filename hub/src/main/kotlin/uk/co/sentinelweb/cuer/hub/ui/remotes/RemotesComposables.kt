@@ -1,16 +1,18 @@
 package uk.co.sentinelweb.cuer.hub.ui.remotes
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import kotlinx.coroutines.flow.onEach
 import org.koin.core.context.GlobalContext
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
@@ -23,25 +25,33 @@ object RemotesComposables {
     @Composable
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
         val state = remember { mutableStateOf(RemotesModelMapper.blankModel()) }
-        coordinator.observeModel { newState -> state.value = newState }
+        coordinator.modelObservable.onEach { newState -> state.value = newState }
         RemotesView(state.value, coordinator)
     }
 
     @Composable
     fun RemotesView(
-        model: RemotesContract.View.Model,
-        view: BaseMviView<RemotesContract.View.Model, RemotesContract.View.Event>
+        model: Model,
+        view: BaseMviView<Model, Event>
     ) {
         log.d("RemotesView")
         Column {
             Header(model, view)
+            LazyColumn(
+                modifier = Modifier.height(300.dp),
+                contentPadding = PaddingValues(top = 4.dp)
+            ) {
+                items(model.remoteNodes) { remote ->
+                    RemoteRow(remote, view)
+                }
+            }
         }
     }
 
     @Composable
     private fun Header(
-        model: RemotesContract.View.Model,
-        view: BaseMviView<RemotesContract.View.Model, RemotesContract.View.Event>
+        model: Model,
+        view: BaseMviView<Model, Event>
     ) {
         Box(modifier = Modifier.height(160.dp)) {
             model.imageUrl
@@ -60,14 +70,14 @@ object RemotesComposables {
                     if (model.wifiState.isConnected) "Start" else "No WiFi",
 //                    R.drawable.ic_play, // icon
                     enabled = model.wifiState.isConnected
-                ) { view.dispatch(RemotesContract.View.Event.OnActionStartServerClicked) }
+                ) { view.dispatch(Event.OnActionStartServerClicked) }
 
-                ServerState.STARTED -> HeaderButton("Stop") { view.dispatch(RemotesContract.View.Event.OnActionStopServerClicked) }
+                ServerState.STARTED -> HeaderButton("Stop") { view.dispatch(Event.OnActionStopServerClicked) }
             }
             if (model.serverState == ServerState.STARTED) {
-                HeaderButton("Ping") { view.dispatch(RemotesContract.View.Event.OnActionPingMulticastClicked) }
+                HeaderButton("Ping") { view.dispatch(Event.OnActionPingMulticastClicked) }
             }
-            HeaderButton("Config") { view.dispatch(RemotesContract.View.Event.OnActionConfigClicked) }
+            HeaderButton("Config") { view.dispatch(Event.OnActionConfigClicked) }
         }
         model.address?.also {
             Text(
@@ -80,5 +90,102 @@ object RemotesComposables {
                 )
             )
         }
+    }
+
+    @Composable
+    private fun RemoteRow(remote: RemoteNodeModel, view: BaseMviView<Model, Event>) {
+        var expanded by remember { mutableStateOf(false) }
+        val contentColor = remote.domain.isAvailable
+            .takeIf { it }
+            ?.let { MaterialTheme.colors.onSurface }
+            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+        Box(
+            modifier = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.CenterEnd,
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(8.dp)
+                    .background(MaterialTheme.colors.surface),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+//                Icon(
+//                    painter = painterResource(R.drawable.ic_wifi_tethering),
+//                    tint = contentColor,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .size(48.dp)
+//                        .padding(4.dp)
+//                )
+                Column { // todo use textview
+                    Text(
+                        text = remote.title,
+                        color = contentColor,
+                        style = MaterialTheme.typography.h5,
+                        modifier = Modifier
+                            .padding(start = 8.dp),
+                    )
+                    Text(
+                        text = remote.address,
+                        color = contentColor,
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                    Text(
+                        text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
+                        color = contentColor,
+                        style = MaterialTheme.typography.body2,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+            // overflow button and dropdown
+            Box(
+                modifier = Modifier.wrapContentWidth(align = Alignment.End),
+            ) {
+//                Icon(
+//                    painter = painterResource(R.drawable.ic_more_vert),
+//                    tint = colorResource(R.color.grey_500),
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .size(48.dp)
+//                        .padding(8.dp)
+//                        .clickable { expanded = !expanded },
+//                )
+                DropdownMenu(
+                    expanded = expanded,
+                    modifier = Modifier.width(200.dp),
+                    onDismissRequest = { expanded = false }
+                ) {
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionPingNodeClicked(remote.domain))
+                    }) {
+                        Text("Ping")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                        Text("Connect")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                        Text("Sync")
+                    }
+                    Divider()
+                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
+                        Text("Play")
+                    }
+                    DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                        Text("Playlists")
+                    }
+                }
+            }
+        }
+    }
+
+    private fun dispatchAndClose(
+        view: BaseMviView<Model, Event>,
+        event: Event.OnActionPingNodeClicked
+    ): Boolean {
+        view.dispatch(event)
+        return false
     }
 }

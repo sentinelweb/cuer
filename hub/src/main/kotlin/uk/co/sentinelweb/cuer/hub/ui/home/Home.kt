@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
@@ -40,7 +41,7 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
     val state = remember { mutableStateOf(HomeModel(1)) }
-    coordinator.observeModel { newModel -> state.value = newModel }
+    coordinator.modelObservable.onEach { newModel -> state.value = newModel }
 
     MaterialTheme {
         Row {
