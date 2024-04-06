@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.hub.ui.remotes
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.height
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -15,7 +13,9 @@ import org.koin.core.context.GlobalContext
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
+import uk.co.sentinelweb.cuer.remote.server.ServerState
 
 object RemotesComposables {
     val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(this) } }
@@ -33,21 +33,9 @@ object RemotesComposables {
         view: BaseMviView<RemotesContract.View.Model, RemotesContract.View.Event>
     ) {
         log.d("RemotesView")
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(model.title) },
-                    actions = {
-                        IconButton(onClick = { view.dispatch(RemotesContract.View.Event.OnActionSettingsClicked) }) {
-                            Icon(Icons.Default.Settings, contentDescription = "Settings")
-                        }
-                    }
-                )
-            },
-            content = {
-                Header(model, view)
-            }
-        )
+        Column {
+            Header(model, view)
+        }
     }
 
     @Composable
@@ -60,6 +48,37 @@ object RemotesComposables {
                 ?.also { url ->
                     ImageFromUrl(url)
                 }
+        }
+        Row(
+            modifier = Modifier.padding(
+                start = 16.dp,
+                top = 16.dp,
+            )
+        ) {
+            when (model.serverState) {
+                ServerState.STOPPED, ServerState.INITIAL -> HeaderButton(
+                    if (model.wifiState.isConnected) "Start" else "No WiFi",
+//                    R.drawable.ic_play, // icon
+                    enabled = model.wifiState.isConnected
+                ) { view.dispatch(RemotesContract.View.Event.OnActionStartServerClicked) }
+
+                ServerState.STARTED -> HeaderButton("Stop") { view.dispatch(RemotesContract.View.Event.OnActionStopServerClicked) }
+            }
+            if (model.serverState == ServerState.STARTED) {
+                HeaderButton("Ping") { view.dispatch(RemotesContract.View.Event.OnActionPingMulticastClicked) }
+            }
+            HeaderButton("Config") { view.dispatch(RemotesContract.View.Event.OnActionConfigClicked) }
+        }
+        model.address?.also {
+            Text(
+                text = it,
+                style = MaterialTheme.typography.h3,
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = 8.dp,
+                    bottom = 0.dp
+                )
+            )
         }
     }
 }

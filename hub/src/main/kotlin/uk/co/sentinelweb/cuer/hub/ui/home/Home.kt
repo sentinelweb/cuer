@@ -1,8 +1,18 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
@@ -29,11 +39,27 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Composable
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
-    var text by remember { mutableStateOf("Hello, World!") }
     val state = remember { mutableStateOf(HomeModel(1)) }
     coordinator.observeModel { newModel -> state.value = newModel }
 
     MaterialTheme {
-        RemotesUi(coordinator.remotes)
+        Row {
+            Box(modifier = Modifier.width(280.dp)) {
+                RemotesUi(coordinator.remotes)
+            }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight()
+                    .background(Color.Blue)
+            ) {
+                Text(
+                    text = "Child",
+                    color = Color.White,
+                    style = TextStyle(fontSize = 30.sp),
+                    modifier = Modifier.padding(20.dp)
+                )
+            }
+        }
     }
 }

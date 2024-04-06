@@ -53,20 +53,7 @@ class AndroidConnectivityWrapper constructor(
         return null
     }
 
-    private fun toUnsignedByte(intVal: Int): Byte {
-        val byteVal: Byte
-        byteVal = if (intVal > 127) {
-            val temp = intVal - 256
-            temp.toByte()
-        } else {
-            intVal.toByte()
-        }
-        return byteVal
-    }
-
-
     override fun isNonMobileAvailable(): Boolean = cm.activeNetworkInfo?.let { isNonMobile(it) } ?: false
-
 
     private fun isNonMobile(info: NetworkInfo?): Boolean =
         info?.run {
