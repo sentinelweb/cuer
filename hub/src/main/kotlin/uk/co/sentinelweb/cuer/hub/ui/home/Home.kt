@@ -20,6 +20,8 @@ import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.flow.onEach
 import loadSVG
 import toImageBitmap
+import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
+import uk.co.sentinelweb.cuer.hub.ui.common.notif.AppleScriptNotif
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
@@ -75,6 +77,12 @@ fun Home(coordinator: HomeUiCoordinator) {
                         style = TextStyle(fontSize = 30.sp),
                         modifier = Modifier.padding(20.dp)
                     )
+                    HeaderButton(
+                        "Notif",
+                        modifier = Modifier.padding(20.dp)
+                    ) {
+                        AppleScriptNotif.showNotification("Title", "text")
+                    }
                 }
             }
         }

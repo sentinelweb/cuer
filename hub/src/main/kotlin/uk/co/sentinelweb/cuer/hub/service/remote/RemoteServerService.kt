@@ -63,19 +63,17 @@ class RemoteServerService(
                 }
                 scoped<RemoteServerContract.Notification.External> {
                     RemoteServerNotificationController(
-//                        view = get(),
-//                        state = get(get)
+                        view = get(),
+                        state = get()
                     )
                 }
-//                scoped<RemoteServerContract.Notification.View> {
-//                    RemoteServerNotification(
-//                        service = get<RemoteServerService>(),
-//                        appState = get(),
-//                        timeProvider = get(),
-//                        log = get(),
-//                        res = get(),
-//                    )
-//                }
+                scoped<RemoteServerContract.Notification.View> {
+                    RemoteServerNotification(
+                        service = get<RemoteServerService>(),
+                        timeProvider = get(),
+                        log = get(),
+                    )
+                }
                 scoped { RemoteServerContract.Notification.State() }
             }
 

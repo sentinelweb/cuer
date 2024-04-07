@@ -24,6 +24,7 @@ import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 
 object RemotesComposables {
+
     val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(this) } }
 
     @Composable
