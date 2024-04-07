@@ -23,6 +23,10 @@ import uk.co.sentinelweb.cuer.hub.util.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.net.DesktopConnectivityWrapper
 import uk.co.sentinelweb.cuer.net.DesktopWifiStateProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
+import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityCheckManager
+import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityCheckTimer
+import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityChecker
+import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
 import uk.co.sentinelweb.cuer.net.di.NetModule
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
@@ -31,6 +35,7 @@ import java.io.File
 
 
 object Modules {
+
     private val scopedModules = listOf(
         RemotesUiCoordinator.uiModule,
     )
@@ -42,9 +47,16 @@ object Modules {
     private val utilModule = module {
         factory<LogWrapper> { SystemLogWrapper() }
         factory { LifecycleRegistry() }
-        factory<ConnectivityWrapper> { DesktopConnectivityWrapper() }
+        single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get()) }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
         factory<WifiStateProvider> { DesktopWifiStateProvider() }
+    }
+
+    private val connectivityModule = module {
+        single { ConnectivityCheckManager(get(), get(), get()) }
+        single { ConnectivityMonitor(get(), get(), get()) }
+        single { ConnectivityCheckTimer() }
+        single { ConnectivityChecker() }
     }
 
     private val configModule = module {
@@ -88,12 +100,14 @@ object Modules {
                 .let { RemotesRepository(it, get(), get(), get()) }
         }
     }
+
     val allModules = listOf(
         DomainModule.objectModule,
         resourcesModule,
         utilModule,
         remoteModule,
         configModule,
+        connectivityModule,
         RemoteModule.objectModule,
         SharedDomainModule.objectModule,
     )

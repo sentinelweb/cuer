@@ -9,7 +9,7 @@ interface LogWrapper {
     fun e(msg: String, t: Throwable? = null)
 }
 
-expect class SystemLogWrapper() : LogWrapper
+expect class SystemLogWrapper(tagObj: Any? = null) : LogWrapper
 
 inline val <reified T> T.TAG: String
     @Suppress("unused")
