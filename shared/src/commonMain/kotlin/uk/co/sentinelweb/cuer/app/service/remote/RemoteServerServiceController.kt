@@ -24,7 +24,7 @@ class RemoteServerServiceController constructor(
     private val localRepo: LocalRepository,
     private val wakeLockManager: WakeLockManager,
     private val wifiStateProvider: WifiStateProvider,
-    private val service: RemoteServerContract.Service
+    private val service: RemoteServerContract.Service, //todo might need to just extract intf for stopSelf()
 ) : RemoteServerContract.Controller {
 
     init {

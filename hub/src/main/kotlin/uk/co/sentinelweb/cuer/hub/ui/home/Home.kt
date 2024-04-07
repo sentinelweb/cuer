@@ -58,7 +58,6 @@ fun Home(coordinator: HomeUiCoordinator) {
                     .background(Color.White)
             ) {
                 Row {
-
                     val imageSize = 32
                     val svgImage = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, imageSize)
                     val imageBitmap = svgImage.toImageBitmap()

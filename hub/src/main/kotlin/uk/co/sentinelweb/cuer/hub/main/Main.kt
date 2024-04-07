@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.hub.main
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.getKoin
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
@@ -15,6 +16,7 @@ fun main() {
 
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
-
+    val serviceController = koin.get<RemoteServerContract.Controller>()
+        .apply { initialise() }
     home(homeUiCoordinator)
 }

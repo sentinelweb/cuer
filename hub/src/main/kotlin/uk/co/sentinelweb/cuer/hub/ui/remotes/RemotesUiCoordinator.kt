@@ -26,10 +26,10 @@ class RemotesUiCoordinator :
     BaseMviView<RemotesContract.View.Model, RemotesContract.View.Event>(),
     RemotesContract.View {
 
+    override val scope: Scope = desktopScopeWithSource(this)
+
     override var modelObservable = MutableStateFlow(RemotesModelMapper.blankModel())
         private set
-
-    override val scope: Scope = desktopScopeWithSource(this)
     private val controller: RemotesController by scope.inject()
 
     private val log: LogWrapper by inject()
@@ -69,6 +69,7 @@ class RemotesUiCoordinator :
     companion object {
         @JvmStatic
         val uiModule = module {
+            factory { RemotesUiCoordinator() }
             scope(named<RemotesUiCoordinator>()) {
                 scoped {
                     RemotesController(

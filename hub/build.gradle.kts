@@ -3,6 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
+//    id("org.openjfx.javafxplugin") version "0.0.9"
 }
 
 val ver_jvm: String by project
@@ -32,10 +33,14 @@ dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
 
+    // todo upgrade ktor - sec vuln
     implementation("io.ktor:ktor-client-core:$ver_ktor")
     implementation("io.ktor:ktor-client-cio:$ver_ktor")
 
     implementation("org.apache.xmlgraphics:batik-transcoder:1.17")
+    // https://mvnrepository.com/artifact/com.github.PlusHaze/TrayNotification
+//    implementation("com.github.PlusHaze:TrayNotification:5393c3a54f")
+
 }
 
 compose.desktop {

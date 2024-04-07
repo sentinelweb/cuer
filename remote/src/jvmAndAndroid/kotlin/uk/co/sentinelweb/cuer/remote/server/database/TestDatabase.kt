@@ -59,7 +59,11 @@ import kotlin.random.Random
                                     platformId = "ggLpFa6CQyU",
                                     platform = PlatformDomain.YOUTUBE,
                                     mediaType = MediaDomain.MediaTypeDomain.VIDEO,
-                                    channelData = ChannelDomain(title = "author", platformId = "xxx", platform = PlatformDomain.YOUTUBE)
+                                    channelData = ChannelDomain(
+                                        title = "author",
+                                        platformId = "xxx",
+                                        platform = PlatformDomain.YOUTUBE
+                                    )
                                 )
                             )
                         )
