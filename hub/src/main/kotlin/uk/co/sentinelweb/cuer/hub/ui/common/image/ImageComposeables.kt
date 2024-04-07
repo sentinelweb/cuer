@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlinx.coroutines.launch
+import loadImageBitmapFromUrl
 
 @Composable
 fun ImageFromUrl(url: String) {

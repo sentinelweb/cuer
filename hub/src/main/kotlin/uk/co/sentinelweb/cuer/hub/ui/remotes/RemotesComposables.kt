@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.hub.ui.remotes
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,10 +9,13 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import kotlinx.coroutines.flow.onEach
+import loadSVG
 import org.koin.core.context.GlobalContext
+import toImageBitmap
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -110,14 +114,15 @@ object RemotesComposables {
                     .background(MaterialTheme.colors.surface),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-//                Icon(
-//                    painter = painterResource(R.drawable.ic_wifi_tethering),
-//                    tint = contentColor,
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(48.dp)
-//                        .padding(4.dp)
-//                )
+                Image(
+                    bitmap = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, 48)
+                        .toImageBitmap(),
+                    contentDescription = "SVG Icon",
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .width(48.dp)
+                        .height(48.dp)
+                )
                 Column { // todo use textview
                     Text(
                         text = remote.title,

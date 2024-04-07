@@ -27,16 +27,15 @@ dependencies {
     // koin
     implementation("io.insert-koin:koin-core:$ver_koin")
 
-
-//    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.20")
-
     // kotlin coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
     // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
 
-    implementation("io.ktor:ktor-client-core:$ver_ktor") // Use the latest version
-    implementation("io.ktor:ktor-client-cio:$ver_ktor") // Use the latest version
+    implementation("io.ktor:ktor-client-core:$ver_ktor")
+    implementation("io.ktor:ktor-client-cio:$ver_ktor")
+
+    implementation("org.apache.xmlgraphics:batik-transcoder:1.17")
 }
 
 compose.desktop {
