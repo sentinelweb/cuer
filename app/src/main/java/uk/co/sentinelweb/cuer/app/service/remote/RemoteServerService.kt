@@ -20,23 +20,19 @@ import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent {
+    override val scope: Scope by serviceScopeWithSource()
+
     override val isServerStarted: Boolean
         get() = controller.isServerStarted
-
-    override suspend fun multicastPing() {
-        controller.multicastPing()
-    }
 
     override val localNode: LocalNodeDomain
         get() = controller.localNode
 
     override var stopListener: (() -> Unit)? = null
 
-    override val scope: Scope by serviceScopeWithSource()
     private val controller: Controller by scope.inject()
     private val notificationWrapper: NotificationWrapper by inject()
     private val appState: CuerAppState by inject()
-
     private val log: LogWrapper by inject()
 
     override fun onCreate() {
@@ -45,6 +41,10 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
         _instance = this
         log.d("Remote Service created")
         controller.initialise()
+    }
+
+    override suspend fun multicastPing() {
+        controller.multicastPing()
     }
 
     override fun onDestroy() {
@@ -116,8 +116,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                     addLinkUsecase = get(),
                 )
             }
-
         }
     }
-
 }

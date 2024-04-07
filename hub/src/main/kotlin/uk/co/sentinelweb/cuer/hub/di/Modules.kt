@@ -5,8 +5,6 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerServiceController
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
@@ -18,13 +16,11 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
-import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerNotificationController
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
-import uk.co.sentinelweb.cuer.hub.util.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.net.DesktopConnectivityWrapper
 import uk.co.sentinelweb.cuer.net.DesktopWifiStateProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -36,8 +32,6 @@ import uk.co.sentinelweb.cuer.net.di.NetModule
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
-import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
-import uk.co.sentinelweb.cuer.remote.server.database.TestDatabase
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 
@@ -47,6 +41,7 @@ object Modules {
     private val scopedModules = listOf(
         HomeUiCoordinator.uiModule,
         RemotesUiCoordinator.uiModule,
+        RemoteServerService.serviceModule,
     )
 
     private val resourcesModule = module {
@@ -95,7 +90,6 @@ object Modules {
             it.mkdirs()
             println(it.absolutePath)
         }
-        single<RemoteServerContract.Manager> { RemoteServerServiceManager(log = get()) }
         single {
             "localNode.json"
                 .let { AFile(File(filesDir, it).absolutePath) }
@@ -108,33 +102,7 @@ object Modules {
                 .let { JsonFileInteractor(it, get()) }
                 .let { RemotesRepository(it, get(), get(), get()) }
         }
-        // todo move to scope? - how to control? wrap inside RemoteServerServiceManager?
-        factory<RemoteServerContract.Controller> {
-            RemoteServerServiceController(
-                notification = get(),
-                webServer = get(),
-                coroutines = get(),
-                log = get(),
-                connectivityWrapper = get(),
-                multi = get(),
-                localRepo = get(),
-                remoteRepo = get(),
-                wakeLockManager = get(),
-                wifiStateProvider = get(),
-                service = get(),
-            )
-        }
-        factory<RemoteServerContract.Notification.External> {
-            RemoteServerNotificationController(
-//                view = get(),
-//                state = get()
-            )
-        }
-        factory<RemoteDatabaseAdapter> {
-            TestDatabase.hardcoded() // todo make db
-        }
         factory<WakeLockManager> { EmptyWakeLockManager() }
-        factory<RemoteServerContract.Service> { RemoteServerService(get()) }
     }
 
     val allModules = listOf(

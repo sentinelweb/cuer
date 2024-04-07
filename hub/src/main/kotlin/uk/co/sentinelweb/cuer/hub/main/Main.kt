@@ -16,7 +16,7 @@ fun main() {
 
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
-    val serviceController = koin.get<RemoteServerContract.Controller>()
-        .apply { initialise() }
+    val remoteServerService = koin.get<RemoteServerContract.Service>()
+
     home(homeUiCoordinator)
 }

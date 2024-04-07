@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.hub.util.remote
+package uk.co.sentinelweb.cuer.hub.service.remote
 
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -7,6 +7,7 @@ class RemoteServerServiceManager(
     private val log: LogWrapper
 ) : RemoteServerContract.Manager {
 
+    // private val service
     init {
         log.tag(this)
     }
