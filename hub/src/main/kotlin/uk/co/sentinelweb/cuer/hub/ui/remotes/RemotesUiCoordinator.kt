@@ -63,9 +63,7 @@ class RemotesUiCoordinator :
         this.modelObservable.value = model
     }
 
-    fun loading(isLoading: Boolean) {
-
-    }
+    fun loading(isLoading: Boolean) = Unit
 
     companion object {
         @JvmStatic
