@@ -6,8 +6,8 @@ interface ConnectivityWrapper {
     fun isConnected(): Boolean
     fun isMetered(): Boolean
     fun getWifiInfo(): WifiStateProvider.WifiState
-    fun getWIFIIP(): String?
-    fun getLocalIpAddress(): String?
-    fun isNonMobileAvailable(): Boolean
+
+    //    fun getWIFIIP(): String?
+//    fun getLocalIpAddress(): String?
     fun wifiIpAddress(): String?
 }

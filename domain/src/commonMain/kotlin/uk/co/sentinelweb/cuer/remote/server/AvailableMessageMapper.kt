@@ -17,7 +17,8 @@ class AvailableMessageMapper(
             hostname = localNode.hostname,
             deviceType = localNode.deviceType,
             version = config.version,
-            ipAddress = if (refreshIp) connectivityWrapper.getWIFIIP() ?: localNode.ipAddress else localNode.ipAddress,
+            ipAddress = if (refreshIp) connectivityWrapper.wifiIpAddress()
+                ?: localNode.ipAddress else localNode.ipAddress,
             port = localNode.port,
             device = localNode.device,
             authType = mapAuthType(localNode.authConfig),

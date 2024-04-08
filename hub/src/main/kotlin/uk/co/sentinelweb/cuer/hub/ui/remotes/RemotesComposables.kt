@@ -30,7 +30,9 @@ object RemotesComposables {
     @Composable
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
         val state = remember { mutableStateOf(RemotesModelMapper.blankModel()) }
-        coordinator.modelObservable.onEach { newState -> state.value = newState }
+        coordinator.modelObservable.onEach { newState ->
+            state.value = newState.also { log.d("New state: $it") }
+        }
         RemotesView(state.value, coordinator)
     }
 

@@ -53,7 +53,7 @@ object Modules {
         factory { LifecycleRegistry() }
         single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get()) }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
-        factory<WifiStateProvider> { DesktopWifiStateProvider() }
+        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
     }
 
     private val connectivityModule = module {

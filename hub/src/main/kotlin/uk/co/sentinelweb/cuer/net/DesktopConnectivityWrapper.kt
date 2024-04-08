@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
+import java.net.InetAddress
 
 class DesktopConnectivityWrapper(
     private val coroutines: CoroutineContextProvider,
@@ -33,11 +34,14 @@ class DesktopConnectivityWrapper(
 
     )
 
-    override fun getWIFIIP(): String? = "0.0.0.0"
+    //override fun getWIFIIP(): String? = "0.0.0.0"
 
-    override fun getLocalIpAddress(): String? = "0.0.0.0"
+//    override fun getLocalIpAddress(): String? = "0.0.0.0"
 
-    override fun isNonMobileAvailable(): Boolean = true
-
-    override fun wifiIpAddress(): String? = "0.0.0.0"
+    override fun wifiIpAddress(): String? = try {
+        InetAddress.getLocalHost().hostAddress
+    } catch (ex: Exception) {
+        ex.printStackTrace()
+        null
+    }
 }

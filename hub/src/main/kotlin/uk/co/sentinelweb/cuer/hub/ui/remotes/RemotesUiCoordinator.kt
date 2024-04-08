@@ -30,6 +30,7 @@ class RemotesUiCoordinator :
 
     override var modelObservable = MutableStateFlow(RemotesModelMapper.blankModel())
         private set
+
     private val controller: RemotesController by scope.inject()
 
     private val log: LogWrapper by inject()

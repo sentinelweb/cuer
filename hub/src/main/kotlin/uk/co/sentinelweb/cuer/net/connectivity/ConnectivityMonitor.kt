@@ -9,10 +9,10 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 class ConnectivityMonitor(
     connectivityCheckTimer: ConnectivityCheckTimer,
     checker: ConnectivityChecker,
-    corooutines: CoroutineContextProvider
+    coroutines: CoroutineContextProvider
 ) {
     val connectivityStatus: SharedFlow<Boolean> = connectivityCheckTimer
         .tick()
         .map { checker.check() }
-        .shareIn(corooutines.ioScope, started = SharingStarted.WhileSubscribed(), replay = 1)
+        .shareIn(coroutines.ioScope, started = SharingStarted.WhileSubscribed(), replay = 1)
 }
