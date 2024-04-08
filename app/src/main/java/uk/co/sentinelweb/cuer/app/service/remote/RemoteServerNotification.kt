@@ -24,10 +24,10 @@ class RemoteServerNotification constructor(
         log.tag(this)
     }
 
-    override fun showNotification(address: String) {
+    override fun showNotification(content: String) {
         service.startForeground(
             FOREGROUND_ID,
-            buildNotification(address)
+            buildNotification(content)
         )
     }
 

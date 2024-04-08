@@ -38,7 +38,9 @@ class RemoteServerService(
     }
 
     override fun stopSelf() {
-        log.d("Stop Self")
+        stopListener?.invoke()
+        scope.close()
+        log.d("stop remote service")
     }
 
     companion object {

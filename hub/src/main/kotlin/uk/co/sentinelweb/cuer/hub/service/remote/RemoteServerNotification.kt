@@ -15,8 +15,8 @@ class RemoteServerNotification constructor(
         log.tag(this)
     }
 
-    override fun showNotification(address: String) {
-        AppleScriptNotif.showNotification("Server status", address)
+    override fun showNotification(content: String) {
+        AppleScriptNotif.showNotification("Server status", content)
     }
 
     override fun stopSelf() {

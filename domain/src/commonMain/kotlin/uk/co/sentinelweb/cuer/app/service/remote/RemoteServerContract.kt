@@ -44,7 +44,7 @@ interface RemoteServerContract {
         interface Controller
 
         interface View {
-            fun showNotification(address: String)
+            fun showNotification(content: String)
             fun stopSelf()
         }
 

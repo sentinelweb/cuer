@@ -1,5 +1,8 @@
 package uk.co.sentinelweb.cuer.hub.main
 
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.getKoin
@@ -14,9 +17,17 @@ fun main() {
     }
     val koin: Koin = getKoin()
 
+
+    val remoteServerManager = koin.get<RemoteServerContract.Manager>()
+        .apply { start() }
+
+    GlobalScope.launch {
+        delay(10000)
+        remoteServerManager.stop()
+    }
+
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
-    val remoteServerService = koin.get<RemoteServerContract.Service>()
 
     home(homeUiCoordinator)
 }
