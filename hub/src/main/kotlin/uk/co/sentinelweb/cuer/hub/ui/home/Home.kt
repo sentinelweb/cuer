@@ -7,8 +7,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
@@ -17,7 +16,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import kotlinx.coroutines.flow.onEach
 import loadSVG
 import toImageBitmap
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
@@ -45,9 +43,8 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Composable
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
-    val state = remember { mutableStateOf(HomeModel(1)) }
-    coordinator.modelObservable.onEach { newModel -> state.value = newModel }
-
+    val state = coordinator.modelObservable
+        .collectAsState(initial = HomeModel(1))
     MaterialTheme {
         Row {
             Box(modifier = Modifier.width(280.dp)) {

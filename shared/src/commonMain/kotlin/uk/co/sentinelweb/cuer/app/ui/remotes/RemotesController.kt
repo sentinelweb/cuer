@@ -86,6 +86,7 @@ class RemotesController constructor(
                     .mapNotNull(eventToIntent) bindTo store
 
                 wifiStateProvider.wifiStateFlow
+                    .onEach { log.d("wifi state: $it") }
                     .map { Intent.WifiStateChange(it) } bindTo store
 
                 remotesRepository.updatesFlow

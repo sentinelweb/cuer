@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
-import kotlinx.coroutines.flow.onEach
 import loadSVG
 import org.koin.core.context.GlobalContext
 import toImageBitmap
@@ -29,10 +28,8 @@ object RemotesComposables {
 
     @Composable
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
-        val state = remember { mutableStateOf(RemotesModelMapper.blankModel()) }
-        coordinator.modelObservable.onEach { newState ->
-            state.value = newState.also { log.d("New state: $it") }
-        }
+        val state = coordinator.modelObservable
+            .collectAsState(initial = RemotesModelMapper.blankModel())
         RemotesView(state.value, coordinator)
     }
 
@@ -41,7 +38,6 @@ object RemotesComposables {
         model: Model,
         view: BaseMviView<Model, Event>
     ) {
-        log.d("RemotesView")
         Column {
             Header(model, view)
             LazyColumn(
