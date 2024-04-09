@@ -51,12 +51,12 @@ object Modules {
     private val utilModule = module {
         factory<LogWrapper> { SystemLogWrapper() }
         factory { LifecycleRegistry() }
-        single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get()) }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
-        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
     }
 
     private val connectivityModule = module {
+        single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
+        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
         single { ConnectivityCheckManager(get(), get(), get()) }
         single { ConnectivityMonitor(get(), get(), get()) }
         single { ConnectivityCheckTimer() }

@@ -9,6 +9,10 @@ val ver_jvm: String by project
 val ver_koin: String by project
 val ver_coroutines: String by project
 val ver_ktor: String by project
+val ver_batik: String by project
+val ver_junit: String by project
+val ver_mockk: String by project
+val ver_turbine: String by project
 
 group = "uk.co.sentinlweb.cuer"
 version = "1.0-SNAPSHOT"
@@ -36,7 +40,15 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ver_ktor")
     implementation("io.ktor:ktor-client-cio:$ver_ktor")
 
-    implementation("org.apache.xmlgraphics:batik-transcoder:1.17")
+    implementation("org.apache.xmlgraphics:batik-transcoder:$ver_batik")
+
+    testImplementation("junit:junit:$ver_junit")
+    testImplementation("io.insert-koin:koin-test:$ver_koin")
+    testImplementation("io.insert-koin:koin-test-junit4:$ver_koin")
+    testImplementation("io.mockk:mockk:$ver_mockk")
+    testImplementation("app.cash.turbine:turbine:$ver_turbine")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+
 }
 
 compose.desktop {
