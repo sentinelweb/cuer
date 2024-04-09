@@ -43,12 +43,13 @@ class RemoteServerServiceController constructor(
             .takeIf { webServer.isRunning }
             ?.let { connectivityWrapper.wifiIpAddress() }
             ?.let { it to webServer.port }
-//            ?.apply { log.d("address: $this ${webServer.isRunning}") }
+            ?.apply { log.d("address: $this ${webServer.isRunning}") }
 
     private var _localNode: LocalNodeDomain? = null
     override val localNode: LocalNodeDomain
         get() = (_localNode ?: throw IllegalStateException("local node not initialised"))
             .let { node -> address?.let { node.copy(ipAddress = it.first, port = it.second) } ?: node }
+            .also { log.d("localNode address: ${it.ipAddress} ${it.port}") }
 
     override fun initialise() {
         coroutines.ioScope.launch {

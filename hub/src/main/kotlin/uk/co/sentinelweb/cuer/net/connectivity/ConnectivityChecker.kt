@@ -12,8 +12,9 @@ import kotlinx.coroutines.withTimeout
 class ConnectivityChecker {
     private val client = HttpClient(CIO) {
         engine {
-            // Configure the connection timeout to 1 second
-            requestTimeout = 1000
+            // Configure the connection timeout
+            // fixme make configurable?
+            requestTimeout = 10000
         }
     }
 

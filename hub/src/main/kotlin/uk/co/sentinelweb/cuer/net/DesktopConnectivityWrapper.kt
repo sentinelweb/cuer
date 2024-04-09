@@ -1,16 +1,18 @@
 package uk.co.sentinelweb.cuer.net
 
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
 import java.net.InetAddress
 
 class DesktopConnectivityWrapper(
     private val coroutines: CoroutineContextProvider,
     private val monitor: ConnectivityMonitor,
+    private val timeProvider: TimeProvider,
     private val log: LogWrapper
 ) : ConnectivityWrapper {
 
@@ -19,7 +21,7 @@ class DesktopConnectivityWrapper(
     init {
         log.tag(this)
         coroutines.mainScope.launch {
-            monitor.connectivityStatus.collect { status ->
+            monitor.connectivityStatus.collectLatest { status ->
                 this@DesktopConnectivityWrapper.status = status
                 log.d("Connected: $status")
             }
@@ -30,9 +32,9 @@ class DesktopConnectivityWrapper(
 
     override fun isMetered(): Boolean = false
 
-    override fun getWifiInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState(
-
-    )
+//    override fun getWifiInfo(): WifiStateProvider.WifiState = WifiStateProvider.WifiState(
+//
+//    )
 
     //override fun getWIFIIP(): String? = "0.0.0.0"
 

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.net
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -20,10 +21,13 @@ class DesktopWifiStateProvider(
     override val wifiStateFlow: Flow<WifiStateProvider.WifiState>
         get() = _wifiStateFlow
 
+    override val wifiState: WifiStateProvider.WifiState
+        get() = _wifiStateFlow.value
+
     init {
         log.tag(this)
         coroutines.mainScope.launch {
-            monitor.connectivityStatus.collect { status ->
+            monitor.connectivityStatus.collectLatest { status ->
                 this@DesktopWifiStateProvider._wifiStateFlow.value =
                     WifiStateProvider.WifiState(
                         isConnected = status,

@@ -5,9 +5,9 @@ package uk.co.sentinelweb.cuer.core.wrapper
 interface ConnectivityWrapper {
     fun isConnected(): Boolean
     fun isMetered(): Boolean
-    fun getWifiInfo(): WifiStateProvider.WifiState
+//    fun getWifiInfo(): WifiStateProvider.WifiState
 
     //    fun getWIFIIP(): String?
 //    fun getLocalIpAddress(): String?
-    fun wifiIpAddress(): String?
+    fun wifiIpAddress(): String? // todo move to wifiSP
 }

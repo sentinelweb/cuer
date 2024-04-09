@@ -190,7 +190,7 @@ class RemotesStoreFactory constructor(
             name = "RemotesStore",
             initialState = State(
                 localNode = localRepository.getLocalNode(),
-                wifiState = connectivityWrapper.getWifiInfo()
+                wifiState = wifiStateProvider.wifiState
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },

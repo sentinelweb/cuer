@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface WifiStateProvider {
 
+    val wifiState: WifiState
     val wifiStateFlow: Flow<WifiState>
 
     data class WifiState(
