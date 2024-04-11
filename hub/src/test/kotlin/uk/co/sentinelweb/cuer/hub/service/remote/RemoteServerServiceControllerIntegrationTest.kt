@@ -1,8 +1,7 @@
-package uk.co.sentinelweb.cuer.app.service.remote
+package uk.co.sentinelweb.cuer.hub.service.remote
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -13,6 +12,8 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerServiceController
 import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
@@ -44,11 +45,11 @@ class RemoteServerServiceControllerIntegrationTest : KoinComponent {
 
 
     private val remoteModule = module {
-        val localResourcePath = "uk/co/sentinelweb/cuer/app/service/remote/localNode_no_address.json"
+        val localResourcePath = "uk/co/sentinelweb/cuer/hub/service/remote/localNode_no_address.json"
         val url = (Thread.currentThread().contextClassLoader.getResource(localResourcePath)
             ?: throw IllegalArgumentException("Resource not found: $localResourcePath"))
         println(url)
-        val base = "/Users/robmunro/repos/personal/cuer/hub/src/test/resources/"
+        val base = "/Users/robmunro/repos/cuer/hub/src/test/resources/"
         single {
             "localNode.json"
                 .let { AFile(base + localResourcePath) }
@@ -181,14 +182,14 @@ class RemoteServerServiceControllerIntegrationTest : KoinComponent {
     }
 
     @Test
-    fun isServerStarted() = runTest {
+    fun isServerStarted() = runBlocking {
         sut.initialise()
-        coroutines.defaultScope.launch {
+        delay(5000)
             while (sut.isServerStarted) {
                 delay(2000)
             }
         }
-    }
+
 
     @Test
     fun getLocalNode() {
