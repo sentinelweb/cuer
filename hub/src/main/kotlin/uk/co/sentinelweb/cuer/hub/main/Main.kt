@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.hub.main
 import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.getKoin
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
@@ -21,7 +22,8 @@ fun main() {
 //        delay(10000)
 //        remoteServerManager.stop()
 //    }
-
+    val wifiStateProvider = koin.get<WifiStateProvider>()
+        .apply { register() }
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
 

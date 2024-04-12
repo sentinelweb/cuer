@@ -27,6 +27,8 @@ class WifiStateReceiver(
 ) : BroadcastReceiver(), WifiStateProvider {
 
     private val _wifiStateFlow: MutableStateFlow<WifiState> = MutableStateFlow(WifiState())
+    override val wifiState: WifiState
+        get() = _wifiStateFlow.value
     override val wifiStateFlow = _wifiStateFlow
 
     init {
@@ -43,9 +45,13 @@ class WifiStateReceiver(
             val netInfo: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
             //dumpNetworkData(intent, context)
             if (netInfo?.type == ConnectivityManager.TYPE_WIFI) {
-                connectivityWrapper.getWifiInfo()
-                    .also { wifiStartChecker.checkToStartServer(it) }
-                    .also { _wifiStateFlow.value = it }
+                (connectivityWrapper.wifiIpAddress()
+                    ?: throw IllegalStateException("no ip"))
+                    .takeIf { it.isNotEmpty() }
+                    // fixme this should be obtained for WifiStateReciever
+                    ?.let { WifiState(isConnected = true, ip = it) }
+                    ?.also { wifiStartChecker.checkToStartServer(it) }
+                    ?.also { _wifiStateFlow.value = it }
             }
         }
     }
@@ -64,8 +70,10 @@ class WifiStateReceiver(
     }
 
     override fun updateWifiInfo() {
-        connectivityWrapper.getWifiInfo()
-            .also { _wifiStateFlow.value = it }
+        connectivityWrapper.wifiIpAddress()
+            // fixme this should be obtained for WifiStateReciever
+            ?.let { WifiState(isConnected = true, ip = it) }
+            ?.also { _wifiStateFlow.value = it }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)

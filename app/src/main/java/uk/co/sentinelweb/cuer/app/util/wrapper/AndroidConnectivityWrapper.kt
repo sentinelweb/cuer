@@ -63,7 +63,7 @@ class AndroidConnectivityWrapper constructor(
                     || type == ConnectivityManager.TYPE_WIMAX)
         } ?: false
 
-    override fun getWifiInfo(): WifiStateProvider.WifiState {
+    /*override*/ fun getWifiInfo(): WifiStateProvider.WifiState {
         val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
         return wifiManager.connectionInfo
             ?.takeIf { it.ipAddress != 0 } // hack but connectivity manager return the wrong connected state
@@ -81,7 +81,8 @@ class AndroidConnectivityWrapper constructor(
             } ?: WifiStateProvider.WifiState()
     }
 
-    fun String.stripQuotes() = if (length > 0 && this[0] == '"' && length > 2) substring(1, length - 1) else this
+    private fun String.stripQuotes() =
+        if (length > 0 && this[0] == '"' && length > 2) substring(1, length - 1) else this
 
     private fun WifiInfo.ipToString() =
         (ipAddress and 0xFF).toString() + "." + (ipAddress shr 8 and 0xFF) + "." + (ipAddress shr 16 and 0xFF) + "." + (ipAddress shr 24 and 0xFF)

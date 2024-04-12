@@ -16,6 +16,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
@@ -29,6 +30,7 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
+import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 import java.io.PrintWriter
@@ -116,6 +118,24 @@ class JvmRemoteWebServer constructor(
                                 }
                         }
                     logWrapper.d(call.request.uri)
+                }
+                get("/playlist-src/{src}/{id}") {
+                    (call.parameters["src"] to call.parameters["id"])
+                        .takeIf { it.checkNull() != null }?.checkNull()
+                        ?.let {
+                            it.second.toGuidIdentifier(Source.valueOf(it.first)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                                .let { id ->
+                                    database.getPlaylist(id)
+                                        ?.let { ResponseDomain(it) }
+                                        ?.apply {
+                                            call.respondText(serialise(), ContentType.Application.Json)
+                                        }
+                                        ?: apply {
+                                            call.error(HttpStatusCode.NotFound, "No playlist with ID: $id")
+                                        }
+                                }
+                            logWrapper.d(call.request.uri)
+                        }
                 }
                 get("/playlistItem/") {
                     call.error(HttpStatusCode.BadRequest, "No ID")

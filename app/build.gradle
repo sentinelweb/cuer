@@ -24,11 +24,14 @@ android {
         versionName app_versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
-        buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
-        buildConfigField "boolean", "cuerBackgroundPlay", "$CUER_BG_PLAY"
-        buildConfigField "boolean", "cuerRemoteEnabled", "$CUER_REMOTE_ENABLED"
+        def ytKey = getEnvOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY')
+        buildConfigField "String", "youtubeApiKey", "\"$ytKey\""
+        def pixKey = getEnvOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY')
+        buildConfigField "String", "pixabayApiKey", "\"$pixKey\""
+        def isBgPlay = getEnvOrDefault('CUER_BG_PLAY', 'true')
+        buildConfigField "boolean", "cuerBackgroundPlay", "$isBgPlay"
+        def isRemote = getEnvOrDefault('CUER_REMOTE_ENABLED', 'true')
+        buildConfigField "boolean", "cuerRemoteEnabled", "$isRemote"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -48,10 +51,14 @@ android {
 //            storeFile file("$CUER_UPLOAD_KEY_FILE")
 //            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-            keyAlias "$CUER_SIGNING_KEY_ALIAS"
-            keyPassword "$CUER_SIGNING_PASSWORD"
-            storeFile file("$CUER_SIGNING_KEY_FILE")
-            storePassword "$CUER_SIGNING_PASSWORD"
+            def signingKeyAlias = getEnvOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS')
+            keyAlias "$signingKeyAlias"
+            def signingPassword = getEnvOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD')
+            keyPassword "$signingPassword"
+            def signingFileAlias = getEnvOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE')
+            storeFile file("$signingFileAlias")
+
+            storePassword "$signingPassword"
         }
     }
 
@@ -291,4 +298,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
+}
+
+def getEnvOrDefault(String key, String defaultValue) {
+    return System.getenv(key) ?: defaultValue
 }
