@@ -301,5 +301,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 }
 
 def getEnvOrDefault(String key, String defaultValue) {
-    return System.getenv(key) ?: defaultValue
+    def val = System.getenv(key)
+    println("$key -> $val def: $defaultValue")
+    return val ?: defaultValue
 }
