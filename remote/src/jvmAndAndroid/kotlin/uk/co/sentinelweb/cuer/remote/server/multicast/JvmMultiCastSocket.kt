@@ -10,9 +10,7 @@ import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType
 import uk.co.sentinelweb.cuer.remote.server.message.deserialiseMulti
 import uk.co.sentinelweb.cuer.remote.server.message.serialise
 import java.io.IOException
-import java.net.DatagramPacket
-import java.net.InetAddress
-import java.net.MulticastSocket
+import java.net.*
 import java.nio.charset.Charset
 
 class JvmMultiCastSocket(
@@ -25,7 +23,7 @@ class JvmMultiCastSocket(
 
     override var startListener: (() -> Unit)? = null
 
-    private lateinit var broadcastAddress: InetAddress
+    private lateinit var broadcastAddress: InetSocketAddress
     private var isKeepGoing = true
     private var theSocket: MulticastSocket? = null
 
@@ -35,13 +33,17 @@ class JvmMultiCastSocket(
 
     override suspend fun runSocketListener() {
         try {
+            printInterfaces()
             isKeepGoing = true
-            broadcastAddress = InetAddress.getByName(config.ip)
+            broadcastAddress = InetSocketAddress(config.ip, config.multiPort)
             theSocket = MulticastSocket(config.multiPort)
-            theSocket!!.joinGroup(broadcastAddress)
+            // fixme play with this and maybe just get the iface by ip address?
+            val networkInterface = findInterface(listOf("wlan0", "en0"))
+            theSocket!!.networkInterface = networkInterface
+            theSocket!!.joinGroup(broadcastAddress, networkInterface)
             val buffer = ByteArray(1 * 1024)
             val data1 = DatagramPacket(buffer, buffer.size)
-            log.d("multi start: addr: $broadcastAddress")
+            log.d("multi start: addr: $broadcastAddress config:${config.ip}:${config.multiPort}")
             startListener?.invoke()
             while (isKeepGoing) {
                 theSocket!!.receive(data1) // blocks
@@ -56,6 +58,30 @@ class JvmMultiCastSocket(
             log.e(e.toString(), e)
         }
         log.d("exit")
+    }
+
+
+    fun findInterface(names: List<String>): NetworkInterface? {
+        val networkInterfaces = NetworkInterface.getNetworkInterfaces()
+        for (netInterface in networkInterfaces) {
+            if (netInterface.isUp && !netInterface.isLoopback) {
+                if (names.contains(netInterface.name)) {
+                    return netInterface
+                }
+            }
+        }
+        return null
+    }
+
+    fun printInterfaces() {
+        log.d("--------NETWORK INTERFACES -------------")
+        val networkInterfaces = NetworkInterface.getNetworkInterfaces()
+        for (netInterface in networkInterfaces) {
+            if (netInterface.isUp && !netInterface.isLoopback) {
+                log.d(netInterface.run { "if:$name addr: $interfaceAddresses isMulti:${supportsMulticast()} isUp:$isUp isLoopback:$isLoopback isKeepGoing:$isKeepGoing isVirtual:$isVirtual" })
+            }
+        }
+        log.d("----------------------------------------")
     }
 
     fun mapLocalNode() =
@@ -95,7 +121,7 @@ class JvmMultiCastSocket(
 
     private fun sendDatagram(msg: AvailableMessage) {
         val serialise = msg.serialise()
-        val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress, config.multiPort)
+        val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress)
         theSocket!!.send(data)
     }
 }
