@@ -24,9 +24,10 @@ android {
         versionName app_versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        def ytKey = getPropertyOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY')
+
+        def ytKey = getPropertyOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY_DEFAULT')
         buildConfigField "String", "youtubeApiKey", "\"$ytKey\""
-        def pixKey = getPropertyOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY')
+        def pixKey = getPropertyOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY_DEFAULT')
         buildConfigField "String", "pixabayApiKey", "\"$pixKey\""
         def isBgPlay = getPropertyOrDefault('CUER_BG_PLAY', 'true')
         buildConfigField "boolean", "cuerBackgroundPlay", "$isBgPlay"
@@ -51,11 +52,11 @@ android {
 //            storeFile file("$CUER_UPLOAD_KEY_FILE")
 //            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-            def signingKeyAlias = getPropertyOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS')
+            def signingKeyAlias = getPropertyOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS_DEFAULT')
             keyAlias "$signingKeyAlias"
-            def signingPassword = getPropertyOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD')
+            def signingPassword = getPropertyOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD_DEFAULT')
             keyPassword "$signingPassword"
-            def signingFileAlias = getPropertyOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE')
+            def signingFileAlias = getPropertyOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE_DEFAULT')
             storeFile file("$signingFileAlias")
 
             storePassword "$signingPassword"
