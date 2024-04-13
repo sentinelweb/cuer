@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.net.wifi
 
-import WifiInfo
+import PlatformWifiInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,7 +17,7 @@ class PlatformWifiStateProvider(
     private val _wifiStateFlow: MutableStateFlow<WifiState> = MutableStateFlow(WifiState())
     override val wifiStateFlow: StateFlow<WifiState> = _wifiStateFlow.asStateFlow()
 
-    private val wifiInfo = WifiInfo()
+    private val platformWifiInfo = PlatformWifiInfo()
 
     override var wifiState: WifiState
         get() = _wifiStateFlow.value
@@ -37,8 +37,8 @@ class PlatformWifiStateProvider(
     override fun updateWifiInfo() = runBlocking {
         try {
             log.d(wifiState.toString())
-            val essid = wifiInfo.getEssid()
-            val ipAddress = wifiInfo.getIpAddress()
+            val essid = platformWifiInfo.getEssid()
+            val ipAddress = platformWifiInfo.getIpAddress()
             wifiState = WifiState(isConnected = essid != "Unknown", ssid = essid, ip = ipAddress)
             log.d(wifiState.toString())
         } catch (e: IOException) {

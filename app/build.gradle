@@ -24,13 +24,13 @@ android {
         versionName app_versionName
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        def ytKey = getEnvOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY')
+        def ytKey = getPropertyOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY')
         buildConfigField "String", "youtubeApiKey", "\"$ytKey\""
-        def pixKey = getEnvOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY')
+        def pixKey = getPropertyOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY')
         buildConfigField "String", "pixabayApiKey", "\"$pixKey\""
-        def isBgPlay = getEnvOrDefault('CUER_BG_PLAY', 'true')
+        def isBgPlay = getPropertyOrDefault('CUER_BG_PLAY', 'true')
         buildConfigField "boolean", "cuerBackgroundPlay", "$isBgPlay"
-        def isRemote = getEnvOrDefault('CUER_REMOTE_ENABLED', 'true')
+        def isRemote = getPropertyOrDefault('CUER_REMOTE_ENABLED', 'true')
         buildConfigField "boolean", "cuerRemoteEnabled", "$isRemote"
 
         javaCompileOptions {
@@ -51,11 +51,11 @@ android {
 //            storeFile file("$CUER_UPLOAD_KEY_FILE")
 //            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-            def signingKeyAlias = getEnvOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS')
+            def signingKeyAlias = getPropertyOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS')
             keyAlias "$signingKeyAlias"
-            def signingPassword = getEnvOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD')
+            def signingPassword = getPropertyOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD')
             keyPassword "$signingPassword"
-            def signingFileAlias = getEnvOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE')
+            def signingFileAlias = getPropertyOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE')
             storeFile file("$signingFileAlias")
 
             storePassword "$signingPassword"
@@ -300,8 +300,8 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     }
 }
 
-def getEnvOrDefault(String key, String defaultValue) {
-    def val = System.getenv(key)
+def getPropertyOrDefault(String key, String defaultValue) {
+    def val = project.property(key)
     println("$key -> $val def: $defaultValue")
     return val ?: defaultValue
 }

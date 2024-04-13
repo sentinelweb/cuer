@@ -3,7 +3,7 @@ import java.io.IOException
 import java.io.InputStreamReader
 import java.net.InetAddress
 
-class WifiInfo {
+class PlatformWifiInfo {
 
     @Throws(IOException::class)
     fun getEssid(): String {
@@ -51,9 +51,8 @@ class WifiInfo {
 
     @Throws(IOException::class)
     private fun getEssidMac(): String {
-
-        val process = Runtime.getRuntime()
-            .exec("/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I")
+        val path = "/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources"
+        val process = Runtime.getRuntime().exec("${path}/airport -I")
 
         // Read the output of the command
         val output = process.inputStream.bufferedReader().use(BufferedReader::readText)
