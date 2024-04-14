@@ -135,7 +135,7 @@ android {
 
 dependencies {
     implementation project(":shared")
-    implementation project(":netKmm")
+    implementation project(':net')
     implementation project(":remote")
     implementation project(":database")// todo: remove get through shared
     implementation project(":domain")

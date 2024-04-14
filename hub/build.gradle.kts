@@ -25,7 +25,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":domain"))
     implementation(project(":remote"))
-    implementation(project(":netKmm"))
+    implementation(project(":net"))
     implementation(compose.desktop.currentOs)
 
     // koin

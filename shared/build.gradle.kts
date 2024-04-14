@@ -145,8 +145,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation(project(":netKmm"))
-//                implementation("com.arkivanov.essenty:lifecycle:0.6.0")
+                implementation(project(":net"))
             }
 
         }
