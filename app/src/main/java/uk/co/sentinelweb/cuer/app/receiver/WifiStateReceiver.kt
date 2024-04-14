@@ -45,6 +45,7 @@ class WifiStateReceiver(
             val netInfo: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
             //dumpNetworkData(intent, context)
             if (netInfo?.type == ConnectivityManager.TYPE_WIFI) {
+                // fixme WIFI should use wifi state
                 (connectivityWrapper.wifiIpAddress()
                     ?: throw IllegalStateException("no ip"))
                     .takeIf { it.isNotEmpty() }
