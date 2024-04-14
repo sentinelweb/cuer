@@ -85,7 +85,8 @@ class PlatformWifiInfo {
         val cmd = arrayOf("/bin/sh", "-c", "ifconfig en0 | awk '/inet / {print $2}'")
         val process = Runtime.getRuntime().exec(cmd)
         BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-            return reader.readLine().toString()
+            return reader.readLines()
+                .first { it != "127.0.0.1" }
         }
     }
 
@@ -94,7 +95,9 @@ class PlatformWifiInfo {
         val process = Runtime.getRuntime().exec(cmd)
         var output = ""
         BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-            output = reader.readLines().toString()
+            output = reader.readLines()
+                .filter { it != "127.0.0.1" }
+                .first()
         }
         BufferedReader(InputStreamReader(process.errorStream)).use { reader ->
             val error = reader.readLines()
@@ -106,7 +109,7 @@ class PlatformWifiInfo {
         return output
     }
 
-    fun essTwst() {
+    fun essTest() {
         try {
             // Run the command
             val process = Runtime.getRuntime()
