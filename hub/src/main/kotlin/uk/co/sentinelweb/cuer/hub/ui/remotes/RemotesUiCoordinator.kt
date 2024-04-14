@@ -45,6 +45,7 @@ class RemotesUiCoordinator :
         controller.onViewCreated(listOf(this), lifecycle)
         lifecycle.onStart()
         lifecycle.onResume()
+        controller.onRefresh()
     }
 
     override fun destroy() {

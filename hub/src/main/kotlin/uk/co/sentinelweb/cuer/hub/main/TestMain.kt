@@ -6,14 +6,12 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.context.GlobalContext
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.test.RemoteServerControllerTestModules
 
 class TestMain() : KoinComponent {
-    private val sut: RemoteServerContract.Controller by inject()
-    private val coroutines: CoroutineContextProvider by inject()
+    private val server: RemoteServerContract.Controller by inject()
     private val wifiStateProvider: WifiStateProvider by inject()
     private val log: LogWrapper by inject()
 
@@ -26,13 +24,13 @@ class TestMain() : KoinComponent {
     }
 
     fun tearDown() {
-        sut.destroy()
+        server.destroy()
     }
 
     fun runServer() = runBlocking {
-        sut.initialise()
+        server.initialise()
         delay(5000)
-        while (sut.isServerStarted) {
+        while (server.isServerStarted) {
             delay(2000)
         }
     }
