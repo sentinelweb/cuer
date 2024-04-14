@@ -48,7 +48,7 @@ jobs:
           CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
           CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
       - name: Test
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD database:verifyCommonMainDatabaseMigration shared:test shared:jvmTest netKmm:test domain:test database:test app:testDebugUnitTest
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD database:verifyCommonMainDatabaseMigration shared:test shared:jvmTest net:test domain:test database:test app:testDebugUnitTest
         # https://issuetracker.google.com/issues/192927707
         #        app:testDebugUnitTest
         env:
@@ -60,6 +60,3 @@ jobs:
           CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
           CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
           CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
-#      - name: Android Test Report
-#        uses: asadmansr/android-test-report-action@v1.2.0
-#        if: ${{ always() }} # IMPORTANT: run Android Test Report regardless

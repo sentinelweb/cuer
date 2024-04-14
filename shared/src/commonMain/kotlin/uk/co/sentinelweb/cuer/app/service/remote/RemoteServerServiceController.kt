@@ -66,20 +66,20 @@ class RemoteServerServiceController constructor(
             log.d("webServer ended")
         }
         _multiJob = coroutines.ioScope.launch {
-            multi.startListener = {
+            multi.runSocketListener {
                 coroutines.ioScope.launch {
                     delay(200)
                     multi.send(MsgType.Join)
                 }
             }
-            multi.runSocketListener()
             log.d("multicast ended")
         }
         _wifiJob = coroutines.mainScope.launch {
             wifiStateProvider.wifiStateFlow.collectLatest { state ->
-                if (state.isConnected.not()) {
-                    service.stopSelf()
-                }
+                // fixme high priority - uncomment but need wifi state first
+//                if (state.isConnected.not()) {
+//                    service.stopSelf()
+//                }
             }
         }
         wakeLockManager.acquireWakeLock()

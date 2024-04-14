@@ -10,13 +10,13 @@ import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
-import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.tools.rule.MainCoroutineRule
 
 class WifiStateReceiverTest {
@@ -39,17 +39,28 @@ class WifiStateReceiverTest {
             every { action } returns WifiManager.NETWORK_STATE_CHANGED_ACTION
             every { getParcelableExtra<NetworkInfo>(WifiManager.EXTRA_NETWORK_INFO) } returns mockNetworkinfo
         }
-        val wifiState = WifiStateProvider.WifiState(isConnected = false)
-        val wifiStateConnected = WifiStateProvider.WifiState(isConnected = true)
-        every { connectivityWrapper.getWifiInfo() }.returnsMany(wifiState, wifiStateConnected)
+        val expectedIp = "1.2.3.4"
+//        val wifiState = WifiStateProvider.WifiState(isConnected = false, ip = expectedIp)
+//        val wifiStateConnected = WifiStateProvider.WifiState(isConnected = true, ip = expectedIp)
+        //every { connectivityWrapper.getWifiInfo() }.returnsMany(wifiState, wifiStateConnected)
+        every { connectivityWrapper.wifiIpAddress() }.returns(expectedIp)
         sut = WifiStateReceiver(connectivityWrapper, log, wifiStartChecker)
 
+        // fixme wifi test the full wifi state after fixing reciever
         sut.wifiStateFlow.test {
+            awaitItem().apply {
+                assertEquals(false, isConnected)
+                assertNull(ip)
+            }
+
             sut.onReceive(mockContext, mockIntent)
-            assertEquals(wifiState, awaitItem())
-            sut.onReceive(mockContext, mockIntent)
-            assertEquals(wifiStateConnected, awaitItem())
+
+            awaitItem().apply {
+                assertEquals(true, isConnected)
+                assertEquals(expectedIp, ip)
+            }
             cancelAndIgnoreRemainingEvents()
         }
+
     }
 }

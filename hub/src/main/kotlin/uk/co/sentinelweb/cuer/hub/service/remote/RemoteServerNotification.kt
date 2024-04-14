@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.common.notif.AppleScriptNotif
 
 class RemoteServerNotification constructor(
-    private val service: RemoteServerService,
+    private val service: RemoteServerContract.Service,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
 ) : RemoteServerContract.Notification.View {

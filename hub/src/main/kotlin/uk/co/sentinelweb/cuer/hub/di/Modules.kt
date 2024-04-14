@@ -21,14 +21,14 @@ import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
-import uk.co.sentinelweb.cuer.net.DesktopConnectivityWrapper
-import uk.co.sentinelweb.cuer.net.DesktopWifiStateProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityCheckManager
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityCheckTimer
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityChecker
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
 import uk.co.sentinelweb.cuer.net.di.NetModule
+import uk.co.sentinelweb.cuer.net.wifi.DesktopConnectivityWrapper
+import uk.co.sentinelweb.cuer.net.wifi.PlatformWifiStateProvider
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
@@ -56,7 +56,8 @@ object Modules {
 
     private val connectivityModule = module {
         single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
-        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
+//        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
+        single<WifiStateProvider> { PlatformWifiStateProvider(get()) }
         single { ConnectivityCheckManager(get(), get(), get()) }
         single { ConnectivityMonitor(get(), get(), get()) }
         single { ConnectivityCheckTimer() }

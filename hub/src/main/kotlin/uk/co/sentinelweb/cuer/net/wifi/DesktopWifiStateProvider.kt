@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.net
+package uk.co.sentinelweb.cuer.net.wifi
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

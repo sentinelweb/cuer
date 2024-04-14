@@ -59,13 +59,13 @@ class RemotesModelMapper constructor(
         fun blankModel() = Model(
             title = "Dummy",
             imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
-            localNode = blankNodeModel(),
+            localNode = blankLocalNodeModel(),
             remoteNodes = listOf(),
             address = "",
             wifiState = WifiStateProvider.WifiState()
         )
 
-        fun blankNodeModel() = LocalNodeModel(
+        fun blankLocalNodeModel() = LocalNodeModel(
             id = "".toGuidIdentifier(MEMORY),
             title = "",
             hostname = "-",

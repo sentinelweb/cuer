@@ -25,7 +25,7 @@ dependencies {
     implementation(project(":shared"))
     implementation(project(":domain"))
     implementation(project(":remote"))
-    implementation(project(":netKmm"))
+    implementation(project(":net"))
     implementation(compose.desktop.currentOs)
 
     // koin
@@ -77,3 +77,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+tasks.create<JavaExec>("runTestMain") {
+    mainClass = "uk.co.sentinelweb.cuer.hub.main.TestMainKt"
+    classpath = sourceSets["main"].runtimeClasspath
+}
