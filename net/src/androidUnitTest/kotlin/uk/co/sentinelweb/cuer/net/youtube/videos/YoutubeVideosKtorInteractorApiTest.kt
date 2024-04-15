@@ -47,7 +47,6 @@ class YoutubeVideosKtorInteractorApiTest {
     private val connectivityWrapper = object : ConnectivityWrapper {
         override fun isConnected() = true
         override fun isMetered() = true
-        override fun wifiIpAddress(): String = "WIFI.IP"
     }
     private val imageMapper = YoutubeImageMapper()
     private lateinit var sut: YoutubeInteractor
