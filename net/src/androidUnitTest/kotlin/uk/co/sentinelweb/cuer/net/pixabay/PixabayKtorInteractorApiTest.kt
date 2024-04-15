@@ -40,7 +40,6 @@ class PixabayKtorInteractorApiTest {
     private val connectivityWrapper = object : ConnectivityWrapper {
         override fun isConnected() = true
         override fun isMetered() = true
-        override fun wifiIpAddress(): String = "WIFI.IP"
     }
     private lateinit var sut: PixabayInteractor
 

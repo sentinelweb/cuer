@@ -13,6 +13,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
+import org.koin.core.context.startKoin
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -43,8 +45,10 @@ class WifiStateReceiverTest {
 //        val wifiState = WifiStateProvider.WifiState(isConnected = false, ip = expectedIp)
 //        val wifiStateConnected = WifiStateProvider.WifiState(isConnected = true, ip = expectedIp)
         //every { connectivityWrapper.getWifiInfo() }.returnsMany(wifiState, wifiStateConnected)
-        every { connectivityWrapper.wifiIpAddress() }.returns(expectedIp)
-        sut = WifiStateReceiver(connectivityWrapper, log, wifiStartChecker)
+        //every { connectivityWrapper.wifiIpAddress() }.returns(expectedIp)
+
+        startKoin { modules(module { factory { wifiStartChecker } }) }
+        sut = WifiStateReceiver(mockContext, log)
 
         // fixme wifi test the full wifi state after fixing reciever
         sut.wifiStateFlow.test {

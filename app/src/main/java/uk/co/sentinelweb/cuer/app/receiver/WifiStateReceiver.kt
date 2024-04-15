@@ -64,6 +64,21 @@ class WifiStateReceiver(
         context.unregisterReceiver(this)
     }
 
+    override fun updateWifiInfo() {
+        ssidAndIp()
+            // fixme this should be obtained for WifiStateReciever
+            ?.let { WifiState(isConnected = it.second != null, ssid = it.first, ip = it.second) }
+            ?.also { _wifiStateFlow.value = it }
+    }
+
+    private fun ssidAndIp(): Pair<String?, String?>? {
+        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val wifiInfo: WifiInfo? = wifiManager.connectionInfo
+        return wifiInfo?.let {
+            it.ssid to wifiIpAddress()
+        }
+    }
+
     override fun wifiIpAddress(): String? {
         val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
         var ipAddress = wifiManager.connectionInfo.ipAddress
@@ -81,21 +96,6 @@ class WifiStateReceiver(
             null
         }
         return ipAddressString
-    }
-
-    private fun ssidAndIp(): Pair<String?, String?>? {
-        val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val wifiInfo: WifiInfo? = wifiManager.connectionInfo
-        return wifiInfo?.let {
-            it.ssid to wifiIpAddress()
-        }
-    }
-
-    override fun updateWifiInfo() {
-        ssidAndIp()
-            // fixme this should be obtained for WifiStateReciever
-            ?.let { WifiState(isConnected = it.second != null, ssid = it.first, ip = it.second) }
-            ?.also { _wifiStateFlow.value = it }
     }
 
     @RequiresApi(Build.VERSION_CODES.S)
