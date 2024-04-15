@@ -71,9 +71,9 @@ class RemoteServerServiceController constructor(
         _wifiJob = coroutines.mainScope.launch {
             wifiStateProvider.wifiStateFlow.collectLatest { state ->
                 // fixme high priority - uncomment but need wifi state first
-//                if (state.isConnected.not()) {
-//                    service.stopSelf()
-//                }
+                if (state.isConnected.not()) {
+                    service.stopSelf()
+                }
             }
         }
         wakeLockManager.acquireWakeLock()

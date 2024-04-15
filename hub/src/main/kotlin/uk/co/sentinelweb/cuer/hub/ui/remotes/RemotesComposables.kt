@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.hub.ui.remotes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -161,15 +162,17 @@ object RemotesComposables {
             Box(
                 modifier = Modifier.wrapContentWidth(align = Alignment.End),
             ) {
-//                Icon(
-//                    painter = painterResource(R.drawable.ic_more_vert),
-//                    tint = colorResource(R.color.grey_500),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(48.dp)
-//                        .padding(8.dp)
-//                        .clickable { expanded = !expanded },
-//                )
+                Image(
+                    bitmap = loadSVG("drawable/ic_more_vert.svg", Color.Black, 48)
+                        .toImageBitmap(),
+                    // painter = painterResource(R.drawable.ic_more_vert),
+                    // tint = colorResource(R.color.grey_500),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                        .clickable { expanded = !expanded },
+                )
                 DropdownMenu(
                     expanded = expanded,
                     modifier = Modifier.width(200.dp),
