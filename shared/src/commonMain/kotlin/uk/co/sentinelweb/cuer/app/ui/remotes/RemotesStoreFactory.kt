@@ -17,7 +17,6 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -37,7 +36,6 @@ class RemotesStoreFactory constructor(
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
     private val remoteInteractor: RemoteInteractor,
-    private val connectivityWrapper: ConnectivityWrapper,
     private val remotesRepository: RemotesRepository,
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
@@ -64,8 +62,9 @@ class RemotesStoreFactory constructor(
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
-                    localNode = remoteServerManager.getService()?.localNode ?: localRepository.getLocalNode()
-                )
+                    localNode = localRepository.localNode, // remoteServerManager.getService()?.localNode ?:
+                    wifiState = wifiStateProvider.wifiState
+                ).also { log.d("it.serverAddress; ${it.serverAddress}") }
 
                 is Result.UpdateWifiState -> copy(wifiState = msg.state)
             }
@@ -113,6 +112,7 @@ class RemotesStoreFactory constructor(
 
         private fun wifiStateChange(intent: Intent.WifiStateChange) {
             dispatch(Result.UpdateWifiState(intent.wifiState))
+            log.d("got wifiStateChange: $intent")
             coroutines.mainScope.launch {
                 delay(300)
                 dispatch(Result.UpdateServerState)
@@ -189,7 +189,7 @@ class RemotesStoreFactory constructor(
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "RemotesStore",
             initialState = State(
-                localNode = localRepository.getLocalNode(),
+                localNode = localRepository.localNode,
                 wifiState = wifiStateProvider.wifiState
             ),
             bootstrapper = BootstrapperImpl(),

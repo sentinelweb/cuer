@@ -3,9 +3,10 @@ package uk.co.sentinelweb.cuer.app.service.remote
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import org.koin.android.ext.android.inject
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -19,7 +20,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
-class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent {
+class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent, KoinComponent {
     override val scope: Scope by serviceScopeWithSource()
 
     override val isServerStarted: Boolean
@@ -82,7 +83,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                         webServer = get(),
                         coroutines = get(),
                         log = get(),
-                        connectivityWrapper = get(),
                         multi = get(),
                         localRepo = get(),
                         remoteRepo = get(),

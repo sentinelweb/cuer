@@ -48,7 +48,7 @@ class JvmRemoteWebServer constructor(
     private val localRepository: LocalRepository by inject()
 
     override val port: Int
-        get() = localRepository.getLocalNode().port
+        get() = localRepository.localNode.port
 
     private var _appEngine: ApplicationEngine? = null
 

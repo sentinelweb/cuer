@@ -9,10 +9,6 @@ import android.net.wifi.WifiManager
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
-import java.math.BigInteger
-import java.net.InetAddress
-import java.net.UnknownHostException
-import java.nio.ByteOrder
 
 
 class AndroidConnectivityWrapper constructor(
@@ -111,24 +107,7 @@ class AndroidConnectivityWrapper constructor(
 
 
     // https://stackoverflow.com/questions/16730711/get-my-wifi-ip-address-android
-    override fun wifiIpAddress(): String? {
-        val wifiManager = context.getSystemService(WIFI_SERVICE) as WifiManager
-        var ipAddress = wifiManager.connectionInfo.ipAddress
 
-        // Convert little-endian to big-endianif needed
-        if (ByteOrder.nativeOrder().equals(ByteOrder.LITTLE_ENDIAN)) {
-            ipAddress = Integer.reverseBytes(ipAddress)
-        }
-        val ipByteArray: ByteArray = BigInteger.valueOf(ipAddress.toLong()).toByteArray()
-        val ipAddressString: String?
-        ipAddressString = try {
-            InetAddress.getByAddress(ipByteArray).getHostAddress()
-        } catch (ex: UnknownHostException) {
-            log.e("Unable to get host address.")
-            null
-        }
-        return ipAddressString
-    }
 
     companion object {
         const val UNKNOWN_SSID = "<unknown ssid>" // android constant added in R(30) but this shows in Q

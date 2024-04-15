@@ -67,7 +67,6 @@ object RemoteServerControllerTestModules {
                 webServer = get(),
                 coroutines = get(),
                 log = get(),
-                connectivityWrapper = get(),
                 multi = get(),
                 localRepo = get(),
                 remoteRepo = get(),

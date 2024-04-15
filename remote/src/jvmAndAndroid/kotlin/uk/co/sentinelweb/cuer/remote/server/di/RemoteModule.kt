@@ -20,6 +20,6 @@ object RemoteModule {
             val config = MultiCastSocketContract.Config(multicastPort = multiPort)
             JvmMultiCastSocket(config, get(), get(), get(), get())
         }
-        factory { AvailableMessageMapper(get(), get()) }
+        factory { AvailableMessageMapper(get()) }
     }
 }

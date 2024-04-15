@@ -71,7 +71,7 @@ class JvmMultiCastSocket(
     }
 
     fun mapLocalNode() =
-        availableMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true)
+        availableMessageMapper.mapToMulticastMessage(localRepository.localNode)
 
     override suspend fun send(msgType: MsgType) {
         if (theSocket != null && !theSocket!!.isClosed) {

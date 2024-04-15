@@ -6,7 +6,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
@@ -18,7 +17,7 @@ class RemoteServerServiceController constructor(
     private val webServer: RemoteWebServerContract,
     private val multi: MultiCastSocketContract,
     private val coroutines: CoroutineContextProvider,
-    private val connectivityWrapper: ConnectivityWrapper,
+//    private val connectivityWrapper: ConnectivityWrapper,
     private val log: LogWrapper,
     private val remoteRepo: RemotesRepository,
     private val localRepo: LocalRepository,
@@ -36,25 +35,20 @@ class RemoteServerServiceController constructor(
     private var _wifiJob: Job? = null
 
     override val isServerStarted: Boolean
-        get() = webServer.isRunning
+        get() = webServer.isRunning.also { log.d("webServer.isRunning:${webServer.isRunning}") }
 
     private val address: Pair<String, Int>?
         get() = true
             .takeIf { webServer.isRunning }
-            ?.let { connectivityWrapper.wifiIpAddress() }
+            ?.let { wifiStateProvider.wifiState.ip }
             ?.let { it to webServer.port }
             ?.apply { log.d("address: $this ${webServer.isRunning}") }
 
-    private var _localNode: LocalNodeDomain? = null
     override val localNode: LocalNodeDomain
-        get() = (_localNode ?: throw IllegalStateException("local node not initialised"))
-            .let { node -> address?.let { node.copy(ipAddress = it.first, port = it.second) } ?: node }
-            .also { log.d("localNode address: ${it.ipAddress} ${it.port}") }
+        get() = localRepo.localNode
+
 
     override fun initialise() {
-        coroutines.ioScope.launch {
-            _localNode = localRepo.getLocalNode()
-        }
         notification.updateNotification("Starting server...")
         _serverJob?.cancel()
         _serverJob = coroutines.ioScope.launch {
