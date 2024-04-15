@@ -61,6 +61,18 @@ object RemotesComposables {
                 ?.also { url ->
                     ImageFromUrl(url, Modifier.fillMaxWidth())
                 }
+            model.wifiState.ssid?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.body2,
+                    color = Color.White,
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 8.dp,
+                        bottom = 0.dp,
+                    )
+                )
+            }
         }
         Row(
             modifier = Modifier.padding(
@@ -93,6 +105,7 @@ object RemotesComposables {
                 )
             )
         }
+
     }
 
     @Composable
