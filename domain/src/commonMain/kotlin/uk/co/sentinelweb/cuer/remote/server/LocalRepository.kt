@@ -34,7 +34,8 @@ class LocalRepository(
         _nodeFlow = MutableStateFlow(loadLocalNode())
     }
 
-    val localNode = _nodeFlow.value.nodeUpdated()
+    val localNode
+        get() = _nodeFlow.value.nodeUpdated()
 
     private fun LocalNodeDomain.nodeUpdated() = this
         .let { node -> wifiStateProvider.wifiState.let { node.copy(ipAddress = it.ip ?: "") } }
