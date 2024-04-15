@@ -41,7 +41,7 @@ object RemotesComposables {
         Column {
             Header(model, view)
             LazyColumn(
-                modifier = Modifier.height(300.dp),
+                modifier = Modifier.fillMaxHeight(),
                 contentPadding = PaddingValues(top = 4.dp)
             ) {
                 items(model.remoteNodes) { remote ->
@@ -56,10 +56,10 @@ object RemotesComposables {
         model: Model,
         view: BaseMviView<Model, Event>
     ) {
-        Box(modifier = Modifier.height(160.dp)) {
+        Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
             model.imageUrl
                 ?.also { url ->
-                    ImageFromUrl(url)
+                    ImageFromUrl(url, Modifier.fillMaxWidth())
                 }
         }
         Row(
@@ -85,7 +85,7 @@ object RemotesComposables {
         model.address?.also {
             Text(
                 text = it,
-                style = MaterialTheme.typography.h3,
+                style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(
                     start = 16.dp,
                     top = 8.dp,

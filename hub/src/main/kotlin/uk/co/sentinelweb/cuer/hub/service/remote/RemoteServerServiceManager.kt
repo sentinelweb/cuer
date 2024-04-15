@@ -27,9 +27,7 @@ class RemoteServerServiceManager(
         }
     }
 
-    override fun getService(): RemoteServerContract.Service? = null
+    override fun getService(): RemoteServerContract.Service? = service
 
     override fun isRunning(): Boolean = service?.isServerStarted ?: false
-
-
 }

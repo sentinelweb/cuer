@@ -152,7 +152,10 @@ class RemotesStoreFactory constructor(
                 coroutines.mainScope.launch {
                     remoteServerManager.start()
                     // fixme limit?
-                    while (remoteServerManager.getService()?.isServerStarted != true) delay(20)
+                    while (remoteServerManager.getService()?.isServerStarted != true) {
+                        print(".")
+                        delay(50)
+                    }
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
 
                     remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }

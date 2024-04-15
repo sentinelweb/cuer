@@ -47,7 +47,7 @@ fun Home(coordinator: HomeUiCoordinator) {
         .collectAsState(initial = HomeModel(1))
     MaterialTheme {
         Row {
-            Box(modifier = Modifier.width(280.dp)) {
+            Box(modifier = Modifier.width(360.dp)) {
                 RemotesUi(coordinator.remotes)
             }
             Box(
