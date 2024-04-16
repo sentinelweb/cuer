@@ -23,6 +23,7 @@ import loadSVG
 import toImageBitmap
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
+import java.io.File
 
 fun home(coordinator: HomeUiCoordinator) = application {
     val windowState = rememberWindowState(
@@ -68,31 +69,58 @@ fun Home(coordinator: HomeUiCoordinator) {
 
 @Composable
 private fun TestUi(coordinator: HomeUiCoordinator) {
-    Row {
-        val imageSize = 32
-        val svgImage = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, imageSize)
-        val imageBitmap = svgImage.toImageBitmap()
-        Image(
-            bitmap = imageBitmap,
-            contentDescription = "SVG Icon",
-            modifier = Modifier
-                .padding(20.dp)
-                .width(imageSize.dp)
-                .height(imageSize.dp)
-        )
-        Text(
-            text = "Child",
-            color = Color.Black,
-            style = TextStyle(fontSize = 30.sp),
-            modifier = Modifier.padding(20.dp)
-        )
-        HeaderButton(
-            "Notif",
-            modifier = Modifier.padding(20.dp)
-        ) {
-            coordinator.initDb()
-            //AppleScriptNotif.showNotification("Title", "text")
+    Column {
+        Row {
+            Image("drawable/ic_wifi_tethering.svg", 32, Color.Blue)
+            Text(
+                text = "Child",
+                color = Color.Black,
+                style = TextStyle(fontSize = 30.sp),
+                modifier = Modifier.padding(20.dp)
+            )
+            HeaderButton(
+                "Notif",
+                modifier = Modifier.padding(20.dp)
+            ) {
+                coordinator.initDb()
+                //AppleScriptNotif.showNotification("Title", "text")
 
+            }
+            Image("drawable/ic_apple.svg")
+        }
+
+        ImageGrid(File("/Users/robmunro/repos/cuer/hub/src/main/resources/drawable"))
+    }
+}
+
+
+@Composable
+fun ImageGrid(imagesDir: File) {
+    val imageFiles = imagesDir.listFiles { _, name -> name.endsWith(".svg") } ?: arrayOf()
+
+    Column {
+        chunkedImages(imageFiles, 15).forEach {
+            Row {
+                it.forEach { Image("drawable/${it.name}") }
+            }
         }
     }
+}
+
+fun chunkedImages(imageFiles: Array<File>, chunkSize: Int): List<List<File>> {
+    return imageFiles.toList().chunked(chunkSize)
+}
+
+@Composable
+private fun Image(s: String, imageSize: Int = 32, tint: Color = Color.Black) {
+    val svgImage = loadSVG(s, tint, imageSize)
+    val imageBitmap = svgImage.toImageBitmap()
+    Image(
+        bitmap = imageBitmap,
+        contentDescription = "SVG Icon",
+        modifier = Modifier
+            .padding(20.dp)
+            .width(imageSize.dp)
+            .height(imageSize.dp)
+    )
 }

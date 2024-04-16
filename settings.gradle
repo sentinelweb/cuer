@@ -15,4 +15,5 @@ include ':database'
 include 'domain'
 include 'net'
 include 'hub'
+include 'scripts'
 
