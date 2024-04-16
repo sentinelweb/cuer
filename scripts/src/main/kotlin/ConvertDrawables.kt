@@ -100,8 +100,6 @@ private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
         // Write to SVG file
         svgFile.writeText(svgContentsBuilder.toString())
     }
-
-
 }
 
 private fun String.replaceDimensions(): String {
@@ -119,22 +117,3 @@ private fun String.replaceStringPaths(): String {
     }
     return newAttr
 }
-
-//private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
-//    val lines = xmlFile.readLines()
-//    val fileName = xmlFile.nameWithoutExtension
-//
-//    val svgLines = mutableListOf<String>()
-//
-//    svgLines += "<svg xmlns='http://www.w3.org/2000/svg'>"
-//
-//    lines
-//        .filter { it.contains("<path") }
-//        .also { println("${xmlFile.name} -> $it") }
-//        .map { it.replace("android:", "") }
-//        .forEach { svgLines += it }
-//
-//    svgLines += "</svg>"
-//
-//    File(outputDir, "$fileName.svg").writeText(svgLines.joinToString("\n"))
-//}
