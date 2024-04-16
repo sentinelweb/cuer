@@ -17,7 +17,7 @@ class PlatformWifiInfo {
     }
 
     @Throws(IOException::class)
-    fun getIpAddress(): String {
+    fun getIpAddress(): String? {
         val osName = System.getProperty("os.name").toLowerCase()
         return when {
             osName.contains("linux") -> getIpAddressLinux()
@@ -80,7 +80,7 @@ class PlatformWifiInfo {
     }
 
     @Throws(IOException::class)
-    private fun getIpAddressMac(): String {
+    private fun getIpAddressMac(): String? = try {
         // getIpAddressMacPrint()
         val cmd = arrayOf("/bin/sh", "-c", "ifconfig en0 | awk '/inet / {print $2}'")
         val process = Runtime.getRuntime().exec(cmd)
@@ -88,6 +88,8 @@ class PlatformWifiInfo {
             return reader.readLines()
                 .first { it != "127.0.0.1" }
         }
+    } catch (n: NoSuchElementException) {
+        null
     }
 
     private fun getIpAddressMacPrint(): String {

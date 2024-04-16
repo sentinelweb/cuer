@@ -46,7 +46,7 @@ object RemoteServerControllerTestModules {
             "localNode.json"
                 .let { AFile(base + localResourcePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get(), get()) }
+                .let { LocalRepository(it, get(), get(), get(), get()) }
         }
         single {
             "remoteNodes.json"
@@ -67,7 +67,6 @@ object RemoteServerControllerTestModules {
                 webServer = get(),
                 coroutines = get(),
                 log = get(),
-                connectivityWrapper = get(),
                 multi = get(),
                 localRepo = get(),
                 remoteRepo = get(),

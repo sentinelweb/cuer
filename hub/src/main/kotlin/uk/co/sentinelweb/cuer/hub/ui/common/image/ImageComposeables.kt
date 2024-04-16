@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import loadImageBitmapFromUrl
 
 @Composable
-fun ImageFromUrl(url: String) {
+fun ImageFromUrl(url: String, modifier: Modifier) {
     val coroutineScope = rememberCoroutineScope()
     var imageBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
 
@@ -22,7 +22,7 @@ fun ImageFromUrl(url: String) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         imageBitmap?.let {
-            Image(bitmap = it, contentDescription = "Loaded Image")
+            Image(bitmap = it, contentDescription = "Loaded Image", modifier = modifier)
         }
     }
 }

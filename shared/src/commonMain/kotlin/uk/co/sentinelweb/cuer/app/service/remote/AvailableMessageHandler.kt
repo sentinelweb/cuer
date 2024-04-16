@@ -30,7 +30,7 @@ class AvailableMessageHandler(
             AvailableMessage.MsgType.JoinReply -> remoteRepo.addUpdateNode(remote)
         }
 
-        if (localRepo.getLocalNode().id != remote.id) {
+        if (localRepo.localNode.id != remote.id) {
             when (msg.type) {
                 AvailableMessage.MsgType.Join -> remoteInteractor.available(AvailableMessage.MsgType.JoinReply, remote)
                 AvailableMessage.MsgType.Ping -> remoteInteractor.available(AvailableMessage.MsgType.PingReply, remote)

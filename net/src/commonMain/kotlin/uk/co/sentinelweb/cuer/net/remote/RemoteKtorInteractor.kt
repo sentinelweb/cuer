@@ -18,7 +18,10 @@ internal class RemoteKtorInteractor(
         remote: RemoteNodeDomain,
     ): NetResult<Boolean> {
         return try {
-            val availableMessage = AvailableMessage(messageType, availableMessageMapper.mapToMulticastMessage(localRepository.getLocalNode(), true))
+            val availableMessage = AvailableMessage(
+                messageType,
+                availableMessageMapper.mapToMulticastMessage(localRepository.localNode)
+            )
             val dto = availableService.sendAvailable(remote, RequestMessage(availableMessage))
             NetResult.Data(true)
         } catch (e: Exception) {

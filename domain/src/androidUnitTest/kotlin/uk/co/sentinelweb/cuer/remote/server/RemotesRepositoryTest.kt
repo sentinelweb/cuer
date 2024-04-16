@@ -27,11 +27,11 @@ class RemotesRepositoryTest {
     @get:Rule
     var mainCoroutineRule = MainCoroutineRule()
 
-    private val localNode: LocalNodeDomain = fixture()
+    private val fixtLocalNode: LocalNodeDomain = fixture()
 
     private val jsonFileInteractor = mockk<JsonFileInteractor>(relaxed = true)
     private val localNodeRepo = mockk<LocalRepository>(relaxed = true) {
-        coEvery { getLocalNode() } returns localNode
+        coEvery { localNode } returns fixtLocalNode
     }
     private val coroutines = TestCoroutineContextProvider(mainCoroutineRule.testDispatcher)
     private val log: LogWrapper = SystemLogWrapper()

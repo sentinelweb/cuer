@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.hub.ui.remotes
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -41,7 +42,7 @@ object RemotesComposables {
         Column {
             Header(model, view)
             LazyColumn(
-                modifier = Modifier.height(300.dp),
+                modifier = Modifier.fillMaxHeight(),
                 contentPadding = PaddingValues(top = 4.dp)
             ) {
                 items(model.remoteNodes) { remote ->
@@ -56,11 +57,23 @@ object RemotesComposables {
         model: Model,
         view: BaseMviView<Model, Event>
     ) {
-        Box(modifier = Modifier.height(160.dp)) {
+        Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
             model.imageUrl
                 ?.also { url ->
-                    ImageFromUrl(url)
+                    ImageFromUrl(url, Modifier.fillMaxWidth())
                 }
+            model.wifiState.ssid?.let {
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.body2,
+                    color = Color.White,
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 8.dp,
+                        bottom = 0.dp,
+                    )
+                )
+            }
         }
         Row(
             modifier = Modifier.padding(
@@ -85,7 +98,7 @@ object RemotesComposables {
         model.address?.also {
             Text(
                 text = it,
-                style = MaterialTheme.typography.h3,
+                style = MaterialTheme.typography.body2,
                 modifier = Modifier.padding(
                     start = 16.dp,
                     top = 8.dp,
@@ -93,6 +106,7 @@ object RemotesComposables {
                 )
             )
         }
+
     }
 
     @Composable
@@ -148,15 +162,17 @@ object RemotesComposables {
             Box(
                 modifier = Modifier.wrapContentWidth(align = Alignment.End),
             ) {
-//                Icon(
-//                    painter = painterResource(R.drawable.ic_more_vert),
-//                    tint = colorResource(R.color.grey_500),
-//                    contentDescription = null,
-//                    modifier = Modifier
-//                        .size(48.dp)
-//                        .padding(8.dp)
-//                        .clickable { expanded = !expanded },
-//                )
+                Image(
+                    bitmap = loadSVG("drawable/ic_more_vert.svg", Color.Black, 48)
+                        .toImageBitmap(),
+                    // painter = painterResource(R.drawable.ic_more_vert),
+                    // tint = colorResource(R.color.grey_500),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(8.dp)
+                        .clickable { expanded = !expanded },
+                )
                 DropdownMenu(
                     expanded = expanded,
                     modifier = Modifier.width(200.dp),

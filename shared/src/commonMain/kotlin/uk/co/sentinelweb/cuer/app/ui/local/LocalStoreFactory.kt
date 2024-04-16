@@ -44,7 +44,7 @@ class LocalStoreFactory constructor(
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
-                    localNode = localRepository.getLocalNode(),
+                    localNode = localRepository.localNode,
                     wifiState = wifiStateProvider.wifiState,
                 )
             }
@@ -69,7 +69,7 @@ class LocalStoreFactory constructor(
             }
 
         private fun save(intent: Intent.ActionSave) {
-            localRepository.getLocalNode()
+            localRepository.localNode
                 .copy(
                     hostname = intent.updated.hostname,
                     port = intent.updated.port,

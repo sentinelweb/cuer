@@ -179,7 +179,7 @@ object Modules {
             "localNode.json"
                 .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get(), get()) }
+                .let { LocalRepository(it, get(), get(), get(), get()) } // x
         }
         single {
             "remoteNodes.json"
@@ -188,7 +188,7 @@ object Modules {
                 .let { RemotesRepository(it, get(), get(), get()) }
         }
         single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
-        single<WifiStateProvider> { WifiStateReceiver(get(), get(), get()) }
+        single<WifiStateProvider> { WifiStateReceiver(androidApplication(), get()) }
     }
 
     private val utilModule = module {

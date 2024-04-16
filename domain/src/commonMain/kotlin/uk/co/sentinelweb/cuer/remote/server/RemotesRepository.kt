@@ -48,7 +48,7 @@ class RemotesRepository constructor(
     }
 
     suspend fun addUpdateNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
-        val local = localNodeRepo.getLocalNode()
+        val local = localNodeRepo.localNode
 //        log.d("addUpdateNode: input isLocal: ${node.id == local.id} ${summarise(node)} ")
         if (node.id == local.id) return
 

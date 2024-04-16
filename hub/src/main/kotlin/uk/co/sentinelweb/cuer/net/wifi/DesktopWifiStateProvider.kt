@@ -5,7 +5,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
@@ -13,7 +12,7 @@ import uk.co.sentinelweb.cuer.net.connectivity.ConnectivityMonitor
 class DesktopWifiStateProvider(
     private val coroutines: CoroutineContextProvider,
     private val monitor: ConnectivityMonitor,
-    private val connectivityWrapper: ConnectivityWrapper,
+    private val wifiStateProvider: WifiStateProvider,
     private val log: LogWrapper
 ) : WifiStateProvider {
 
@@ -28,12 +27,7 @@ class DesktopWifiStateProvider(
         log.tag(this)
         coroutines.mainScope.launch {
             monitor.connectivityStatus.collectLatest { status ->
-                this@DesktopWifiStateProvider._wifiStateFlow.value =
-                    WifiStateProvider.WifiState(
-                        isConnected = status,
-                        ip = connectivityWrapper.wifiIpAddress()
-                    )//.also { log.d(it.toString()) }
-
+                this@DesktopWifiStateProvider._wifiStateFlow.value = wifiStateProvider.wifiState
             }
         }
     }
@@ -43,5 +37,7 @@ class DesktopWifiStateProvider(
     override fun unregister() = Unit
 
     override fun updateWifiInfo() = Unit
+
+    override fun wifiIpAddress(): String? = _wifiStateFlow.value.ip
 
 }
