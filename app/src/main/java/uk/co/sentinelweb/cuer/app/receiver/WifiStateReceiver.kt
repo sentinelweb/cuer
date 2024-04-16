@@ -47,8 +47,8 @@ class WifiStateReceiver(
             val netInfo: NetworkInfo? = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO)
             //dumpNetworkData(intent, context)
             if (netInfo?.type == ConnectivityManager.TYPE_WIFI) {
-                wifiState
-                    .also { wifiStartChecker.checkToStartServer(it) }
+                updateWifiInfo()
+                    .also { wifiStartChecker.checkToStartServer(_wifiStateFlow.value) }
             }
         }
     }

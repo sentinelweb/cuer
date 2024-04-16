@@ -45,7 +45,6 @@ fun home(coordinator: HomeUiCoordinator) = application {
     }
 }
 
-
 @Composable
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
