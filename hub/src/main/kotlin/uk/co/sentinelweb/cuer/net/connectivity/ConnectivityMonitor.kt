@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.net.connectivity
 
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
@@ -11,7 +11,7 @@ class ConnectivityMonitor(
     checker: ConnectivityChecker,
     coroutines: CoroutineContextProvider
 ) {
-    val connectivityStatus: SharedFlow<Boolean> = connectivityCheckTimer
+    val connectivityStatus: Flow<Boolean> = connectivityCheckTimer
         .tick()
         .map { checker.check() }
         .shareIn(coroutines.ioScope, started = SharingStarted.WhileSubscribed(), replay = 1)

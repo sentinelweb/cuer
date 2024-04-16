@@ -10,8 +10,6 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
-// import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
-
 class AppRemoteDatabaseAdapter constructor(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,

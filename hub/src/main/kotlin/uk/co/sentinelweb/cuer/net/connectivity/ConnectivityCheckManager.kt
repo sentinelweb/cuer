@@ -18,7 +18,7 @@ class ConnectivityCheckManager(
     private var checkJob: Job? = null
 
     fun start() {
-        coroutines.mainScope.launch {
+        checkJob = coroutines.mainScope.launch {
             monitor.connectivityStatus.collect { status ->
                 println(if (status) "Connected" else "Disconnected")
             }

@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
 import android.content.Context
+import java.io.IOException
 import java.io.InputStream
 
 actual class AssetOperations(
@@ -10,7 +11,7 @@ actual class AssetOperations(
         try {
             val inputStream: InputStream = context.assets.open(path)
             inputStream.bufferedReader().use { it.readText() }
-        } catch (ex: Exception) {
+        } catch (ex: IOException) {
             ex.printStackTrace()
             null
         }

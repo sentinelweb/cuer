@@ -18,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScopeComponent, KoinComponent {
     override val scope: Scope by serviceScopeWithSource()
@@ -107,14 +106,6 @@ class RemoteServerService : Service(), RemoteServerContract.Service, AndroidScop
                     )
                 }
                 scoped { Notification.State() }
-            }
-
-            factory<RemoteDatabaseAdapter> {
-                AppRemoteDatabaseAdapter(
-                    playlistOrchestrator = get(),
-                    playlistItemOrchestrator = get(),
-                    addLinkUsecase = get(),
-                )
             }
         }
     }

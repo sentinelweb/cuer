@@ -9,8 +9,6 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
-import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
-import uk.co.sentinelweb.cuer.remote.server.database.TestDatabase
 
 class RemoteServerService(
     private val log: LogWrapper,
@@ -77,11 +75,6 @@ class RemoteServerService(
                 }
                 scoped { RemoteServerContract.Notification.State() }
             }
-
-            factory<RemoteDatabaseAdapter> {
-                TestDatabase.hardcoded()
-            }
-
         }
     }
 }

@@ -22,6 +22,7 @@ dependencies {
     // compose.desktop.currentOs should be used in launcher-sourceSet
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
+    implementation(project(":database"))
     implementation(project(":shared"))
     implementation(project(":domain"))
     implementation(project(":remote"))
@@ -80,4 +81,28 @@ java {
 tasks.create<JavaExec>("runTestMain") {
     mainClass = "uk.co.sentinelweb.cuer.hub.main.TestMainKt"
     classpath = sourceSets["main"].runtimeClasspath
+}
+
+tasks.register("generateApiKeyClass") {
+    doLast {
+        val file = File("$projectDir/src/main/kotlin/uk/co/sentinelweb/cuer/net/key/ApiKey.kt")
+        file.writeText(
+            """
+            package uk.co.sentinelweb.cuer.net.key
+            
+            import uk.co.sentinelweb.cuer.net.ApiKeyProvider
+            
+            class CuerPixabayApiKeyProvider : ApiKeyProvider {
+                override val key: String = "${project.findProperty("CUER_PIXABAY_API_KEY") ?: ""}"
+            }
+            class CuerYoutubeApiKeyProvider : ApiKeyProvider {
+                override val key: String = "${project.findProperty("CUER_YOUTUBE_API_KEY") ?: ""}"
+            }
+        """.trimIndent()
+        )
+    }
+}
+
+tasks.named("compileKotlin") {
+    dependsOn("generateApiKeyClass")
 }

@@ -16,9 +16,10 @@ class AndroidLinkScanner constructor(
     override fun scan(uriString: String): Pair<ObjectTypeDomain, Domain>? {
         try {
             val uri = Uri.parse(clean(uriString))
+//            println("path: ${uri.path}, ${uri.query}, ${uri.host}, ${uri.host?.endsWith("youtu.be")}")
             mappers.forEach {
                 it
-                    .takeIf { it.check(uri) }
+                    .takeIf { it.check(uri) }//.apply { println("path: ${it.javaClass.simpleName} -> $it") }
                     ?.map(uri)
                     ?.apply { return@scan this }
             }

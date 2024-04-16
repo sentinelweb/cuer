@@ -303,6 +303,5 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
 
 def getPropertyOrDefault(String key, String defaultValue) {
     def val = project.property(key)
-//    println("$key -> $val def: $defaultValue")
     return val ?: defaultValue
 }

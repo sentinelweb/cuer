@@ -22,7 +22,6 @@ import androidx.compose.ui.window.rememberWindowState
 import loadSVG
 import toImageBitmap
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
-import uk.co.sentinelweb.cuer.hub.ui.common.notif.AppleScriptNotif
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
@@ -40,7 +39,7 @@ fun home(coordinator: HomeUiCoordinator) = application {
         state = windowState,
         title = "Cuer Hub",
 
-    ) {
+        ) {
         Home(coordinator)
     }
 }
@@ -61,32 +60,39 @@ fun Home(coordinator: HomeUiCoordinator) {
                     .fillMaxHeight()
                     .background(Color.White)
             ) {
-                Row {
-                    val imageSize = 32
-                    val svgImage = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, imageSize)
-                    val imageBitmap = svgImage.toImageBitmap()
-                    Image(
-                        bitmap = imageBitmap,
-                        contentDescription = "SVG Icon",
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .width(imageSize.dp)
-                            .height(imageSize.dp)
-                    )
-                    Text(
-                        text = "Child",
-                        color = Color.Black,
-                        style = TextStyle(fontSize = 30.sp),
-                        modifier = Modifier.padding(20.dp)
-                    )
-                    HeaderButton(
-                        "Notif",
-                        modifier = Modifier.padding(20.dp)
-                    ) {
-                        AppleScriptNotif.showNotification("Title", "text")
-                    }
-                }
+                TestUi(coordinator)
             }
+        }
+    }
+}
+
+@Composable
+private fun TestUi(coordinator: HomeUiCoordinator) {
+    Row {
+        val imageSize = 32
+        val svgImage = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, imageSize)
+        val imageBitmap = svgImage.toImageBitmap()
+        Image(
+            bitmap = imageBitmap,
+            contentDescription = "SVG Icon",
+            modifier = Modifier
+                .padding(20.dp)
+                .width(imageSize.dp)
+                .height(imageSize.dp)
+        )
+        Text(
+            text = "Child",
+            color = Color.Black,
+            style = TextStyle(fontSize = 30.sp),
+            modifier = Modifier.padding(20.dp)
+        )
+        HeaderButton(
+            "Notif",
+            modifier = Modifier.padding(20.dp)
+        ) {
+            coordinator.initDb()
+            //AppleScriptNotif.showNotification("Title", "text")
+
         }
     }
 }

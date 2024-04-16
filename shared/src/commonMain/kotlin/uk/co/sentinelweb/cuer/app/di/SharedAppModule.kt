@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.*
 import uk.co.sentinelweb.cuer.app.queue.QueueMediator
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorState
+import uk.co.sentinelweb.cuer.app.service.remote.AppRemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.app.service.remote.AvailableMessageHandler
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
@@ -34,6 +35,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapperImpl
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.domain.*
+import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 
 object SharedAppModule {
     private val queueModule = module {
@@ -115,6 +117,17 @@ object SharedAppModule {
         factory { MediaUpdateFromPlatformUseCase(get(), get()) }
     }
 
+    private val remoteModule = module {
+        factory { WifiStartChecker(get(), get()) }
+        factory<RemoteDatabaseAdapter> {
+            AppRemoteDatabaseAdapter(
+                playlistOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                addLinkUsecase = get(),
+            )
+        }
+    }
+
     private val objectModule = module {
         factory { ParserFactory() }
         single {
@@ -153,7 +166,6 @@ object SharedAppModule {
                 log = get()
             )
         }
-        factory { WifiStartChecker(get(), get()) }
         factory<RemoteServerContract.AvailableMessageHandler> {
             AvailableMessageHandler(
                 remoteRepo = get(),
@@ -186,5 +198,6 @@ object SharedAppModule {
         .plus(dbModule)
         .plus(usecaseModule)
         .plus(uiModule)
+        .plus(remoteModule)
         .plus(DescriptionContract.viewModule)
 }

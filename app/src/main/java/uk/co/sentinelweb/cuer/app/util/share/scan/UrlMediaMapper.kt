@@ -129,12 +129,12 @@ private class GoogleYoutubeUrlMapper(
     override fun check(uri: Uri): Boolean =
         ((uri.host?.contains("google.") ?: false)
                 && (uri.path?.let { it.indexOf("url") == 1 } ?: false)
-                && (uri.getQueryParameters("url")?.takeIf { it.size == 1 }?.get(0)?.contains("youtube.com") ?: false))
+                && (uri.getQueryParameters("url").takeIf { it.size == 1 }?.get(0)?.contains("youtube.com") ?: false))
 
 
     override fun map(uri: Uri): Pair<ObjectTypeDomain, MediaDomain> =
         uri.getQueryParameters("url")
-            ?.takeIf { it.size == 1 }
+            .takeIf { it.size == 1 }
             ?.get(0)
             ?.let { URLDecoder.decode(it) }
             ?.let { Uri.parse(it) }

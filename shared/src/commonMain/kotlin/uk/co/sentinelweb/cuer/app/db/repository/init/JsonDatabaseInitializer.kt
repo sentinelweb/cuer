@@ -24,6 +24,7 @@ class JsonDatabaseInitializer constructor(
     }
 
     private val listeners: MutableList<(Boolean) -> Unit> = mutableListOf()
+
     override fun isInitialized(): Boolean = preferences.dbInitialised
 
     override fun initDatabase(path: String) {
