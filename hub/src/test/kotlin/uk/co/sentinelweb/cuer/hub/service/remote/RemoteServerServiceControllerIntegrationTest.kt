@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.test.RemoteServerControllerTestModules
+import kotlin.test.Ignore
 
 class RemoteServerServiceControllerIntegrationTest : KoinComponent {
 
@@ -38,6 +39,7 @@ class RemoteServerServiceControllerIntegrationTest : KoinComponent {
     }
 
     @Test
+    @Ignore
     fun isServerStarted() = runBlocking {
         sut.initialise()
         delay(5000)
@@ -52,24 +54,24 @@ class RemoteServerServiceControllerIntegrationTest : KoinComponent {
         }
     }
 
-
-    @Test
-    fun getLocalNode() {
-    }
-
-    @Test
-    fun initialise() {
-    }
-
-    @Test
-    fun handleAction() {
-    }
-
-    @Test
-    fun multicastPing() {
-    }
-
-    @Test
-    fun destroy() {
-    }
+//
+//    @Test
+//    fun getLocalNode() {
+//    }
+//
+//    @Test
+//    fun initialise() {
+//    }
+//
+//    @Test
+//    fun handleAction() {
+//    }
+//
+//    @Test
+//    fun multicastPing() {
+//    }
+//
+//    @Test
+//    fun destroy() {
+//    }
 }

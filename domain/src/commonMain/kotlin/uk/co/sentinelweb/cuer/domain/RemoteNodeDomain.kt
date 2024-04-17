@@ -4,6 +4,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 
+// todo add ssid
 @Serializable
 data class RemoteNodeDomain(
     val id: OrchestratorContract.Identifier<GUID>?,

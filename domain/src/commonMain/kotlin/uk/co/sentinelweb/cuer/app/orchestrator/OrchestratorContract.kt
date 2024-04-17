@@ -3,12 +3,8 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.db.repository.DbResult
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
-import uk.co.sentinelweb.cuer.domain.toGUID
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import kotlin.reflect.KClass
@@ -18,6 +14,16 @@ interface OrchestratorContract<Domain> {
     // to support generic orchestrator injection via koin
     enum class Inject { Playlist, PlaylistStats, PlaylistItem, Media, Channel }
     enum class Source { MEMORY, LOCAL, LOCAL_NETWORK, REMOTE, PLATFORM }
+
+    @Serializable
+    data class Identifier<IdType>(
+        val id: IdType,
+        val source: Source,
+        val locator: Locator? = null
+    ) {
+        @Serializable
+        data class Locator(val ip: String, val port: Int)
+    }
 
     val updates: Flow<Triple<Operation, Source, Domain>>
 
@@ -88,18 +94,8 @@ interface OrchestratorContract<Domain> {
     class NetException(result: NetResult<*>) : Exception((result as NetResult.Error<*>).msg, result.t)
     class MemoryException(msg: String, cause: Throwable? = null) : Exception(msg, cause)
 
-    @Serializable
-    // todo make a data class - no need to subclass
-    data class Identifier<IdType>(
-        val id: IdType,
-        val source: Source,
-    )
-
     companion object {
         val NO_PLAYLIST = Identifier("no-playlist".toGUID(), MEMORY)
         val EMPTY_ID = Identifier("empty-id".toGUID(), MEMORY)
     }
 }
-
-fun String.toGuidIdentifier(source: Source): Identifier<GUID> = Identifier(GUID(this), source)
-fun GUID.toIdentifier(source: Source): Identifier<GUID> = Identifier(this, source)

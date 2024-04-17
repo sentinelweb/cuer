@@ -9,6 +9,6 @@ class CommonGreetingTest {
     @Test
     @Ignore
     fun testExample() {
-        assertTrue(true, "Check 'Hello' is mentioned")
+        assertTrue(true, "test example")
     }
 }

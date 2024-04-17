@@ -14,7 +14,7 @@ class QueueCastConnectionListener(
 
     enum class CastState { PLAYING, CONNECTING, NOT_CONNECTED }
 
-    var playListId: OrchestratorContract.Identifier<*> = (-1L).toLocalIdentifier()
+    var playListId: OrchestratorContract.Identifier<*> = "".toLocalIdentifier()
     lateinit var callback: (CastState) -> Unit
 
     private val isQueuedPlaylist: Boolean
