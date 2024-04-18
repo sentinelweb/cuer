@@ -237,23 +237,23 @@ object RemotesComposables {
                 ) {
                     DropdownMenuItem(onClick = {
                         expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
-                    }
-                    ) {
+                    }) {
                         Text("Ping")
-                    }
-                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                        Text("Connect")
                     }
                     DropdownMenuItem(onClick = {
                         expanded = dispatchAndClose(view, OnActionSync(remote.domain))
                     }) {
                         Text("Sync")
                     }
-                    Divider()
-                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                        Text("Play")
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionDelete(remote.domain))
+                    }) {
+                        Text("Delete")
                     }
-                    DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                    Divider()
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))
+                    }) {
                         Text("Playlists")
                     }
                 }

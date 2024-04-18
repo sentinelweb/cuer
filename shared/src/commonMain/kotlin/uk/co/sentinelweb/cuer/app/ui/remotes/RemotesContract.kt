@@ -31,6 +31,7 @@ class RemotesContract {
             data class RemoteUpdate(val remotes: List<RemoteNodeDomain>) : Intent()
             data class RemoteSync(val remote: RemoteNodeDomain) : Intent()
             data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
+            data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
         }
 
         sealed class Label {
@@ -104,6 +105,7 @@ class RemotesContract {
             data class OnActionPingNodeClicked(val remote: RemoteNodeDomain) : Event()
             data class OnActionDelete(val remote: RemoteNodeDomain) : Event()
             data class OnActionSync(val remote: RemoteNodeDomain) : Event()
+            data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
         }
     }
 }

@@ -22,10 +22,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
-import uk.co.sentinelweb.cuer.remote.server.LocalRepository
-import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
-import uk.co.sentinelweb.cuer.remote.server.ServerState
-import uk.co.sentinelweb.cuer.remote.server.http
+import uk.co.sentinelweb.cuer.remote.server.*
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Ping
 
 class RemotesStoreFactory constructor(
@@ -103,6 +100,7 @@ class RemotesStoreFactory constructor(
                 is Intent.RemoteUpdate -> remotesUpdate(intent)
                 is Intent.RemoteDelete -> deleteRemote(intent)
                 is Intent.RemoteSync -> syncRemote(intent)
+                is Intent.RemotePlaylists -> getRemotePlaylists(intent)
             }
 
         private fun deleteRemote(intent: Intent.RemoteDelete) {
@@ -191,6 +189,12 @@ class RemotesStoreFactory constructor(
         }
 
         private fun syncRemote(intent: Intent.RemoteSync) {
+            coroutines.ioScope.launch {
+                log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
+            }
+        }
+
+        private fun getRemotePlaylists(intent: Intent.RemotePlaylists) {
             coroutines.ioScope.launch {
                 val playlists = getPlaylistsFromDeviceUseCase(intent.remote)
                 log.d(playlists.toString())

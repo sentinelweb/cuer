@@ -183,9 +183,6 @@ object RemotesComposables {
                     }) {
                         Text("Ping")
                     }
-                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                        Text("Connect")
-                    }
                     DropdownMenuItem(onClick = {
                         expanded = dispatchAndClose(view, Event.OnActionSync(remote.domain))
                     }) {
@@ -197,7 +194,9 @@ object RemotesComposables {
                         Text("Delete")
                     }
                     Divider()
-                    DropdownMenuItem(onClick = { /* Handle settings! */ }) {
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionPlaylists(remote.domain))
+                    }) {
                         Text("Playlists")
                     }
                 }
