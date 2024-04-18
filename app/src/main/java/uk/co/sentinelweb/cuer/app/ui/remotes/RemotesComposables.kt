@@ -83,7 +83,7 @@ object RemotesComposables {
                             items(model.remoteNodes) { remote ->
                                 swipeToDismiss(
                                     editSwipeResources { view.dispatch(OnActionPingNodeClicked(remote.domain)) },
-                                    deleteSwipeResources { view.dispatch(OnActionDeleteSwipe(remote.domain)) }
+                                    deleteSwipeResources { view.dispatch(OnActionDelete(remote.domain)) }
                                 ) { RemoteRow(remote, view) }
                             }
                         }
@@ -235,13 +235,18 @@ object RemotesComposables {
                     modifier = Modifier.width(200.dp),
                     onDismissRequest = { expanded = false }
                 ) {
-                    DropdownMenuItem(onClick = { expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain)) }) {
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
+                    }
+                    ) {
                         Text("Ping")
                     }
                     DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
                         Text("Connect")
                     }
-                    DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, OnActionSync(remote.domain))
+                    }) {
                         Text("Sync")
                     }
                     Divider()
@@ -258,7 +263,7 @@ object RemotesComposables {
 
     private fun dispatchAndClose(
         view: BaseMviView<Model, Event>,
-        event: OnActionPingNodeClicked
+        event: Event
     ): Boolean {
         view.dispatch(event)
         return false
@@ -276,7 +281,12 @@ private fun RemotesPreview() {
     )
     val view = object : BaseMviView<Model, Event>() {}
     RemotesComposables.RemotesView(
-        modelMapper.map(RemotesContract.MviStore.State(localNode = localNode, wifiState = WifiStateProvider.WifiState())),
+        modelMapper.map(
+            RemotesContract.MviStore.State(
+                localNode = localNode,
+                wifiState = WifiStateProvider.WifiState()
+            )
+        ),
         view
     )
 }

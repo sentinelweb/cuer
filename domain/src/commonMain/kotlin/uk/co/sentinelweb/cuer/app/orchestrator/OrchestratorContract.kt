@@ -22,7 +22,7 @@ interface OrchestratorContract<Domain> {
         val locator: Locator? = null
     ) {
         @Serializable
-        data class Locator(val ip: String, val port: Int)
+        data class Locator(val address: String, val port: Int)
     }
 
     val updates: Flow<Triple<Operation, Source, Domain>>

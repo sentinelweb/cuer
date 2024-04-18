@@ -7,11 +7,11 @@ import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 
-internal class RemoteKtorInteractor(
+internal class RemoteStatusKtorInteractor(
     private val availableService: RemoteAvailableService,
     private val availableMessageMapper: AvailableMessageMapper,
     private val localRepository: LocalRepository,
-) : RemoteInteractor {
+) : RemoteStatusInteractor {
 
     override suspend fun available(
         messageType: AvailableMessage.MsgType,

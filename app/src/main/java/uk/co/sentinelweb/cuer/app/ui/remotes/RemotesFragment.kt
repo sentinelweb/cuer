@@ -172,10 +172,11 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),
-                        remoteInteractor = get(),
+                        remoteStatusInteractor = get(),
                         remotesRepository = get(),
                         locationPermissionLaunch = get(),
-                        wifiStateProvider = get()
+                        wifiStateProvider = get(),
+                        getPlaylistsFromDeviceUseCase = get()
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

@@ -40,13 +40,13 @@ class JvmMultiCastSocket(
             theSocket!!.networkInterface = networkInterface
             theSocket!!.joinGroup(broadcastAddress, networkInterface)
             val buffer = ByteArray(1 * 1024)
-            val data1 = DatagramPacket(buffer, buffer.size)
+            val data = DatagramPacket(buffer, buffer.size)
             log.d("multi start: addr: $broadcastAddress config:${config.multicastIp}:${config.multicastPort}")
             startListener()
             while (isKeepGoing) {
-                theSocket!!.receive(data1) // blocks
-                val msg = String(buffer, 0, data1.length, Charset.defaultCharset())
-                log.d("multi Received: $msg")
+                theSocket!!.receive(data) // blocks
+                val msg = String(buffer, 0, data.length, Charset.defaultCharset())
+                //log.d("multi Received: $msg")
                 if (isKeepGoing) {
                     val msgDecoded = deserialiseMulti(msg)
                     availableMessageHandler.messageReceived(msgDecoded)

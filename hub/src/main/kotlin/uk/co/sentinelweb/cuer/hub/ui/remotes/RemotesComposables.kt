@@ -186,13 +186,17 @@ object RemotesComposables {
                     DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
                         Text("Connect")
                     }
-                    DropdownMenuItem(onClick = { /* Handle send feedback! */ }) {
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionSync(remote.domain))
+                    }) {
                         Text("Sync")
                     }
-                    Divider()
-                    DropdownMenuItem(onClick = { /* Handle refresh! */ }) {
-                        Text("Play")
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionDelete(remote.domain))
+                    }) {
+                        Text("Delete")
                     }
+                    Divider()
                     DropdownMenuItem(onClick = { /* Handle settings! */ }) {
                         Text("Playlists")
                     }
@@ -203,7 +207,7 @@ object RemotesComposables {
 
     private fun dispatchAndClose(
         view: BaseMviView<Model, Event>,
-        event: Event.OnActionPingNodeClicked
+        event: Event
     ): Boolean {
         view.dispatch(event)
         return false

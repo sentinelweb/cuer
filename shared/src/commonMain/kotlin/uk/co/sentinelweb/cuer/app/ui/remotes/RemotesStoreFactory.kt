@@ -14,13 +14,14 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
+import uk.co.sentinelweb.cuer.app.usecase.GetPlaylistsFromDeviceUseCase
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
-import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
+import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
@@ -35,10 +36,11 @@ class RemotesStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
-    private val remoteInteractor: RemoteInteractor,
+    private val remoteStatusInteractor: RemoteStatusInteractor,
     private val remotesRepository: RemotesRepository,
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
+    private val getPlaylistsFromDeviceUseCase: GetPlaylistsFromDeviceUseCase,
 ) {
 
     init {
@@ -99,10 +101,11 @@ class RemotesStoreFactory constructor(
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
                 is Intent.RemoteUpdate -> remotesUpdate(intent)
-                is Intent.DeleteRemote -> deleteRemote(intent)
+                is Intent.RemoteDelete -> deleteRemote(intent)
+                is Intent.RemoteSync -> syncRemote(intent)
             }
 
-        private fun deleteRemote(intent: Intent.DeleteRemote) {
+        private fun deleteRemote(intent: Intent.RemoteDelete) {
             coroutines.mainScope.launch { remotesRepository.removeNode(intent.remote) }
         }
 
@@ -127,7 +130,7 @@ class RemotesStoreFactory constructor(
             coroutines.ioScope.launch {
                 remotesRepository.addUpdateNode(
                     intent.remote.copy(
-                        isAvailable = remoteInteractor.available(Ping, intent.remote).isSuccessful
+                        isAvailable = remoteStatusInteractor.available(Ping, intent.remote).isSuccessful
                     )
                 )
             }
@@ -186,6 +189,13 @@ class RemotesStoreFactory constructor(
             dispatch(Result.UpdateServerState)
             wifiStateProvider.updateWifiInfo()
         }
+
+        private fun syncRemote(intent: Intent.RemoteSync) {
+            coroutines.ioScope.launch {
+                val playlists = getPlaylistsFromDeviceUseCase(intent.remote)
+                log.d(playlists.toString())
+            }
+        }
     }
 
     fun create(): MviStore =
@@ -199,6 +209,4 @@ class RemotesStoreFactory constructor(
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()
         ) {}
-
-
 }

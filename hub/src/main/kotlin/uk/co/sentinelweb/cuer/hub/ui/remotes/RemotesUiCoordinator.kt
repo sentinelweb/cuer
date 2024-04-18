@@ -92,11 +92,12 @@ class RemotesUiCoordinator :
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),
-                        remoteInteractor = get(),
+                        remoteStatusInteractor = get(),
                         //connectivityWrapper = get(),
                         remotesRepository = get(),
                         locationPermissionLaunch = get(),
-                        wifiStateProvider = get()
+                        wifiStateProvider = get(),
+                        getPlaylistsFromDeviceUseCase = get()
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

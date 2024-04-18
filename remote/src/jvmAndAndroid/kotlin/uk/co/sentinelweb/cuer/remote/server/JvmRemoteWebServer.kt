@@ -29,6 +29,9 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
@@ -94,7 +97,7 @@ class JvmRemoteWebServer constructor(
                     )
                     logWrapper.d("/ : " + call.request.uri)
                 }
-                get("/playlists") {
+                get(PLAYLISTS_API.PATH) {
                     database.getPlaylists()
                         .let { ResponseDomain(it) }
                         .apply {
@@ -105,7 +108,7 @@ class JvmRemoteWebServer constructor(
                 get("/playlist/") {
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
-                get("/playlist/{id}") {
+                get(PLAYLIST_API.PATH) {
                     (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylist(id)
@@ -119,7 +122,7 @@ class JvmRemoteWebServer constructor(
                         }
                     logWrapper.d(call.request.uri)
                 }
-                get("/playlist-src/{src}/{id}") {
+                get(PLAYLIST_SOURCE_API.PATH) {
                     (call.parameters["src"] to call.parameters["id"])
                         .takeIf { it.checkNull() != null }?.checkNull()
                         ?.let {

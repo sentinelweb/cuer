@@ -12,9 +12,7 @@ import uk.co.sentinelweb.cuer.net.pixabay.PixabayInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayKtorInteractor
 import uk.co.sentinelweb.cuer.net.pixabay.PixabayService
 import uk.co.sentinelweb.cuer.net.pixabay.mapper.PixabayImageMapper
-import uk.co.sentinelweb.cuer.net.remote.RemoteAvailableService
-import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
-import uk.co.sentinelweb.cuer.net.remote.RemoteKtorInteractor
+import uk.co.sentinelweb.cuer.net.remote.*
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeInteractor
 import uk.co.sentinelweb.cuer.net.youtube.YoutubeService
 import uk.co.sentinelweb.cuer.net.youtube.videos.YoutubeKtorInteractor
@@ -38,6 +36,7 @@ object NetModule {
 
         factory(named(REMOTE)) { ServiceExecutor(get(named(REMOTE)), REMOTE, get()) }
         factory { RemoteAvailableService(executor = get(named(REMOTE))) }
+        factory { RemotePlaylistsService(executor = get(named(REMOTE))) }
     }
 
     private val interactorModule = module {
@@ -64,11 +63,16 @@ object NetModule {
                 errorMapper = get()
             )
         }
-        factory<RemoteInteractor> {
-            RemoteKtorInteractor(
+        factory<RemoteStatusInteractor> {
+            RemoteStatusKtorInteractor(
                 availableService = get(),
                 availableMessageMapper = get(),
                 localRepository = get()
+            )
+        }
+        factory<RemotePlaylistsInteractor> {
+            RemotePlaylistsKtorInteractor(
+                remotePlaylistsService = get()
             )
         }
     }

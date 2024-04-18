@@ -23,7 +23,10 @@ internal class ServiceExecutor(
         urlParams: Map<String, Any?> = emptyMap(),
         headers: Map<String, Any?> = emptyMap(),
     ): T = try {
-        val response: HttpResponse = client.get("${type.baseUrl}/$path") {
+
+        val urlString = "${type.baseUrl}/$path"
+        log.d("Execute: $urlString")
+        val response: HttpResponse = client.get(urlString) {
             urlParams.forEach { parameter(it.key, it.value) }
             headers.forEach { header(it.key, it.value) }
         }

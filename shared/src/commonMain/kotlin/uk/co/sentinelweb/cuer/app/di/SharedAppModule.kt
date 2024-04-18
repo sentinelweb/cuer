@@ -115,6 +115,7 @@ object SharedAppModule {
         factory { AddPlaylistUsecase(get(), get(), get(), get()) }
         factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
         factory { MediaUpdateFromPlatformUseCase(get(), get()) }
+        factory { GetPlaylistsFromDeviceUseCase(get()) }
     }
 
     private val remoteModule = module {
@@ -170,7 +171,7 @@ object SharedAppModule {
             AvailableMessageHandler(
                 remoteRepo = get(),
                 availableMessageMapper = get(),
-                remoteInteractor = get(),
+                remoteStatusInteractor = get(),
                 localRepo = get(),
                 log = get()
             )

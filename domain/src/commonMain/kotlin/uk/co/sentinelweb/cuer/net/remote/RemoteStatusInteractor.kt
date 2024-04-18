@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 
-interface RemoteInteractor {
+interface RemoteStatusInteractor {
 
     @Throws(Exception::class)
     suspend fun available(

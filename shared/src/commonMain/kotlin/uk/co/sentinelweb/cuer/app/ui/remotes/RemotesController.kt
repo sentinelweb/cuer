@@ -66,7 +66,8 @@ class RemotesController constructor(
             Event.OnActionStartServerClicked -> Intent.ActionStartServer
             Event.OnActionStopServerClicked -> Intent.ActionStopServer
             Event.OnActionObscuredPermClicked -> Intent.ActionObscuredPerm
-            is Event.OnActionDeleteSwipe -> Intent.DeleteRemote(remote)
+            is Event.OnActionDelete -> Intent.RemoteDelete(remote)
+            is Event.OnActionSync -> Intent.RemoteSync(remote)
         }
     }
 

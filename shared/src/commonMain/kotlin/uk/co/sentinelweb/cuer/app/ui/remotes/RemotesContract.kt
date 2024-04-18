@@ -29,7 +29,8 @@ class RemotesContract {
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
             data class WifiStateChange(val wifiState: WifiStateProvider.WifiState) : Intent()
             data class RemoteUpdate(val remotes: List<RemoteNodeDomain>) : Intent()
-            data class DeleteRemote(val remote: RemoteNodeDomain) : Intent()
+            data class RemoteSync(val remote: RemoteNodeDomain) : Intent()
+            data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
         }
 
         sealed class Label {
@@ -101,7 +102,8 @@ class RemotesContract {
             object OnActionConfigClicked : Event()
             object OnActionObscuredPermClicked : Event()
             data class OnActionPingNodeClicked(val remote: RemoteNodeDomain) : Event()
-            data class OnActionDeleteSwipe(val remote: RemoteNodeDomain) : Event()
+            data class OnActionDelete(val remote: RemoteNodeDomain) : Event()
+            data class OnActionSync(val remote: RemoteNodeDomain) : Event()
         }
     }
 }
