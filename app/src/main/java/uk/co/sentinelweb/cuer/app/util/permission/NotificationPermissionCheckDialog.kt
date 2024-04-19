@@ -4,11 +4,16 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.provider.Settings
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class NotificationPermissionCheckDialog(
     private val activity: Activity,
-    private val notificationPermissionCheck: NotificationPermissionCheck
+    private val notificationPermissionCheck: NotificationPermissionCheck,
+    private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
 
     fun checkToShow() {
         if (!notificationPermissionCheck.isNotificationsEnabled()) {
@@ -22,7 +27,7 @@ class NotificationPermissionCheckDialog(
         alertDialogBuilder.setTitle("Enable notifications")
         alertDialogBuilder.setMessage("Do you want to enable notification?")
         alertDialogBuilder.setPositiveButton("Yes") { dialog, _ ->
-            askPermission()
+            openNotificationSettings()
             dialog.dismiss()
         }
         alertDialogBuilder.setNegativeButton("No") { dialog, _ ->
@@ -32,11 +37,17 @@ class NotificationPermissionCheckDialog(
         alertDialog.show()
     }
 
-    private fun askPermission(channelId: String? = null) {
-        val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
-            putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
-            channelId?.let { putExtra(Settings.EXTRA_CHANNEL_ID, it) }
-        }
+    fun openNotificationSettings() {
+        val intent = Intent()
+        intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+
+        //for Android 5-7
+        intent.putExtra("app_package", activity.packageName)
+        intent.putExtra("app_uid", activity.applicationInfo.uid)
+
+        // for Android 8 and above
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
+
         activity.startActivity(intent)
     }
 }
