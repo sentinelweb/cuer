@@ -38,6 +38,4 @@ class DesktopWifiStateProvider(
 
     override fun updateWifiInfo() = Unit
 
-    //override fun wifiIpAddress(): String? = _wifiStateFlow.value.ip
-
 }

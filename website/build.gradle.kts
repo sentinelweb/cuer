@@ -1,5 +1,6 @@
 plugins {
-    kotlin("js")
+//    kotlin("js")
+    kotlin("multiplatform")
 }
 // ./gradlew :website:jsBrowserRun --continue
 group = "sentinelweb.cuer"
@@ -12,15 +13,6 @@ val outputJsLibName = "cuer_website.js"
 
 repositories {
     mavenCentral()
-}
-
-dependencies {
-    implementation(project(":shared"))
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
-    implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
-
-    testImplementation(kotlin("test-js"))
 }
 
 kotlin {
@@ -38,6 +30,23 @@ kotlin {
             }
             runTask {
                 devServer = devServer?.copy(port = 3030)
+            }
+        }
+    }
+    sourceSets {
+
+        val commonMain by getting {
+            dependencies {
+                implementation(project(":shared"))
+            }
+        }
+
+        val jsMain by getting {
+            dependencies {
+
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
+                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
             }
         }
     }

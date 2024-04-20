@@ -21,13 +21,8 @@ class PlatformWifiStateProvider(
 
     override val wifiState: WifiState
         get() = _wifiStateFlow.value
-//        private set(value) {
-//            _wifiStateFlow.value = value
-//        }
 
     override fun register() {
-        // Start listening for WiFi state updates
-        // todo check regularly
         updateWifiInfo()
     }
 
@@ -43,11 +38,8 @@ class PlatformWifiStateProvider(
             _wifiStateFlow.value = WifiState(isConnected = essid != "Unknown", ssid = essid, ip = ipAddress)
             log.d(wifiState.toString())
         } catch (e: IOException) {
-            // Handle error
             e.printStackTrace()
             _wifiStateFlow.value = WifiState()
         }
     }
-
-    //override fun wifiIpAddress(): String? = _wifiStateFlow.value.ip
 }
