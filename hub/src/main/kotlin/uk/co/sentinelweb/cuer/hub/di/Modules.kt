@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
+import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
@@ -22,6 +23,7 @@ import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
+import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
@@ -121,6 +123,9 @@ object Modules {
         }
         factory<WakeLockManager> { EmptyWakeLockManager() }
         factory<LinkScanner> { TodoLinkScanner() }
+        factory<RemoteServerContract.Service> { RemoteServerService(get()) }
+        single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
+
     }
 
     val allModules = listOf(

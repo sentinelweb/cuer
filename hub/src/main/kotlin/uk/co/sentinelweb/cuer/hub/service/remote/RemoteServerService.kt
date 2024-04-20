@@ -44,8 +44,6 @@ class RemoteServerService(
 
     companion object {
         val serviceModule = module {
-            factory<RemoteServerContract.Service> { RemoteServerService(get()) }
-            single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
             scope(named<RemoteServerService>()) {
                 scoped<RemoteServerContract.Controller> {
                     RemoteServerServiceController(
