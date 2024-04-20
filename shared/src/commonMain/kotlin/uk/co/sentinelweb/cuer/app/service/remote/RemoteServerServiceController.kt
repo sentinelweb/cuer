@@ -107,5 +107,4 @@ class RemoteServerServiceController constructor(
         }
         log.d("Controller destroyed")
     }
-
 }
