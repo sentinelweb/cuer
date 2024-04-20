@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
@@ -19,9 +18,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import loadSVG
-import toImageBitmap
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageGrid
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 import java.io.File
 
@@ -71,7 +70,7 @@ fun Home(coordinator: HomeUiCoordinator) {
 private fun TestUi(coordinator: HomeUiCoordinator) {
     Column {
         Row {
-            Image("drawable/ic_wifi_tethering.svg", 32, Color.Blue)
+            ImageSvg("drawable/ic_wifi_tethering.svg", 32, Color.Blue)
             Text(
                 text = "Child",
                 color = Color.Black,
@@ -86,41 +85,9 @@ private fun TestUi(coordinator: HomeUiCoordinator) {
                 //AppleScriptNotif.showNotification("Title", "text")
 
             }
-            Image("drawable/ic_apple.svg")
+            ImageSvg("drawable/ic_apple.svg")
         }
 
         ImageGrid(File("/Users/robmunro/repos/cuer/hub/src/main/resources/drawable"))
     }
-}
-
-
-@Composable
-fun ImageGrid(imagesDir: File) {
-    val imageFiles = imagesDir.listFiles { _, name -> name.endsWith(".svg") } ?: arrayOf()
-
-    Column {
-        chunkedImages(imageFiles, 15).forEach {
-            Row {
-                it.forEach { Image("drawable/${it.name}") }
-            }
-        }
-    }
-}
-
-fun chunkedImages(imageFiles: Array<File>, chunkSize: Int): List<List<File>> {
-    return imageFiles.toList().chunked(chunkSize)
-}
-
-@Composable
-private fun Image(s: String, imageSize: Int = 32, tint: Color = Color.Black) {
-    val svgImage = loadSVG(s, tint, imageSize)
-    val imageBitmap = svgImage.toImageBitmap()
-    Image(
-        bitmap = imageBitmap,
-        contentDescription = "SVG Icon",
-        modifier = Modifier
-            .padding(20.dp)
-            .width(imageSize.dp)
-            .height(imageSize.dp)
-    )
 }
