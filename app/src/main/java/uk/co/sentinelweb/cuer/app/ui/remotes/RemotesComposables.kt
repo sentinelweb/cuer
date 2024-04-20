@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarCompo
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.deleteSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.editSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.swipeToDismiss
+import uk.co.sentinelweb.cuer.app.ui.common.mapper.ImageEnumMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
@@ -188,7 +189,7 @@ object RemotesComposables {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_wifi_tethering),
+                    painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
                     tint = contentColor,
                     contentDescription = null,
                     modifier = Modifier
@@ -246,7 +247,7 @@ object RemotesComposables {
                         Text("Sync")
                     }
                     DropdownMenuItem(onClick = {
-                        expanded = dispatchAndClose(view, Event.OnActionDelete(remote.domain))
+                        expanded = dispatchAndClose(view, OnActionDelete(remote.domain))
                     }) {
                         Text("Delete")
                     }

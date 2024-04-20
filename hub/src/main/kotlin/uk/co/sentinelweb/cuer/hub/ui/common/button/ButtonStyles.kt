@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 
 // todo copied from app file of the same name - merge to a library
 @Composable
@@ -44,7 +45,7 @@ fun cuerNoOutlineButtonStroke(enabled: Boolean = true) =
 @Composable
 fun HeaderButton(
     text: String,
-    // icon: Int,
+    icon: String,
     modifier: Modifier = Modifier,
     colors: ButtonColors = cuerOutlineButtonColors(),
     border: @Composable (Boolean) -> BorderStroke = cuerOutlineButtonStrokEnabler,
@@ -60,13 +61,9 @@ fun HeaderButton(
         enabled = enabled,
         elevation = ButtonDefaults.elevation(0.dp),
     ) {
-        // todo button icons
-//        Icon(
-//            painter = painterResource(icon),
-//            tint = colors.contentColor(enabled).value,
-//            contentDescription = null,
-//            modifier = Modifier.size(24.dp)
-//        )
+
+        ImageSvg(icon)
+
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.button,

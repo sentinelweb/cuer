@@ -9,7 +9,7 @@ import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper.Companion.blankModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 

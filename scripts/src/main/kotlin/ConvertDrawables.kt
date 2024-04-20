@@ -50,13 +50,15 @@ private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
     val svgFile = File(outputDir, "$fileName.svg")
 
     // Extract relevant properties
-    val viewBox = Regex("""viewBox=['"](.*?)['"]""").find(xmlContents)?.groupValues?.get(1)
     val width = Regex("""android:width=['"](.*?)['"]""").find(xmlContents)?.groupValues?.get(1)
         ?.replace("dp", "")
         ?.replaceDimensions()
     val height = Regex("""android:height=['"](.*?)['"]""").find(xmlContents)?.groupValues?.get(1)
         ?.replace("dp", "")
         ?.replaceDimensions()
+    val viewportWidth = Regex("""android:viewportWidth=['"](.*?)['"]""").find(xmlContents)?.groupValues?.get(1)
+    val viewportHeight = Regex("""android:viewportHeight=['"](.*?)['"]""").find(xmlContents)?.groupValues?.get(1)
+
 
     // Extract all <path> elements
     val rawPaths =
@@ -67,6 +69,11 @@ private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
             .map { it.replace("pathData", "d") }
             .map { it.replace("fillColor", "fill") }
             .map { it.replace(Regex("""name=".*?"\s*"""), "") }
+            .map { it.replace(Regex("""strokeColor=".*?"\s*"""), "") }
+            .map { it.replace(Regex("""strokeLineCap=".*?"\s*"""), "") }
+            .map { it.replace(Regex("""strokeLineJoin=".*?"\s*"""), "") }
+            .map { it.replace(Regex("""strokeWidth=".*?"\s*"""), "") }
+            .map { it.replace(Regex("""fillType=".*?"\s*"""), "") }
             .map { it.replaceStringPaths() }
             .toList()
 
@@ -85,7 +92,7 @@ private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
         val svgContentsBuilder = StringBuilder()
 
         svgContentsBuilder.append("<svg xmlns=\"http://www.w3.org/2000/svg\"")
-        if (viewBox != null) svgContentsBuilder.append(" viewBox=\"$viewBox\"")
+        if (viewportWidth != null && viewportHeight != null) svgContentsBuilder.append(" viewBox=\"0 0 $viewportWidth $viewportHeight\"")
         if (width != null) svgContentsBuilder.append(" width=\"$width\"")
         if (height != null) svgContentsBuilder.append(" height=\"$height\"")
         svgContentsBuilder.append(">\n")
@@ -94,7 +101,7 @@ private fun convertXmlToSvg(xmlFile: File, outputDir: File) {
 
         svgContentsBuilder.append("</svg>")
 
-        processedPaths.forEach { println("$it") }
+        processedPaths.forEach { println(it) }
         println(svgContentsBuilder.toString())
 
         // Write to SVG file

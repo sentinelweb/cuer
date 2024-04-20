@@ -6,6 +6,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 
 object LocalComposables {
     @Composable
@@ -21,6 +22,7 @@ object LocalComposables {
                 title = { Text(text = "Dialog Title") },
                 buttons = {
                     Button(onClick = onClose) {
+                        ImageSvg("drawable/ic_clear.svg")
                         Text("Close")
                     }
                 },

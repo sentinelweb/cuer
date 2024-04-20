@@ -51,7 +51,7 @@ fun Home(coordinator: HomeUiCoordinator) {
         .collectAsState(initial = HomeModel(1))
     MaterialTheme {
         Row {
-            Box(modifier = Modifier.width(360.dp)) {
+            Box(modifier = Modifier.width(400.dp)) {
                 RemotesUi(coordinator.remotes)
             }
             Box(
@@ -70,7 +70,7 @@ fun Home(coordinator: HomeUiCoordinator) {
 private fun TestUi(coordinator: HomeUiCoordinator) {
     Column {
         Row {
-            ImageSvg("drawable/ic_wifi_tethering.svg", 32, Color.Blue, Modifier.padding(vertical = 8.dp))
+            ImageSvg("drawable/ic_wifi_tethering.svg", modifier = Modifier.padding(vertical = 8.dp))
             Text(
                 text = "Child",
                 color = Color.Black,
@@ -79,6 +79,7 @@ private fun TestUi(coordinator: HomeUiCoordinator) {
             )
             HeaderButton(
                 "Notif",
+                "drawable/ic_bitcoin.svg",
                 modifier = Modifier.padding(20.dp)
             ) {
                 coordinator.initDb()

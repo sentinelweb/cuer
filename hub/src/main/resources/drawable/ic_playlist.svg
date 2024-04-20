@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24.0 24.0" width="24" height="24">
     <path
             fill="?colorOnSurface"
             d="M14,10L2,10v2h12v-2zM14,6L2,6v2h12L14,6zM2,16h12v-2L2,14v2z"

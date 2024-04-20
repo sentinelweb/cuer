@@ -76,7 +76,7 @@ fun chunkedImages(imageFiles: List<File>, chunkSize: Int): List<List<File>> {
 }
 
 @Composable
-fun ImageSvg(s: String, imageSize: Int = 32, tint: Color = Color.Black, modifier: Modifier) {
+fun ImageSvg(s: String, imageSize: Int = 24, tint: Color = Color.Black, modifier: Modifier = Modifier) {
     val bufferedImage = loadSVG(s, tint, imageSize)
     val imageBitmap = bufferedImage.toImageBitmap()
     Image(

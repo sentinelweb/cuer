@@ -20,7 +20,9 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.blankModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageEnumMapper
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
+import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 
@@ -60,7 +62,7 @@ object RemotesComposables {
         Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
             model.imageUrl
                 ?.also { url ->
-                    ImageFromUrl(url, Modifier.fillMaxWidth())
+                    ImageFromUrl(url, modifier = Modifier.fillMaxWidth().background(Color.Black))
                 }
             model.wifiState.ssid?.let {
                 Text(
@@ -86,16 +88,20 @@ object RemotesComposables {
             when (model.serverState) {
                 ServerState.STOPPED, ServerState.INITIAL -> HeaderButton(
                     if (model.wifiState.isConnected) "Start" else "No WiFi",
-//                    R.drawable.ic_play, // icon
+                    "drawable/ic_play.svg", // icon
                     enabled = model.wifiState.isConnected
                 ) { view.dispatch(Event.OnActionStartServerClicked) }
 
-                ServerState.STARTED -> HeaderButton("Stop") { view.dispatch(Event.OnActionStopServerClicked) }
+                ServerState.STARTED -> HeaderButton("Stop", "drawable/ic_stop.svg") {
+                    view.dispatch(Event.OnActionStopServerClicked)
+                }
             }
             if (model.serverState == ServerState.STARTED) {
-                HeaderButton("Ping") { view.dispatch(Event.OnActionPingMulticastClicked) }
+                HeaderButton("Ping", "drawable/ic_ping.svg") {
+                    view.dispatch(Event.OnActionPingMulticastClicked)
+                }
             }
-            HeaderButton("Config") {
+            HeaderButton("Config", "drawable/ic_menu_settings.svg") {
                 //view.dispatch(Event.OnActionConfigClicked)
                 isDialogOpen = true
             }
@@ -136,10 +142,9 @@ object RemotesComposables {
                     .background(MaterialTheme.colors.surface),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Image(
-                    bitmap = loadSVG("drawable/ic_wifi_tethering.svg", Color.Blue, 48)
-                        .toImageBitmap(),
-                    contentDescription = "SVG Icon",
+                ImageSvg(
+                    ImageEnumMapper.map(remote.deviceType),
+                    imageSize = 48,
                     modifier = Modifier
                         .padding(20.dp)
                         .width(48.dp)
