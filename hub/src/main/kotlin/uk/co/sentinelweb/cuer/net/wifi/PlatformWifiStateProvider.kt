@@ -49,5 +49,5 @@ class PlatformWifiStateProvider(
         }
     }
 
-    override fun wifiIpAddress(): String? = _wifiStateFlow.value.ip
+    //override fun wifiIpAddress(): String? = _wifiStateFlow.value.ip
 }

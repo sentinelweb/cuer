@@ -183,7 +183,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }
-                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity()) }
+                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity(), get()) }
             }
         }
     }

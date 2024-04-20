@@ -11,9 +11,6 @@ interface WifiStateProvider {
         val isConnected: Boolean = false,
         val ssid: String? = null,
         val ip: String? = null,
-//        val linkSpeed: Int? = null,
-//        val bssid: String? = null,
-//        val rssi: Int? = null,
         val isObscured: Boolean = false,
     ) {
         override fun toString(): String = "isConnected: $isConnected, ssid=\"$ssid\" ip=\"$ip\", isObscured=$isObscured"
@@ -22,5 +19,5 @@ interface WifiStateProvider {
     fun register()
     fun unregister()
     fun updateWifiInfo()
-    fun wifiIpAddress(): String?
+//    fun wifiIpAddress(): String?
 }
