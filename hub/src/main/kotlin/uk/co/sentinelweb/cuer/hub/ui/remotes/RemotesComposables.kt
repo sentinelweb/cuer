@@ -17,10 +17,11 @@ import loadSVG
 import org.koin.core.context.GlobalContext
 import toImageBitmap
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.blankModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
+import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 
 object RemotesComposables {
@@ -29,8 +30,7 @@ object RemotesComposables {
 
     @Composable
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
-        val state = coordinator.modelObservable
-            .collectAsState(initial = RemotesModelMapper.blankModel())
+        val state = coordinator.modelObservable.collectAsState(initial = blankModel())
         RemotesView(state.value, coordinator)
     }
 
@@ -81,6 +81,8 @@ object RemotesComposables {
                 top = 16.dp,
             )
         ) {
+            var isDialogOpen by remember { mutableStateOf(false) }
+
             when (model.serverState) {
                 ServerState.STOPPED, ServerState.INITIAL -> HeaderButton(
                     if (model.wifiState.isConnected) "Start" else "No WiFi",
@@ -93,7 +95,14 @@ object RemotesComposables {
             if (model.serverState == ServerState.STARTED) {
                 HeaderButton("Ping") { view.dispatch(Event.OnActionPingMulticastClicked) }
             }
-            HeaderButton("Config") { view.dispatch(Event.OnActionConfigClicked) }
+            HeaderButton("Config") {
+                //view.dispatch(Event.OnActionConfigClicked)
+                isDialogOpen = true
+            }
+            LocalComposables.showDialog(
+                isDialogOpen = isDialogOpen,
+                onClose = { isDialogOpen = false },
+            )
         }
         model.address?.also {
             Text(
