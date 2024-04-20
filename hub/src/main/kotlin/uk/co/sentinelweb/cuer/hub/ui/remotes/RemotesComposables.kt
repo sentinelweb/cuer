@@ -151,7 +151,7 @@ object RemotesComposables {
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     Text(
-                        text = "${remote.device} : ${remote.deviceType} : ${remote.authType}",
+                        text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
                         color = contentColor,
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(start = 8.dp)

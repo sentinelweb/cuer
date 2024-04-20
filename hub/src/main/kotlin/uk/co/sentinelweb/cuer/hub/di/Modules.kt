@@ -19,13 +19,15 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.JvmDatabaseModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
+import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
+import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
+import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
@@ -80,14 +82,13 @@ object Modules {
     private val configModule = module {
         single {
             // todo make SharedAppDependencies object : see ios di
-            // todo fetch data from gradle props or OS
             BuildConfigDomain(
-                true,
-                true,
-                1,
-                "0.1-alpha",
-                device = "Unknown",
-                deviceType = NodeDomain.DeviceType.MAC
+                isDebug = BuildConfigInject.isDebug,
+                cuerRemoteEnabled = BuildConfigInject.cuerRemoteEnabled,
+                versionCode = BuildConfigInject.versionCode,
+                version = BuildConfigInject.version,
+                device = getOSData(),
+                deviceType = getNodeDeviceType()
             )
         }
         factory {

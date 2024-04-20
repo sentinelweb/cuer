@@ -14,6 +14,12 @@ val ver_junit: String by project
 val ver_mockk: String by project
 val ver_turbine: String by project
 
+val isProduction: String by project
+val app_versionCode: String by project
+val app_versionName: String by project
+val CUER_BG_PLAY: String by project
+val CUER_REMOTE_ENABLED: String by project
+
 group = "uk.co.sentinlweb.cuer"
 version = "1.0-SNAPSHOT"
 
@@ -103,6 +109,26 @@ tasks.register("generateApiKeyClass") {
     }
 }
 
+tasks.register("generateBuildConfigInjectClass") {
+    doLast {
+        val file = File("$projectDir/src/main/kotlin/uk/co/sentinelweb/cuer/hub/BuildConfigInject.kt")
+        file.writeText(
+            """
+            package uk.co.sentinelweb.cuer.hub
+            
+            object BuildConfigInject {
+                val isDebug: Boolean = ${isProduction}.not()
+                val cuerRemoteEnabled: Boolean = $CUER_REMOTE_ENABLED
+                val cuerBgPlayEnabled: Boolean = $CUER_BG_PLAY
+                val versionCode: Int = $app_versionCode
+                val version: String = "$app_versionName"
+            }
+        """.trimIndent()
+        )
+    }
+}
+
 tasks.named("compileKotlin") {
     dependsOn("generateApiKeyClass")
+    dependsOn("generateBuildConfigInjectClass")
 }

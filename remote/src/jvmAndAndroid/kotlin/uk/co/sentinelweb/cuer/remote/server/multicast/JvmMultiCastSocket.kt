@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.remote.server.multicast
 
+//import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.remote.server.AvailableMessageMapper
@@ -45,6 +46,7 @@ class JvmMultiCastSocket(
             startListener()
             while (isKeepGoing) {
                 theSocket!!.receive(data) // blocks
+
                 val msg = String(buffer, 0, data.length, Charset.defaultCharset())
                 //log.d("multi Received: $msg")
                 if (isKeepGoing) {

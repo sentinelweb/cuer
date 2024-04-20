@@ -50,8 +50,6 @@ class LocalRepository(
         }
     }
 
-    //.fun getLocalNode(): LocalNodeDomain = _node.value
-
     private fun loadLocalNode(): LocalNodeDomain =
         jsonFileInteractor
             .takeIf { it.exists() }
@@ -60,7 +58,9 @@ class LocalRepository(
             ?.let { attemptDeserialize(it) }
             ?.copy(
                 version = buildConfigDomain.version,
-                versionCode = buildConfigDomain.versionCode
+                versionCode = buildConfigDomain.versionCode,
+                deviceType = buildConfigDomain.deviceType,
+                device = buildConfigDomain.device,
             )
             ?: run {
                 LocalNodeDomain(

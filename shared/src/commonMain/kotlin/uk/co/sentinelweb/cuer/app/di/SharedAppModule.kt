@@ -164,7 +164,7 @@ object SharedAppModule {
                 parserFactory = get(),
                 playlistItemCreator = get(),
                 timeProvider = get(),
-                log = get()
+                log = get(),
             )
         }
         factory<RemoteServerContract.AvailableMessageHandler> {
@@ -173,7 +173,8 @@ object SharedAppModule {
                 availableMessageMapper = get(),
                 remoteStatusInteractor = get(),
                 localRepo = get(),
-                log = get()
+                wifiStateProvider = get(),
+                log = get(),
             )
         }
         factory<UpcomingContract.Presenter> {
@@ -183,7 +184,7 @@ object SharedAppModule {
                 mediaOrchestrator = get(named(Media)),
                 coroutines = get(),
                 timeProvider = get(),
-                log = get()
+                log = get(),
             )
         }
     }

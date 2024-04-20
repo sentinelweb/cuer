@@ -1,6 +1,9 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
+//import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+//import uk.co.sentinelweb.cuer.app.orchestrator.toLocalNetworkIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
 import uk.co.sentinelweb.cuer.remote.server.AvailableMessageMapper
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -12,6 +15,7 @@ class AvailableMessageHandler(
     private val availableMessageMapper: AvailableMessageMapper,
     private val remoteStatusInteractor: RemoteStatusInteractor,
     private val localRepo: LocalRepository,
+    private val wifiStateProvider: WifiStateProvider,
     private val log: LogWrapper,
 ) : RemoteServerContract.AvailableMessageHandler {
 
@@ -48,5 +52,5 @@ class AvailableMessageHandler(
     }
 
     private fun mapRemoteNode(msgDecoded: AvailableMessage) =
-        availableMessageMapper.mapFromMulticastMessage(msgDecoded.node)
+        availableMessageMapper.mapFromMulticastMessage(msgDecoded.node, wifiStateProvider.wifiState)
 }

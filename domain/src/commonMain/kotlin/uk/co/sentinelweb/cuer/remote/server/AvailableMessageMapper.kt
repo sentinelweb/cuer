@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.remote.server
 
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -29,7 +30,10 @@ class AvailableMessageMapper(
         is LocalNodeDomain.AuthConfig.Confirm -> AvailableMessage.AuthMethod.Confirm
     }
 
-    fun mapFromMulticastMessage(msg: AvailableMessage.DeviceInfo): RemoteNodeDomain {
+    fun mapFromMulticastMessage(
+        msg: AvailableMessage.DeviceInfo,
+        wifiState: WifiStateProvider.WifiState
+    ): RemoteNodeDomain {
         return RemoteNodeDomain(
             id = msg.id,
             ipAddress = msg.ipAddress,
@@ -40,6 +44,7 @@ class AvailableMessageMapper(
             authType = mapAuthType(msg.authType),
             version = msg.version,
             versionCode = msg.versionCode,
+            ssid = wifiState.ssid
         )
     }
 
