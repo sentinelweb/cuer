@@ -70,7 +70,7 @@ fun Home(coordinator: HomeUiCoordinator) {
 private fun TestUi(coordinator: HomeUiCoordinator) {
     Column {
         Row {
-            ImageSvg("drawable/ic_wifi_tethering.svg", 32, Color.Blue)
+            ImageSvg("drawable/ic_wifi_tethering.svg", 32, Color.Blue, Modifier.padding(vertical = 8.dp))
             Text(
                 text = "Child",
                 color = Color.Black,
@@ -85,7 +85,7 @@ private fun TestUi(coordinator: HomeUiCoordinator) {
                 //AppleScriptNotif.showNotification("Title", "text")
 
             }
-            ImageSvg("drawable/ic_apple.svg")
+            ImageSvg("drawable/ic_apple.svg", modifier = Modifier.padding(vertical = 8.dp))
         }
 
         ImageGrid(File("/Users/robmunro/repos/cuer/hub/src/main/resources/drawable"))

@@ -46,16 +46,19 @@ fun DynamicGrid(images: List<File>) {
             items(chunkedImages) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(padding)
+                    horizontalArrangement = Arrangement.spacedBy(padding),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     it.forEach {
                         Column(
                             modifier = Modifier
-                                .size(cellSize)
+                                .width(cellSize)
+                                .wrapContentHeight()
+                                .padding(vertical = 8.dp)
                                 .weight(1f),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            ImageSvg("drawable/${it.name}")
+                            ImageSvg("drawable/${it.name}", modifier = Modifier.padding(vertical = 8.dp))
                             Text(
                                 text = it.name.replace(".svg", ""),
                                 style = TextStyle(fontSize = 14.sp)
@@ -73,14 +76,13 @@ fun chunkedImages(imageFiles: List<File>, chunkSize: Int): List<List<File>> {
 }
 
 @Composable
-fun ImageSvg(s: String, imageSize: Int = 32, tint: Color = Color.Black) {
-    val svgImage = loadSVG(s, tint, imageSize)
-    val imageBitmap = svgImage.toImageBitmap()
+fun ImageSvg(s: String, imageSize: Int = 32, tint: Color = Color.Black, modifier: Modifier) {
+    val bufferedImage = loadSVG(s, tint, imageSize)
+    val imageBitmap = bufferedImage.toImageBitmap()
     Image(
         bitmap = imageBitmap,
         contentDescription = "SVG Icon",
-        modifier = Modifier
-            .padding(20.dp)
+        modifier = modifier
             .width(imageSize.dp)
             .height(imageSize.dp)
     )

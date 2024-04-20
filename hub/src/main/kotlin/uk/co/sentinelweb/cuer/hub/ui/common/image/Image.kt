@@ -62,8 +62,6 @@ fun loadSVG(resourcePath: String, color: Color, size: Int): BufferedImage {
         element.setAttribute("fill", hexColor)
     }
 
-    println("color: $hexColor")
-
     val userAgent = UserAgentAdapter()
     val ctx = BridgeContext(userAgent)
     val builder = GVTBuilder()
