@@ -13,11 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import loadSVG
 import org.koin.core.context.GlobalContext
+import org.koin.java.KoinJavaComponent.getKoin
 import toImageBitmap
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.blankModel
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageEnumMapper
@@ -64,17 +68,31 @@ object RemotesComposables {
                 ?.also { url ->
                     ImageFromUrl(url, modifier = Modifier.fillMaxWidth().background(Color.Black))
                 }
-            model.wifiState.ssid?.let {
+            Column {
                 Text(
-                    text = it,
-                    style = MaterialTheme.typography.body2,
+                    text = model.title,
+                    style = MaterialTheme.typography.h5,
                     color = Color.White,
                     modifier = Modifier.padding(
                         start = 16.dp,
                         top = 8.dp,
                         bottom = 0.dp,
+                    ),
+
                     )
-                )
+                model.wifiState.ssid?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.body2,
+                        color = Color.White,
+                        modifier = Modifier.padding(
+                            start = 16.dp,
+                            top = 8.dp,
+                            bottom = 0.dp,
+                        ),
+
+                        )
+                }
             }
         }
         Row(
@@ -109,7 +127,10 @@ object RemotesComposables {
                 isDialogOpen = isDialogOpen,
                 coordinator = view.localCoordinator(),
                 onClose = {
-                    view.destroyLocalCoordinator()
+                    getKoin().get<CoroutineContextProvider>().mainScope.launch {
+                        delay(50)
+                        view.destroyLocalCoordinator()
+                    }
                     isDialogOpen = false
                 },
             )

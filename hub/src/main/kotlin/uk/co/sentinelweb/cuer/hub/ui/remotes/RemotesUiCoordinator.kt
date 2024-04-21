@@ -96,6 +96,7 @@ class RemotesUiCoordinator :
                         log = get(),
                         wifiStateProvider = get(),
                         remotesRepository = get(),
+                        localRepository = get(),
                         coroutines = get(),
                     )
                 }

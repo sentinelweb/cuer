@@ -18,13 +18,15 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 
-class RemotesController constructor(
+class RemotesController(
     storeFactory: RemotesStoreFactory,
     private val modelMapper: RemotesModelMapper,
     private val wifiStateProvider: WifiStateProvider,
     private val remotesRepository: RemotesRepository,
+    private val localRepository: LocalRepository,
     lifecycle: Lifecycle?,
     private val log: LogWrapper,
     private val coroutines: CoroutineContextProvider,
@@ -93,6 +95,9 @@ class RemotesController constructor(
 
                 remotesRepository.updatesFlow
                     .map { Intent.RemoteUpdate(it) } bindTo store
+
+                localRepository.updatesFlow
+                    .map { Intent.LocalUpdate(it) } bindTo store
 
                 log.d("binding")
             }

@@ -101,6 +101,7 @@ class RemotesStoreFactory constructor(
                 is Intent.RemoteDelete -> deleteRemote(intent)
                 is Intent.RemoteSync -> syncRemote(intent)
                 is Intent.RemotePlaylists -> getRemotePlaylists(intent)
+                is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
             }
 
         private fun deleteRemote(intent: Intent.RemoteDelete) {

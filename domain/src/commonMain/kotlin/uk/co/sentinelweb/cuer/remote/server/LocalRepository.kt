@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.remote.server
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -28,6 +29,9 @@ class LocalRepository(
     private val wifiStateProvider: WifiStateProvider by inject()
 
     private val _nodeFlow: MutableStateFlow<LocalNodeDomain>
+
+    val updatesFlow: Flow<LocalNodeDomain>
+        get() = _nodeFlow
 
     init {
         log.tag(this)

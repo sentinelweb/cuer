@@ -32,6 +32,7 @@ class RemotesContract {
             data class ActionPingNode(val remote: RemoteNodeDomain) : Intent()
             data class WifiStateChange(val wifiState: WifiStateProvider.WifiState) : Intent()
             data class RemoteUpdate(val remotes: List<RemoteNodeDomain>) : Intent()
+            data class LocalUpdate(val local: LocalNodeDomain) : Intent()
             data class RemoteSync(val remote: RemoteNodeDomain) : Intent()
             data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
             data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
