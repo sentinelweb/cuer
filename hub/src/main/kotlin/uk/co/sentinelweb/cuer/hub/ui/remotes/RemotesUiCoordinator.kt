@@ -38,7 +38,7 @@ class RemotesUiCoordinator :
     private val log: LogWrapper by inject()
     private val lifecycle: LifecycleRegistry by inject()
 
-    val localCoordinator: LocalUiCoordinator by inject()
+    private var _localCoordinator: LocalUiCoordinator? = null
 
     init {
         log.tag(this)
@@ -68,7 +68,20 @@ class RemotesUiCoordinator :
         this.modelObservable.value = model
     }
 
-    fun loading(isLoading: Boolean) = Unit
+    fun localCoordinator(): LocalUiCoordinator {
+        if (_localCoordinator == null) {
+            _localCoordinator = getKoin().get()
+            _localCoordinator?.create()
+        }
+        return _localCoordinator ?: throw IllegalStateException("_localCoordinator is null")
+    }
+
+    fun destroyLocalCoordinator() {
+        if (_localCoordinator != null) {
+            _localCoordinator?.destroy()
+            _localCoordinator = null
+        }
+    }
 
     companion object {
         @JvmStatic

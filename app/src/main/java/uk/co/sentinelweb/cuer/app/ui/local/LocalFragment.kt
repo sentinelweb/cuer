@@ -129,6 +129,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                     LocalController(
                         storeFactory = get(),
                         modelMapper = get(),
+                        coroutines = get(),
                         lifecycle = get<LocalFragment>().lifecycle.asEssentyLifecycle(),
                         log = get()
                     )
@@ -140,7 +141,6 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         log = get(),
                         remoteServerManager = get(),
                         localRepository = get(),
-                        connectivityWrapper = get(),
                         wifiStateProvider = get(),
                     )
                 }

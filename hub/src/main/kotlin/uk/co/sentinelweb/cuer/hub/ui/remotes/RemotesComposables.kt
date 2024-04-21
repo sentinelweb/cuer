@@ -107,8 +107,11 @@ object RemotesComposables {
             }
             LocalComposables.showDialog(
                 isDialogOpen = isDialogOpen,
-                coordinator = view.localCoordinator,
-                onClose = { isDialogOpen = false },
+                coordinator = view.localCoordinator(),
+                onClose = {
+                    view.destroyLocalCoordinator()
+                    isDialogOpen = false
+                },
             )
         }
         model.address?.also {

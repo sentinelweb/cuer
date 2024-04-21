@@ -58,6 +58,7 @@ class LocalUiCoordinator :
     }
 
     override fun render(model: Model) {
+        log.d("label: $model")
         this.modelObservable.value = model
     }
 
@@ -70,6 +71,7 @@ class LocalUiCoordinator :
                     LocalController(
                         storeFactory = get(),
                         modelMapper = get(),
+                        coroutines = get(),
                         lifecycle = get<LocalUiCoordinator>().lifecycle as Lifecycle,
                         log = get()
                     )

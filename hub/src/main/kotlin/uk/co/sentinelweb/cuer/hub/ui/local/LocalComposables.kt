@@ -14,7 +14,6 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import org.koin.core.context.GlobalContext
@@ -29,7 +28,6 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseLocalNode
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButtonSolid
-import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
 
 object LocalComposables {
 
@@ -94,7 +92,7 @@ object LocalComposables {
             Row(modifier = Modifier.height(160.dp)) {
                 model.imageUrl
                     ?.also { url ->
-                        ImageFromUrl(url, modifier = Modifier.fillMaxWidth().background(Color.Black))
+                        //ImageFromUrl(url, modifier = Modifier.fillMaxWidth().background(Color.Black))
                     }
             }
             var localNode by rememberSaveable(
