@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.hub.di
 
+import PlatformWifiInfo
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
@@ -76,7 +77,8 @@ object Modules {
     private val connectivityModule = module {
         single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
 //        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
-        single<WifiStateProvider> { PlatformWifiStateProvider(get(),get()) }
+        single<WifiStateProvider> { PlatformWifiStateProvider(get(),get(), get()) }
+        single { PlatformWifiInfo() }
         single { ConnectivityCheckManager(get(), get(), get()) }
         single { ConnectivityMonitor(get(), get(), get()) }
         single { ConnectivityCheckTimer() }

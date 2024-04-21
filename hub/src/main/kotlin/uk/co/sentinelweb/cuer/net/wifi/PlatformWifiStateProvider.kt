@@ -13,13 +13,12 @@ import java.io.IOException
 
 class PlatformWifiStateProvider(
     private val wifiStartChecker: WifiStartChecker,
+    private val platformWifiInfo: PlatformWifiInfo,
     private val log: LogWrapper
 ) : WifiStateProvider {
 
     private val _wifiStateFlow: MutableStateFlow<WifiState> = MutableStateFlow(WifiState())
     override val wifiStateFlow: StateFlow<WifiState> = _wifiStateFlow.asStateFlow()
-
-    private val platformWifiInfo = PlatformWifiInfo()
 
     override val wifiState: WifiState
         get() = _wifiStateFlow.value
