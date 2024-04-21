@@ -33,6 +33,8 @@ import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
+import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
+import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer.Companion.CONFIG_DIRECTORY
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -77,7 +79,7 @@ object Modules {
     private val connectivityModule = module {
         single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
 //        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
-        single<WifiStateProvider> { PlatformWifiStateProvider(get(),get(), get()) }
+        single<WifiStateProvider> { PlatformWifiStateProvider(get(), get(), get()) }
         single { PlatformWifiInfo() }
         single { ConnectivityCheckManager(get(), get(), get()) }
         single { ConnectivityMonitor(get(), get(), get()) }
@@ -106,22 +108,16 @@ object Modules {
     }
 
     private val remoteModule = module {
-        // todo put in application files dir
-        // todo make an initialiser object to create dir
-        val filesDir = "/Users/robmunro/cuer_hub"
-        File(filesDir).also {
-            it.mkdirs()
-            println(it.absolutePath)
-        }
+        single { RemoteConfigFileInitialiseer() }
         single {
             "localNode.json"
-                .let { AFile(File(filesDir, it).absolutePath) }
+                .let { AFile(File(CONFIG_DIRECTORY, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
                 .let { LocalRepository(it, get(), get(), get(), get()) }
         }
         single {
             "remoteNodes.json"
-                .let { AFile(File(filesDir, it).absolutePath) }
+                .let { AFile(File(CONFIG_DIRECTORY, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
                 .let { RemotesRepository(it, get(), get(), get()) }
         }
@@ -129,7 +125,6 @@ object Modules {
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
-
     }
 
     val allModules = listOf(
