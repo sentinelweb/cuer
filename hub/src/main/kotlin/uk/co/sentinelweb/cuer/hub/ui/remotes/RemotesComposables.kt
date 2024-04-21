@@ -39,7 +39,7 @@ object RemotesComposables {
     @Composable
     fun RemotesView(
         model: Model,
-        view: BaseMviView<Model, Event>
+        view: RemotesUiCoordinator
     ) {
         Column {
             Header(model, view)
@@ -57,7 +57,7 @@ object RemotesComposables {
     @Composable
     private fun Header(
         model: Model,
-        view: BaseMviView<Model, Event>
+        view: RemotesUiCoordinator
     ) {
         Box(modifier = Modifier.height(160.dp).fillMaxWidth()) {
             model.imageUrl
@@ -107,6 +107,7 @@ object RemotesComposables {
             }
             LocalComposables.showDialog(
                 isDialogOpen = isDialogOpen,
+                coordinator = view.localCoordinator,
                 onClose = { isDialogOpen = false },
             )
         }

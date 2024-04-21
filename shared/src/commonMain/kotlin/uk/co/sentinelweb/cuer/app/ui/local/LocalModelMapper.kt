@@ -20,6 +20,6 @@ class LocalModelMapper constructor(
             serverState = state.serverState,
             address = state.serverAddress,
             wifiState = state.wifiState
-        )
+        ).also { log.d("local: $it") }
     }
 }

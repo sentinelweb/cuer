@@ -39,17 +39,16 @@ object LocalComposables {
     val log: LogWrapper by lazy {
         GlobalContext.get().get<LogWrapper>()
             .apply { tag = "LocalComposables" }
-//            .apply { log.d("init") }
     }
 
     @Composable
-    fun RemotesUi(view: LocalMviViewProxy) {
-        RemotesView(view.observableModel, view)
+    fun LocalUi(view: LocalMviViewProxy) {
+        LocalView(view.observableModel, view)
     }
 
     // todo use scaffold
     @Composable
-    fun RemotesView(model: Model, view: BaseMviView<Model, Event>) {
+    fun LocalView(model: Model, view: BaseMviView<Model, Event>) {
         CuerTheme {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
@@ -57,14 +56,9 @@ object LocalComposables {
                         text = model.title,
                         backgroundColor = colorResource(id = R.color.black_transparent_background),
                         onUp = { view.dispatch(Event.OnUpClicked) },
-//                        actions = listOf(
-//                            Action(CuerMenuItem.Help,
-//                                { view.dispatch(OnActionHelpClicked) }),
-//                            Action(CuerMenuItem.Search, { view.dispatch(OnActionSearchClicked) }),
-//                            Action(CuerMenuItem.PasteAdd, { view.dispatch(OnActionPasteAdd) }),
-//                            Action(CuerMenuItem.Settings, { view.dispatch(OnActionSettingsClicked) }),
-//                        ),
-                        modifier = Modifier.zIndex(1f).height(56.dp)
+                        modifier = Modifier
+                            .zIndex(1f)
+                            .height(56.dp)
                     )
                     Column(
                         modifier = Modifier
@@ -87,7 +81,10 @@ object LocalComposables {
                                     )
                                 }
                         }
-                        var localNode by rememberSaveable(model, saver = stateSaverLocalDomain()) { mutableStateOf(model.localNodeDomain) }
+                        var localNode by rememberSaveable(
+                            model,
+                            saver = stateSaverLocalDomain()
+                        ) { mutableStateOf(model.localNodeDomain) }
                         log.d(localNode.serialise())
                         Row(
                             modifier = Modifier.padding(
@@ -95,13 +92,21 @@ object LocalComposables {
                                 top = 16.dp,
                             )
                         ) {
-                            HeaderButtonSolid("Save", R.drawable.ic_tick) { view.dispatch(Event.OnActionSaveClicked(localNode)) }
+                            HeaderButtonSolid("Save", R.drawable.ic_tick) {
+                                view.dispatch(
+                                    Event.OnActionSaveClicked(
+                                        localNode
+                                    )
+                                )
+                            }
                         }
+
                         Text(
                             text = model.localNodeDomain.id?.id?.value ?: "No ID",
                             style = MaterialTheme.typography.body2,
                             modifier = Modifier.padding(8.dp)
                         )
+
                         TextField(
                             value = localNode.hostname ?: "",
                             onValueChange = { localNode = localNode.copy(hostname = it) },
@@ -126,6 +131,7 @@ object LocalComposables {
                             icon = R.drawable.ic_login,
                             modifier = Modifier.padding(start = 16.dp)
                         ) { authDropdownExpanded = true }
+
                         DropdownMenu(
                             expanded = authDropdownExpanded,
                             onDismissRequest = { authDropdownExpanded = false },
@@ -153,7 +159,8 @@ object LocalComposables {
                                 TextField(
                                     value = (localNode.authConfig as Username).username,
                                     onValueChange = {
-                                        localNode = localNode.copy(authConfig = (localNode.authConfig as Username).copy(username = it))
+                                        localNode =
+                                            localNode.copy(authConfig = (localNode.authConfig as Username).copy(username = it))
                                     },
                                     label = { Text("Username") },
                                     modifier = Modifier.padding(16.dp)
@@ -162,7 +169,8 @@ object LocalComposables {
                                 TextField(
                                     value = (localNode.authConfig as Username).password,
                                     onValueChange = {
-                                        localNode = localNode.copy(authConfig = (localNode.authConfig as Username).copy(password = it))
+                                        localNode =
+                                            localNode.copy(authConfig = (localNode.authConfig as Username).copy(password = it))
                                     },
                                     label = { Text("Password") },
                                     modifier = Modifier.padding(16.dp)
@@ -198,7 +206,11 @@ object LocalComposables {
                                         modifier = Modifier.padding(start = 16.dp)
                                     ) {
                                         localNode =
-                                            localNode.copy(wifiAutoConnectSSIDs = localNode.wifiAutoConnectSSIDs.plus(model.wifiState.ssid!!))
+                                            localNode.copy(
+                                                wifiAutoConnectSSIDs = localNode.wifiAutoConnectSSIDs.plus(
+                                                    model.wifiState.ssid!!
+                                                )
+                                            )
                                     }
                                 }
                                 localNode.wifiAutoConnectSSIDs.forEach {
@@ -233,10 +245,10 @@ fun stateSaverLocalDomain() = Saver<MutableState<LocalNodeDomain>, String>(
 @Preview(name = "Top level")
 @Composable
 @ExperimentalAnimationApi
-private fun RemotesPreview() {
+private fun LocalPreview() {
     val modelMapper = LocalModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
     val view = object : BaseMviView<Model, Event>() {}
-    LocalComposables.RemotesView(
+    LocalComposables.LocalView(
         modelMapper.map(State(wifiState = WifiStateProvider.WifiState())),
         view
     )

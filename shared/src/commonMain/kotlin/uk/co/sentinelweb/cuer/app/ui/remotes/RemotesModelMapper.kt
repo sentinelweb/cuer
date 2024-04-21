@@ -24,7 +24,7 @@ class RemotesModelMapper constructor(
             serverState = state.serverState,
             address = state.serverAddress,
             wifiState = state.wifiState,
-        ).also { log.d("mapped: $it") }
+        )
     }
 
     // todo different model type for remote

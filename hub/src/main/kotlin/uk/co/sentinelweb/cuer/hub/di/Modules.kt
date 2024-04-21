@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
@@ -58,6 +59,7 @@ object Modules {
         RemotesUiCoordinator.uiModule,
         RemoteServerService.serviceModule,
         UpdateService.serviceModule,
+        LocalUiCoordinator.uiModule,
     )
 
     private val resourcesModule = module {

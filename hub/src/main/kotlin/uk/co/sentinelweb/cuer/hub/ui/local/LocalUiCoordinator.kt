@@ -81,7 +81,6 @@ class LocalUiCoordinator :
                         log = get(),
                         remoteServerManager = get(),
                         localRepository = get(),
-                        connectivityWrapper = get(),
                         wifiStateProvider = get(),
                     )
                 }

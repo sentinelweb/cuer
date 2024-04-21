@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesController
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesStoreFactory
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
@@ -36,6 +37,8 @@ class RemotesUiCoordinator :
     private val controller: RemotesController by scope.inject()
     private val log: LogWrapper by inject()
     private val lifecycle: LifecycleRegistry by inject()
+
+    val localCoordinator: LocalUiCoordinator by inject()
 
     init {
         log.tag(this)

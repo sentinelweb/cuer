@@ -62,7 +62,7 @@ fun HeaderButton(
         elevation = ButtonDefaults.elevation(0.dp),
     ) {
 
-        ImageSvg(icon)
+        ImageSvg(icon, tint = colors.contentColor(true).value)
 
         Text(
             text = text.uppercase(),
@@ -71,4 +71,15 @@ fun HeaderButton(
             color = colors.contentColor(enabled).value,
         )
     }
+}
+
+@Composable
+fun HeaderButtonSolid(
+    text: String,
+    icon: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    action: () -> Unit
+) {
+    HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStrokeEnabler, enabled, action)
 }

@@ -7,10 +7,8 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -22,7 +20,6 @@ class LocalStoreFactory constructor(
     private val log: LogWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val localRepository: LocalRepository,
-    private val connectivityWrapper: ConnectivityWrapper,
     private val wifiStateProvider: WifiStateProvider,
 ) {
 
@@ -92,7 +89,10 @@ class LocalStoreFactory constructor(
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "LocalStore",
-            initialState = State(wifiState = wifiStateProvider.wifiState),
+            initialState = State(
+                localNode = localRepository.localNode,
+                wifiState = wifiStateProvider.wifiState
+            ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()
