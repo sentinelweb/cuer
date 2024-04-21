@@ -5,12 +5,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.runBlocking
+import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider.WifiState
 import java.io.IOException
 
 class PlatformWifiStateProvider(
+    private val wifiStartChecker: WifiStartChecker,
     private val log: LogWrapper
 ) : WifiStateProvider {
 
@@ -36,6 +38,7 @@ class PlatformWifiStateProvider(
             val essid = platformWifiInfo.getEssid()
             val ipAddress = platformWifiInfo.getIpAddress()
             _wifiStateFlow.value = WifiState(isConnected = essid != "Unknown", ssid = essid, ip = ipAddress)
+            wifiStartChecker.checkToStartServer(_wifiStateFlow.value)
             log.d(wifiState.toString())
         } catch (e: IOException) {
             e.printStackTrace()

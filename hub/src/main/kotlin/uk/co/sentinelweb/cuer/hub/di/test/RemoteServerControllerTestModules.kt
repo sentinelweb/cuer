@@ -95,8 +95,7 @@ object RemoteServerControllerTestModules {
     private val connectivityModule = module {
         single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
 //        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
-//        single<WifiStateProvider> { JnetPcapWifiStateProvider(get()) }
-        single<WifiStateProvider> { PlatformWifiStateProvider(get()) }
+        single<WifiStateProvider> { PlatformWifiStateProvider(get(),get()) }
         single { ConnectivityCheckManager(get(), get(), get()) }
         single { ConnectivityMonitor(get(), get(), get()) }
         single { ConnectivityCheckTimer() }
