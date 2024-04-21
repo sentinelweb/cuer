@@ -37,8 +37,8 @@ jobs:
         env:
           GS: "${{ secrets.GOOGLESERVICES_JSON }}"
       - name: Build
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY\
-          -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY\
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=CUER_YOUTUBE_API_KEY\
+          -PCUER_PIXABAY_API_KEY=CUER_PIXABAY_API_KEY\
           -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS\
           -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE\
           -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD\
@@ -50,24 +50,40 @@ jobs:
           clean :app:assembleDebug linkPodDebugFrameworkIosX64\
           :hub:generateApiKeyClass :hub:generateApiKeyClass :hub:build
         env:
-          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
-          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_YOUTUBE_API_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          CUER_PIXABAY_API_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
           CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
           CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
           CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
           CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
           CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
           CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
+          CUER_HUB_STORE_KEY: "${{ secrets.CUER_HUB_STORE_KEY }}"
+          CUER_HUB_STORE_PASS: "${{ secrets.CUER_HUB_STORE_PASS }}"
       - name: Test
-        run: ./gradlew -PCUER_YOUTUBE_API_KEY=$YT_KEY -PCUER_PIXABAY_API_KEY=$PIXABAY_KEY -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD database:verifyCommonMainDatabaseMigration shared:test shared:jvmTest net:test domain:test database:test app:testDebugUnitTest :hub:test
+        run: ./gradlew -PCUER_YOUTUBE_API_KEY=CUER_YOUTUBE_API_KEY\
+          -PCUER_PIXABAY_API_KEY=CUER_PIXABAY_API_KEY\
+          -PCUER_SIGNING_KEY_ALIAS=$CUER_SIGNING_KEY_ALIAS\
+          -PCUER_SIGNING_KEY_FILE=$CUER_SIGNING_KEY_FILE\
+          -PCUER_SIGNING_PASSWORD=$CUER_SIGNING_PASSWORD\
+          -PCUER_UPLOAD_KEY_ALIAS=$CUER_UPLOAD_KEY_ALIAS\
+          -PCUER_UPLOAD_KEY_FILE=$CUER_UPLOAD_KEY_FILE\
+          -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD\
+          -CUER_HUB_STORE_KEY=CUER_HUB_STORE_KEY\
+          -PCUER_UPLOAD_PASSWORD=$CUER_UPLOAD_PASSWORD\
+          database:verifyCommonMainDatabaseMigration\
+          shared:test shared:jvmTest net:test domain:test\
+          database:test app:testDebugUnitTest :hub:test
         # https://issuetracker.google.com/issues/192927707
         #        app:testDebugUnitTest
         env:
-          YT_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
-          PIXABAY_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
+          CUER_YOUTUBE_API_KEY: "${{ secrets.CUER_YOUTUBE_API_KEY }}"
+          CUER_PIXABAY_API_KEY: "${{ secrets.CUER_PIXABAY_API_KEY }}"
           CUER_SIGNING_KEY_ALIAS: "${{ secrets.CUER_SIGNING_KEY_ALIAS }}"
           CUER_SIGNING_KEY_FILE: "${{ secrets.CUER_SIGNING_KEY_FILE }}"
           CUER_SIGNING_PASSWORD: "${{ secrets.CUER_SIGNING_PASSWORD }}"
           CUER_UPLOAD_KEY_ALIAS: "${{ secrets.CUER_UPLOAD_KEY_ALIAS }}"
           CUER_UPLOAD_KEY_FILE: "${{ secrets.CUER_UPLOAD_KEY_FILE }}"
           CUER_UPLOAD_PASSWORD: "${{ secrets.CUER_UPLOAD_PASSWORD }}"
+          CUER_HUB_STORE_KEY: "${{ secrets.CUER_HUB_STORE_KEY }}"
+          CUER_HUB_STORE_PASS: "${{ secrets.CUER_HUB_STORE_PASS }}"
