@@ -10,6 +10,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
@@ -22,7 +23,10 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
-import uk.co.sentinelweb.cuer.remote.server.*
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
+import uk.co.sentinelweb.cuer.remote.server.ServerState
+import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Ping
 
 class RemotesStoreFactory constructor(
@@ -38,6 +42,7 @@ class RemotesStoreFactory constructor(
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
     private val getPlaylistsFromDeviceUseCase: GetPlaylistsFromDeviceUseCase,
+    private val playlistsOrchestrator: PlaylistOrchestrator
 ) {
 
     init {
@@ -191,13 +196,18 @@ class RemotesStoreFactory constructor(
 
         private fun syncRemote(intent: Intent.RemoteSync) {
             coroutines.ioScope.launch {
-                log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
+                getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                    .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
+                    //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
+                    .also { log.d(it.toString()) }
+
+                //log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
             }
         }
 
         private fun getRemotePlaylists(intent: Intent.RemotePlaylists) {
             coroutines.ioScope.launch {
-                val playlists = getPlaylistsFromDeviceUseCase(intent.remote)
+                val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
                 log.d(playlists.toString())
             }
         }

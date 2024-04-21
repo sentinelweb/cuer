@@ -8,7 +8,11 @@ class GetPlaylistsFromDeviceUseCase(
     private val interactor: RemotePlaylistsInteractor
 ) {
 
-    suspend operator fun invoke(remote: RemoteNodeDomain): List<PlaylistDomain> {
+    suspend fun getPlaylists(remote: RemoteNodeDomain): List<PlaylistDomain> {
         return interactor.getRemotePlaylists(remote)
+    }
+
+    suspend fun getPlaylist(playlistDomain: PlaylistDomain): PlaylistDomain {
+        return interactor.getRemotePlaylist(playlistDomain.id ?: throw IllegalArgumentException("no id"))
     }
 }

@@ -22,6 +22,7 @@ internal class RemotePlaylistsService(
     internal suspend fun getPlaylist(
         id: OrchestratorContract.Identifier<GUID>
     ): ResponseDomain = executor.get<ResponseDomain>(
-        path = (id.locator ?: throw IllegalArgumentException()).ipport() + PLAYLIST_API.PATH
+        path = ((id.locator ?: throw IllegalArgumentException()).ipport() + PLAYLIST_API.PATH)
+            .replace("{id}", id.id.value) // fixme use whatever ktor way
     )
 }
