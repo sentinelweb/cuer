@@ -47,7 +47,6 @@ class RemoteServerServiceController constructor(
     override val localNode: LocalNodeDomain
         get() = localRepo.localNode
 
-
     override fun initialise() {
         notification.updateNotification("Starting server...")
         _serverJob?.cancel()
@@ -87,7 +86,6 @@ class RemoteServerServiceController constructor(
     }
 
     override fun destroy() {
-        // fixme ?? cancel coroutines
         log.d("Controller destroy")
         wakeLockManager.releaseWakeLock()
         webServer.stop()
