@@ -19,6 +19,8 @@ val app_versionCode: String by project
 val app_versionName: String by project
 val CUER_BG_PLAY: String by project
 val CUER_REMOTE_ENABLED: String by project
+val CUER_HUB_STORE_KEY: String by project
+val CUER_HUB_STORE_PASS: String by project
 
 group = "uk.co.sentinlweb.cuer"
 version = "1.0-SNAPSHOT"
@@ -124,6 +126,8 @@ tasks.register("generateBuildConfigInjectClass") {
                 val cuerBgPlayEnabled: Boolean = $CUER_BG_PLAY
                 val versionCode: Int = $app_versionCode
                 val version: String = "$app_versionName"
+                val hubStoreKey: String = "$CUER_HUB_STORE_KEY"
+                val hubStorePass: String = "$CUER_HUB_STORE_PASS"
             }
         """.trimIndent()
         )

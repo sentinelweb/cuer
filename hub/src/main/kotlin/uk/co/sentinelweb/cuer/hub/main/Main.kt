@@ -8,9 +8,11 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
+import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 
 fun main() {
+
     startKoin {
         modules(Modules.allModules)
     }
@@ -24,6 +26,9 @@ fun main() {
 
     koin.get<RemoteConfigFileInitialiseer>()
         .apply { initIfNecessary() }
+
+    koin.get<KeyStoreManager>()
+        .apply { generateKeysIfNecessary() }
 
     koin.get<WifiStateProvider>()
         .apply { register() }

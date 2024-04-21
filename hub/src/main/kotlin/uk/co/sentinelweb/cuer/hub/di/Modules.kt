@@ -6,6 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
+import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
@@ -33,8 +34,9 @@ import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
+import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
+import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
-import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer.Companion.CONFIG_DIRECTORY
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -109,15 +111,17 @@ object Modules {
 
     private val remoteModule = module {
         single { RemoteConfigFileInitialiseer() }
+        single { FileEncryption(get()) }
+        single { KeyStoreManager() }
         single {
             "localNode.json"
-                .let { AFile(File(CONFIG_DIRECTORY, it).absolutePath) }
+                .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
                 .let { LocalRepository(it, get(), get(), get(), get()) }
         }
         single {
             "remoteNodes.json"
-                .let { AFile(File(CONFIG_DIRECTORY, it).absolutePath) }
+                .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
                 .let { RemotesRepository(it, get(), get(), get()) }
         }

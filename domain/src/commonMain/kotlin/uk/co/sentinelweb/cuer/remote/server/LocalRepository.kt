@@ -23,7 +23,7 @@ class LocalRepository(
     private val coroutineContext: CoroutineContextProvider,
     private val guidCreator: GuidCreator,
     private val buildConfigDomain: BuildConfigDomain,
-    private val log: LogWrapper,
+    private val log: LogWrapper
 ) : KoinComponent {
 
     private val wifiStateProvider: WifiStateProvider by inject()
