@@ -92,7 +92,7 @@ tasks.create<JavaExec>("runTestMain") {
 tasks.register("generateApiKeyClass") {
     doLast {
         val file = File("$projectDir/src/main/kotlin/uk/co/sentinelweb/cuer/net/key/ApiKey.kt")
-        file.mkdirs()
+        file.parentFile.mkdirs()
         file.writeText(
             """
             package uk.co.sentinelweb.cuer.net.key
@@ -113,7 +113,7 @@ tasks.register("generateApiKeyClass") {
 tasks.register("generateBuildConfigInjectClass") {
     doLast {
         val file = File("$projectDir/src/main/kotlin/uk/co/sentinelweb/cuer/hub/BuildConfigInject.kt")
-        file.mkdirs()
+        file.parentFile.mkdirs()
         file.writeText(
             """
             package uk.co.sentinelweb.cuer.hub
