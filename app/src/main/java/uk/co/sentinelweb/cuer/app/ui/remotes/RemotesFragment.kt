@@ -177,7 +177,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         remotesRepository = get(),
                         locationPermissionLaunch = get(),
                         wifiStateProvider = get(),
-                        getPlaylistsFromDeviceUseCase = get()
+                        getPlaylistsFromDeviceUseCase = get(),
+                        playlistsOrchestrator = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
