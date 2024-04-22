@@ -14,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
+import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
 import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -38,6 +39,7 @@ import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
+import uk.co.sentinelweb.cuer.hub.util.wrapper.EmptyVibrateWrapper
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
@@ -76,6 +78,7 @@ object Modules {
         factory<LogWrapper> { SystemLogWrapper() }
         factory { LifecycleRegistry() }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
+        factory<VibrateWrapper> { EmptyVibrateWrapper() }
     }
 
     private val connectivityModule = module {
