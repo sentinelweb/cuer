@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.remote.server
 
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -8,16 +8,15 @@ import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 
 class AvailableMessageMapper(
     private val config: BuildConfigDomain,
-    private val connectivityWrapper: ConnectivityWrapper,
 ) {
 
-    fun mapToMulticastMessage(localNode: LocalNodeDomain, refreshIp: Boolean): AvailableMessage.DeviceInfo {
+    fun mapToMulticastMessage(localNode: LocalNodeDomain): AvailableMessage.DeviceInfo {
         return AvailableMessage.DeviceInfo(
             id = localNode.id,
             hostname = localNode.hostname,
             deviceType = localNode.deviceType,
             version = config.version,
-            ipAddress = if (refreshIp) connectivityWrapper.getWIFIIP() ?: localNode.ipAddress else localNode.ipAddress,
+            ipAddress = localNode.ipAddress,
             port = localNode.port,
             device = localNode.device,
             authType = mapAuthType(localNode.authConfig),
@@ -31,7 +30,10 @@ class AvailableMessageMapper(
         is LocalNodeDomain.AuthConfig.Confirm -> AvailableMessage.AuthMethod.Confirm
     }
 
-    fun mapFromMulticastMessage(msg: AvailableMessage.DeviceInfo): RemoteNodeDomain {
+    fun mapFromMulticastMessage(
+        msg: AvailableMessage.DeviceInfo,
+        wifiState: WifiStateProvider.WifiState
+    ): RemoteNodeDomain {
         return RemoteNodeDomain(
             id = msg.id,
             ipAddress = msg.ipAddress,
@@ -42,6 +44,7 @@ class AvailableMessageMapper(
             authType = mapAuthType(msg.authType),
             version = msg.version,
             versionCode = msg.versionCode,
+            ssid = wifiState.ssid
         )
     }
 

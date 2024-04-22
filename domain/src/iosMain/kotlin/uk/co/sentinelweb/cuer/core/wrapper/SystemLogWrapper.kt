@@ -1,6 +1,10 @@
 package uk.co.sentinelweb.cuer.core.wrapper
 
-actual class SystemLogWrapper : LogWrapper {
+actual class SystemLogWrapper actual constructor(tagObj: Any?) : LogWrapper {
+
+    init {
+        tagObj?.also { tag(it) }
+    }
 
     override var tag: String = "CuerIos"
         get() = field

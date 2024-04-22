@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
+import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class RemotesRepository constructor(
-    private val fileInteractor: FileInteractor,
+    private val jsonFileInteractor: JsonFileInteractor,
     private val localNodeRepo: LocalRepository,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper
@@ -37,7 +37,7 @@ class RemotesRepository constructor(
 
     suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()
-        fileInteractor.loadJson()
+        jsonFileInteractor.loadJson()
             ?.takeIf { it.isNotEmpty() }
             ?.let { deserialiseRemoteNodeList(it) }
             ?.let { it.map { it.copy(isAvailable = false) } }
@@ -48,7 +48,7 @@ class RemotesRepository constructor(
     }
 
     suspend fun addUpdateNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
-        val local = localNodeRepo.getLocalNode()
+        val local = localNodeRepo.localNode
 //        log.d("addUpdateNode: input isLocal: ${node.id == local.id} ${summarise(node)} ")
         if (node.id == local.id) return
 
@@ -86,7 +86,7 @@ class RemotesRepository constructor(
     }
 
     private fun saveAll() {
-        fileInteractor.saveJson(_remoteNodes.serialise())
+        jsonFileInteractor.saveJson(_remoteNodes.serialise())
     }
 }
 

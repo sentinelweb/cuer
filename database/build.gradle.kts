@@ -124,6 +124,11 @@ kotlin {
                 implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
             }
         }
+        val jvmMain by getting {
+            dependencies {
+                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
+            }
+        }
         val jsTest by getting
     }
 }

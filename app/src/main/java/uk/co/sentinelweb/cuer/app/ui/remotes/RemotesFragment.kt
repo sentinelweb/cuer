@@ -159,6 +159,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         log = get(),
                         wifiStateProvider = get(),
                         remotesRepository = get(),
+                        coroutines = get(),
+                        localRepository = get()
                     )
                 }
                 scoped {
@@ -171,18 +173,19 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),
-                        remoteInteractor = get(),
-                        connectivityWrapper = get(),
+                        remoteStatusInteractor = get(),
                         remotesRepository = get(),
                         locationPermissionLaunch = get(),
-                        wifiStateProvider = get()
+                        wifiStateProvider = get(),
+                        getPlaylistsFromDeviceUseCase = get(),
+                        playlistsOrchestrator = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }
-                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity()) }
+                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity(), get()) }
             }
         }
     }

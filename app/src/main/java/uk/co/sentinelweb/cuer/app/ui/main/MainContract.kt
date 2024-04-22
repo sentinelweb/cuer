@@ -81,7 +81,6 @@ interface MainContract {
                 scoped { navigationRouter(false, get<MainActivity>()) }
                 viewModel { State() }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
-                // scoped<PlaylistContract.Interactions?> { null }
                 scoped { FloatingPlayerCastListener(get(), get(), get()) }
                 scoped { AlertDialogCreator(get<MainActivity>(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
@@ -92,8 +91,9 @@ interface MainContract {
                 scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { ShareNavigationHack() }
+
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
-                scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get()) }
+                scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
             }
         }
     }

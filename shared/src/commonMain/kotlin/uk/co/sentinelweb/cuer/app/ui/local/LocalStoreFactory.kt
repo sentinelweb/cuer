@@ -7,11 +7,10 @@ import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
@@ -21,7 +20,7 @@ class LocalStoreFactory constructor(
     private val log: LogWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val localRepository: LocalRepository,
-    private val connectivityWrapper: ConnectivityWrapper,
+    private val wifiStateProvider: WifiStateProvider,
 ) {
 
     init {
@@ -42,8 +41,8 @@ class LocalStoreFactory constructor(
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
-                    localNode = localRepository.getLocalNode(),
-                    wifiState = connectivityWrapper.getWifiInfo(),
+                    localNode = localRepository.localNode,
+                    wifiState = wifiStateProvider.wifiState,
                 )
             }
     }
@@ -67,7 +66,7 @@ class LocalStoreFactory constructor(
             }
 
         private fun save(intent: Intent.ActionSave) {
-            localRepository.getLocalNode()
+            localRepository.localNode
                 .copy(
                     hostname = intent.updated.hostname,
                     port = intent.updated.port,
@@ -90,7 +89,10 @@ class LocalStoreFactory constructor(
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "LocalStore",
-            initialState = State(wifiState = connectivityWrapper.getWifiInfo()),
+            initialState = State(
+                localNode = localRepository.localNode,
+                wifiState = wifiStateProvider.wifiState
+            ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()

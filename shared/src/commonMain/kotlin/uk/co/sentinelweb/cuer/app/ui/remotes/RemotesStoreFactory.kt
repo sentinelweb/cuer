@@ -10,18 +10,19 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
+import uk.co.sentinelweb.cuer.app.usecase.GetPlaylistsFromDeviceUseCase
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
-import uk.co.sentinelweb.cuer.net.remote.RemoteInteractor
+import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.ServerState
@@ -36,11 +37,12 @@ class RemotesStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
-    private val remoteInteractor: RemoteInteractor,
-    private val connectivityWrapper: ConnectivityWrapper,
+    private val remoteStatusInteractor: RemoteStatusInteractor,
     private val remotesRepository: RemotesRepository,
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
+    private val getPlaylistsFromDeviceUseCase: GetPlaylistsFromDeviceUseCase,
+    private val playlistsOrchestrator: PlaylistOrchestrator
 ) {
 
     init {
@@ -64,8 +66,9 @@ class RemotesStoreFactory constructor(
                 is Result.UpdateServerState -> copy(
                     serverState = if (remoteServerManager.isRunning()) ServerState.STARTED else ServerState.STOPPED,
                     serverAddress = remoteServerManager.getService()?.localNode?.http(),
-                    localNode = remoteServerManager.getService()?.localNode ?: localRepository.getLocalNode()
-                )
+                    localNode = localRepository.localNode, // remoteServerManager.getService()?.localNode ?:
+                    wifiState = wifiStateProvider.wifiState
+                ).also { log.d("it.serverAddress; ${it.serverAddress}") }
 
                 is Result.UpdateWifiState -> copy(wifiState = msg.state)
             }
@@ -100,10 +103,13 @@ class RemotesStoreFactory constructor(
                 is Intent.WifiStateChange -> wifiStateChange(intent)
                 is Intent.ActionObscuredPerm -> launchLocationPermission()
                 is Intent.RemoteUpdate -> remotesUpdate(intent)
-                is Intent.DeleteRemote -> deleteRemote(intent)
+                is Intent.RemoteDelete -> deleteRemote(intent)
+                is Intent.RemoteSync -> syncRemote(intent)
+                is Intent.RemotePlaylists -> getRemotePlaylists(intent)
+                is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
             }
 
-        private fun deleteRemote(intent: Intent.DeleteRemote) {
+        private fun deleteRemote(intent: Intent.RemoteDelete) {
             coroutines.mainScope.launch { remotesRepository.removeNode(intent.remote) }
         }
 
@@ -113,6 +119,7 @@ class RemotesStoreFactory constructor(
 
         private fun wifiStateChange(intent: Intent.WifiStateChange) {
             dispatch(Result.UpdateWifiState(intent.wifiState))
+            log.d("got wifiStateChange: $intent")
             coroutines.mainScope.launch {
                 delay(300)
                 dispatch(Result.UpdateServerState)
@@ -127,7 +134,7 @@ class RemotesStoreFactory constructor(
             coroutines.ioScope.launch {
                 remotesRepository.addUpdateNode(
                     intent.remote.copy(
-                        isAvailable = remoteInteractor.available(Ping, intent.remote).isSuccessful
+                        isAvailable = remoteStatusInteractor.available(Ping, intent.remote).isSuccessful
                     )
                 )
             }
@@ -152,7 +159,10 @@ class RemotesStoreFactory constructor(
                 coroutines.mainScope.launch {
                     remoteServerManager.start()
                     // fixme limit?
-                    while (remoteServerManager.getService()?.isServerStarted != true) delay(20)
+                    while (remoteServerManager.getService()?.isServerStarted != true) {
+                        print(".")
+                        delay(50)
+                    }
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
 
                     remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }
@@ -183,19 +193,35 @@ class RemotesStoreFactory constructor(
             dispatch(Result.UpdateServerState)
             wifiStateProvider.updateWifiInfo()
         }
+
+        private fun syncRemote(intent: Intent.RemoteSync) {
+            coroutines.ioScope.launch {
+                getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                    .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
+                    //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
+                    .also { log.d(it.toString()) }
+
+                //log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
+            }
+        }
+
+        private fun getRemotePlaylists(intent: Intent.RemotePlaylists) {
+            coroutines.ioScope.launch {
+                val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                log.d(playlists.toString())
+            }
+        }
     }
 
     fun create(): MviStore =
         object : MviStore, Store<Intent, State, Label> by storeFactory.create(
             name = "RemotesStore",
             initialState = State(
-                localNode = localRepository.getLocalNode(),
-                wifiState = connectivityWrapper.getWifiInfo()
+                localNode = localRepository.localNode,
+                wifiState = wifiStateProvider.wifiState
             ),
             bootstrapper = BootstrapperImpl(),
             executorFactory = { ExecutorImpl() },
             reducer = ReducerImpl()
         ) {}
-
-
 }

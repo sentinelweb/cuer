@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.core.wrapper
 
-actual class SystemLogWrapper : LogWrapper {
+actual class SystemLogWrapper actual constructor(tagObj: Any?) : LogWrapper {
 
     override var tag = APP_TAG
 

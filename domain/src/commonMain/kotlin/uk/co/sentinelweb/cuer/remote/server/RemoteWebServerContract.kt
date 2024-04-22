@@ -14,5 +14,16 @@ interface RemoteWebServerContract {
         object AVAILABLE_API {
             val PATH = "/available"
         }
+        object PLAYLISTS_API {
+            val PATH = "/playlists"
+        }
+
+        object PLAYLIST_API {
+            val PATH = "/playlist/{id}"
+        }
+
+        object PLAYLIST_SOURCE_API {
+            val PATH = "/playlist-src/{src}/{id}"
+        }
     }
 }

@@ -25,10 +25,14 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField "String", "youtubeApiKey", "\"$CUER_YOUTUBE_API_KEY\""
-        buildConfigField "String", "pixabayApiKey", "\"$CUER_PIXABAY_API_KEY\""
-        buildConfigField "boolean", "cuerBackgroundPlay", "$CUER_BG_PLAY"
-        buildConfigField "boolean", "cuerRemoteEnabled", "$CUER_REMOTE_ENABLED"
+        def ytKey = getPropertyOrDefault('CUER_YOUTUBE_API_KEY', 'CUER_YOUTUBE_API_KEY_DEFAULT')
+        buildConfigField "String", "youtubeApiKey", "\"$ytKey\""
+        def pixKey = getPropertyOrDefault('CUER_PIXABAY_API_KEY', 'CUER_PIXABAY_API_KEY_DEFAULT')
+        buildConfigField "String", "pixabayApiKey", "\"$pixKey\""
+        def isBgPlay = getPropertyOrDefault('CUER_BG_PLAY', 'true')
+        buildConfigField "boolean", "cuerBackgroundPlay", "$isBgPlay"
+        def isRemote = getPropertyOrDefault('CUER_REMOTE_ENABLED', 'true')
+        buildConfigField "boolean", "cuerRemoteEnabled", "$isRemote"
 
         javaCompileOptions {
             annotationProcessorOptions {
@@ -48,10 +52,14 @@ android {
 //            storeFile file("$CUER_UPLOAD_KEY_FILE")
 //            storePassword "$CUER_UPLOAD_PASSWORD"
             // for assembleRelease
-            keyAlias "$CUER_SIGNING_KEY_ALIAS"
-            keyPassword "$CUER_SIGNING_PASSWORD"
-            storeFile file("$CUER_SIGNING_KEY_FILE")
-            storePassword "$CUER_SIGNING_PASSWORD"
+            def signingKeyAlias = getPropertyOrDefault('CUER_SIGNING_KEY_ALIAS', 'CUER_SIGNING_KEY_ALIAS_DEFAULT')
+            keyAlias "$signingKeyAlias"
+            def signingPassword = getPropertyOrDefault('CUER_SIGNING_PASSWORD', 'CUER_SIGNING_PASSWORD_DEFAULT')
+            keyPassword "$signingPassword"
+            def signingFileAlias = getPropertyOrDefault('CUER_SIGNING_KEY_FILE', 'CUER_SIGNING_KEY_FILE_DEFAULT')
+            storeFile file("$signingFileAlias")
+
+            storePassword "$signingPassword"
         }
     }
 
@@ -127,7 +135,7 @@ android {
 
 dependencies {
     implementation project(":shared")
-    implementation project(":netKmm")
+    implementation project(':net')
     implementation project(":remote")
     implementation project(":database")// todo: remove get through shared
     implementation project(":domain")
@@ -154,14 +162,6 @@ dependencies {
     // WorkManager
     // Kotlin + coroutines
     implementation "androidx.work:work-runtime-ktx:$ver_workmanager"
-    // optional - RxJava2 support
-    implementation "androidx.work:work-rxjava2:$ver_workmanager"
-    // optional - GCMNetworkManager support
-    implementation "androidx.work:work-gcm:$ver_workmanager"
-    // optional - Test helpers
-    androidTestImplementation "androidx.work:work-testing:$ver_workmanager"
-    // optional - Multiprocess support
-    implementation "androidx.work:work-multiprocess:$ver_workmanager"
 
     // Compose
     implementation "androidx.compose.animation:animation:$ver_compose"
@@ -220,7 +220,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core"
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core"
 
-
     // glide
     implementation "com.github.bumptech.glide:glide:$ver_glide"
     annotationProcessor "com.github.bumptech.glide:compiler:$ver_glide"
@@ -271,7 +270,6 @@ dependencies {
     testImplementation "androidx.test.espresso:espresso-core:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-contrib:$ver_espresso_core"
     testImplementation "androidx.test.espresso:espresso-intents:$ver_espresso_core"
-    testImplementation "io.insert-koin:koin-test-junit4:$ver_koin"
     testImplementation "app.cash.turbine:turbine:$ver_turbine"
 
     androidTestImplementation "io.insert-koin:koin-test:$ver_koin"
@@ -292,10 +290,18 @@ dependencies {
     androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$ver_espresso_core"
     androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$ver_espresso_core"
     androidTestImplementation "org.robolectric:annotations:$ver_robolectric"
+
+    // optional - WorkManager Test helpers
+    //androidTestImplementation "androidx.work:work-testing:$ver_workmanager"
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
+}
+
+def getPropertyOrDefault(String key, String defaultValue) {
+    def val = project.property(key)
+    return val ?: defaultValue
 }

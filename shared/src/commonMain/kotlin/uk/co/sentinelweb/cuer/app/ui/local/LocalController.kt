@@ -13,11 +13,13 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Event
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class LocalController constructor(
     storeFactory: LocalStoreFactory,
     private val modelMapper: LocalModelMapper,
+    private val coroutines: CoroutineContextProvider,
     lifecycle: Lifecycle?,
     log: LogWrapper,
 ) {
@@ -39,7 +41,7 @@ class LocalController constructor(
     @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<LocalContract.View>, viewLifecycle: Lifecycle) {
         if (binder != null) throw IllegalStateException("Already bound")
-        binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
+        binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP, mainContext = coroutines.mainScope.coroutineContext) {
             views.forEach { view ->
                 // store -> view
                 store.states.mapNotNull { modelMapper.map(it) } bindTo view
@@ -52,5 +54,4 @@ class LocalController constructor(
             }
         }
     }
-
 }

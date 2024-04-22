@@ -13,5 +13,7 @@ include ':remote'
 include ':website'
 include ':database'
 include 'domain'
-include 'netKmm'
+include 'net'
+include 'hub'
+include 'scripts'
 

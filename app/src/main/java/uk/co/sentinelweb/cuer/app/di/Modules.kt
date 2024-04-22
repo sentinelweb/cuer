@@ -14,8 +14,8 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.backup.BackupFileManager
 import uk.co.sentinelweb.cuer.app.backup.IBackupManager
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
-import uk.co.sentinelweb.cuer.app.db.repository.file.FileInteractor
 import uk.co.sentinelweb.cuer.app.db.repository.file.ImageFileRepository
+import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.net.CuerPixabayApiKeyProvider
 import uk.co.sentinelweb.cuer.app.net.CuerYoutubeApiKeyProvider
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
@@ -88,7 +88,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
-import uk.co.sentinelweb.cuer.core.di.SharedCoreModule
+import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -178,17 +178,17 @@ object Modules {
         single {
             "localNode.json"
                 .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
-                .let { FileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get(), get()) }
+                .let { JsonFileInteractor(it, get()) }
+                .let { LocalRepository(it, get(), get(), get(), get()) } // x
         }
         single {
             "remoteNodes.json"
                 .let { AFile(File(androidApplication().filesDir, it).absolutePath) }
-                .let { FileInteractor(it, get()) }
+                .let { JsonFileInteractor(it, get()) }
                 .let { RemotesRepository(it, get(), get(), get()) }
         }
         single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
-        single<WifiStateProvider> { WifiStateReceiver(get(), get(), get()) }
+        single<WifiStateProvider> { WifiStateReceiver(androidApplication(), get()) }
     }
 
     private val utilModule = module {
@@ -289,7 +289,7 @@ object Modules {
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.modules)
-        .plus(SharedCoreModule.objectModule)
+        .plus(DomainModule.objectModule)
         .plus(SharedDomainModule.objectModule)
         .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)

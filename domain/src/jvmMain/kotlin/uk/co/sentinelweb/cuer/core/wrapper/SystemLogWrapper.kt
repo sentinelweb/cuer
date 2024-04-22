@@ -1,8 +1,12 @@
 package uk.co.sentinelweb.cuer.core.wrapper
 
-actual class SystemLogWrapper : LogWrapper {
+actual class SystemLogWrapper actual constructor(tagObj: Any?) : LogWrapper {
 
     override var tag = APP_TAG
+
+    init {
+        tagObj?.also { tag(it) }
+    }
 
     override fun tag(obj: Any) {
         tag = obj::class.java.simpleName

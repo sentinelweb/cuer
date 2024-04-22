@@ -9,11 +9,11 @@ import com.arkivanov.mvikotlin.core.view.BaseMviView
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper.Companion.blankModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class RemotesMviViewProxy constructor(
+class RemotesMviViewProxy(
     private val log: LogWrapper,
     private val res: ResourceWrapper,
 ) : BaseMviView<Model, Event>(), RemotesContract.View {
@@ -23,9 +23,6 @@ class RemotesMviViewProxy constructor(
     }
 
     var observableModel: Model by mutableStateOf(blankModel())
-        private set
-
-    var observableLoading: Boolean by mutableStateOf(false)
         private set
 
     private val _labelData: MutableLiveData<Label> = MutableLiveData()
@@ -41,6 +38,6 @@ class RemotesMviViewProxy constructor(
     }
 
     fun loading(isLoading: Boolean) {
-        observableLoading = isLoading
+
     }
 }

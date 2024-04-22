@@ -1,0 +1,14 @@
+{
+    "id": {
+        "id": {
+            "value": "a20c13e7-633e-4e37-a9ed-42b988479b0e"
+        },
+        "source": "LOCAL_NETWORK"
+    },
+    "ipAddress": "",
+    "port": 9090,
+    "device": "Unknown",
+    "deviceType": "MAC",
+    "version": "0.1-test",
+    "versionCode": 1
+}

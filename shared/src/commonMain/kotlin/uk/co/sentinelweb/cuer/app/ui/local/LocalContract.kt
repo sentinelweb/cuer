@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.domain.LocalNodeDomain.AuthConfig
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.ServerState.INITIAL
+import uk.co.sentinelweb.cuer.remote.server.ServerState.STOPPED
 
 class LocalContract {
 
@@ -43,7 +44,19 @@ class LocalContract {
             val address: String?,
             val serverState: ServerState,
             val wifiState: WifiStateProvider.WifiState
-        )
+        ) {
+            companion object {
+                fun blankModel() = Model(
+                    title = "",
+                    imageUrl = "",
+                    localNodeDomain = LocalNodeDomain(id = null, ipAddress = "", port = 0),
+                    address = "",
+                    serverState = STOPPED,
+                    wifiState = WifiStateProvider.WifiState(),
+                )
+
+            }
+        }
 
 
         sealed class Event {

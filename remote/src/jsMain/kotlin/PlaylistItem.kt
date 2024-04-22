@@ -10,8 +10,8 @@ import react.dom.*
 import styled.StyledDOMBuilder
 import styled.css
 import styled.styledDiv
+import uk.co.sentinelweb.cuer.app.util.link.YoutubeUrl.Companion.videoUrl
 import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.platform.YoutubeUrl.Companion.videoUrl
 import uk.co.sentinelweb.cuer.remote.util.WebLink
 
 external interface PlaylistItemProps : Props {

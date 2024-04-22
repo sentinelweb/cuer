@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 
 
 interface DispatcherProvider {
+    val Main: CoroutineDispatcher
     val IO: CoroutineDispatcher
     val Computation: CoroutineDispatcher
 }
@@ -12,9 +13,9 @@ interface DispatcherProvider {
 expect object PlatformDispatcherProvider : DispatcherProvider
 
 open class CoroutineContextProvider constructor(
-    val Main: CoroutineDispatcher = Dispatchers.Main,
+    val Main: CoroutineDispatcher = PlatformDispatcherProvider.Main,
     val IO: CoroutineDispatcher = PlatformDispatcherProvider.IO,
-    val Default: CoroutineDispatcher = Dispatchers.Default,// todo remove
+    val Default: CoroutineDispatcher = Dispatchers.Default,
     val Computation: CoroutineDispatcher = PlatformDispatcherProvider.Computation
 ) {
     inner class ScopeHolder(private val dispatcher: CoroutineDispatcher) {
@@ -32,6 +33,7 @@ open class CoroutineContextProvider constructor(
     }
 
     private var _mainScope = ScopeHolder(Main)
+
     val mainScope: CoroutineScope
         get() = _mainScope.get()
 
@@ -39,6 +41,7 @@ open class CoroutineContextProvider constructor(
         get() = _mainScope.isActive()
 
     private var _computationScope = ScopeHolder(Computation)
+
     val computationScope: CoroutineScope
         get() = _computationScope.get()
 
@@ -46,16 +49,27 @@ open class CoroutineContextProvider constructor(
         get() = _computationScope.isActive()
 
     private var _ioScope = ScopeHolder(IO)
+
     val ioScope: CoroutineScope
         get() = _ioScope.get()
 
     val ioScopeActive: Boolean
         get() = _ioScope.isActive()
 
+    private var _defaultScope = ScopeHolder(Default)
+
+    val defaultScope: CoroutineScope
+        get() = _defaultScope.get()
+
+    val defaultScopeActive: Boolean
+        get() = _defaultScope.isActive()
+
+
     fun cancel() {
         _mainScope.cancel()
         _computationScope.cancel()
         _ioScope.cancel()
+        _defaultScope.cancel()
     }
 }
 

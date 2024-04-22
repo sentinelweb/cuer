@@ -9,7 +9,7 @@ class Utils {
 
     fun log(): LogWrapper = SystemLogWrapper()
 
-    fun lifecycleRegistry() = LifecycleRegistry()
+    fun lifecycleRegistry() = LifecycleRegistry() // todo inject where needed
 
     open class UBaseView<in Model : Any, Event : Any> : BaseMviView<Model, Event>()
 }

@@ -68,3 +68,6 @@ fastlane/readme.md
 
 # ios app
 ios_app/CuerIos/CuerIos/app/ApiKeys.plist
+
+# hub app
+/hub/src/main/kotlin/uk/co/sentinelweb/cuer/net/key/ApiKey.kt

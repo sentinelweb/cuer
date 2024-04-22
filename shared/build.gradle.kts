@@ -54,26 +54,12 @@ kotlin {
     iosX64()
     iosArm64()
     iosSimulatorArm64()
-//
-//    targets
-//        .filterIsInstance<org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget>()
-//        .filter { it.konanTarget.family == org.jetbrains.kotlin.konan.target.Family.IOS }
-//        .forEach { target ->
-//            target.binaries.framework {
-//                export("com.arkivanov.essenty:lifecycle:0.6.0")
-//                export("com.arkivanov.essenty:instance-keeper:0.6.0")
-//                export("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
-//                export("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
-////                export(project(":mvikotlin-timetravel"))
-//            }
-//        }
 
     cocoapods {
         framework {
             isStatic = true //or false
             baseName = "shared"
         }
-//        name = "shared"
         summary = "shared"
         homepage = "https://sentinelweb.co.uk"
         ios.deploymentTarget = ver_ios_deploy_target
@@ -159,8 +145,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation(project(":netKmm"))
-//                implementation("com.arkivanov.essenty:lifecycle:0.6.0")
+                implementation(project(":net"))
             }
 
         }
