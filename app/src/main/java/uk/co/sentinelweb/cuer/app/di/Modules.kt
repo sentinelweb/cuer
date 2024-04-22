@@ -246,6 +246,7 @@ object Modules {
         factory { BitmapSizer() }
         factory { NotificationChannelCreator(get(), get()) }
         factory { NotificationPermissionCheck(get(), get()) }
+        factory<VibrateWrapper> { AndroidVibrateWarpper(androidApplication()) }
     }
 
     private val wrapperModule = module {

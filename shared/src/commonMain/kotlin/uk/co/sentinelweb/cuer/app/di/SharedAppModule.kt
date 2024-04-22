@@ -174,6 +174,7 @@ object SharedAppModule {
                 remoteStatusInteractor = get(),
                 localRepo = get(),
                 wifiStateProvider = get(),
+                vibrateWrapper = get(),
                 log = get(),
             )
         }
