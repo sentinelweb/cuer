@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
-import io.mockk.coVerify
-import io.mockk.every
-import io.mockk.mockk
+import io.mockk.*
 import kotlinx.coroutines.test.runTest
 import org.junit.After
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -76,12 +76,15 @@ class AvailableMessageHandlerTest {
                 fixtAvailableMessage.node,
                 fixtWifiState
             )
-        } returns fixRemoteNodeAvailable
+        } returns fixtRemoteNode
 
+        val slot = slot<RemoteNodeDomain>()
+        coEvery { remotesRepository.addUpdateNode(capture(slot)) } returns Unit
         every { wifiStateProvider.wifiState } returns fixtWifiState
 
         sut.messageReceived(fixtAvailableMessage)
 
+        assertTrue(slot.captured.isAvailable)
         coVerify { remotesRepository.addUpdateNode(fixRemoteNodeAvailable) }
         coVerify { remoteStatusInteractor.available(PingReply, fixRemoteNodeAvailable) }
         coVerify { vibrateWrapper.vibrate() }
@@ -96,12 +99,14 @@ class AvailableMessageHandlerTest {
                 fixtAvailableMessage.node,
                 fixtWifiState
             )
-        } returns fixRemoteNodeAvailable
-
+        } returns fixtRemoteNode
+        val slot = slot<RemoteNodeDomain>()
+        coEvery { remotesRepository.addUpdateNode(capture(slot)) } returns Unit
         every { wifiStateProvider.wifiState } returns fixtWifiState
 
         sut.messageReceived(fixtAvailableMessage)
 
+        assertTrue(slot.captured.isAvailable)
         coVerify { remotesRepository.addUpdateNode(fixRemoteNodeAvailable) }
         coVerify { remoteStatusInteractor.available(JoinReply, fixRemoteNodeAvailable) }
         coVerify { vibrateWrapper.vibrate() }
@@ -116,12 +121,14 @@ class AvailableMessageHandlerTest {
                 fixtAvailableMessage.node,
                 fixtWifiState
             )
-        } returns fixRemoteNodeAvailable
-
+        } returns fixtRemoteNode
+        val slot = slot<RemoteNodeDomain>()
+        coEvery { remotesRepository.addUpdateNode(capture(slot)) } returns Unit
         every { wifiStateProvider.wifiState } returns fixtWifiState
 
         sut.messageReceived(fixtAvailableMessage)
 
+        assertTrue(slot.captured.isAvailable)
         coVerify { remotesRepository.addUpdateNode(fixRemoteNodeAvailable) }
         coVerify(exactly = 0) { remoteStatusInteractor.available(any(), any()) }
         coVerify(exactly = 0) { vibrateWrapper.vibrate() }
@@ -136,12 +143,15 @@ class AvailableMessageHandlerTest {
                 fixtAvailableMessage.node,
                 fixtWifiState
             )
-        } returns fixRemoteNodeAvailable
+        } returns fixtRemoteNode
 
+        val slot = slot<RemoteNodeDomain>()
+        coEvery { remotesRepository.addUpdateNode(capture(slot)) } returns Unit
         every { wifiStateProvider.wifiState } returns fixtWifiState
 
         sut.messageReceived(fixtAvailableMessage)
 
+        assertTrue(slot.captured.isAvailable)
         coVerify { remotesRepository.addUpdateNode(fixRemoteNodeAvailable) }
         coVerify(exactly = 0) { remoteStatusInteractor.available(any(), any()) }
         coVerify(exactly = 0) { vibrateWrapper.vibrate() }
@@ -150,19 +160,21 @@ class AvailableMessageHandlerTest {
     @Test
     fun `messageReceived Close should NOT send`() = runTest {
         val fixtAvailableMessage = AvailableMessage(AvailableMessage.MsgType.Close, fixtDeviceInfo)
-        val fixRemoteNodeAvailable = fixtRemoteNode.copy(isAvailable = false)
+        val fixRemoteNodeNotAvailable = fixtRemoteNode.copy(isAvailable = false)
         every {
             availableMessageMapper.mapFromMulticastMessage(
                 fixtAvailableMessage.node,
                 fixtWifiState
             )
-        } returns fixRemoteNodeAvailable
-
+        } returns fixtRemoteNode
+        val slot = slot<RemoteNodeDomain>()
+        coEvery { remotesRepository.addUpdateNode(capture(slot)) } returns Unit
         every { wifiStateProvider.wifiState } returns fixtWifiState
 
         sut.messageReceived(fixtAvailableMessage)
 
-        coVerify { remotesRepository.addUpdateNode(fixRemoteNodeAvailable) }
+        assertFalse(slot.captured.isAvailable)
+        coVerify { remotesRepository.addUpdateNode(fixRemoteNodeNotAvailable) }
         coVerify(exactly = 0) { remoteStatusInteractor.available(any(), any()) }
         coVerify(exactly = 0) { vibrateWrapper.vibrate() }
     }
