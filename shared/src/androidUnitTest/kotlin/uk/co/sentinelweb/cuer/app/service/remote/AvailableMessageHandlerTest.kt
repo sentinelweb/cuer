@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.app.service.remote
 
 import io.mockk.*
 import kotlinx.coroutines.test.runTest
-import org.junit.After
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -177,9 +176,5 @@ class AvailableMessageHandlerTest {
         coVerify { remotesRepository.addUpdateNode(fixRemoteNodeNotAvailable) }
         coVerify(exactly = 0) { remoteStatusInteractor.available(any(), any()) }
         coVerify(exactly = 0) { vibrateWrapper.vibrate() }
-    }
-
-    @After
-    fun tearDown() {
     }
 }
