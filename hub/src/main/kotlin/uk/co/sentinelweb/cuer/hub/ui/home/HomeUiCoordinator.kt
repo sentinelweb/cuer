@@ -28,6 +28,7 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
 
     override fun create() {
         remotes.create()
+        preferencesUiCoordinator.create()
     }
 
     override fun destroy() {

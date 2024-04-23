@@ -2,10 +2,10 @@ package uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings
 
 import com.russhwolf.settings.Settings
 
-class MultiPlatformPreferencesWrapperImpl : MultiPlatformPreferencesWrapper {
+class MultiPlatformPreferencesWrapperImpl(private val settings: Settings = Settings()) : MultiPlatformPreferencesWrapper {
 
     private val prefs: Settings by lazy {
-        Settings()
+        settings
     }
 
     override fun getLong(field: MultiPlatformPreferences, def: Long): Long = prefs.getLong(field.fname, def)

@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.hub.di
 
 import PlatformWifiInfo
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.russhwolf.settings.JvmPreferencesSettings
+import com.russhwolf.settings.Settings
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
@@ -58,6 +60,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
+import java.util.prefs.Preferences
 
 
 object Modules {
@@ -81,6 +84,10 @@ object Modules {
         factory { LifecycleRegistry() }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
         factory<VibrateWrapper> { EmptyVibrateWrapper() }
+        factory<Settings> {
+            val preferences = Preferences.userRoot().node(".cuer")
+            JvmPreferencesSettings(preferences)
+        }
     }
 
     private val connectivityModule = module {

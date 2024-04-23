@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.di
 
+import com.russhwolf.settings.Settings
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.backup.BackupCheck
@@ -145,7 +146,11 @@ object SharedAppModule {
         }
         single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
         single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
-        single<MultiPlatformPreferencesWrapper> { MultiPlatformPreferencesWrapperImpl() }
+        single<MultiPlatformPreferencesWrapper> {
+            MultiPlatformPreferencesWrapperImpl(
+                getOrNull<Settings>() ?: Settings()
+            )
+        }
         factory { BrowseRecentCategories(get(), get()) }
         factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }

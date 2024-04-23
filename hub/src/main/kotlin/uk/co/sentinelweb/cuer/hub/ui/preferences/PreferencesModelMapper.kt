@@ -6,6 +6,7 @@ class PreferencesModelMapper(
     private val prefs: MultiPlatformPreferencesWrapper
 ) {
     fun map(): PreferencesModel = PreferencesModel(
-        folderRoots = prefs.folderRoots
+        folderRoots = prefs.folderRoots,
+        isDatabaseInitialised = prefs.dbInitialised
     )
 }
