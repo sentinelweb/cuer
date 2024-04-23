@@ -55,5 +55,4 @@ data class MediaDomain(
             )
         )
     }
-
 }

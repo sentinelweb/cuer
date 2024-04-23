@@ -46,4 +46,7 @@ actual class PlatformFileOperation {
                 )
             }
 
+    actual fun parent(file: AFile): AFile?  =
+        File(file.path).parent?.let { AFile(it) }
+
 }

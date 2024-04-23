@@ -35,4 +35,8 @@ actual class PlatformFileOperation {
     actual fun properties(file: AFile): AFileProperties? {
         TODO("Not yet implemented")
     }
+
+    actual fun parent(file: AFile): AFile? {
+        TODO("Not yet implemented")
+    }
 }

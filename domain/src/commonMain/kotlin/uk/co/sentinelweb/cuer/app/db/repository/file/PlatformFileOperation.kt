@@ -34,4 +34,5 @@ expect class PlatformFileOperation() {
     fun list(dir: AFile): List<AFile>?
 
     fun properties(file: AFile): AFileProperties?
+    fun parent(file: AFile): AFile?
 }

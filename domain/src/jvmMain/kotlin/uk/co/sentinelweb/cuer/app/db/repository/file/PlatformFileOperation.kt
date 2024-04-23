@@ -45,4 +45,7 @@ actual class PlatformFileOperation {
                     isDirectory = it.isDirectory
                 )
             }
+
+    actual fun parent(file: AFile): AFile? =
+        File(file.path).parent?.let { AFile(it) }
 }

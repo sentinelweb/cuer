@@ -29,7 +29,8 @@ class FilesUiCoordinator(
     }
 
     fun refresh() {
-        modelObservable.value = mapper.map(getFolders.getFolderList(currentFolder?.platformId))
+       getFolders.getFolderList(currentFolder?.platformId)
+           ?.let { modelObservable.value = mapper.map(it) }
     }
 
     override fun destroy() {
