@@ -21,6 +21,7 @@ import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageGrid
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
+import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 import java.io.File
 
@@ -60,7 +61,8 @@ fun Home(coordinator: HomeUiCoordinator) {
                     .fillMaxHeight()
                     .background(Color.White)
             ) {
-                TestUi(coordinator)
+                //TestUi(coordinator)
+                PreferencesUi(coordinator.preferencesUiCoordinator)
             }
         }
     }

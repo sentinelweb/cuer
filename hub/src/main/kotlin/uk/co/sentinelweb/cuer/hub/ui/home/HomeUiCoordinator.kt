@@ -8,6 +8,7 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -20,6 +21,7 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
     val remotes: RemotesUiCoordinator by inject()
     val dbInit: DatabaseInitializer by inject()
     val remoteServiceManager: RemoteServerContract.Manager by inject()
+    val preferencesUiCoordinator:PreferencesUiCoordinator by inject()
 
     override var modelObservable = MutableStateFlow(HomeModel(0))
         private set
