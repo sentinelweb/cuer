@@ -14,6 +14,7 @@ data class PlaylistItemDomain(
     val archived: Boolean = false,
     val playlistId: Identifier<GUID>? // todo make this non nullable .. maybe(= NO_PLAYLIST)
 ) : Domain {
+
     companion object {
         const val FLAG_ARCHIVED = 1L
     }

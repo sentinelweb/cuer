@@ -31,4 +31,8 @@ actual class PlatformFileOperation {
     actual fun list(dir: AFile): List<AFile>? {
         TODO("Not yet implemented")
     }
+
+    actual fun properties(file: AFile): AFileProperties? {
+        TODO("Not yet implemented")
+    }
 }

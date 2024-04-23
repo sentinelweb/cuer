@@ -26,6 +26,7 @@ data class PlaylistDomain constructor(
     val thumb: ImageDomain? = null,
     val image: ImageDomain? = null,
     val playItemsFromStart: Boolean = false,
+    val subPlaylists:List<PlaylistDomain> = listOf(),
     val config: PlaylistConfigDomain = PlaylistConfigDomain()
 ) : Domain {
 

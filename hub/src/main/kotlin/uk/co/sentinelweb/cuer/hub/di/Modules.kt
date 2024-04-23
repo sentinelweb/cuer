@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
@@ -72,6 +73,7 @@ object Modules {
         UpdateService.serviceModule,
         LocalUiCoordinator.uiModule,
         PreferencesUiCoordinator.uiModule,
+        FilesUiCoordinator.uiModule,
     )
 
     private val resourcesModule = module {

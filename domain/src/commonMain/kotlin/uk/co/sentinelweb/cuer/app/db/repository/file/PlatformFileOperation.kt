@@ -1,10 +1,20 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
+import kotlinx.datetime.Instant
+
 data class AFile(
     val path: String
 ) {
     fun child(name: String): AFile = AFile(this.path + "/" + name)
 }
+
+data class AFileProperties(
+    val file: AFile,
+    val name: String,
+    val size: Long,
+    val modified: Instant? = null,
+    val isDirectory: Boolean
+)
 
 expect class PlatformFileOperation() {
     fun delete(file: AFile)
@@ -22,4 +32,6 @@ expect class PlatformFileOperation() {
     fun copyTo(from: AFile, to: AFile)
 
     fun list(dir: AFile): List<AFile>?
+
+    fun properties(file: AFile): AFileProperties?
 }

@@ -3,8 +3,10 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -21,6 +23,9 @@ import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.hub.ui.common.button.HeaderButton
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageGrid
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesComposeables.FilesUi
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 import java.io.File
@@ -49,24 +54,44 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
     val state = coordinator.modelObservable
-        .collectAsState(initial = HomeModel(1))
+        .collectAsState(initial = HomeModel(Settings))
     MaterialTheme {
-        Row {
-            Box(modifier = Modifier.width(400.dp)) {
-                RemotesUi(coordinator.remotes)
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(text = "Cuer hub") },
+                    actions = {
+                        IconButton(onClick = { coordinator.go(Files) }) {
+                            Icon(Icons.Filled.List, contentDescription = "Files")
+                        }
+                        IconButton(onClick = { coordinator.go(Settings) }) {
+                            Icon(Icons.Filled.Settings, contentDescription = "Settings")
+                        }
+                    }
+                )
             }
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .background(Color.White)
-            ) {
-                //TestUi(coordinator)
-                PreferencesUi(coordinator.preferencesUiCoordinator)
+        ) {
+            Row {
+                Box(modifier = Modifier.width(400.dp)) {
+                    RemotesUi(coordinator.remotes)
+                }
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight()
+                        .background(Color.White)
+                ) {
+                    //TestUi(coordinator)
+                    when (state.value.route) {
+                        Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
+                        Files -> FilesUi(coordinator.filesUiCoordinator)
+                    }
+                }
             }
         }
     }
 }
+
 
 @Composable
 private fun TestUi(coordinator: HomeUiCoordinator) {

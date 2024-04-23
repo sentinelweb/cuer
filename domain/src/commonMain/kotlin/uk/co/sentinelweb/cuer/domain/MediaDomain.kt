@@ -31,7 +31,7 @@ data class MediaDomain(
 ) : Domain {
 
     enum class MediaTypeDomain {
-        VIDEO, AUDIO, WEB
+        VIDEO, AUDIO, WEB, FILE
     }
 
     companion object {
