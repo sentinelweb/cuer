@@ -19,7 +19,7 @@ class GetFolderListUseCase(
     private val guidCreator: GuidCreator,
     private val timeProvider: TimeProvider,
 ) {
-    fun getFolderList(folderPath: String? = null): PlaylistDomain? =
+    fun getFolderList(folderPath: String? = null): PlaylistAndSubsDomain? =
         (if (folderPath == null) {
             prefs.folderRoots.map { AFile(it) }
         } else if (checkFolderPathIsInAllowedSet(folderPath)) {
@@ -61,7 +61,7 @@ class GetFolderListUseCase(
                     ).apply { subFolders.add(0, this) }
                 }
 
-                PlaylistDomain(
+                val playlist = PlaylistDomain(
                     id = rootId,
                     title = folderPath ?: "Top",
                     platform = PlatformDomain.FILESYSTEM,
@@ -69,6 +69,10 @@ class GetFolderListUseCase(
                     items = filesProperties.mapIndexed { index, item ->
                         mapFileToPlaylist(index, rootId, item, folderPath)
                     },
+                )
+
+                PlaylistAndSubsDomain(
+                    playlist = playlist,
                     subPlaylists = subFolders
                 )
             }

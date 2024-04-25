@@ -26,7 +26,6 @@ data class PlaylistDomain constructor(
     val thumb: ImageDomain? = null,
     val image: ImageDomain? = null,
     val playItemsFromStart: Boolean = false,
-    val subPlaylists:List<PlaylistDomain> = listOf(),
     val config: PlaylistConfigDomain = PlaylistConfigDomain()
 ) : Domain {
 
@@ -83,7 +82,7 @@ data class PlaylistDomain constructor(
         )
 
         fun createDummy(id: Identifier<GUID>? = null, title: String) = PlaylistDomain(
-            id = null,
+            id = id,
             config = PlaylistConfigDomain(),
             type = PlaylistTypeDomain.APP,
             platform = PlatformDomain.OTHER,

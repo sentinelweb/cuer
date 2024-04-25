@@ -22,14 +22,14 @@ class FilesUiCoordinator(
     private val mapper: FilesModelMapper by scope.inject()
     override val modelObservable = MutableStateFlow<FilesModel>(blankModel())
 
-    private var currentFolder: PlaylistDomain? = null
+    private var currentFolder: String? = null
 
     override fun create() {
         refresh()
     }
 
     fun refresh() {
-       getFolders.getFolderList(currentFolder?.platformId)
+        getFolders.getFolderList(currentFolder)
            ?.let { modelObservable.value = mapper.map(it) }
     }
 
@@ -38,7 +38,7 @@ class FilesUiCoordinator(
     }
 
     fun loadFolder(folder: PlaylistDomain) {
-        currentFolder = folder
+        currentFolder = folder.platformId
         refresh()
     }
 

@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -21,7 +23,8 @@ object FilesComposeables {
 
     @Composable
     private fun FilesView(model: FilesModel, view: FilesUiCoordinator) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        val scrollState = rememberScrollState()
+        Column(modifier = Modifier.padding(8.dp).verticalScroll(scrollState)) {
             model.list.subPlaylists.forEach {
                 Row(modifier = Modifier.clickable { view.loadFolder(it) }) {
                     val icon = if (it.title.equals("..")) "drawable/ic_up.svg" else "drawable/ic_folder.svg"
@@ -29,7 +32,7 @@ object FilesComposeables {
                     Text(text = it.title, modifier = Modifier.padding(16.dp))
                 }
             }
-            model.list.items.forEach {
+            model.list.playlist.items.forEach {
                 Row {
                     val icon = when (it.media.mediaType) {
                         MediaDomain.MediaTypeDomain.VIDEO -> "drawable/ic_video.svg"
