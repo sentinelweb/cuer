@@ -26,6 +26,8 @@ interface PrefWrapper<T : Field> {
     fun <T1 : Any?, T2 : Any?> putPair(field: T, pair: Pair<T1, T2>)
     fun <T1 : Any?, T2 : Any?> getPair(field: T, def: Pair<T1, T2>): Pair<T1, T2>
     fun <T1 : Any?, T2 : Any?> getPairNonNull(field: T, def: Pair<T1, T2>): Pair<T1, T2>?
+
+
 }
 
 interface GeneralPreferencesWrapper : PrefWrapper<GeneralPreferences>

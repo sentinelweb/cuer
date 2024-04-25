@@ -34,4 +34,18 @@ actual class PlatformFileOperation {
         File(dir.path).listFiles()
             ?.map { AFile(it.absolutePath) }
 
+    actual fun properties(file: AFile): AFileProperties? =
+        File(file.path)
+            .takeIf { it.exists() }
+            ?.let {
+                AFileProperties(
+                    file = file,
+                    name = it.name,
+                    size = it.length(),
+                    isDirectory = it.isDirectory
+                )
+            }
+
+    actual fun parent(file: AFile): AFile? =
+        File(file.path).parent?.let { AFile(it) }
 }

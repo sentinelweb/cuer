@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.hub.di
 
 import PlatformWifiInfo
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.russhwolf.settings.JvmPreferencesSettings
+import com.russhwolf.settings.Settings
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
@@ -28,8 +30,10 @@ import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
@@ -57,6 +61,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
 import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
+import java.util.prefs.Preferences
 
 
 object Modules {
@@ -67,6 +72,8 @@ object Modules {
         RemoteServerService.serviceModule,
         UpdateService.serviceModule,
         LocalUiCoordinator.uiModule,
+        PreferencesUiCoordinator.uiModule,
+        FilesUiCoordinator.uiModule,
     )
 
     private val resourcesModule = module {
@@ -79,6 +86,10 @@ object Modules {
         factory { LifecycleRegistry() }
         factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
         factory<VibrateWrapper> { EmptyVibrateWrapper() }
+        factory<Settings> {
+            val preferences = Preferences.userRoot().node(".cuer")
+            JvmPreferencesSettings(preferences)
+        }
     }
 
     private val connectivityModule = module {

@@ -39,6 +39,7 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     LAST_BOTTOM_TAB("lastBottomNavTab"),
     DATABASE_VERSION("db.version"),
     ONBOARDED_PREFIX("onboarded_"),
+    FOLDER_ROOTS("folder.roots"),
     ;
 
     companion object {
@@ -160,4 +161,23 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
     fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
     fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)
 
+    val folderRoots: Set<String>
+        get() = getString(FOLDER_ROOTS, null)
+            ?.split(FolderRootsSeparator)
+            ?.toSet()
+            ?: setOf()
+
+    fun addFolderRoot(path: String) {
+        if (!folderRoots.contains(path)) {
+            putString(FOLDER_ROOTS, folderRoots.joinToString(FolderRootsSeparator) + FolderRootsSeparator + path)
+        }
+    }
+
+    fun deleteFolderRoot(path: String) {
+        putString(FOLDER_ROOTS, folderRoots.minus(path).joinToString(FolderRootsSeparator))
+    }
+
+    companion object {
+        private var FolderRootsSeparator = "::"
+    }
 }

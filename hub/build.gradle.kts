@@ -13,6 +13,7 @@ val ver_batik: String by project
 val ver_junit: String by project
 val ver_mockk: String by project
 val ver_turbine: String by project
+val ver_multiplatform_settings: String by project
 
 val isProduction: String by project
 val app_versionCode: String by project
@@ -50,6 +51,7 @@ dependencies {
     implementation("io.ktor:ktor-client-cio:$ver_ktor")
 
     implementation("org.apache.xmlgraphics:batik-transcoder:$ver_batik")
+    implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
 
     testImplementation("junit:junit:$ver_junit")
     testImplementation("io.insert-koin:koin-test:$ver_koin")
