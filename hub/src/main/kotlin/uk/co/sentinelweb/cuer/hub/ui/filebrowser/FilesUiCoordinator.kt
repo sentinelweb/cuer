@@ -6,8 +6,10 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesModel.Companion.blankModel
+import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerWindow
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
@@ -40,6 +42,10 @@ class FilesUiCoordinator(
     fun loadFolder(folder: PlaylistDomain) {
         currentFolder = folder.platformId
         refresh()
+    }
+
+    fun playVideo(file: MediaDomain) {
+        VlcPlayerWindow().showWindow(file)
     }
 
     companion object {

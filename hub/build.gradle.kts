@@ -60,6 +60,8 @@ dependencies {
     testImplementation("app.cash.turbine:turbine:$ver_turbine")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
 
+    implementation("uk.co.caprica:vlcj:4.8.2")
+
 }
 
 compose.desktop {
