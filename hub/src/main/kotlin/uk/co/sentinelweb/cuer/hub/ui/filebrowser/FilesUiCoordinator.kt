@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesModel.Companion.blankModel
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerWindow
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -46,6 +47,11 @@ class FilesUiCoordinator(
 
     fun playVideo(file: MediaDomain) {
         VlcPlayerWindow().showWindow(file)
+    }
+
+    fun showFile(file: MediaDomain) {
+//        showTextWindow(file)
+        openFileInDefaultApp(file)
     }
 
     companion object {

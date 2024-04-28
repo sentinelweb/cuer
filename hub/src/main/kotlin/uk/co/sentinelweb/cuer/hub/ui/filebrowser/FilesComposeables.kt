@@ -36,7 +36,9 @@ object FilesComposeables {
                 Row(modifier = Modifier.clickable {
                     if (listOf(VIDEO, AUDIO).contains(it.media.mediaType))
                         view.playVideo(it.media)
-                    else Unit
+                    else if (FILE.equals(it.media.mediaType)) {
+                        view.showFile(it.media)
+                    }
                 }) {
                     val icon = when (it.media.mediaType) {
                         VIDEO -> "drawable/ic_video.svg"
