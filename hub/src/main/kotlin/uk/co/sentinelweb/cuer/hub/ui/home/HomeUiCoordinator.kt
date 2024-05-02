@@ -3,12 +3,15 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
@@ -24,7 +27,10 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
     val dbInit: DatabaseInitializer by inject()
     val remoteServiceManager: RemoteServerContract.Manager by inject()
     val preferencesUiCoordinator: PreferencesUiCoordinator by inject()
-    val filesUiCoordinator: FilesUiCoordinator by inject()
+    val filesUiCoordinator: FilesUiCoordinator by inject { parametersOf(this) }
+
+    // fixme handel player destruction
+    var playerUiCoordinator: VlcPlayerUiCoordinator? = null
 
     override var modelObservable = MutableStateFlow(HomeModel.blankModel)
         private set
@@ -48,6 +54,17 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
 
     fun go(route: HomeModel.DisplayRoute) {
         modelObservable.value = modelObservable.value.copy(route = route)
+    }
+
+    fun showPlayer(item: PlaylistItemDomain) {
+        playerUiCoordinator = getKoin().get(parameters = { parametersOf(this) })
+        playerUiCoordinator?.create()
+        playerUiCoordinator?.play(item)
+    }
+
+    fun killPlayer() {
+        playerUiCoordinator?.destroy()
+        playerUiCoordinator = null
     }
 
     companion object {

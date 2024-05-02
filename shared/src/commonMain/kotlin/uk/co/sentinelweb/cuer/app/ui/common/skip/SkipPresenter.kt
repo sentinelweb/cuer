@@ -9,6 +9,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+// todo move to shared
 class SkipPresenter constructor(
     private val view: SkipContract.View,
     private val state: SkipContract.State,

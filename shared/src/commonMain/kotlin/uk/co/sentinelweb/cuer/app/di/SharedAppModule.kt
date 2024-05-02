@@ -26,6 +26,8 @@ import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
@@ -131,6 +133,13 @@ object SharedAppModule {
         }
     }
 
+    private val playerModule = module {
+        factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
+        single { PlayerListener(get(), get()) }
+
+    }
+
+    // todo vrewake up this module into logical moduules
     private val objectModule = module {
         factory { ParserFactory() }
         single {
@@ -208,5 +217,6 @@ object SharedAppModule {
         .plus(usecaseModule)
         .plus(uiModule)
         .plus(remoteModule)
+        .plus(playerModule)
         .plus(DescriptionContract.viewModule)
 }

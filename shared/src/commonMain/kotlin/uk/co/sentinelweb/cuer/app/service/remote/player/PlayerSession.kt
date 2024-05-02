@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
+// todo maybe emulate MediaSessionManager
 interface Session {
     val id: OrchestratorContract.Identifier<GUID>
     fun start()
@@ -34,7 +35,7 @@ class PlayerSessionManager(
     private val sessions: MutableList<PlayerSession> = mutableListOf()
 
     fun createSession(item: PlaylistItemDomain): PlayerSession {
-        PlayerSession(guidCreator.create().toIdentifier(LOCAL), item)
+        return PlayerSession(guidCreator.create().toIdentifier(LOCAL), item)
             .apply { sessions.add(this) }
     }
 

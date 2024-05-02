@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 
+// todo move to AytPortraitActivity - delete this
 interface AytPortraitContract {
     companion object {
 

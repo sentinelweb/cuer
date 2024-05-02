@@ -33,6 +33,7 @@ import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
@@ -74,6 +75,7 @@ object Modules {
         LocalUiCoordinator.uiModule,
         PreferencesUiCoordinator.uiModule,
         FilesUiCoordinator.uiModule,
+        VlcPlayerUiCoordinator.uiModule,
     )
 
     private val resourcesModule = module {

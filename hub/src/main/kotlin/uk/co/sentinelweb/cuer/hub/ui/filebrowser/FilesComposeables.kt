@@ -35,7 +35,7 @@ object FilesComposeables {
             model.list.playlist.items.forEach {
                 Row(modifier = Modifier.clickable {
                     if (listOf(VIDEO, AUDIO).contains(it.media.mediaType))
-                        view.playVideo(it.media)
+                        view.playVideo(it)
                     else if (FILE.equals(it.media.mediaType)) {
                         view.showFile(it.media)
                     }
