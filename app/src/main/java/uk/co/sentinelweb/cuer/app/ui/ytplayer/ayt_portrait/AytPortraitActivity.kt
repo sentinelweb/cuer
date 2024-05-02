@@ -110,6 +110,7 @@ class AytPortraitActivity : AppCompatActivity(),
         // this POS restores the AYT player to the mvi kotlin state after returning from a home press
         if (this::playerMviView.isInitialized) {
             coroutines.mainScope.launch {
+                // fixme check if this is still needed - delay added in PlayerStoreFactory.init()
                 delay(50)
                 playerMviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
             }
@@ -194,7 +195,6 @@ class AytPortraitActivity : AppCompatActivity(),
             }
 
             override fun onPlaylistChipClick(chipModel: ChipModel) = Unit
-
         }
         val playlistAndItem = itemLoader.load()
             ?: queueConsumer.playlistAndItem

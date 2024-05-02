@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import java.awt.BorderLayout
 import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
@@ -23,7 +22,7 @@ class VlcPlayerSwingWindow : JFrame() {
 
     private fun createWindow() {
 
-        this.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
+        this.defaultCloseOperation = DO_NOTHING_ON_CLOSE
 
         this.layout = BorderLayout()
 
@@ -50,11 +49,18 @@ class VlcPlayerSwingWindow : JFrame() {
         // Handle window closing operation
         this.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent) {
-                mediaPlayerComponent.mediaPlayer().release()
-                this@VlcPlayerSwingWindow.dispose()
                 coordinator.playerWindowDestroyed()
             }
         })
+    }
+
+    fun playItem(path: String) {
+        mediaPlayerComponent.mediaPlayer().media().play(path)
+    }
+
+    fun destroy() {
+        mediaPlayerComponent.mediaPlayer().release()
+        this@VlcPlayerSwingWindow.dispose()
     }
 
     private fun createControls() {
@@ -73,24 +79,20 @@ class VlcPlayerSwingWindow : JFrame() {
         controlsPane.add(fullButton)
 
         pauseButton.addActionListener {
-            mediaPlayerComponent.mediaPlayer().controls().pause();
+            mediaPlayerComponent.mediaPlayer().controls().pause()
         }
 
         rewindButton.addActionListener {
-            mediaPlayerComponent.mediaPlayer().controls().skipTime(-10000);
+            mediaPlayerComponent.mediaPlayer().controls().skipTime(-10000)
         }
 
         skipButton.addActionListener {
-            mediaPlayerComponent.mediaPlayer().controls().skipTime(10000);
+            mediaPlayerComponent.mediaPlayer().controls().skipTime(10000)
         }
         skipButton.addActionListener {
-            mediaPlayerComponent.mediaPlayer().fullScreen();
+            mediaPlayerComponent.mediaPlayer().fullScreen()
         }
         this.contentPane.add(controlsPane, BorderLayout.SOUTH)
-    }
-
-    fun playItem(itemDomain: PlaylistItemDomain) {
-        mediaPlayerComponent.mediaPlayer().media().play(itemDomain.media.platformId)
     }
 
     companion object {

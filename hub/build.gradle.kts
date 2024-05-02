@@ -71,7 +71,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Cuer"
-            packageVersion = app_versionName
+            packageVersion = "1.0.0"// fixme shoudl use app_versionName but there are a lot of platform dependent rules
         }
     }
 }

@@ -355,6 +355,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
             controller.onStart()
             mviView.onStart()
             coroutines.mainScope.launch {
+                // fixme check if this is still needed - delay added in PlayerStoreFactory.init()
                 delay(300)
                 mviView.init()
             }

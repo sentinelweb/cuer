@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -169,12 +171,15 @@ class PlayerStoreFactory(
                 }
         }
 
-        private fun init() {
+        private fun init() = coroutines.mainScope.launch {
+            // fixme there seem to be some race condition when binding the store to the UI so the initial load command
+            // label doesnt make it to the view.processLabel() - this delay gets around it
+            delay(1)
             itemLoader.load()?.also { playlistAndItem ->
                 log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
                 loadItem(playlistAndItem)
             }
-        }
+        }.ignoreJob()
 
         private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
             playlistAndItem
@@ -195,6 +200,7 @@ class PlayerStoreFactory(
         }
 
         private fun trackChange(intent: Intent.TrackChange) {
+            log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
             mediaSessionManager.checkCreateMediaSession(playerControls)

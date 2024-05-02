@@ -67,7 +67,7 @@ class PlaylistMemoryRepository constructor(
         Unfinished.id -> unfinishedItemsInteractor.getPlaylist()
         LiveUpcoming.id -> liveUpcomingItemsPlayistInteractor.getPlaylist()
         Shared.id -> data[id]
-        else -> throw NotImplementedException("$id is invalid memory playlist")
+        else -> data[id] ?: throw DoesNotExistException("$id is invalid memory playlist")
     }
 
     override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
@@ -80,20 +80,21 @@ class PlaylistMemoryRepository constructor(
     }
 
     override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
-        domain.id?.let { playlistId ->
-            if (!options.flat || !data.containsKey(playlistId.id)) {
-                domain.copy(
-                    items = domain.items.map { item ->
-                        item.copy(playlistId = playlistId)
-                    }
-                )
-            } else {
-                domain.copy(
-                    items = data[playlistId.id]?.items
-                        ?: throw IllegalStateException("Data got emptied")
-                )
-            }
-        }?.also { data[it.id!!.id] = it }
+        domain.id
+            ?.let { playlistId ->
+                if (!options.flat || !data.containsKey(playlistId.id)) {
+                    domain.copy(
+                        items = domain.items.map { item ->
+                            item.copy(playlistId = playlistId)
+                        }
+                    )
+                } else {
+                    domain.copy(
+                        items = data[playlistId.id]?.items
+                            ?: throw IllegalStateException("Data got emptied")
+                    )
+                }
+            }?.also { data[it.id!!.id] = it }
             ?.also {
                 if (options.emit) {
                     coroutines.computationScope.launch {
@@ -139,6 +140,7 @@ class PlaylistMemoryRepository constructor(
                     .map { it.items }
                     .flatten()
                     .filter { filter.ids.contains(it.media.id?.id) }
+
                 else -> throw NotImplementedException()
             }
 

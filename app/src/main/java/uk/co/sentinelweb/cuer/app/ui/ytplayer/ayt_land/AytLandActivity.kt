@@ -90,6 +90,7 @@ class AytLandActivity : AppCompatActivity(),
         // this POS restores the ayt player to the mvi kotlin state after returning from a home press
         if (this::mviView.isInitialized) {
             coroutines.mainScope.launch {
+                // fixme check if this is still needed - delay added in PlayerStoreFactory.init()
                 delay(50)
                 mviView.dispatch(PlayerStateChanged(aytViewHolder.playerState))
             }

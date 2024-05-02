@@ -48,7 +48,7 @@ class FilesUiCoordinator(
     }
 
     fun playVideo(item: PlaylistItemDomain) {
-        parent.showPlayer(item)
+        parent.showPlayer(item, modelObservable.value.list.playlist)
     }
 
     fun showFile(file: MediaDomain) {

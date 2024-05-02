@@ -22,7 +22,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -48,6 +47,7 @@ class VlcPlayerUiCoordinator(
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
     override fun create() {
+        log.tag(this)
         lifecycle.onCreate()
         controller.onViewCreated(listOf(this), lifecycle)
         lifecycle.onStart()
@@ -56,6 +56,7 @@ class VlcPlayerUiCoordinator(
     }
 
     override fun destroy() {
+        playerWindow.destroy()
         lifecycle.onPause()
         lifecycle.onStop()
         lifecycle.onDestroy()
@@ -63,16 +64,24 @@ class VlcPlayerUiCoordinator(
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
+        log.d("label: $label")
+        when (label) {
+            is PlayerContract.MviStore.Label.Command -> when (label.command) {
+                is PlayerContract.PlayerCommand.Load -> {
 
+                    val command = label.command as PlayerContract.PlayerCommand.Load
+                    playerWindow.playItem(command.platformId)
+                }
+
+                else -> log.d("Unprocessed command: ${label.command}")
+            }
+
+            else -> log.d("Unprocessed label: $label")
+        }
     }
 
     override fun render(model: Model) {
-        log.d("label: $model")
         this.modelObservable.value = model
-    }
-
-    fun play(item: PlaylistItemDomain) {
-        playerWindow.playItem(item)
     }
 
     fun playerWindowDestroyed() {
@@ -89,6 +98,8 @@ class VlcPlayerUiCoordinator(
             factory<LivePlaybackContract.Controller> { EmptyLivePlaybackController() }
             factory<SkipContract.External> { EmptySkip() }
             factory<MediaSessionContract.Manager> { EmptyMediaSessionManager() }
+            single { FolderMemoryPlaylistItemLoader() }
+            single<PlayerContract.PlaylistItemLoader> { get<FolderMemoryPlaylistItemLoader>() }
 
             scope(named<VlcPlayerUiCoordinator>()) {
                 scoped {
@@ -119,7 +130,6 @@ class VlcPlayerUiCoordinator(
                         playlistItemOrchestrator = get()
                     ).create()
                 }
-                scoped<PlayerContract.PlaylistItemLoader> { FolderMemoryPlaylistItemLoader() }
             }
         }
     }

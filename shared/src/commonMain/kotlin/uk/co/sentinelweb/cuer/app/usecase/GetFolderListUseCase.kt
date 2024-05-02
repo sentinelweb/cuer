@@ -84,28 +84,30 @@ class GetFolderListUseCase(
 
     private fun mapFileToPlaylist(
         index: Int,
-        rootId: OrchestratorContract.Identifier<GUID>,
+        playlistId: OrchestratorContract.Identifier<GUID>,
         item: AFileProperties,
         folderPath: String?
-    ) = PlaylistItemDomain(
-        id = guidCreator.create().toIdentifier(MEMORY),
-        dateAdded = timeProvider.instant(),
-        order = index.toLong(),
-        playlistId = rootId,
-        media = MediaDomain(
+    ): PlaylistItemDomain {
+        return PlaylistItemDomain(
             id = guidCreator.create().toIdentifier(MEMORY),
-            title = item.name,
-            mediaType = checkMediaType(item),
-            platform = PlatformDomain.FILESYSTEM,
-            platformId = item.file.path,
-            url = "file://${item.file.path}",
-            channelData = ChannelDomain(
+            dateAdded = timeProvider.instant(),
+            order = index.toLong(),
+            playlistId = playlistId,
+            media = MediaDomain(
                 id = guidCreator.create().toIdentifier(MEMORY),
+                title = item.name,
+                mediaType = checkMediaType(item),
                 platform = PlatformDomain.FILESYSTEM,
-                platformId = folderPath
+                platformId = item.file.path,
+                url = "file://${item.file.path}",
+                channelData = ChannelDomain(
+                    id = guidCreator.create().toIdentifier(MEMORY),
+                    platform = PlatformDomain.FILESYSTEM,
+                    platformId = folderPath
+                )
             )
         )
-    )
+    }
 
     fun checkMediaType(item: AFileProperties):MediaTypeDomain {
         val ext = getFileExtension(item.name)
