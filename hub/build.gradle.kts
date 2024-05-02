@@ -70,8 +70,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "test"
-            packageVersion = "1.0.0"
+            packageName = "Cuer"
+            packageVersion = app_versionName
         }
     }
 }
