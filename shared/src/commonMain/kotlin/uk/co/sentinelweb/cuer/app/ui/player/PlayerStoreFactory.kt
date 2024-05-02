@@ -48,7 +48,7 @@ class PlayerStoreFactory(
 
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        data class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
+        data class Screen(val content: PlayerContract.MviStore.Content) : Result()
         data class Position(val pos: Long) : Result()
     }
 
@@ -69,7 +69,7 @@ class PlayerStoreFactory(
 
                 is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(screen = msg.screen)
+                is Result.Screen -> copy(content = msg.content)
                 is Result.SkipTimes -> copy(
                     skipFwdText = msg.fwd ?: skipFwdText,
                     skipBackText = msg.back ?: skipBackText
@@ -118,8 +118,8 @@ class PlayerStoreFactory(
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
-                is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
-                is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
+                is Intent.PlaylistView -> dispatch(Result.Screen(Content.PLAYLIST))
+                is Intent.PlaylistItemView -> dispatch(Result.Screen(Content.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)

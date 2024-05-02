@@ -32,9 +32,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonModel
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Content.DESCRIPTION
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Content.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.DESCRIPTION
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Screen.PLAYLIST
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.Play
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -234,7 +234,7 @@ class AytPortraitActivity : AppCompatActivity(),
                         ?.isVisible = it.starred
                 }
             })
-            diff(get = PlayerContract.View.Model::screen, set = {
+            diff(get = PlayerContract.View.Model::content, set = {
                 when (it) {
                     DESCRIPTION -> {
                         binding.portraitPlayerDescription.isVisible = true

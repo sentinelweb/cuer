@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
+// todo possibly integrate into PlaylistOrchestator
 class GetFolderListUseCase(
     private val prefs: MultiPlatformPreferencesWrapper,
     private val fileOperations: PlatformFileOperation,

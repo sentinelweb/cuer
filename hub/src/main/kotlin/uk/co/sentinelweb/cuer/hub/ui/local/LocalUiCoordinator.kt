@@ -25,7 +25,6 @@ import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 class LocalUiCoordinator :
     LocalContract.View,
     UiCoordinator<Model>,
-
     BaseMviView<Model, Event>(),
     DesktopScopeComponent,
     KoinComponent {
@@ -40,6 +39,7 @@ class LocalUiCoordinator :
     private val lifecycle: LifecycleRegistry by inject()
 
     override fun create() {
+        log.tag(this)
         lifecycle.onCreate()
         controller.onViewCreated(listOf(this), lifecycle)
         lifecycle.onStart()
