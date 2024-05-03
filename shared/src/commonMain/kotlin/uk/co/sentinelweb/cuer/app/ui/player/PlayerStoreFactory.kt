@@ -125,7 +125,7 @@ class PlayerStoreFactory(
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
-                is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
+                is Intent.Duration -> receiveDuration(intent)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
                 is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()!!))
@@ -138,6 +138,14 @@ class PlayerStoreFactory(
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
             }
+
+        private fun receiveDuration(intent: Intent.Duration) {
+            livePlaybackController.gotDuration(intent.ms)
+            queueConsumer.currentItem
+                ?.takeIf { it.media.duration == null || it.media.duration != intent.ms }
+                ?.let { it.media.copy(duration = intent.ms) }
+                ?.also { queueConsumer.updateCurrentMediaItem(it) }
+        }
 
         private fun openChannel(state: State) =
             state.item?.media?.channelData

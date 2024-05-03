@@ -785,7 +785,6 @@ class QueueMediatorTest {
     }
 
     @Test
-    // @Ignore("flaky")
     fun previousItem() = runTest {
         createSut()
         val expectedIndex = fixtCurrentCurentIndex - 1
