@@ -7,11 +7,16 @@ import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
@@ -26,7 +31,12 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -49,7 +59,14 @@ class VlcPlayerUiCoordinator(
     private val controller: PlayerController by scope.inject()
     private val log: LogWrapper by inject()
     private val lifecycle: LifecycleRegistry by inject()
+
+    private val playerItemLoader: FolderMemoryPlaylistItemLoader by inject()
+    private val playlistOrchestrator: PlaylistOrchestrator by inject()
+    private val coroutines: CoroutineContextProvider by inject()
+
     private lateinit var playerWindow: VlcPlayerSwingWindow
+
+    private var playlistId: OrchestratorContract.Identifier<GUID>? = null
 
     override fun create() {
         log.tag(this)
@@ -61,11 +78,17 @@ class VlcPlayerUiCoordinator(
     }
 
     override fun destroy() {
-        playerWindow.destroy()
-        lifecycle.onPause()
-        lifecycle.onStop()
-        lifecycle.onDestroy()
-        scope.close()
+        coroutines.mainScope.launch {
+            playlistId
+                ?.takeIf { it.source == MEMORY }
+                ?.also { playlistOrchestrator.delete(it.id, it.deepOptions()) }
+            playerWindow.destroy()
+            lifecycle.onPause()
+            lifecycle.onStop()
+            lifecycle.onDestroy()
+            scope.close()
+            coroutines.cancel()
+        }
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
@@ -91,6 +114,25 @@ class VlcPlayerUiCoordinator(
 
     fun playerWindowDestroyed() {
         parent.killPlayer()
+
+    }
+
+    fun setupPlaylistAndItem(item: PlaylistItemDomain, playlist: PlaylistDomain) {
+        coroutines.mainScope.launch {
+            playlistId = playlist.id
+            log.d("showPlayer: id:${playlist.id}")
+            if (playlist.id?.source == MEMORY) {
+                playlistOrchestrator.save(playlist, playlist.id!!.deepOptions())
+            }
+            playerItemLoader.setPlaylistAndItem(
+                PlaylistAndItemDomain(
+                    playlistId = playlist.id,
+                    playlistTitle = playlist.platformId,
+                    item = item
+                )
+            )
+            create() // initialises the player controller
+        }
     }
 
     companion object {

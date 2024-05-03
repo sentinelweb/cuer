@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -9,11 +8,9 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
-import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
@@ -64,19 +61,8 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
     }
 
     fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
-        coroutines.mainScope.launch {
-            log.d("showPlayer: id:${playlist.id}")
-            playlistOrchestrator.save(playlist, playlist.id!!.deepOptions())
-            playerItemLoader.setPlaylistAndItem(
-                PlaylistAndItemDomain(
-                    playlistId = playlist.id,
-                    playlistTitle = playlist.platformId,
-                    item = item
-                )
-            )
-            playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
-            playerUiCoordinator?.create()
-        }
+        playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
+        playerUiCoordinator?.setupPlaylistAndItem(item, playlist)
     }
 
     fun killPlayer() {

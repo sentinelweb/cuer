@@ -124,6 +124,10 @@ class PlaylistMemoryRepository constructor(
             ?.let { playlistMemoryCache.remove(it.id) }
             .let { it != null }
 
+    override suspend fun delete(id: GUID, options: Options): Boolean =
+        playlistMemoryCache.remove(id)?.let { true } ?: false
+
+
     // -----------------------------------------------------------------------------------------------------
     // PlayListItemMemoryRepository ------------------------------------------------------------------------
     // -----------------------------------------------------------------------------------------------------
@@ -186,6 +190,7 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
+
         override suspend fun update(update: UpdateDomain<PlaylistItemDomain>, options: Options): PlaylistItemDomain {
             throw NotImplementedException()
         }
@@ -204,6 +209,11 @@ class PlaylistMemoryRepository constructor(
                         true
                     } ?: false
                 } ?: false
+
+
+        override suspend fun delete(id: GUID, options: Options): Boolean {
+            throw NotImplementedException()
+        }
     }
 
     // -----------------------------------------------------------------------------------------------------
@@ -272,6 +282,10 @@ class PlaylistMemoryRepository constructor(
         }
 
         override suspend fun count(filter: Filter, options: Options): Int {
+            throw NotImplementedException()
+        }
+
+        override suspend fun delete(id: GUID, options: Options): Boolean {
             throw NotImplementedException()
         }
 

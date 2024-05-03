@@ -51,6 +51,10 @@ class ChannelOrchestrator constructor(
             Source.PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
+    override suspend fun delete(id: GUID, options: Options): Boolean {
+        throw NotImplementedException()
+    }
+
     override suspend fun delete(domain: ChannelDomain, options: Options): Boolean {
         throw NotImplementedException()
     }

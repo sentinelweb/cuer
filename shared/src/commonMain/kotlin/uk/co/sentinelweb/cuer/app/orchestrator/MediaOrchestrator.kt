@@ -115,6 +115,10 @@ class MediaOrchestrator constructor(
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
+    override suspend fun delete(id: GUID, options: Options): Boolean {
+        throw NotImplementedException()
+    }
+
 
     override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
         throw NotImplementedException()
