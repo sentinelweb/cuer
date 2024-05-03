@@ -144,8 +144,9 @@ class PlayerStoreFactory(
             skip.duration = intent.ms
             queueConsumer.currentItem
                 ?.takeIf { it.media.duration == null || it.media.duration != intent.ms }
-                ?.let { it.media.copy(duration = intent.ms) }
-                ?.also { queueConsumer.updateCurrentMediaItem(it) }
+                ?.let { it.copy(media = it.media.copy(duration = intent.ms)) }
+                ?.also { queueConsumer.updateCurrentMediaItem(it.media) }
+                ?.apply { dispatch(Result.SetVideo(this)) }
         }
 
         private fun openChannel(state: State) =

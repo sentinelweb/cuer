@@ -15,7 +15,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.removeItemByPlatformId
 import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
+import uk.co.sentinelweb.cuer.domain.ext.replaceMediaById
 import uk.co.sentinelweb.cuer.domain.ext.replaceMediaByPlatformId
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistMemoryRepository constructor(
     private val coroutines: CoroutineContextProvider,
@@ -112,6 +115,10 @@ class PlaylistMemoryRepository constructor(
         else -> throw NotImplementedException()
     }
 
+    override suspend fun update(update: UpdateDomain<PlaylistDomain>, options: Options): PlaylistDomain {
+        throw NotImplementedException()
+    }
+
     override suspend fun delete(domain: PlaylistDomain, options: Options): Boolean =
         domain.id
             ?.let { playlistMemoryCache.remove(it.id) }
@@ -179,6 +186,10 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
+        override suspend fun update(update: UpdateDomain<PlaylistItemDomain>, options: Options): PlaylistItemDomain {
+            throw NotImplementedException()
+        }
+
         override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
             domain.playlistId
                 ?.takeIf { playlistMemoryCache.contains(it.id) }
@@ -226,14 +237,21 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        // FIXME THIS DEOSNT SAVE THE MEDIAS IF THE ID IS NOT NULL !! - CHECK USAGE
-        override suspend fun save(domain: MediaDomain, options: Options): MediaDomain {
+        override suspend fun save(domain: MediaDomain, options: Options): MediaDomain? {
             if (domain.id == null) {
                 playlistMemoryCache[Shared.id]
                     .takeIf { it != null }
                     ?.also { playlistMemoryCache[Shared.id] = it.replaceMediaByPlatformId(media = domain) }
+                return domain
+            } else {
+                domain.id
+                    ?.let { mediaId ->
+                        findPlaylistForMediaId(mediaId.id)
+                            .takeIf { it != null }
+                            ?.also { playlistMemoryCache[it.id!!.id] = it.replaceMediaById(media = domain) }
+                        return load(mediaId.id, options)
+                    } ?: throw DoesNotExistException("id is null")
             }
-            return domain
         }
 
         // fixme this just finds the playlist for the first item
@@ -257,8 +275,32 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
+        override suspend fun update(update: UpdateDomain<MediaDomain>, options: Options): MediaDomain =
+            when (update) {
+                is MediaPositionUpdateDomain -> {
+                    load(update.id.id, options)
+                        ?.copy(
+                            duration = update.duration,
+                            positon = update.positon,
+                            dateLastPlayed = update.dateLastPlayed,
+                            watched = update.watched
+                        )
+                        ?.also { save(it, options) }
+                    load(update.id.id, options) ?: throw DoesNotExistException("Save failed")
+                }
+
+                else -> throw NotImplementedException()
+            }
+
+
         override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
             throw NotImplementedException()
         }
+
+        private fun findPlaylistForMediaId(id: GUID) = playlistMemoryCache.values
+            .map { it.items }
+            .flatten()
+            .firstOrNull { id == it.media.id?.id }
+            ?.let { playlistMemoryCache[it.playlistId?.id] }
     }
 }

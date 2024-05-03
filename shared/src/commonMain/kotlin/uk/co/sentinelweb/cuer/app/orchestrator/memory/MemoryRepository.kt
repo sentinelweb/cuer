@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator.memory
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 interface MemoryRepository<Domain> {
     val updates: Flow<Pair<Operation, Domain>>
@@ -23,5 +24,6 @@ interface MemoryRepository<Domain> {
 
     suspend fun delete(domain: Domain, options: Options): Boolean
 
+    suspend fun update(update: UpdateDomain<Domain>, options: Options): Domain
 
 }

@@ -228,9 +228,7 @@ class QueueMediator constructor(
     }
 
     private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
-        //log.d("updateCurrentItemFromMedia: item.null=${state.currentItem != null} ${updatedMedia.summarise()}")
         state.currentItem = state.currentItem
-            ?.takeIf { it.media.id?.source != OrchestratorContract.Source.MEMORY }
             ?.run {
                 media.let {
                     MediaPositionUpdateDomain(
@@ -241,15 +239,11 @@ class QueueMediator constructor(
                         watched = true
                     )
                 }.let {
-                    //log.d("updateCurrentItemFromMedia: media update: pl.null=${playlist == null} ${it}")
-                    //log.d("updateCurrentMediaItem b4 sv: position=${state.currentItem?.media?.positon} target=${it.positon}")
                     mediaUpdate.updateMedia(playlist!!, it, it.id.source.flatOptions(emit = true))
                         .let { copy(media = it) }
-                    //?.also { log.d("mediaUpdate complete ;") }
                 }
             }
             ?: state.currentItem
-        //log.d("updateCurrentItemFromMedia: state.currentItem.pos:${state.currentItem?.media?.positon}")
         state.playlist = state.playlist
             ?.let {
                 it.copy(items = it.items.toMutableList().apply {

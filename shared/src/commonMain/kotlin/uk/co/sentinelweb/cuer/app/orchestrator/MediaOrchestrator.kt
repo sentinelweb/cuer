@@ -81,7 +81,7 @@ class MediaOrchestrator constructor(
 
     suspend override fun save(domain: MediaDomain, options: Options): MediaDomain =
         when (options.source) {
-            MEMORY -> mediaMemoryRepository.save(domain, options)
+            MEMORY -> mediaMemoryRepository.save(domain, options) ?: throw DoesNotExistException("save failed")
             LOCAL -> mediaDatabaseRepository
                 .save(domain, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Save failed $domain")
@@ -90,7 +90,6 @@ class MediaOrchestrator constructor(
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw NotImplementedException()
         }
-
 
     suspend override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> =
         when (options.source) {
@@ -123,7 +122,7 @@ class MediaOrchestrator constructor(
 
     override suspend fun update(update: UpdateDomain<MediaDomain>, options: Options): MediaDomain =
         when (options.source) {
-            MEMORY -> throw NotImplementedException()
+            MEMORY -> mediaMemoryRepository.update(update, options)
             LOCAL -> mediaDatabaseRepository
                 .update(update, options.flat, options.emit)
                 .forceDatabaseSuccessNotNull("Update failed: ${update}")

@@ -16,6 +16,7 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -26,15 +27,17 @@ import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
+import javax.swing.event.ChangeEvent
 
 
 class VlcPlayerSwingWindow(
-    private val coordinator: VlcPlayerUiCoordinator
+    private val coordinator: VlcPlayerUiCoordinator,
 ) : JFrame(), KoinComponent {
 
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
+    private val timeProvider: TimeProvider by inject()
 
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
@@ -46,6 +49,13 @@ class VlcPlayerSwingWindow(
 
     private var durationMs: Long? = null
 
+    val seekChangeListner: (e: ChangeEvent) -> Unit = { e ->
+        val source = e.source as JSlider
+        if (!source.valueIsAdjusting) {
+            val posValue = source.value.toFloat() // between 0 and 1000
+            coordinator.dispatch(SeekBarChanged(posValue / source.maximum))
+        }
+    }
     init {
         log.tag(this)
         createWindow()
@@ -127,9 +137,16 @@ class VlcPlayerSwingWindow(
                     coordinator.dispatch(PlayerStateChanged(ENDED))
                 }
 
+                var lastPosUpdateTime = 0L
                 override fun positionChanged(mediaPlayer: MediaPlayer?, newPosition: Float) {
-                    //log.d("event positionChanged: $newPosition")
-                    durationMs?.let { coordinator.dispatch(PositionReceived((newPosition * it).toLong())) }
+                    val current = timeProvider.currentTimeMillis()
+                    if (current - lastPosUpdateTime > 200) {
+                        durationMs?.let {
+                            val newPositionLong = (newPosition * it).toLong()
+                            coordinator.dispatch(PositionReceived(newPositionLong))
+                        }
+                        lastPosUpdateTime = current
+                    }
                 }
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
@@ -195,13 +212,8 @@ class VlcPlayerSwingWindow(
         }
         seekBar = JSlider(0, 1000, 0).apply {
             seekPane.add(this, CENTER)
-            addChangeListener { e ->
-                val source = e.source as JSlider
-                if (!source.getValueIsAdjusting()) {
-                    val posValue = source.value.toFloat() // between 0 and 1000
-                    coordinator.dispatch(SeekBarChanged(posValue / maximum))
-                }
-            }
+
+            addChangeListener(seekChangeListner)
         }
         posText = JLabel("00:00:00").apply {
             seekPane.add(this, WEST)
@@ -237,7 +249,9 @@ class VlcPlayerSwingWindow(
     }
 
     fun updateUiTimes(times: PlayerContract.View.Model.Times) {
+        seekBar.removeChangeListener(seekChangeListner)
         seekBar.value = (times.seekBarFraction * seekBar.maximum).toInt()
+        seekBar.addChangeListener(seekChangeListner)
         posText.text = times.positionText
         durText.text = times.durationText
     }
