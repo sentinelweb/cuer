@@ -40,6 +40,8 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     DATABASE_VERSION("db.version"),
     ONBOARDED_PREFIX("onboarded_"),
     FOLDER_ROOTS("folder.roots"),
+    SKIP_FWD_TIME("skipFwdTime"),
+    SKIP_BACK_TIME("skipBackTime"),
     ;
 
     companion object {

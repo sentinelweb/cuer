@@ -15,7 +15,9 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
+import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -99,7 +101,6 @@ class VlcPlayerUiCoordinator(
             factory<AppPlaylistInteractor.CustomisationResources>(named(Unfinished)) { EmptyCustomisationResources() }
             factory<RibbonCreator> { EmptyRibbonCreator() }
             factory<LivePlaybackContract.Controller> { EmptyLivePlaybackController() }
-            factory<SkipContract.External> { EmptySkip() }
             factory<MediaSessionContract.Manager> { EmptyMediaSessionManager() }
             single { FolderMemoryPlaylistItemLoader() }
             single<PlayerContract.PlaylistItemLoader> { get<FolderMemoryPlaylistItemLoader>() }
@@ -132,6 +133,15 @@ class VlcPlayerUiCoordinator(
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get()
                     ).create()
+                }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = EmptySkipView(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = get(),
+                        prefsWrapper = get()
+                    )
                 }
             }
         }

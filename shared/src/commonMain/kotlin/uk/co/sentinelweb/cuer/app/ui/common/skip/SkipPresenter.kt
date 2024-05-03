@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.common.skip
 
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences
-import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -9,13 +9,12 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-// todo move to shared
 class SkipPresenter constructor(
     private val view: SkipContract.View,
     private val state: SkipContract.State,
     private val mapper: SkipContract.Mapper,
     private val log: LogWrapper,
-    private val prefsWrapper: GeneralPreferencesWrapper
+    private val prefsWrapper: MultiPlatformPreferencesWrapper
 ) : SkipContract.Presenter, SkipContract.External {
 
     override val skipBackText: String get() = mapper.mapBackTime(state.backJumpInterval.toLong())
@@ -43,8 +42,8 @@ class SkipPresenter constructor(
     }
 
     override fun updateSkipTimes() {
-        state.forwardJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_FWD_TIME, 30000)
-        state.backJumpInterval = prefsWrapper.getInt(GeneralPreferences.SKIP_BACK_TIME, 30000)
+        state.forwardJumpInterval = prefsWrapper.getInt(MultiPlatformPreferences.SKIP_FWD_TIME, 30000)
+        state.backJumpInterval = prefsWrapper.getInt(MultiPlatformPreferences.SKIP_BACK_TIME, 30000)
     }
 
     override fun skipFwd() {
@@ -152,12 +151,12 @@ class SkipPresenter constructor(
     private fun onSkipTimeSelected(time: Int, fwd: Boolean) {
         if (fwd) {
             state.forwardJumpInterval = time
-            prefsWrapper.putInt(GeneralPreferences.SKIP_FWD_TIME, time)
+            prefsWrapper.putInt(MultiPlatformPreferences.SKIP_FWD_TIME, time)
             listener.skipSetFwdText(skipForwardText)
             skipFwd()
         } else {
             state.backJumpInterval = time
-            prefsWrapper.putInt(GeneralPreferences.SKIP_BACK_TIME, time)
+            prefsWrapper.putInt(MultiPlatformPreferences.SKIP_BACK_TIME, time)
             listener.skipSetBackText(skipBackText)
             skipBack()
         }

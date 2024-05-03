@@ -25,6 +25,8 @@ import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
@@ -136,10 +138,10 @@ object SharedAppModule {
     private val playerModule = module {
         factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
         single { PlayerListener(get(), get()) }
-
+        factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
     }
 
-    // todo vrewake up this module into logical moduules
+    // todo remake up this module into logical moduules
     private val objectModule = module {
         factory { ParserFactory() }
         single {

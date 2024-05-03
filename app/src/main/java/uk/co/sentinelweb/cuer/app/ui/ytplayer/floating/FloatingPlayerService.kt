@@ -16,7 +16,10 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
-import uk.co.sentinelweb.cuer.app.ui.common.skip.*
+import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
@@ -134,7 +137,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         view = EmptySkipView(),
                         state = SkipContract.State(),
                         log = get(),
-                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        mapper = get(),
                         prefsWrapper = get()
                     )
                 }

@@ -1,14 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.common.skip
 
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogModel
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 
 class SkipModelMapper constructor(
-    private val timeSinceFormatter: TimeSinceFormatter,
-    private val res: ResourceWrapper
+    private val timeSinceFormatter: TimeSinceFormatter
 ) : SkipContract.Mapper {
     override fun mapForwardTime(time: Long): String = timeSinceFormatter.formatTimeShort(time)
     override fun mapBackTime(time: Long): String = "-" + timeSinceFormatter.formatTimeShort(time)
@@ -21,19 +18,23 @@ class SkipModelMapper constructor(
     ) = SelectDialogModel(
         type = DialogModel.Type.SKIP_TIME,
         multi = false,
-        title = res.getString(
-            if (forward) R.string.dialog_title_select_fwd_skip_time
-            else R.string.dialog_title_select_back_skip_time
-        ),
-        items = res.getIntArray(R.array.skip_time_values).map { time ->
+        title =
+        if (forward) "Select forward skip time"
+        else "Select backward skip time",
+        items = skipChoices.map { time ->
             SelectDialogModel.Item(
                 if (forward) mapForwardTime(time.toLong()) else mapBackTime(time.toLong()),
                 selected = (currentTimeMs == time),
                 selectable = true
             )
         },
-        itemClick = { index, selected -> itemClick(res.getIntArray(R.array.skip_time_values)[index]) },
+        itemClick = { index, selected -> itemClick(skipChoices[index]) },
         confirm = null,
         dismiss = {}
     )
+
+    companion object {
+        //skipChoices = res.getIntArray(R.array.skip_time_values)
+        private val skipChoices = intArrayOf(5000, 10000, 30000, 60000, 300000, 600000, 1800000)
+    }
 }

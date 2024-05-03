@@ -50,7 +50,7 @@ class PlayerStoreFactory(
 
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        data class Screen(val content: PlayerContract.MviStore.Content) : Result()
+        data class Screen(val content: Content) : Result()
         data class Position(val pos: Long) : Result()
     }
 
@@ -141,6 +141,7 @@ class PlayerStoreFactory(
 
         private fun receiveDuration(intent: Intent.Duration) {
             livePlaybackController.gotDuration(intent.ms)
+            skip.duration = intent.ms
             queueConsumer.currentItem
                 ?.takeIf { it.media.duration == null || it.media.duration != intent.ms }
                 ?.let { it.media.copy(duration = intent.ms) }

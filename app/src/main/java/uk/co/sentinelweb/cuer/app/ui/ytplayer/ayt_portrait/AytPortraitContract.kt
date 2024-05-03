@@ -15,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
@@ -82,7 +81,7 @@ interface AytPortraitContract {
                         view = get(),
                         state = SkipContract.State(),
                         log = get(),
-                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        mapper = get(),
                         prefsWrapper = get()
                     )
                 }

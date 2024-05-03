@@ -10,7 +10,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
@@ -65,7 +64,7 @@ interface AytLandContract {
                         view = get(),
                         state = SkipContract.State(),
                         log = get(),
-                        mapper = SkipModelMapper(timeSinceFormatter = get(), res = get()),
+                        mapper = get(),
                         prefsWrapper = get()
                     )
                 }
