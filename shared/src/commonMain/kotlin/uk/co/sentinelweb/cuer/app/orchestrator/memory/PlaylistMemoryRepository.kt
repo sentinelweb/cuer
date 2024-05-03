@@ -67,7 +67,7 @@ class PlaylistMemoryRepository constructor(
         Unfinished.id -> unfinishedItemsInteractor.getPlaylist()
         LiveUpcoming.id -> liveUpcomingItemsPlayistInteractor.getPlaylist()
         Shared.id -> playlistMemoryCache[id]
-        else -> playlistMemoryCache[id] ?: throw DoesNotExistException("$id is invalid memory playlist")
+        else -> playlistMemoryCache[id]
     }
 
     override suspend fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
@@ -196,8 +196,8 @@ class PlaylistMemoryRepository constructor(
     }
 
     // -----------------------------------------------------------------------------------------------------
-//  MediaMemoryRepository ------------------------------------------------------------------------
-// -----------------------------------------------------------------------------------------------------
+    //  MediaMemoryRepository ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------
     inner class MediaMemoryRepository : MemoryRepository<MediaDomain> {
         private val _mediaFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
         override val updates: Flow<Pair<Operation, MediaDomain>>
@@ -207,18 +207,26 @@ class PlaylistMemoryRepository constructor(
             throw NotImplementedException()
         }
 
-        override suspend fun load(domain: MediaDomain, options: Options): MediaDomain? {
-            throw NotImplementedException()
-        }
+        override suspend fun load(domain: MediaDomain, options: Options): MediaDomain? =
+            domain.takeIf { it.id != null }
+                ?.let { playlistMemoryCache.values }
+                ?.map { it.items }
+                ?.flatten()
+                ?.firstOrNull { domain.id?.id == it.media.id?.id }
+                ?.media
 
-        override suspend fun load(id: GUID, options: Options): MediaDomain? {
-            throw NotImplementedException()
-        }
+        override suspend fun load(id: GUID, options: Options): MediaDomain? =
+            playlistMemoryCache.values
+                .map { it.items }
+                .flatten()
+                .firstOrNull { id == it.media.id?.id }
+                ?.media
 
         override suspend fun loadList(filter: Filter, options: Options): List<MediaDomain> {
             throw NotImplementedException()
         }
 
+        // FIXME THIS DEOSNT SAVE THE MEDIAS IF THE ID IS NOT NULL !! - CHECK USAGE
         override suspend fun save(domain: MediaDomain, options: Options): MediaDomain {
             if (domain.id == null) {
                 playlistMemoryCache[Shared.id]
@@ -228,6 +236,8 @@ class PlaylistMemoryRepository constructor(
             return domain
         }
 
+        // fixme this just finds the playlist for the first item
+        // FIXME THIS DEOSNT SAVE THE MEDIAS IF THE ID IS NOT NULL !! - CHECK USAGE
         override suspend fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
             playlistMemoryCache[Shared.id]
                 .takeIf { it != null }

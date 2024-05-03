@@ -15,7 +15,7 @@ interface MemoryRepository<Domain> {
 
     suspend fun loadList(filter: Filter, options: Options): List<Domain>
 
-    suspend fun save(domain: Domain, options: Options): Domain
+    suspend fun save(domain: Domain, options: Options): Domain?
 
     suspend fun save(domains: List<Domain>, options: Options): List<Domain>
 
