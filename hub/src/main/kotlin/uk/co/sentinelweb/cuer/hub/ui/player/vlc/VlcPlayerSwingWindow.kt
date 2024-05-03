@@ -17,13 +17,12 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import java.awt.BorderLayout
+import java.awt.BorderLayout.*
+import java.awt.Color
 import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.swing.JButton
-import javax.swing.JFrame
-import javax.swing.JOptionPane
-import javax.swing.JPanel
+import javax.swing.*
 
 
 class VlcPlayerSwingWindow(
@@ -38,6 +37,9 @@ class VlcPlayerSwingWindow(
     private lateinit var pauseButton: JButton
     private lateinit var rewindButton: JButton
     private lateinit var skipButton: JButton
+    private lateinit var seekBar: JSlider
+    private lateinit var posText: JLabel
+    private lateinit var durText: JLabel
 
     private var durationMs: Long? = null
 
@@ -81,11 +83,10 @@ class VlcPlayerSwingWindow(
 
     fun createMediaPlayer() {
         mediaPlayerComponent = CallbackMediaPlayerComponent()
-        this.contentPane.add(mediaPlayerComponent, BorderLayout.CENTER)
+        this.contentPane.add(mediaPlayerComponent, CENTER)
         mediaPlayerComponent.mediaPlayer().events().addMediaEventListener(
             object : MediaEventAdapter() {
                 override fun mediaParsedChanged(media: Media, newStatus: MediaParsedStatus) {
-                    super.mediaParsedChanged(media, newStatus)
                     val ms = media.info().duration()
                     log.d("duration: $ms")
                     durationMs = ms
@@ -109,8 +110,8 @@ class VlcPlayerSwingWindow(
 
                 override fun playing(mediaPlayer: MediaPlayer?) {
                     log.d("event playing")
-                    // send on ready
-                    //coordinator.dispatch(PlayerStateChanged(PLAYING))
+                    // also send PLAYING on ready
+                    coordinator.dispatch(PlayerStateChanged(PLAYING))
                 }
 
                 override fun paused(mediaPlayer: MediaPlayer?) {
@@ -155,54 +156,93 @@ class VlcPlayerSwingWindow(
 
     private fun createControls() {
         val controlsPane = JPanel()
+        controlsPane.layout = BorderLayout()
+        controlsPane.background = Color.BLACK
+
+        val buttonsPane = JPanel()
+        buttonsPane.background = Color.BLACK
+        controlsPane.add(buttonsPane, CENTER)
+
+        val seekPane = JPanel()
+        seekPane.layout = BorderLayout()
+        seekPane.background = Color.BLACK
+        controlsPane.add(seekPane, SOUTH)
+
+        this.contentPane.add(controlsPane, SOUTH)
 
         playButton = JButton("Play").apply {
-            controlsPane.add(this)
+            buttonsPane.add(this)
             addActionListener { coordinator.dispatch(PlayPauseClicked(false)) }
         }
         pauseButton = JButton("Pause").apply {
-            controlsPane.add(this)
+            buttonsPane.add(this)
             addActionListener { coordinator.dispatch(PlayPauseClicked(true)) }
         }
         rewindButton = JButton("<< Rewind").apply {
-            controlsPane.add(this)
+            buttonsPane.add(this)
             addActionListener { coordinator.dispatch(SkipBackClicked) }
         }
         skipButton = JButton("Skip >>").apply {
-            controlsPane.add(this)
+            buttonsPane.add(this)
             addActionListener { coordinator.dispatch(SkipFwdClicked) }
         }
+        seekBar = JSlider(0, 1000, 0).apply {
+            seekPane.add(this, CENTER)
+            addChangeListener { e ->
+                val source = e.source as JSlider
+                if (!source.getValueIsAdjusting()) {
+                    val posValue = source.value.toFloat() // between 0 and 1000
+                    coordinator.dispatch(SeekBarChanged(posValue / maximum))
+                }
+            }
+        }
+        posText = JLabel("00:00:00").apply {
+            seekPane.add(this, WEST)
+            foreground = Color.WHITE
 
-        this.contentPane.add(controlsPane, BorderLayout.SOUTH)
+        }
+        durText = JLabel("00:00:00").apply {
+            seekPane.add(this, EAST)
+            foreground = Color.WHITE
+        }
     }
 
-    fun updateUiPlayState(state: PlayerStateDomain) = when (state) {
-        UNKNOWN -> Unit
-        UNSTARTED -> Unit
-        ENDED -> Unit
-        PLAYING -> {
-//            pauseButton.isVisible = true
-//            playButton.isVisible = false
-        }
+    fun updateUiPlayState(state: PlayerStateDomain) {
+        log.d("state:${state::class.java.simpleName}")
+        return when (state) {
+            UNKNOWN -> Unit
+            UNSTARTED -> Unit
+            ENDED -> Unit
+            PLAYING -> {
+                pauseButton.isVisible = true
+                playButton.isVisible = false
+            }
 
-        PAUSED -> {
-//            pauseButton.isVisible = false
-//            playButton.isVisible = true
-        }
+            PAUSED -> {
+                pauseButton.isVisible = false
+                playButton.isVisible = true
+            }
 
-        BUFFERING -> Unit
-        VIDEO_CUED -> Unit
-        PlayerStateDomain.ERROR -> Unit
+            BUFFERING -> Unit
+            VIDEO_CUED -> Unit
+            PlayerStateDomain.ERROR -> Unit
+        }
     }
 
-    fun playState(command: PlayerContract.PlayerCommand) = when (command) {
+    fun updateUiTimes(times: PlayerContract.View.Model.Times) {
+        seekBar.value = (times.seekBarFraction * seekBar.maximum).toInt()
+        posText.text = times.positionText
+        durText.text = times.durationText
+    }
+
+    fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
         is Load -> playItem(command.platformId)
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
         is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
         is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
         is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
         is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
-    }
+    }.also { log.d("command:${command::class.java.simpleName}") }
 
     companion object {
         fun showWindow(coordinator: VlcPlayerUiCoordinator): VlcPlayerSwingWindow? {

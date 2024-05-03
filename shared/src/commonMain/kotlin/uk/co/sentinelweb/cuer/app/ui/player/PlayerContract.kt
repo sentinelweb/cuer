@@ -110,7 +110,7 @@ interface PlayerContract {
                 val skipBackText: String?,
             )
 
-            data class Times constructor(
+            data class Times(
                 val positionText: String,
                 val durationText: String,
                 val liveTime: String?,

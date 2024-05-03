@@ -67,9 +67,8 @@ class VlcPlayerUiCoordinator(
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
-        log.d("label: $label")
         when (label) {
-            is Command -> playerWindow.playState(label.command)
+            is Command -> playerWindow.playStateChanged(label.command)
             else -> log.d("Unprocessed label: $label")
         }
     }
@@ -77,17 +76,13 @@ class VlcPlayerUiCoordinator(
     override val renderer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
             playerWindow.updateUiPlayState(it)
-//            when (it) {
-//                PlayerStateDomain.BUFFERING -> showBuffering()
-//                PlayerStateDomain.PLAYING -> setPlaying()
-//                PlayerStateDomain.PAUSED -> setPaused()
-//                else -> Unit
-//            }
         })
-//        diff(get = Model::itemImage, set = { url ->
-//            url?.let { setImage(it) }
-//        })
+        diff(get = Model::times, set = {
+            playerWindow.updateUiTimes(it)
+        })
+
     }
+
 //    override fun render(model: Model) {
 //        this.modelObservable.value = model
 //    }
