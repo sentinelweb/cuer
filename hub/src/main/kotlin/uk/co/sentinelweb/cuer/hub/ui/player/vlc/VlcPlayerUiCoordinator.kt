@@ -2,7 +2,9 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
+import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
@@ -15,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInte
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -66,23 +69,28 @@ class VlcPlayerUiCoordinator(
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
         log.d("label: $label")
         when (label) {
-            is PlayerContract.MviStore.Label.Command -> when (label.command) {
-                is PlayerContract.PlayerCommand.Load -> {
-
-                    val command = label.command as PlayerContract.PlayerCommand.Load
-                    playerWindow.playItem(command.platformId)
-                }
-
-                else -> log.d("Unprocessed command: ${label.command}")
-            }
-
+            is Command -> playerWindow.playState(label.command)
             else -> log.d("Unprocessed label: $label")
         }
     }
 
-    override fun render(model: Model) {
-        this.modelObservable.value = model
+    override val renderer: ViewRenderer<Model> = diff {
+        diff(get = Model::playState, set = {
+            playerWindow.updateUiPlayState(it)
+//            when (it) {
+//                PlayerStateDomain.BUFFERING -> showBuffering()
+//                PlayerStateDomain.PLAYING -> setPlaying()
+//                PlayerStateDomain.PAUSED -> setPaused()
+//                else -> Unit
+//            }
+        })
+//        diff(get = Model::itemImage, set = { url ->
+//            url?.let { setImage(it) }
+//        })
     }
+//    override fun render(model: Model) {
+//        this.modelObservable.value = model
+//    }
 
     fun playerWindowDestroyed() {
         parent.killPlayer()
