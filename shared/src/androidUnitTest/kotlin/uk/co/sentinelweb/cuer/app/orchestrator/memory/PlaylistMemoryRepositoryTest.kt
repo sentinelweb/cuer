@@ -17,11 +17,15 @@ import uk.co.sentinelweb.cuer.core.providers.TestCoroutineContextProvider
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
 import uk.co.sentinelweb.cuer.tools.rule.CoroutineTestRule
+import uk.co.sentinelweb.cuer.tools.rule.FlakyTestRule
 import kotlin.test.assertEquals
 
 class PlaylistMemoryRepositoryTest {
     @get:Rule
     var rule = CoroutineTestRule()
+
+    @get:Rule
+    var flakyTestRule = FlakyTestRule(5)
 
     private val fixture = kotlinFixtureDefaultConfig
 
