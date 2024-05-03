@@ -1,7 +1,10 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
+import androidx.compose.ui.graphics.Color.Companion.Black
+import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import toImageIcon
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
@@ -172,18 +175,22 @@ class VlcPlayerSwingWindow(
 
         playButton = JButton("Play").apply {
             buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_play.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(PlayPauseClicked(false)) }
         }
         pauseButton = JButton("Pause").apply {
             buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_pause.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(PlayPauseClicked(true)) }
         }
-        rewindButton = JButton("<< Rewind").apply {
+        rewindButton = JButton("Rewind").apply {
             buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_fast_rewind.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(SkipBackClicked) }
         }
-        skipButton = JButton("Skip >>").apply {
+        skipButton = JButton("Skip").apply {
             buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_fast_forward.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(SkipFwdClicked) }
         }
         seekBar = JSlider(0, 1000, 0).apply {

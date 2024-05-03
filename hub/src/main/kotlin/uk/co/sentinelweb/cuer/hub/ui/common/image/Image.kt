@@ -15,9 +15,11 @@ import org.w3c.dom.Element
 import java.awt.RenderingHints
 import java.awt.geom.AffineTransform
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
 import javax.imageio.ImageIO
+import javax.swing.ImageIcon
 
 suspend fun loadImageBitmapFromUrl(url: String): ImageBitmap? {
     val client = HttpClient(CIO)
@@ -34,7 +36,7 @@ suspend fun loadImageBitmapFromUrl(url: String): ImageBitmap? {
 }
 
 // Extension function to convert BufferedImage to Compose ImageBitmap
-fun BufferedImage.toImageBitmap(): androidx.compose.ui.graphics.ImageBitmap {
+fun BufferedImage.toImageBitmap(): ImageBitmap {
     val outputStream = ByteArrayOutputStream()
     ImageIO.write(this, "PNG", outputStream)
     val byteArray = outputStream.toByteArray()
@@ -42,11 +44,21 @@ fun BufferedImage.toImageBitmap(): androidx.compose.ui.graphics.ImageBitmap {
     return skijaImage.toComposeImageBitmap()
 }
 
+// Extension function to convert BufferedImage to ImageIcon
+fun BufferedImage.toImageIcon(): ImageIcon {
+    val outputStream = ByteArrayOutputStream()
+    ImageIO.write(this, "PNG", outputStream)
+    val byteArray = outputStream.toByteArray()
+    val inputStream = ByteArrayInputStream(byteArray)
+    val image = ImageIO.read(inputStream)
+    return ImageIcon(image)
+}
+
 @OptIn(ExperimentalStdlibApi::class)
 fun loadSVG(resourcePath: String, color: Color, size: Int): BufferedImage {
     val inputStream: InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(resourcePath)
         ?: throw IllegalArgumentException("Resource not found: $resourcePath")
-    val svgURI = Thread.currentThread().contextClassLoader.getResource(resourcePath).toURI()
+    val svgURI = Thread.currentThread().contextClassLoader.getResource(resourcePath)?.toURI()
 
     val parser = XMLResourceDescriptor.getXMLParserClassName()
     val factory = SAXSVGDocumentFactory(parser)
