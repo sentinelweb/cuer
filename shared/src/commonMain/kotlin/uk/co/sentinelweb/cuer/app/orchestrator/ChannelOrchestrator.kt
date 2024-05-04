@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.orchestrator
 import kotlinx.coroutines.flow.Flow
 import uk.co.sentinelweb.cuer.app.db.repository.ChannelDatabaseRepository
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.domain.ChannelDomain
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
@@ -41,15 +42,19 @@ class ChannelOrchestrator constructor(
 
     override suspend fun count(filter: Filter, options: Options): Int =
         when (options.source) {
-            Source.MEMORY -> throw NotImplementedException()
-            Source.LOCAL ->
+            MEMORY -> throw NotImplementedException()
+            LOCAL ->
                 channelDatabaseRepository.count(filter)
                     .forceDatabaseSuccessNotNull("Count failed $filter")
 
-            Source.LOCAL_NETWORK -> throw NotImplementedException()
-            Source.REMOTE -> throw NotImplementedException()
-            Source.PLATFORM -> throw InvalidOperationException(this::class, null, options)
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
+
+    override suspend fun delete(id: GUID, options: Options): Boolean {
+        throw NotImplementedException()
+    }
 
     override suspend fun delete(domain: ChannelDomain, options: Options): Boolean {
         throw NotImplementedException()

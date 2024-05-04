@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
+// todo move LivePlaybackController to shared move all prefs to MultiPlatformPreferencesWrapper
 class LivePlaybackController constructor(
     private val state: LivePlaybackContract.State,
     private val prefKeys: LivePlaybackContract.PrefKeys,
@@ -74,5 +75,4 @@ class LivePlaybackController constructor(
             log.d("did not clear duration")
         }
     }
-
 }

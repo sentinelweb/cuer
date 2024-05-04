@@ -66,6 +66,17 @@ fun PlaylistDomain.replaceMediaByPlatformId(media: MediaDomain) =
             )
         } ?: this
 
+fun PlaylistDomain.replaceMediaById(media: MediaDomain) =
+    this.items
+        .indexOfFirst { it.media.id == media.id }
+        .takeIf { it > -1 }
+        ?.let { index ->
+            this.copy(
+                items = this.items.toMutableList()
+                    .apply { set(index, get(index).copy(media = media)) }.toList()
+            )
+        } ?: this
+
 /**
  * Replace the item in the playlist with the same platform id
  */

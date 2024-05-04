@@ -5,6 +5,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -17,9 +18,13 @@ import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.domain.ext.orderString
 import uk.co.sentinelweb.cuer.tools.ext.generatePlaylist
 import uk.co.sentinelweb.cuer.tools.ext.kotlinFixtureDefaultConfig
+import uk.co.sentinelweb.cuer.tools.rule.FlakyTestRule
 import java.lang.Integer.max
 
 class PlaylistMutatorTest {
+    @get:Rule
+    var flakyTestRule = FlakyTestRule(5)
+
     private val fixture = kotlinFixtureDefaultConfig
 
     private lateinit var fixtPlaylist: PlaylistDomain

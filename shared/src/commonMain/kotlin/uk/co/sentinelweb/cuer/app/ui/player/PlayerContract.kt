@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.player
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import kotlinx.datetime.Clock
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.*
@@ -58,7 +59,7 @@ interface PlayerContract {
             data class ItemOpen(val item: PlaylistItemDomain) : Label()
         }
 
-        enum class Screen { DESCRIPTION, PLAYLIST, PLAYLISTS }
+        enum class Content { DESCRIPTION, PLAYLIST, PLAYLISTS }
 
         data class State constructor(
             val item: PlaylistItemDomain? = null,
@@ -66,7 +67,7 @@ interface PlayerContract {
             val playerState: PlayerStateDomain = UNKNOWN,
             val skipFwdText: String = "-",
             val skipBackText: String = "-",
-            val screen: Screen = Screen.DESCRIPTION,
+            val content: Content = Content.DESCRIPTION,
             val position: Long = -1,
         ) {
             fun playlistAndItem(): PlaylistAndItemDomain? = item?.let {
@@ -89,7 +90,7 @@ interface PlayerContract {
             val times: Times,
             val itemImage: String?,
             val description: DescriptionModel,
-            val screen: Screen,
+            val content: Content,
             val playlistItem: PlaylistItemDomain?,
             val playlistAndItem: PlaylistAndItemDomain? = null,
         ) {
@@ -109,13 +110,63 @@ interface PlayerContract {
                 val skipBackText: String?,
             )
 
-            data class Times constructor(
+            data class Times(
                 val positionText: String,
                 val durationText: String,
                 val liveTime: String?,
                 val isLive: Boolean,
                 val seekBarFraction: Float,
             )
+
+            companion object {
+                fun blankModel(): Model = Model(
+                    texts = Texts(
+                        title = "No title",
+                        playlistTitle = "playlistTitle",
+                        playlistData = "playlistData",
+                        nextTrackText = "nextTrackText",
+                        lastTrackText = "lastTrackText",
+                        skipFwdText = "skipFwdText",
+                        skipBackText = "skipBackText",
+                    ),
+                    buttons = Buttons(false, false, false),
+                    description = DescriptionModel(
+                        title = "Title",
+                        description = "Description",
+                        playlistChips = listOf(),
+                        channelTitle = "channelTitle",
+                        channelThumbUrl = null,
+                        channelDescription = "channelDescription",
+                        pubDate = "pubDate",
+                        ribbonActions = listOf(),
+                        info = DescriptionModel.Info(platform = PlatformDomain.OTHER, platformId = "platformId")
+                    ),
+                    itemImage = null,
+                    playState = UNKNOWN,
+                    playlistItem = PlaylistItemDomain(
+                        id = null,
+                        dateAdded = Clock.System.now(),
+                        order = 0,
+                        playlistId = null,
+                        media = MediaDomain(
+                            id = null,
+                            url = "media url",
+                            platform = PlatformDomain.OTHER,
+                            platformId = "platformId",
+                            mediaType = MediaDomain.MediaTypeDomain.WEB,
+                            channelData = ChannelDomain(
+                                id = null,
+                                title = "channel title",
+                                platform = PlatformDomain.OTHER,
+                                platformId = "platformId",
+                            )
+                        )
+                    ),
+                    playlistAndItem = null,
+                    content = Content.DESCRIPTION,
+                    times = Times("00:00", "??:??", liveTime = null, isLive = false, seekBarFraction = 0f)
+                )
+            }
         }
 
         sealed class Event {

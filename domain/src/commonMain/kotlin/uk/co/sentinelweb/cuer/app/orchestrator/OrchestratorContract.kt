@@ -43,6 +43,8 @@ interface OrchestratorContract<Domain> {
 
     suspend fun delete(domain: Domain, options: Options): Boolean
 
+    suspend fun delete(id: GUID, options: Options): Boolean
+
     suspend fun update(update: UpdateDomain<Domain>, options: Options): Domain?
 
     data class Options constructor(

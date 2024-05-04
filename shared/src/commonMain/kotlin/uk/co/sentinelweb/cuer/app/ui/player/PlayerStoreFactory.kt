@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.MediaOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -48,7 +50,7 @@ class PlayerStoreFactory(
 
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        data class Screen(val screen: PlayerContract.MviStore.Screen) : Result()
+        data class Screen(val content: Content) : Result()
         data class Position(val pos: Long) : Result()
     }
 
@@ -69,7 +71,7 @@ class PlayerStoreFactory(
 
                 is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(screen = msg.screen)
+                is Result.Screen -> copy(content = msg.content)
                 is Result.SkipTimes -> copy(
                     skipFwdText = msg.fwd ?: skipFwdText,
                     skipBackText = msg.back ?: skipBackText
@@ -118,12 +120,12 @@ class PlayerStoreFactory(
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
                 is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
-                is Intent.PlaylistView -> dispatch(Result.Screen(Screen.PLAYLIST))
-                is Intent.PlaylistItemView -> dispatch(Result.Screen(Screen.DESCRIPTION))
+                is Intent.PlaylistView -> dispatch(Result.Screen(Content.PLAYLIST))
+                is Intent.PlaylistItemView -> dispatch(Result.Screen(Content.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
-                is Intent.Duration -> livePlaybackController.gotDuration(intent.ms)
+                is Intent.Duration -> receiveDuration(intent)
                 is Intent.Id -> livePlaybackController.gotVideoId(intent.videoId)
                 is Intent.FullScreenPlayerOpen -> publish(Label.FullScreenPlayerOpen(getState().playlistAndItem()!!))
                 is Intent.PortraitPlayerOpen -> publish(Label.PortraitPlayerOpen(getState().playlistAndItem()!!))
@@ -136,6 +138,16 @@ class PlayerStoreFactory(
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
             }
+
+        private fun receiveDuration(intent: Intent.Duration) {
+            livePlaybackController.gotDuration(intent.ms)
+            skip.duration = intent.ms
+            queueConsumer.currentItem
+                ?.takeIf { it.media.duration == null || it.media.duration != intent.ms }
+                ?.let { it.copy(media = it.media.copy(duration = intent.ms)) }
+                ?.also { queueConsumer.updateCurrentMediaItem(it.media) }
+                ?.apply { dispatch(Result.SetVideo(this)) }
+        }
 
         private fun openChannel(state: State) =
             state.item?.media?.channelData
@@ -169,12 +181,15 @@ class PlayerStoreFactory(
                 }
         }
 
-        private fun init() {
+        private fun init() = coroutines.mainScope.launch {
+            // fixme there seem to be some race condition when binding the store to the UI so the initial load command
+            // label doesnt make it to the view.processLabel() - this delay gets around it
+            delay(1)
             itemLoader.load()?.also { playlistAndItem ->
                 log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
                 loadItem(playlistAndItem)
             }
-        }
+        }.ignoreJob()
 
         private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
             playlistAndItem
@@ -195,6 +210,7 @@ class PlayerStoreFactory(
         }
 
         private fun trackChange(intent: Intent.TrackChange) {
+            log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
             mediaSessionManager.checkCreateMediaSession(playerControls)

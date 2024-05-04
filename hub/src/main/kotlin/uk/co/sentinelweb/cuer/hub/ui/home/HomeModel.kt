@@ -9,6 +9,6 @@ data class HomeModel(
     }
 
     companion object {
-        val blankModel: HomeModel = HomeModel(HomeModel.DisplayRoute.Settings)
+        val blankModel: HomeModel = HomeModel(DisplayRoute.Files)
     }
 }

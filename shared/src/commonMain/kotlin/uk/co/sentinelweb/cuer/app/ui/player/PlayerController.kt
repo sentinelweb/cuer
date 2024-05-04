@@ -88,7 +88,8 @@ class PlayerController constructor(
     @ExperimentalCoroutinesApi
     fun onViewCreated(views: List<PlayerContract.View>, viewLifecycle: Lifecycle) {
         if (binder != null) throw IllegalStateException("Already bound")
-        binder = bind(viewLifecycle, BinderLifecycleMode.START_STOP) {
+        binder =
+            bind(viewLifecycle, BinderLifecycleMode.START_STOP, mainContext = coroutines.mainScope.coroutineContext) {
             bindTheThings(views)
         }
     }

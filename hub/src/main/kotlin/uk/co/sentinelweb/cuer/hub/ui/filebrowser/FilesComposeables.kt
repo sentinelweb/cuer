@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 
 object FilesComposeables {
@@ -33,12 +33,18 @@ object FilesComposeables {
                 }
             }
             model.list.playlist.items.forEach {
-                Row {
+                Row(modifier = Modifier.clickable {
+                    if (listOf(VIDEO, AUDIO).contains(it.media.mediaType))
+                        view.playVideo(it)
+                    else if (FILE.equals(it.media.mediaType)) {
+                        view.showFile(it.media)
+                    }
+                }) {
                     val icon = when (it.media.mediaType) {
-                        MediaDomain.MediaTypeDomain.VIDEO -> "drawable/ic_video.svg"
-                        MediaDomain.MediaTypeDomain.AUDIO -> "drawable/ic_mic.svg"
-                        MediaDomain.MediaTypeDomain.WEB -> "drawable/ic_browse.svg"
-                        MediaDomain.MediaTypeDomain.FILE -> "drawable/ic_file.svg"
+                        VIDEO -> "drawable/ic_video.svg"
+                        AUDIO -> "drawable/ic_mic.svg"
+                        WEB -> "drawable/ic_browse.svg"
+                        FILE -> "drawable/ic_file.svg"
                     }
                     ImageSvg(icon, modifier = Modifier.padding(16.dp))
                     Text(text = it.media.title ?: "No title", modifier = Modifier.padding(16.dp))

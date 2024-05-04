@@ -158,9 +158,7 @@ object Modules {
         factory<CustomisationResources>(named(NewItems)) { NewPlaylistCustomisationResources(get()) }
         factory<CustomisationResources>(named(Starred)) { StarredPlaylistCustomisationResources(get()) }
         factory<CustomisationResources>(named(Unfinished)) {
-            UnfinishedPlaylistCustomisationResources(
-                get()
-            )
+            UnfinishedPlaylistCustomisationResources(get())
         }
         factory<UpcomingContract.View> { UpcomingNotification(get(), get(), get(), get(), get()) }
     }

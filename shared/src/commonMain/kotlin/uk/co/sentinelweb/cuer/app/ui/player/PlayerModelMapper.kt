@@ -54,14 +54,14 @@ class PlayerModelMapper constructor(
                 playState = playerState,
                 times = PlayerContract.View.Model.Times(
                     positionText = mapPosition(),
-                    durationText = item?.media?.duration?.let { timeFormatter.formatMillis(it, SECS) } ?: "-",
+                    durationText = item?.media?.duration?.let { timeFormatter.formatMillis(it, SECS) } ?: "--:--",
                     liveTime = mapLiveTime(),
                     isLive = item?.media?.isLiveOrUpcoming() ?: false,
                     seekBarFraction = item?.media?.positon?.let { pos ->
                         item.media.duration?.let { pos.toFloat() / it }
                     } ?: 0f
                 ),
-                screen = screen,
+                content = content,
                 playlistItem = state.item,
                 playlistAndItem = state.playlistAndItem()
             )

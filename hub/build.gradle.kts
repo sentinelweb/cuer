@@ -14,7 +14,7 @@ val ver_junit: String by project
 val ver_mockk: String by project
 val ver_turbine: String by project
 val ver_multiplatform_settings: String by project
-
+val ver_vlcj: String by project
 val isProduction: String by project
 val app_versionCode: String by project
 val app_versionName: String by project
@@ -60,6 +60,8 @@ dependencies {
     testImplementation("app.cash.turbine:turbine:$ver_turbine")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
 
+    implementation("uk.co.caprica:vlcj:$ver_vlcj")
+
 }
 
 compose.desktop {
@@ -68,8 +70,8 @@ compose.desktop {
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "test"
-            packageVersion = "1.0.0"
+            packageName = "Cuer"
+            packageVersion = "1.0.0"// fixme shoudl use app_versionName but there are a lot of platform dependent rules
         }
     }
 }

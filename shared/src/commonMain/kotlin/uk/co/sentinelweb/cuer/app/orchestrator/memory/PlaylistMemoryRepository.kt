@@ -15,7 +15,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.removeItemByPlatformId
 import uk.co.sentinelweb.cuer.domain.ext.replaceItemByPlatformId
+import uk.co.sentinelweb.cuer.domain.ext.replaceMediaById
 import uk.co.sentinelweb.cuer.domain.ext.replaceMediaByPlatformId
+import uk.co.sentinelweb.cuer.domain.update.MediaPositionUpdateDomain
+import uk.co.sentinelweb.cuer.domain.update.UpdateDomain
 
 class PlaylistMemoryRepository constructor(
     private val coroutines: CoroutineContextProvider,
@@ -41,7 +44,7 @@ class PlaylistMemoryRepository constructor(
         fun identifier() = Identifier(id, Source.MEMORY)
     }
 
-    private val data: MutableMap<GUID, PlaylistDomain> = mutableMapOf()
+    private val playlistMemoryCache: MutableMap<GUID, PlaylistDomain> = mutableMapOf()
 
     val playlistItemMemoryRepository = PlayListItemMemoryRepository()
     val mediaMemoryRepository = MediaMemoryRepository()
@@ -50,12 +53,12 @@ class PlaylistMemoryRepository constructor(
     override val updates: Flow<Pair<Operation, PlaylistDomain>>
         get() = _playlistFlow
 
-    override fun load(platformId: String, options: Options): PlaylistDomain? {
+    override suspend fun load(platformId: String, options: Options): PlaylistDomain? {
         throw NotImplementedException()
     }
 
-    override fun load(domain: PlaylistDomain, options: Options): PlaylistDomain? {
-        throw NotImplementedException()
+    override suspend fun load(domain: PlaylistDomain, options: Options): PlaylistDomain? {
+        return domain.id?.id?.let { load(it, options) }
     }
 
     override suspend fun load(id: GUID, options: Options): PlaylistDomain? = when (id) {
@@ -66,34 +69,35 @@ class PlaylistMemoryRepository constructor(
         Starred.id -> starredItemsInteractor.getPlaylist()
         Unfinished.id -> unfinishedItemsInteractor.getPlaylist()
         LiveUpcoming.id -> liveUpcomingItemsPlayistInteractor.getPlaylist()
-        Shared.id -> data[id]
-        else -> throw NotImplementedException("$id is invalid memory playlist")
+        Shared.id -> playlistMemoryCache[id]
+        else -> playlistMemoryCache[id]
     }
 
-    override fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
-        is IdListFilter -> data.keys
+    override suspend fun loadList(filter: Filter, options: Options): List<PlaylistDomain> = when (filter) {
+        is IdListFilter -> playlistMemoryCache.keys
             .filter { filter.ids.contains(it) }
-            .map { data[it] }
+            .map { playlistMemoryCache[it] }
             .filterNotNull()
 
         else -> throw NotImplementedException("$filter")
     }
 
-    override fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
-        domain.id?.let { playlistId ->
-            if (!options.flat || !data.containsKey(playlistId.id)) {
-                domain.copy(
-                    items = domain.items.map { item ->
-                        item.copy(playlistId = playlistId)
-                    }
-                )
-            } else {
-                domain.copy(
-                    items = data[playlistId.id]?.items
-                        ?: throw IllegalStateException("Data got emptied")
-                )
-            }
-        }?.also { data[it.id!!.id] = it }
+    override suspend fun save(domain: PlaylistDomain, options: Options): PlaylistDomain =
+        domain.id
+            ?.let { playlistId ->
+                if (!options.flat || !playlistMemoryCache.containsKey(playlistId.id)) {
+                    domain.copy(
+                        items = domain.items.map { item ->
+                            item.copy(playlistId = playlistId)
+                        }
+                    )
+                } else {
+                    domain.copy(
+                        items = playlistMemoryCache[playlistId.id]?.items
+                            ?: throw IllegalStateException("Data got emptied")
+                    )
+                }
+            }?.also { playlistMemoryCache[it.id!!.id] = it }
             ?.also {
                 if (options.emit) {
                     coroutines.computationScope.launch {
@@ -102,52 +106,70 @@ class PlaylistMemoryRepository constructor(
                 }
             } ?: throw MemoryException("Please set the ID")
 
-    override fun save(domains: List<PlaylistDomain>, options: Options): List<PlaylistDomain> {
+    override suspend fun save(domains: List<PlaylistDomain>, options: Options): List<PlaylistDomain> {
         throw NotImplementedException()
     }
 
-    override fun count(filter: Filter, options: Options): Int = when (filter) {
-        is PlatformIdListFilter -> data.values.filter { filter.ids.contains(it.platformId) }.size
+    override suspend fun count(filter: Filter, options: Options): Int = when (filter) {
+        is PlatformIdListFilter -> playlistMemoryCache.values.filter { filter.ids.contains(it.platformId) }.size
         else -> throw NotImplementedException()
     }
 
-    override fun delete(domain: PlaylistDomain, options: Options): Boolean =
+    override suspend fun update(update: UpdateDomain<PlaylistDomain>, options: Options): PlaylistDomain {
+        throw NotImplementedException()
+    }
+
+    override suspend fun delete(domain: PlaylistDomain, options: Options): Boolean =
         domain.id
-            ?.let { data.remove(it.id) }
+            ?.let { playlistMemoryCache.remove(it.id) }
             .let { it != null }
 
+    override suspend fun delete(id: GUID, options: Options): Boolean =
+        playlistMemoryCache.remove(id)?.let { true } ?: false
+
+
+    // -----------------------------------------------------------------------------------------------------
+    // PlayListItemMemoryRepository ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------
     inner class PlayListItemMemoryRepository : MemoryRepository<PlaylistItemDomain> {
         private val _playlistItemFlow = MutableSharedFlow<Pair<Operation, PlaylistItemDomain>>()
         override val updates: Flow<Pair<Operation, PlaylistItemDomain>>
             get() = _playlistItemFlow
 
-        override fun load(platformId: String, options: Options): PlaylistItemDomain? {
+        override suspend fun load(platformId: String, options: Options): PlaylistItemDomain? {
             throw NotImplementedException()
         }
 
-        override fun load(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain? {
-            throw NotImplementedException()
-        }
+        override suspend fun load(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain? =
+            domain.takeIf { it.id != null }
+                ?.let { playlistMemoryCache.values }
+                ?.map { it.items }
+                ?.flatten()
+                ?.firstOrNull { domain.id?.id == it.id?.id }
 
-        override suspend fun load(id: GUID, options: Options): PlaylistItemDomain? {
-            throw NotImplementedException()
-        }
 
-        override fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
+        override suspend fun load(id: GUID, options: Options): PlaylistItemDomain? =
+            playlistMemoryCache.values
+                .map { it.items }
+                .flatten()
+                .firstOrNull { id == it.id?.id }
+
+        override suspend fun loadList(filter: Filter, options: Options): List<PlaylistItemDomain> =
             when (filter) {
-                is MediaIdListFilter -> data.values
+                is MediaIdListFilter -> playlistMemoryCache.values
                     .map { it.items }
                     .flatten()
                     .filter { filter.ids.contains(it.media.id?.id) }
+
                 else -> throw NotImplementedException()
             }
 
-        override fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
+        override suspend fun save(domain: PlaylistItemDomain, options: Options): PlaylistItemDomain =
             domain.playlistId
-                ?.takeIf { data.contains(it.id) }
+                ?.takeIf { playlistMemoryCache.contains(it.id) }
                 ?.let { playlistId ->
-                    data[playlistId.id]?.let {
-                        data.set(playlistId.id, it.replaceItemByPlatformId(domain))
+                    playlistMemoryCache[playlistId.id]?.let {
+                        playlistMemoryCache.set(playlistId.id, it.replaceItemByPlatformId(domain))
                         if (options.emit) {
                             coroutines.computationScope.launch {
                                 _playlistItemFlow.emit((if (options.flat) FLAT else FULL) to domain)
@@ -157,66 +179,95 @@ class PlaylistMemoryRepository constructor(
                     }
                 } ?: throw DoesNotExistException("Playlist ${domain.playlistId} does not exist")
 
-        override fun save(
+        override suspend fun save(
             domains: List<PlaylistItemDomain>,
             options: Options
         ): List<PlaylistItemDomain> {
             throw NotImplementedException()
         }
 
-        override fun count(filter: Filter, options: Options): Int {
+        override suspend fun count(filter: Filter, options: Options): Int {
             throw NotImplementedException()
         }
 
-        override fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
+
+        override suspend fun update(update: UpdateDomain<PlaylistItemDomain>, options: Options): PlaylistItemDomain {
+            throw NotImplementedException()
+        }
+
+        override suspend fun delete(domain: PlaylistItemDomain, options: Options): Boolean =
             domain.playlistId
-                ?.takeIf { data.contains(it.id) }
+                ?.takeIf { playlistMemoryCache.contains(it.id) }
                 ?.let { playlistId ->
-                    data[playlistId.id]?.let {
-                        data.set(playlistId.id, it.removeItemByPlatformId(domain) ?: it)
+                    playlistMemoryCache[playlistId.id]?.let {
+                        playlistMemoryCache.set(playlistId.id, it.removeItemByPlatformId(domain) ?: it)
                         if (options.emit) {
                             coroutines.computationScope.launch {
                                 _playlistItemFlow.emit(DELETE to domain)
                             }
                         }
                         true
-                    }
-                    false
+                    } ?: false
                 } ?: false
+
+
+        override suspend fun delete(id: GUID, options: Options): Boolean {
+            throw NotImplementedException()
+        }
     }
 
+    // -----------------------------------------------------------------------------------------------------
+    //  MediaMemoryRepository ------------------------------------------------------------------------
+    // -----------------------------------------------------------------------------------------------------
     inner class MediaMemoryRepository : MemoryRepository<MediaDomain> {
         private val _mediaFlow = MutableSharedFlow<Pair<Operation, MediaDomain>>()
         override val updates: Flow<Pair<Operation, MediaDomain>>
             get() = _mediaFlow
 
-        override fun load(platformId: String, options: Options): MediaDomain? {
+        override suspend fun load(platformId: String, options: Options): MediaDomain? {
             throw NotImplementedException()
         }
 
-        override fun load(domain: MediaDomain, options: Options): MediaDomain? {
+        override suspend fun load(domain: MediaDomain, options: Options): MediaDomain? =
+            domain.takeIf { it.id != null }
+                ?.let { playlistMemoryCache.values }
+                ?.map { it.items }
+                ?.flatten()
+                ?.firstOrNull { domain.id?.id == it.media.id?.id }
+                ?.media
+
+        override suspend fun load(id: GUID, options: Options): MediaDomain? =
+            playlistMemoryCache.values
+                .map { it.items }
+                .flatten()
+                .firstOrNull { id == it.media.id?.id }
+                ?.media
+
+        override suspend fun loadList(filter: Filter, options: Options): List<MediaDomain> {
             throw NotImplementedException()
         }
 
-        override suspend fun load(id: GUID, options: Options): MediaDomain? {
-            throw NotImplementedException()
-        }
-
-        override fun loadList(filter: Filter, options: Options): List<MediaDomain> {
-            throw NotImplementedException()
-        }
-
-        override fun save(domain: MediaDomain, options: Options): MediaDomain {
+        override suspend fun save(domain: MediaDomain, options: Options): MediaDomain? {
             if (domain.id == null) {
-                data[Shared.id]
+                playlistMemoryCache[Shared.id]
                     .takeIf { it != null }
-                    ?.also { data[Shared.id] = it.replaceMediaByPlatformId(media = domain) }
+                    ?.also { playlistMemoryCache[Shared.id] = it.replaceMediaByPlatformId(media = domain) }
+                return domain
+            } else {
+                domain.id
+                    ?.let { mediaId ->
+                        findPlaylistForMediaId(mediaId.id)
+                            .takeIf { it != null }
+                            ?.also { playlistMemoryCache[it.id!!.id] = it.replaceMediaById(media = domain) }
+                        return load(mediaId.id, options)
+                    } ?: throw DoesNotExistException("id is null")
             }
-            return domain
         }
 
-        override fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
-            data[Shared.id]
+        // fixme this just finds the playlist for the first item
+        // FIXME THIS DEOSNT SAVE THE MEDIAS IF THE ID IS NOT NULL !! - CHECK USAGE
+        override suspend fun save(domains: List<MediaDomain>, options: Options): List<MediaDomain> {
+            playlistMemoryCache[Shared.id]
                 .takeIf { it != null }
                 ?.also { playlist ->
                     var playlistMutate = playlist
@@ -225,17 +276,45 @@ class PlaylistMemoryRepository constructor(
                             playlistMutate = playlistMutate.replaceMediaByPlatformId(media = domain)
                         }
                     }
-                    data[Shared.id] = playlistMutate
+                    playlistMemoryCache[Shared.id] = playlistMutate
                 }
             return domains
         }
 
-        override fun count(filter: Filter, options: Options): Int {
+        override suspend fun count(filter: Filter, options: Options): Int {
             throw NotImplementedException()
         }
 
-        override fun delete(domain: MediaDomain, options: Options): Boolean {
+        override suspend fun delete(id: GUID, options: Options): Boolean {
             throw NotImplementedException()
         }
+
+        override suspend fun update(update: UpdateDomain<MediaDomain>, options: Options): MediaDomain =
+            when (update) {
+                is MediaPositionUpdateDomain -> {
+                    load(update.id.id, options)
+                        ?.copy(
+                            duration = update.duration,
+                            positon = update.positon,
+                            dateLastPlayed = update.dateLastPlayed,
+                            watched = update.watched
+                        )
+                        ?.also { save(it, options) }
+                    load(update.id.id, options) ?: throw DoesNotExistException("Save failed")
+                }
+
+                else -> throw NotImplementedException()
+            }
+
+
+        override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
+            throw NotImplementedException()
+        }
+
+        private fun findPlaylistForMediaId(id: GUID) = playlistMemoryCache.values
+            .map { it.items }
+            .flatten()
+            .firstOrNull { id == it.media.id?.id }
+            ?.let { playlistMemoryCache[it.playlistId?.id] }
     }
 }

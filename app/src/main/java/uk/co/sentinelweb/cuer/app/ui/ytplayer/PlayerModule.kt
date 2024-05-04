@@ -2,8 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer
 
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.ayt_player.live.LivePlaybackController
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferences.*
@@ -26,7 +24,5 @@ object PlayerModule {
                 log = get()
             )
         }
-        factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
-        single { PlayerListener(get(), get()) }
     }
 }

@@ -6,13 +6,18 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesModel.Companion.blankModel
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
 class FilesUiCoordinator(
+    private val parent: HomeUiCoordinator,
     private val getFolders: GetFolderListUseCase
 ) : UiCoordinator<FilesModel>,
     DesktopScopeComponent,
@@ -30,7 +35,7 @@ class FilesUiCoordinator(
 
     fun refresh() {
         getFolders.getFolderList(currentFolder)
-           ?.let { modelObservable.value = mapper.map(it) }
+            ?.let { modelObservable.value = mapper.map(it) }
     }
 
     override fun destroy() {
@@ -42,10 +47,19 @@ class FilesUiCoordinator(
         refresh()
     }
 
+    fun playVideo(item: PlaylistItemDomain) {
+        parent.showPlayer(item, modelObservable.value.list.playlist)
+    }
+
+    fun showFile(file: MediaDomain) {
+//        showTextWindow(file)
+        openFileInDefaultApp(file)
+    }
+
     companion object {
         @JvmStatic
         val uiModule = module {
-            factory { FilesUiCoordinator(get()) }
+            factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator(parent, get()) }
             scope(named<FilesUiCoordinator>()) {
                 scoped { FilesModelMapper() }
             }

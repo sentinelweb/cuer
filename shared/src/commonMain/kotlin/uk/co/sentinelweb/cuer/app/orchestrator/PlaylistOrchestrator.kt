@@ -46,6 +46,7 @@ class PlaylistOrchestrator constructor(
             MEMORY -> playlistMemoryRepository.loadList(filter, options)
             LOCAL -> playlistDatabaseRepository.loadList(filter, options.flat)
                 .allowDatabaseListResultEmpty()
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, filter, options)
@@ -77,8 +78,9 @@ class PlaylistOrchestrator constructor(
             LOCAL ->
                 playlistDatabaseRepository.save(domain, options.flat, options.emit)
                     .forceDatabaseSuccessNotNull("Save failed ${domain.id}")
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
@@ -88,6 +90,7 @@ class PlaylistOrchestrator constructor(
             LOCAL ->
                 playlistDatabaseRepository.save(domains, options.flat, options.emit)
                     .forceDatabaseListResultNotEmpty("Save failed ${domains.map { it.id }}")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
@@ -100,10 +103,21 @@ class PlaylistOrchestrator constructor(
             LOCAL ->
                 playlistDatabaseRepository.count(filter)
                     .forceDatabaseSuccessNotNull("Count failed $filter")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
+
+    override suspend fun delete(id: GUID, options: Options): Boolean =
+        when (options.source) {
+            MEMORY -> playlistMemoryRepository.delete(id, options)
+            LOCAL -> throw NotImplementedException()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
+            PLATFORM -> throw InvalidOperationException(this::class, null, options)
+        }
+
 
     override suspend fun delete(domain: PlaylistDomain, options: Options): Boolean =
         when (options.source) {
@@ -111,6 +125,7 @@ class PlaylistOrchestrator constructor(
             LOCAL ->
                 playlistDatabaseRepository.delete(domain, options.emit)
                     .forceDatabaseSuccessNotNull("Delete failed ${domain.id}")
+
             LOCAL_NETWORK -> throw NotImplementedException()
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)

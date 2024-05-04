@@ -230,5 +230,4 @@ class AytViewHolder(
                 ?: throw IllegalStateException("Player not yet initialized")
         }
     }
-
 }

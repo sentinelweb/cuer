@@ -15,7 +15,12 @@ import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 val kotlinFixtureDefaultConfig = kotlinFixture {
     nullabilityStrategy(NeverNullStrategy)
     repeatCount { 6 }
-    factory { OrchestratorContract.Identifier(GuidCreator().create(), fixture()) }
+    factory<OrchestratorContract.Identifier<GUID>> {
+        OrchestratorContract.Identifier(
+            GuidCreator().create(),
+            fixture()
+        )
+    }
     optionalStrategy(NeverOptionalStrategy) {
         propertyOverride(PlaylistDomain::id, NeverOptionalStrategy)
         propertyOverride(PlaylistItemDomain::id, NeverOptionalStrategy)
@@ -23,6 +28,7 @@ val kotlinFixtureDefaultConfig = kotlinFixture {
         propertyOverride(ImageDomain::id, NeverOptionalStrategy)
         propertyOverride(ChannelDomain::id, NeverOptionalStrategy)
     }
+    factory<List<PlaylistItemDomain>> { (1..6).map { fixture<PlaylistItemDomain>() } }
 }
 
 private val fixture = kotlinFixtureDefaultConfig
