@@ -79,8 +79,8 @@ class PlaylistOrchestrator constructor(
                 playlistDatabaseRepository.save(domain, options.flat, options.emit)
                     .forceDatabaseSuccessNotNull("Save failed ${domain.id}")
 
-            LOCAL_NETWORK -> TODO()
-            REMOTE -> TODO()
+            LOCAL_NETWORK -> throw NotImplementedException()
+            REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
 
@@ -117,7 +117,7 @@ class PlaylistOrchestrator constructor(
             REMOTE -> throw NotImplementedException()
             PLATFORM -> throw InvalidOperationException(this::class, null, options)
         }
-    
+
 
     override suspend fun delete(domain: PlaylistDomain, options: Options): Boolean =
         when (options.source) {

@@ -64,6 +64,20 @@ object SharedAppModule {
 
     private val dbModule = module {
         single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get(), get(), get()) }
+        single {
+            PlaylistMemoryRepository(
+                coroutines = get(),
+                newItemsInteractor = get(),
+                recentItemsInteractor = get(),
+                localSearchInteractor = get(),
+                starredItemsInteractor = get(),
+                remoteSearchOrchestrator = get(),
+                unfinishedItemsInteractor = get(),
+                liveUpcomingItemsPlayistInteractor = get()
+            )
+        }
+        single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
+        single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
     }
 
     private val orchestratorModule = module {
@@ -133,6 +147,17 @@ object SharedAppModule {
                 addLinkUsecase = get(),
             )
         }
+        factory<RemoteServerContract.AvailableMessageHandler> {
+            AvailableMessageHandler(
+                remoteRepo = get(),
+                availableMessageMapper = get(),
+                remoteStatusInteractor = get(),
+                localRepo = get(),
+                wifiStateProvider = get(),
+                vibrateWrapper = get(),
+                log = get(),
+            )
+        }
     }
 
     private val playerModule = module {
@@ -141,30 +166,13 @@ object SharedAppModule {
         factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
     }
 
-    // todo remake up this module into logical moduules
-    private val objectModule = module {
+    private val utilModule = module {
         factory { ParserFactory() }
-        single {
-            PlaylistMemoryRepository(
-                coroutines = get(),
-                newItemsInteractor = get(),
-                recentItemsInteractor = get(),
-                localSearchInteractor = get(),
-                starredItemsInteractor = get(),
-                remoteSearchOrchestrator = get(),
-                unfinishedItemsInteractor = get(),
-                liveUpcomingItemsPlayistInteractor = get()
-            )
-        }
-        single { get<PlaylistMemoryRepository>().playlistItemMemoryRepository }
-        single { get<PlaylistMemoryRepository>().mediaMemoryRepository }
         single<MultiPlatformPreferencesWrapper> {
             MultiPlatformPreferencesWrapperImpl(
                 getOrNull<Settings>() ?: Settings()
             )
         }
-        factory { BrowseRecentCategories(get(), get()) }
-        factory { RecentLocalPlaylists(get(), get()) }
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
@@ -184,17 +192,13 @@ object SharedAppModule {
                 log = get(),
             )
         }
-        factory<RemoteServerContract.AvailableMessageHandler> {
-            AvailableMessageHandler(
-                remoteRepo = get(),
-                availableMessageMapper = get(),
-                remoteStatusInteractor = get(),
-                localRepo = get(),
-                wifiStateProvider = get(),
-                vibrateWrapper = get(),
-                log = get(),
-            )
-        }
+    }
+
+    private val uiModule = module {
+        factory { IconMapper() }
+        factory { DurationTextColorMapper() }
+        factory { BrowseRecentCategories(get(), get()) }
+        factory { RecentLocalPlaylists(get(), get()) }
         factory<UpcomingContract.Presenter> {
             UpcomingPresenter(
                 view = get(),
@@ -207,12 +211,7 @@ object SharedAppModule {
         }
     }
 
-    private val uiModule = module {
-        factory { IconMapper() }
-        factory { DurationTextColorMapper() }
-    }
-
-    val modules = listOf(objectModule)
+    val modules = listOf(utilModule)
         .plus(orchestratorModule)
         .plus(queueModule)
         .plus(dbModule)
