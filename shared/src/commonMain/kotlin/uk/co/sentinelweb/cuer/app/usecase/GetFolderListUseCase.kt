@@ -30,8 +30,8 @@ class GetFolderListUseCase(
                 ?.let { fileOperations.list(it) }
         } else {
             null
-        })
-            ?.mapNotNull { fileOperations.properties(it) }
+        })?.mapNotNull { fileOperations.properties(it) }
+            ?.sortedBy { it.name }
             ?.let {
                 val filesProperties = it.filter { it.isDirectory.not() }
                 val subFoldersProperties = it.filter { it.isDirectory }

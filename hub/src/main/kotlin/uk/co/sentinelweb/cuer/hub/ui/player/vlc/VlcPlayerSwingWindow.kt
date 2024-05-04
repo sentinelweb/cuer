@@ -42,7 +42,9 @@ class VlcPlayerSwingWindow(
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
     private lateinit var rewindButton: JButton
-    private lateinit var skipButton: JButton
+    private lateinit var forwardButton: JButton
+    private lateinit var prevButton: JButton
+    private lateinit var nextButton: JButton
     private lateinit var seekBar: JSlider
     private lateinit var posText: JLabel
     private lateinit var durText: JLabel
@@ -190,6 +192,16 @@ class VlcPlayerSwingWindow(
 
         this.contentPane.add(controlsPane, SOUTH)
 
+        prevButton = JButton("Previous").apply {
+            buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_track_b.svg", Black, 24).toImageIcon())
+            addActionListener { coordinator.dispatch(TrackBackClicked) }
+        }
+        rewindButton = JButton("Rewind").apply {
+            buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_fast_rewind.svg", Black, 24).toImageIcon())
+            addActionListener { coordinator.dispatch(SkipBackClicked) }
+        }
         playButton = JButton("Play").apply {
             buttonsPane.add(this)
             setIcon(loadSVG("drawable/ic_player_play.svg", Black, 24).toImageIcon())
@@ -200,15 +212,15 @@ class VlcPlayerSwingWindow(
             setIcon(loadSVG("drawable/ic_player_pause.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(PlayPauseClicked(true)) }
         }
-        rewindButton = JButton("Rewind").apply {
-            buttonsPane.add(this)
-            setIcon(loadSVG("drawable/ic_player_fast_rewind.svg", Black, 24).toImageIcon())
-            addActionListener { coordinator.dispatch(SkipBackClicked) }
-        }
-        skipButton = JButton("Skip").apply {
+        forwardButton = JButton("Skip").apply {
             buttonsPane.add(this)
             setIcon(loadSVG("drawable/ic_player_fast_forward.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(SkipFwdClicked) }
+        }
+        nextButton = JButton("Next").apply {
+            buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_player_track_f.svg", Black, 24).toImageIcon())
+            addActionListener { coordinator.dispatch(TrackFwdClicked) }
         }
         seekBar = JSlider(0, 1000, 0).apply {
             seekPane.add(this, CENTER)
@@ -264,6 +276,18 @@ class VlcPlayerSwingWindow(
         is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
         is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
     }.also { log.d("command:${command::class.java.simpleName}") }
+
+    fun updateTexts(texts: PlayerContract.View.Model.Texts) {
+        title = texts.title
+        forwardButton.text = "Forward [${texts.skipFwdText}]"
+        rewindButton.text = "Rewind [${texts.skipBackText}]"
+    }
+
+    fun updateButtons(it: PlayerContract.View.Model.Buttons) {
+        nextButton.isEnabled = it.nextTrackEnabled
+        prevButton.isEnabled = it.prevTrackEnabled
+        seekBar.isEnabled = it.seekEnabled
+    }
 
     companion object {
         fun showWindow(coordinator: VlcPlayerUiCoordinator): VlcPlayerSwingWindow? {

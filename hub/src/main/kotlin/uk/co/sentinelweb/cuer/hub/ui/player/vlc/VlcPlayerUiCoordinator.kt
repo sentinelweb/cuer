@@ -105,7 +105,12 @@ class VlcPlayerUiCoordinator(
         diff(get = Model::times, set = {
             playerWindow.updateUiTimes(it)
         })
-
+        diff(get = Model::texts, set = {
+            playerWindow.updateTexts(it)
+        })
+        diff(get = Model::buttons, set = {
+            playerWindow.updateButtons(it)
+        })
     }
 
 //    override fun render(model: Model) {
