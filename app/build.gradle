@@ -108,10 +108,10 @@ android {
         // Adds exported schema location as test app assets.
         androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
         testDebug {
-            java.srcDir 'src/sharedTest/java'
+            java.srcDir 'src/sharedTest/kotlin'
         }
         androidTest {
-            java.srcDir 'src/sharedTest/java'
+            java.srcDir 'src/sharedTest/kotlin'
         }
     }
 
@@ -243,7 +243,7 @@ dependencies {
     // splash screen
     implementation "androidx.core:core-splashscreen:$ver_splash"
 
-    debugImplementation("androidx.fragment:fragment-testing:$ver_androidx_fragment_test") {// hack
+    debugImplementation("androidx.fragment:fragment-testing:$ver_androidx_fragment_test") {
         exclude group: "androidx.test"
     }
 
