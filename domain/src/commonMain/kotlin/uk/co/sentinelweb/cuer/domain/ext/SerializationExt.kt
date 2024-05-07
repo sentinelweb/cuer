@@ -127,6 +127,9 @@ fun List<RemoteNodeDomain>.serialise() =
 fun deserialiseRemoteNodeList(input: String) =
     domainJsonSerializer.decodeFromString(ListSerializer(RemoteNodeDomain.serializer()), input)
 
+fun deserialisePlaylistAndSubs(input: String) =
+    domainJsonSerializer.decodeFromString(ListSerializer(PlaylistAndSubsDomain.serializer()), input)
+
 
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
@@ -146,6 +149,7 @@ val domainSerializersModule = SerializersModule {
         LocalNodeDomain::class to LocalNodeDomain.serializer(),
         RemoteNodeDomain::class to RemoteNodeDomain.serializer(),
         PlaylistAndItemDomain::class to PlaylistAndItemDomain.serializer(),
+        PlaylistAndSubsDomain::class to PlaylistAndSubsDomain.serializer(),
 
         AuthConfig.Username::class to AuthConfig.Username.serializer(),
         AuthType.Username::class to AuthType.Username.serializer(),
@@ -162,6 +166,7 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
     polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
     polymorphic(Domain::class, PlaylistAndItemDomain::class, PlaylistAndItemDomain.serializer())
+    polymorphic(Domain::class, PlaylistAndSubsDomain::class, PlaylistAndSubsDomain.serializer())
 
     polymorphic(AuthConfig::class, AuthConfig.Open::class, AuthConfig.Open.serializer())
     polymorphic(AuthConfig::class, AuthConfig.Confirm::class, AuthConfig.Confirm.serializer())

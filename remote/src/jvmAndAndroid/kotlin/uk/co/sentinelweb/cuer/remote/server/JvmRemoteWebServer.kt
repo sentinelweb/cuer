@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
@@ -52,6 +53,7 @@ class JvmRemoteWebServer constructor(
 
     private val localRepository: LocalRepository by inject()
     private val playerSessionHolder: PlayerSessionHolder by inject()
+    private val getFolderListUseCase: GetFolderListUseCase by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -237,6 +239,19 @@ class JvmRemoteWebServer constructor(
                         playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
                         call.respond(HttpStatusCode.OK)
                     } ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                }
+                get("/folders") {
+                    // todo rewrite paths to remove base
+                    val path = call.parameters["p"]
+                    logWrapper.d("Folder: $path")
+                    getFolderListUseCase.getFolderList(path)
+                        ?.let { ResponseDomain(it) }
+                        ?.apply {
+                            call.respondText(serialise(), ContentType.Application.Json)
+                        }
+                        ?: apply {
+                            call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
+                        }
                 }
                 static("/") {
                     resources("")
