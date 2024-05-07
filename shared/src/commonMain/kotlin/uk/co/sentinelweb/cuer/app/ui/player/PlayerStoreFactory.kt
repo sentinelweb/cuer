@@ -12,6 +12,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionManager
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
@@ -38,16 +40,18 @@ class PlayerStoreFactory(
     private val log: LogWrapper,
     private val livePlaybackController: LivePlaybackContract.Controller,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val playerControls: PlayerListener,
+    private val mediaSessionMessageListener: MediaSessionMessageListener,
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
-) {
+    private val playerSessionManager: PlayerSessionManager,
+    private val playerSessionListener: PlayerSessionListener,
+
+    ) {
 
     private sealed class Result {
         object NoVideo : Result()
         data class State(val state: PlayerStateDomain) : Result()
         data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
-
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
         data class Screen(val content: Content) : Result()
@@ -119,7 +123,7 @@ class PlayerStoreFactory(
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
-                is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
+                is Intent.SeekToFraction -> seekTo(intent.fraction, getState().item)
                 is Intent.PlaylistView -> dispatch(Result.Screen(Content.PLAYLIST))
                 is Intent.PlaylistItemView -> dispatch(Result.Screen(Content.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
@@ -193,7 +197,8 @@ class PlayerStoreFactory(
 
         private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
             playlistAndItem
-                .apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
+                .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionMessageListener) }
+                .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
@@ -213,7 +218,8 @@ class PlayerStoreFactory(
             log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
-            mediaSessionManager.checkCreateMediaSession(playerControls)
+            mediaSessionManager.checkCreateMediaSession(mediaSessionMessageListener)
+            playerSessionManager.checkCreateMediaSession(playerSessionListener)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
@@ -221,6 +227,7 @@ class PlayerStoreFactory(
                 )
             )
             mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
         }
 
         private fun updatePosition(
@@ -278,6 +285,12 @@ class PlayerStoreFactory(
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist
             )
+            playerSessionManager.updatePlaybackState(
+                media,
+                playState,
+                if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
+                queueConsumer.playlist
+            )
         }
 
         private fun trackSelected(item: PlaylistItemDomain, resetPosition: Boolean) {
@@ -310,6 +323,7 @@ class PlayerStoreFactory(
         ) {
             override fun endSession() {
                 mediaSessionManager.destroyMediaSession()
+                playerSessionManager.destroyMediaSession()
             }
         }
 }

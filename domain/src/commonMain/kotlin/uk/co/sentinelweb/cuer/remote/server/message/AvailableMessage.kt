@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.remote.server.Message
 
 @Serializable
 data class AvailableMessage(val type: MsgType, val node: DeviceInfo) : Message {

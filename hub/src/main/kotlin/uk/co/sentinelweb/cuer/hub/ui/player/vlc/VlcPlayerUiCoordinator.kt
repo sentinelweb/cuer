@@ -85,6 +85,8 @@ class VlcPlayerUiCoordinator(
             playerWindow.destroy()
             lifecycle.onPause()
             lifecycle.onStop()
+            controller.onViewDestroyed()
+            controller.onDestroy(endSession = true)
             lifecycle.onDestroy()
             scope.close()
             coroutines.cancel()
@@ -160,7 +162,8 @@ class VlcPlayerUiCoordinator(
                         coroutines = get(),
                         lifecycle = get<VlcPlayerUiCoordinator>().lifecycle as Lifecycle,
                         log = get(),
-                        playControls = get(),
+                        mediaSessionMessageListener = get(),
+                        playSessionListener = get(),
                         store = get()
                     )
                 }
@@ -176,9 +179,11 @@ class VlcPlayerUiCoordinator(
                         log = get(),
                         livePlaybackController = get(),
                         mediaSessionManager = get(),
-                        playerControls = get(),
+                        mediaSessionMessageListener = get(),
                         mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get()
+                        playlistItemOrchestrator = get(),
+                        playerSessionManager = get(),
+                        playerSessionListener = get(),
                     ).create()
                 }
                 scoped<SkipContract.External> {

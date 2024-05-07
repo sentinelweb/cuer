@@ -36,19 +36,22 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 import java.io.PrintWriter
 import java.io.StringWriter
 
 class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
-    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler
+    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler,
 ) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
     }
 
     private val localRepository: LocalRepository by inject()
+    private val playerSessionHolder: PlayerSessionHolder by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -215,6 +218,25 @@ class JvmRemoteWebServer constructor(
                         call.error(HttpStatusCode.InternalServerError, null, e)
                     }
                     logWrapper.d(call.request.uri)
+                }
+                get("/player/{command}/{arg0}") {
+                    val command = call.parameters["command"]
+                    val arg0 = call.parameters["arg0"]
+                    logWrapper.d("${call.request.uri} $command $arg0 ${SkipFwd::class.java.simpleName}")
+                    when (command) {
+                        SkipFwd::class.java.simpleName -> SkipFwd
+                        SkipBack::class.java.simpleName -> SkipBack
+                        TrackFwd::class.java.simpleName -> TrackFwd
+                        TrackBack::class.java.simpleName -> TrackBack
+                        PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
+                        SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
+                        else -> null
+                    }?.also {
+                        // fixme get operation success and return the code
+                        logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
+                        playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
+                        call.respond(HttpStatusCode.OK)
+                    } ?: call.error(HttpStatusCode.BadRequest, "url is required")
                 }
                 static("/") {
                     resources("")

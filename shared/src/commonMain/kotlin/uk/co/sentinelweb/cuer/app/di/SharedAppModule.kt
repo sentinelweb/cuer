@@ -22,13 +22,17 @@ import uk.co.sentinelweb.cuer.app.service.remote.AppRemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.app.service.remote.AvailableMessageHandler
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.service.remote.WifiStartChecker
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerMessageToIntentMapper
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionManager
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseRecentCategories
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.DurationTextColorMapper
 import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerListener
+import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionMessageListener
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
@@ -41,6 +45,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 
 object SharedAppModule {
     private val queueModule = module {
@@ -162,8 +167,13 @@ object SharedAppModule {
 
     private val playerModule = module {
         factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
-        single { PlayerListener(get(), get()) }
+        single { MediaSessionMessageListener(get(), get()) }
         factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
+        single { PlayerSessionHolder() }
+        factory { PlayerSessionManager(get(), get()) }
+        single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
+        single { PlayerEventToIntentMapper }
+        factory { PlayerMessageToIntentMapper(get()) }
     }
 
     private val utilModule = module {

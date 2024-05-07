@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 
-class MediaSessionManager constructor(
+class MediaSessionManager(
     private val appState: CuerAppState,
     private val state: State,
     private val context: Context,
@@ -22,7 +22,7 @@ class MediaSessionManager constructor(
     private val metadataMapper: MediaMetadataMapper,
     private val playbackStateMapper: PlaybackStateMapper,
 ) : MediaSessionContract.Manager {
-    data class State constructor(
+    data class State(
         var bitmapUrl: String? = null,
         var bitmap: Bitmap? = null,
     )
@@ -61,7 +61,7 @@ class MediaSessionManager constructor(
         appState.mediaSession?.setMetadata(metadataMapper.map(media, state.bitmap, playlist))
     }
 
-    inner class BitmapLoadTarget constructor(
+    inner class BitmapLoadTarget(
         private val media: MediaDomain,
         val playlist: PlaylistDomain?,
     ) : CustomTarget<Bitmap?>() {

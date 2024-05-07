@@ -51,9 +51,11 @@ interface AytLandContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        playerControls = get(),
+                        mediaSessionMessageListener = get(),
                         mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get()
+                        playlistItemOrchestrator = get(),
+                        playerSessionManager = get(),
+                        playerSessionListener = get(),
                     ).create()
                 }
                 scoped { ShowHideUi(get<AytLandActivity>()) }

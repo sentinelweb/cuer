@@ -1,7 +1,5 @@
 package uk.co.sentinelweb.cuer.app.service.remote
 
-//import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
-//import uk.co.sentinelweb.cuer.app.orchestrator.toLocalNetworkIdentifier
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider

@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.RequestDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import uk.co.sentinelweb.cuer.remote.server.message.messageSerializersModule
+import uk.co.sentinelweb.cuer.remote.server.messageSerializersModule
 
 // channel
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(ChannelDomain.serializer(), this)
