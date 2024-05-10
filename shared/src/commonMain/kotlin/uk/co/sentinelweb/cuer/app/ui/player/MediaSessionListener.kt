@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class MediaSessionMessageListener(
+class MediaSessionListener(
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
 ) : PlayerContract.PlayerControls.Listener {

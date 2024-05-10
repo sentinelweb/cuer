@@ -40,7 +40,7 @@ class PlayerStoreFactory(
     private val log: LogWrapper,
     private val livePlaybackController: LivePlaybackContract.Controller,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val mediaSessionMessageListener: MediaSessionMessageListener,
+    private val mediaSessionListener: MediaSessionListener,
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playerSessionManager: PlayerSessionManager,
@@ -197,7 +197,7 @@ class PlayerStoreFactory(
 
         private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
             playlistAndItem
-                .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionMessageListener) }
+                .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
                 .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
@@ -218,7 +218,7 @@ class PlayerStoreFactory(
             log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
-            mediaSessionManager.checkCreateMediaSession(mediaSessionMessageListener)
+            mediaSessionManager.checkCreateMediaSession(mediaSessionListener)
             playerSessionManager.checkCreateMediaSession(playerSessionListener)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(

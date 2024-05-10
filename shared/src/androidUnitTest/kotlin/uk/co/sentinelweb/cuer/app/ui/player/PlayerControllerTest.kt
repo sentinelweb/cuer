@@ -24,7 +24,7 @@ class PlayerControllerTest {
 
     private val queueConsumer: QueueMediatorContract.Consumer = mockk(relaxed = true)
     private val modelMapper: PlayerModelMapper = mockk(relaxed = true)
-    private val playControls: MediaSessionMessageListener = mockk(relaxed = true)
+    private val playControls: MediaSessionListener = mockk(relaxed = true)
     private val log: LogWrapper = mockk(relaxed = true)
     private val store: PlayerContract.MviStore = mockk(relaxed = true)
     private val testCoroutines = TestCoroutineContextProvider(rule.dispatcher)

@@ -31,7 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
-import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionMessageListener
+import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
@@ -167,7 +167,7 @@ object SharedAppModule {
 
     private val playerModule = module {
         factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
-        single { MediaSessionMessageListener(get(), get()) }
+        single { MediaSessionListener(get(), get()) }
         factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
         single { PlayerSessionHolder() }
         factory { PlayerSessionManager(get(), get()) }

@@ -162,7 +162,7 @@ class VlcPlayerUiCoordinator(
                         coroutines = get(),
                         lifecycle = get<VlcPlayerUiCoordinator>().lifecycle as Lifecycle,
                         log = get(),
-                        mediaSessionMessageListener = get(),
+                        mediaSessionListener = get(),
                         playSessionListener = get(),
                         store = get()
                     )
@@ -179,7 +179,7 @@ class VlcPlayerUiCoordinator(
                         log = get(),
                         livePlaybackController = get(),
                         mediaSessionManager = get(),
-                        mediaSessionMessageListener = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),

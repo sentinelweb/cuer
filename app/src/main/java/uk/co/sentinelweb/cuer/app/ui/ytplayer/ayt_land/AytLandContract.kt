@@ -35,8 +35,9 @@ interface AytLandContract {
                         coroutines = get(),
                         lifecycle = get<AytLandActivity>().lifecycle.asEssentyLifecycle(),
                         log = get(),
-                        playControls = get(),
-                        store = get()
+                        mediaSessionListener = get(),
+                        store = get(),
+                        playSessionListener = get()
                     )
                 }
                 scoped {
@@ -51,7 +52,7 @@ interface AytLandContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        mediaSessionMessageListener = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),

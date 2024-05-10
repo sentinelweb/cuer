@@ -14,16 +14,16 @@ import uk.co.sentinelweb.cuer.tools.rule.CoroutineTestRule
 
 //todo something wrong with test setup
 @ExperimentalCoroutinesApi
-class MediaSessionMessageListenerTest {
+class MediaSessionListenerTest {
     @get:Rule
     var rule = CoroutineTestRule()
 
     private val testCoroutines = TestCoroutineContextProvider(rule.dispatcher)
-    private lateinit var sut: MediaSessionMessageListener
+    private lateinit var sut: MediaSessionListener
 
     @Before
     fun setUp() {
-        sut = MediaSessionMessageListener(testCoroutines, SystemLogWrapper())
+        sut = MediaSessionListener(testCoroutines, SystemLogWrapper())
     }
 
     @Test

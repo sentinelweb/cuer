@@ -32,8 +32,9 @@ interface YoutubeFullScreenContract {
                         coroutines = get(),
                         lifecycle = null,
                         log = get(),
-                        playControls = get(),
-                        store = get()
+                        mediaSessionListener = get(),
+                        store = get(),
+                        playSessionListener = get()
                     )
                 }
                 scoped {
@@ -48,7 +49,7 @@ interface YoutubeFullScreenContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        mediaSessionMessageListener = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),

@@ -23,7 +23,7 @@ class PlayerController constructor(
     private val queueConsumer: QueueMediatorContract.Consumer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
-    private val mediaSessionMessageListener: MediaSessionMessageListener,
+    private val mediaSessionListener: MediaSessionListener,
     private val playSessionListener: PlayerSessionListener,
     private val log: LogWrapper,
     private val store: PlayerContract.MviStore,
@@ -70,7 +70,7 @@ class PlayerController constructor(
             // view -> store
             view.events.mapNotNull(PlayerEventToIntentMapper.eventToIntent) bindTo store
         }
-        mediaSessionMessageListener.intentFlow bindTo store
+        mediaSessionListener.intentFlow bindTo store
         playSessionListener.intentFlow bindTo store
         // queue -> store
         queueConsumer.currentItemFlow
