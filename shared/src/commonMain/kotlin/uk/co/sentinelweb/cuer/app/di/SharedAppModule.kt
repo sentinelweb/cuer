@@ -140,7 +140,7 @@ object SharedAppModule {
         factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
         factory { MediaUpdateFromPlatformUseCase(get(), get()) }
         factory { GetPlaylistsFromDeviceUseCase(get()) }
-        factory { GetFolderListUseCase(get(), get(), get(), get()) }
+        factory { GetFolderListUseCase(get(), get(), get(), get(), get()) }
     }
 
     private val remoteModule = module {

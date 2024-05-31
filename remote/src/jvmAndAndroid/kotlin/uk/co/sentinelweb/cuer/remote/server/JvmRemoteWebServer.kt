@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 import java.io.PrintWriter
 import java.io.StringWriter
 
+// todo break this up into use cases
 class JvmRemoteWebServer constructor(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
@@ -222,23 +223,29 @@ class JvmRemoteWebServer constructor(
                     logWrapper.d(call.request.uri)
                 }
                 get("/player/{command}/{arg0}") {
-                    val command = call.parameters["command"]
-                    val arg0 = call.parameters["arg0"]
-                    logWrapper.d("${call.request.uri} $command $arg0 ${SkipFwd::class.java.simpleName}")
-                    when (command) {
-                        SkipFwd::class.java.simpleName -> SkipFwd
-                        SkipBack::class.java.simpleName -> SkipBack
-                        TrackFwd::class.java.simpleName -> TrackFwd
-                        TrackBack::class.java.simpleName -> TrackBack
-                        PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
-                        SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
-                        else -> null
-                    }?.also {
-                        // fixme get operation success and return the code
-                        logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
-                        playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
-                        call.respond(HttpStatusCode.OK)
-                    } ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    try {
+                        val command = call.parameters["command"]
+                        val arg0 = call.parameters["arg0"]
+                        logWrapper.d("${call.request.uri} $command $arg0 ${SkipFwd::class.java.simpleName}")
+                        when (command) {
+                            SkipFwd::class.java.simpleName -> SkipFwd
+                            SkipBack::class.java.simpleName -> SkipBack
+                            TrackFwd::class.java.simpleName -> TrackFwd
+                            TrackBack::class.java.simpleName -> TrackBack
+                            PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
+                            SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
+                            else -> null
+                        }?.also {
+                            // fixme get operation success and return the code
+                            logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
+                            playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
+                            call.respond(HttpStatusCode.OK)
+                        } ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    } catch (e: NumberFormatException) {
+                        call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                    }
                 }
                 get("/folders") {
                     // todo rewrite paths to remove base

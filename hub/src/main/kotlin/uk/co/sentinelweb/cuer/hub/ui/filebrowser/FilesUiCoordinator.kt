@@ -6,6 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -18,16 +19,21 @@ import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
 class FilesUiCoordinator(
     private val parent: HomeUiCoordinator,
-    private val getFolders: GetFolderListUseCase
+    private val getFolders: GetFolderListUseCase,
+    private val log: LogWrapper
 ) : UiCoordinator<FilesModel>,
     DesktopScopeComponent,
     KoinComponent {
+
+    init {
+        log.tag(this)
+    }
     override val scope: Scope = desktopScopeWithSource(this)
 
     private val mapper: FilesModelMapper by scope.inject()
     override val modelObservable = MutableStateFlow<FilesModel>(blankModel())
 
-    private var currentFolder: String? = null
+    private var currentFolder: String? = null // todo make state object
 
     override fun create() {
         refresh()
@@ -44,6 +50,7 @@ class FilesUiCoordinator(
 
     fun loadFolder(folder: PlaylistDomain) {
         currentFolder = folder.platformId
+        log.tag("currentFolder; $currentFolder")
         refresh()
     }
 
@@ -59,7 +66,7 @@ class FilesUiCoordinator(
     companion object {
         @JvmStatic
         val uiModule = module {
-            factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator(parent, get()) }
+            factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator(parent, get(), get()) }
             scope(named<FilesUiCoordinator>()) {
                 scoped { FilesModelMapper() }
             }

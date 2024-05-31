@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMOR
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
@@ -18,21 +19,29 @@ class GetFolderListUseCase(
     private val fileOperations: PlatformFileOperation,
     private val guidCreator: GuidCreator,
     private val timeProvider: TimeProvider,
+    private val log: LogWrapper
 ) {
+    init {
+        log.tag(this)
+    }
+
     fun getFolderList(folderPath: String? = null): PlaylistAndSubsDomain? =
         (if (folderPath == null) {
             prefs.folderRoots.map { AFile(it) }
-        } else if (checkFolderPathIsInAllowedSet(folderPath)) {
-            folderPath
-                .let { AFile(it) }
-                .takeIf { fileOperations.exists(it) }
-                ?.let { fileOperations.list(it) }
         } else {
-            null
+            folderPath
+                .let { truncatedToFullFolderPath(it) }
+                ?.takeIf { checkFolderPathIsInAllowedSet(it) }
+                ?.let { AFile(it) }
+                ?.takeIf { fileOperations.exists(it) }
+                ?.let { fileOperations.list(it) }
         })
+            ?.also { log.d("folderPath: $folderPath") }
             ?.mapNotNull { fileOperations.properties(it) }
             ?.sortedBy { it.name }
             ?.let {
+                val fullFolderPath = folderPath?.let { truncatedToFullFolderPath(it) }
+                log.d("fullFolderPath: $fullFolderPath")
                 val filesProperties = it.filter { it.isDirectory.not() }
                 val subFoldersProperties = it.filter { it.isDirectory }
                 val rootId = guidCreator.create().toIdentifier(MEMORY)
@@ -66,9 +75,9 @@ class GetFolderListUseCase(
                     id = rootId,
                     title = folderPath ?: "Top",
                     platform = PlatformDomain.FILESYSTEM,
-                    platformId = folderPath,
+                    platformId = fullFolderPath,
                     items = filesProperties.mapIndexed { index, item ->
-                        mapFileToPlaylist(index, rootId, item, folderPath)
+                        mapFileToPlaylist(index, rootId, item, fullFolderPath)
                     },
                 )
 
@@ -78,9 +87,18 @@ class GetFolderListUseCase(
                 )
             }
 
-    private fun checkFolderPathIsInAllowedSet(folderPath: String): Boolean =
+    internal fun checkFolderPathIsInAllowedSet(folderPath: String): Boolean =
         prefs.folderRoots.any { folderPath.startsWith(it) }
 
+    internal fun fullToTruncatedFolderPath(path: String): String? =
+        prefs.folderRoots
+            .find { path.startsWith(it) }
+            ?.let { path.replace(it, it.substringAfterLast("/")) }
+
+    internal fun truncatedToFullFolderPath(path: String): String? =
+        prefs.folderRoots
+            .find { path.startsWith(it.substringAfterLast("/")) }
+            ?.let { path.replace(it.substringAfterLast("/"), it) }
 
     private fun mapFileToPlaylist(
         index: Int,
@@ -88,6 +106,7 @@ class GetFolderListUseCase(
         item: AFileProperties,
         folderPath: String?
     ): PlaylistItemDomain {
+        val truncatedPath = fullToTruncatedFolderPath(item.file.path)!!
         return PlaylistItemDomain(
             id = guidCreator.create().toIdentifier(MEMORY),
             dateAdded = timeProvider.instant(),
@@ -98,8 +117,8 @@ class GetFolderListUseCase(
                 title = item.name,
                 mediaType = checkMediaType(item),
                 platform = PlatformDomain.FILESYSTEM,
-                platformId = item.file.path,
-                url = "file://${item.file.path}",
+                platformId = truncatedPath,
+                url = "file://${truncatedPath}",
                 channelData = ChannelDomain(
                     id = guidCreator.create().toIdentifier(MEMORY),
                     platform = PlatformDomain.FILESYSTEM,
@@ -109,7 +128,7 @@ class GetFolderListUseCase(
         )
     }
 
-    fun checkMediaType(item: AFileProperties):MediaTypeDomain {
+    fun checkMediaType(item: AFileProperties): MediaTypeDomain {
         val ext = getFileExtension(item.name)
         return mediaTypes[ext]?.type ?: FILE
     }
