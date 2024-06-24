@@ -25,7 +25,7 @@ object FilesComposeables {
     private fun FilesView(model: FilesModel, view: FilesUiCoordinator) {
         val scrollState = rememberScrollState()
         Column(modifier = Modifier.padding(8.dp).verticalScroll(scrollState)) {
-            model.list.subPlaylists.forEach {
+            model.list.children.forEach {
                 Row(modifier = Modifier.clickable { view.loadFolder(it) }) {
                     val icon = if (it.title.equals("..")) "drawable/ic_up.svg" else "drawable/ic_folder.svg"
                     ImageSvg(icon, modifier = Modifier.padding(16.dp))

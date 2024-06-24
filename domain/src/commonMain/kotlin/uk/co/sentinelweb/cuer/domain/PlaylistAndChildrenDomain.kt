@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.domain
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class PlaylistAndSubsDomain(
+data class PlaylistAndChildrenDomain(
     val playlist: PlaylistDomain,
-    val subPlaylists: List<PlaylistDomain> = listOf(),
+    val children: List<PlaylistDomain> = listOf(),
 ) : Domain

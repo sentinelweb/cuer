@@ -222,6 +222,7 @@ class JvmRemoteWebServer constructor(
                     }
                     logWrapper.d(call.request.uri)
                 }
+                // http://192.168.1.x:9090/player/PlayPause/true
                 get("/player/{command}/{arg0}") {
                     try {
                         val command = call.parameters["command"]

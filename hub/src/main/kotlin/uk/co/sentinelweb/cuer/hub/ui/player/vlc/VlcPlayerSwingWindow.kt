@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.koin.java.KoinJavaComponent.getKoin
 import toImageIcon
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.media.Media
@@ -16,6 +17,7 @@ import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -27,11 +29,13 @@ import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
+import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
 
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
+    private val folderListUseCase: GetFolderListUseCase,
 ) : JFrame(), KoinComponent {
 
 
@@ -269,7 +273,12 @@ class VlcPlayerSwingWindow(
     }
 
     fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
-        is Load -> playItem(command.platformId)
+        is Load -> {
+            command.platformId
+                .let { folderListUseCase.truncatedToFullFolderPath(it) }
+                ?.also { playItem(it) }
+                ?: log.d("Cannot get full path ${command.platformId}")
+        }
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
         is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
         is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
@@ -298,11 +307,11 @@ class VlcPlayerSwingWindow(
                     null,  // parent component, can be null if not considering location of dialog
                     message,
                     "Error",
-                    JOptionPane.ERROR_MESSAGE
+                    ERROR_MESSAGE
                 )
                 return null
             } else {
-                val frame = VlcPlayerSwingWindow(coordinator)
+                val frame = VlcPlayerSwingWindow(coordinator, getKoin().get(GetFolderListUseCase::class))
                 frame.createWindow()
                 frame.createMediaPlayer()
                 frame.createControls()
@@ -311,9 +320,3 @@ class VlcPlayerSwingWindow(
         }
     }
 }
-
-//        val fullButton = JButton("Fullscreen")
-//        controlsPane.add(fullButton)
-//        skipButton.addActionListener {
-//            mediaPlayerComponent.mediaPlayer().fullScreen()
-//        }

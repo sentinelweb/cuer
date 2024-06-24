@@ -74,7 +74,7 @@ class VlcPlayerUiCoordinator(
         controller.onViewCreated(listOf(this), lifecycle)
         lifecycle.onStart()
         lifecycle.onResume()
-        playerWindow = VlcPlayerSwingWindow.showWindow(this) ?: throw IllegalStateException("Cant find VLC")
+        playerWindow = VlcPlayerSwingWindow.showWindow(this) ?: throw IllegalStateException("Can't find VLC")
     }
 
     override fun destroy() {
@@ -121,7 +121,6 @@ class VlcPlayerUiCoordinator(
 
     fun playerWindowDestroyed() {
         parent.killPlayer()
-
     }
 
     fun setupPlaylistAndItem(item: PlaylistItemDomain, playlist: PlaylistDomain) {
