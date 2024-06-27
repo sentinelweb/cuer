@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color.Companion.Black
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.koin.java.KoinJavaComponent.getKoin
 import toImageIcon
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.media.Media
@@ -67,6 +66,11 @@ class VlcPlayerSwingWindow(
         createWindow()
     }
 
+    fun assemble() {
+        createWindow()
+        createMediaPlayer()
+        createControls()
+    }
     private fun createWindow() {
         this.defaultCloseOperation = DO_NOTHING_ON_CLOSE
 
@@ -100,7 +104,7 @@ class VlcPlayerSwingWindow(
         this.isVisible = true
     }
 
-    fun createMediaPlayer() {
+    private fun createMediaPlayer() {
         mediaPlayerComponent = CallbackMediaPlayerComponent()
         this.contentPane.add(mediaPlayerComponent, CENTER)
         mediaPlayerComponent.mediaPlayer().events().addMediaEventListener(
@@ -299,23 +303,19 @@ class VlcPlayerSwingWindow(
     }
 
     companion object {
-        fun showWindow(coordinator: VlcPlayerUiCoordinator): VlcPlayerSwingWindow? {
+        fun checkShowWindow(): Boolean {
             if (!NativeDiscovery().discover()) {
+                // todo add installation instructions and link
                 val message = "Could not find VLC installation, please set VLC_PLUGIN_PATH environment variable"
-                println(message)
                 JOptionPane.showMessageDialog(
                     null,  // parent component, can be null if not considering location of dialog
                     message,
                     "Error",
                     ERROR_MESSAGE
                 )
-                return null
+                return false
             } else {
-                val frame = VlcPlayerSwingWindow(coordinator, getKoin().get(GetFolderListUseCase::class))
-                frame.createWindow()
-                frame.createMediaPlayer()
-                frame.createControls()
-                return frame
+                return true
             }
         }
     }

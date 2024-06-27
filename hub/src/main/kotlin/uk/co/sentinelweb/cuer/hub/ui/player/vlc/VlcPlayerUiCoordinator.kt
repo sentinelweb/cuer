@@ -74,7 +74,10 @@ class VlcPlayerUiCoordinator(
         controller.onViewCreated(listOf(this), lifecycle)
         lifecycle.onStart()
         lifecycle.onResume()
-        playerWindow = VlcPlayerSwingWindow.showWindow(this) ?: throw IllegalStateException("Can't find VLC")
+        playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
+            scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
+                .apply { assemble() }
+        } else throw IllegalStateException("Can't find VLC")
     }
 
     override fun destroy() {
@@ -193,6 +196,9 @@ class VlcPlayerUiCoordinator(
                         mapper = get(),
                         prefsWrapper = get()
                     )
+                }
+                factory {
+                    VlcPlayerSwingWindow(get(), get())
                 }
             }
         }
