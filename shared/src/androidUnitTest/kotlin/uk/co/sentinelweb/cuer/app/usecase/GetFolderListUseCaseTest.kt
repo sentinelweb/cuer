@@ -36,11 +36,6 @@ class GetFolderListUseCaseTest {
     fun getFolderList_null_returns_root_folders() {
         val folderPath: String? = null
         every { prefs.folderRoots } returns setOf("/path1", "/x/y/z/path2", "/a/path3")
-//        every { fileOperations.exists(AFile("/path1")) } returns true
-//        every { fileOperations.list(AFile("/path1")) } returns listOf(
-//            AFile("/path1/file1.mp3"),
-//            AFile("/path1/file2.mkv")
-//        )
         every { fileOperations.properties(AFile("/path1")) } returns AFileProperties(
             file = AFile("/path1"),
             name = "path1",
@@ -59,21 +54,10 @@ class GetFolderListUseCaseTest {
             size = 0,
             isDirectory = true
         )
-//        every { fileOperations.properties(AFile("/path1/file1.mp3")) } returns AFileProperties(
-//            file = AFile("/path1/file1.mp3"),
-//            name = "file1.mp3",
-//            size = 2000,
-//            isDirectory = false
-//        )
-//        every { fileOperations.properties(AFile("/path1/file2.mkv")) } returns AFileProperties(
-//            file = AFile("/path1/file2.mkv"),
-//            name = "file2.mkv",
-//            size = 3000,
-//            isDirectory = false
-//        )
         val actual = sut.getFolderList(null)
-        // log.d(actual.toString())
+
         assertNotNull(actual!!)
+
         assertEquals("Top", actual.playlist.title)
         assertEquals(FILESYSTEM, actual.playlist.platform)
         assertNull(actual.playlist.platformId)
@@ -209,8 +193,38 @@ class GetFolderListUseCaseTest {
     }
 
     @Test
-    fun getFolderList_file_path_returns_null() {
+    fun getFolderList_with_full_path_returns_null() {
+        every { prefs.folderRoots } returns setOf("/path1", "/x/y/z/path2", "/a/path3")
+        every { fileOperations.exists(AFile("/path1")) } returns true
+        every { fileOperations.properties(AFile("/path1")) } returns AFileProperties(
+            file = AFile("/path1"),
+            name = "path1",
+            size = 0,
+            isDirectory = true
+        )
+        val actual: PlaylistAndChildrenDomain? = sut.getFolderList("/path1")
+        assertNull(actual)
+    }
 
+    @Test
+    fun getFolderList_file_path_returns_null() {
+        every { prefs.folderRoots } returns setOf("/path1", "/x/y/z/path2", "/a/path3")
+        every { fileOperations.exists(AFile("/path1")) } returns true
+        every { fileOperations.exists(AFile("/path1/test.txt")) } returns true
+        every { fileOperations.properties(AFile("/path1")) } returns AFileProperties(
+            file = AFile("/path1"),
+            name = "sub",
+            size = 1000,
+            isDirectory = true
+        )
+        every { fileOperations.properties(AFile("/path1/test.txt")) } returns AFileProperties(
+            file = AFile("/path1/test.txt"),
+            name = "test.txt",
+            size = 1000,
+            isDirectory = false
+        )
+        val actual: PlaylistAndChildrenDomain? = sut.getFolderList("path1/test.txt")
+        assertNull(actual)
     }
 
     @Test

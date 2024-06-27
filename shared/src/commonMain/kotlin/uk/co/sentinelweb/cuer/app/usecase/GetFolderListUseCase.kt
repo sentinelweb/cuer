@@ -35,6 +35,7 @@ class GetFolderListUseCase(
                 ?.takeIf { checkFolderPathIsInAllowedSet(it) }
                 ?.let { AFile(it) }
                 ?.takeIf { fileOperations.exists(it) }
+                ?.takeIf { fileOperations.properties(it)?.isDirectory ?: false }
                 ?.let { fileOperations.list(it) }
         })
             ?.also { log.d("folderPath: $folderPath") }
