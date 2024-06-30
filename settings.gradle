@@ -16,4 +16,5 @@ include 'domain'
 include 'net'
 include 'hub'
 include 'scripts'
+include 'sharedUi'
 

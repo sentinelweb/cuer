@@ -33,6 +33,7 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(project(":database"))
     implementation(project(":shared"))
+    implementation(project(":sharedUi"))
     implementation(project(":domain"))
     implementation(project(":remote"))
     implementation(project(":net"))

@@ -51,6 +51,12 @@ kotlin {
             kotlinOptions.jvmTarget = ver_jvm
         }
     }
+    // fixme should be this
+//    androidTarget() {
+//        compilations.all {
+//            kotlinOptions.jvmTarget = ver_jvm
+//        }
+//    }
     iosX64()
     iosArm64()
     iosSimulatorArm64()

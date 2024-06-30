@@ -51,6 +51,7 @@ object BrowseComposables {
             Surface {
                 Box(contentAlignment = Alignment.Center) {
                     Column {
+                        // HelloSharedWorld()
                         CuerTopAppBarComposables.CuerAppBar(
                             text = model.title,
                             onUp = { view.dispatch(Event.OnUpClicked) },
@@ -197,7 +198,8 @@ object BrowseComposables {
             )
         ) {
             Surface(
-                modifier = Modifier.padding(4.dp)
+                modifier = Modifier
+                    .padding(4.dp)
                     .animateEnterExit(
                         enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                         exit = fadeOut(animationSpec = tween(durationMillis = 200))
