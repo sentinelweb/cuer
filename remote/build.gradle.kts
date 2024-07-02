@@ -11,23 +11,6 @@ plugins {
     kotlin("native.cocoapods")
 }
 
-val ver_kotlin: String by project
-val ver_kotlinx_datetime: String by project
-val ver_kotlinx_serialization_core: String by project
-val ver_coroutines: String by project
-val ver_ktor: String by project
-//val ver_jvm: String by project
-val ver_koin: String by project
-val ver_kotlin_react: String by project
-val ver_kotlin_styled: String by project
-val ver_jfixture: String by project
-val ver_truth: String by project
-val isProduction: String by project
-val ver_logback = "1.2.3"
-
-val ver_swift_tools: String by project
-val ver_ios_deploy_target: String by project
-
 val outputJsLibName = "cuer_remote.js"
 
 group = "uk.co.sentinelweb.cuer.remote"
@@ -63,7 +46,7 @@ kotlin {
         }
         summary = "remote"
         homepage = "https://sentinelweb.co.uk"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
     }
 
     sourceSets {
@@ -73,13 +56,12 @@ kotlin {
                 implementation(project(":domain"))
                 implementation(project(":database"))
                 implementation(project(":shared"))
-
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("io.insert-koin:koin-core:$ver_koin")
-                implementation("io.ktor:ktor-client-core:$ver_ktor")
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.koinCore)
+                implementation(libs.ktorClientCore)
             }
         }
 
@@ -87,26 +69,21 @@ kotlin {
             kotlin.srcDir("src/jvmAndAndroid/kotlin")
             dependsOn(commonMain)
             dependencies {
-                implementation("ch.qos.logback:logback-classic:$ver_logback")
-                implementation("io.ktor:ktor-server-core:$ver_ktor")
-                implementation("io.ktor:ktor-server-cio:$ver_ktor")
-                implementation("io.ktor:ktor-serialization:$ver_ktor")
-                implementation("io.ktor:ktor-server-cors:$ver_ktor")
-                implementation("io.ktor:ktor-server-content-negotiation:$ver_ktor")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
-                implementation("io.ktor:ktor-server-compression:$ver_ktor")
-                implementation("io.ktor:ktor-server-call-logging:$ver_ktor")
-                implementation("io.ktor:ktor-server-auth:$ver_ktor")
-                implementation("io.ktor:ktor-server-auth-jwt:$ver_ktor") {
-                    // stops dep conflict with guava listenablefuture use in android runtime
-                    exclude(group = "com.google.guava", module = "guava")
-                }
+                implementation(libs.logbackClassic)
+                implementation(libs.ktorServerCore)
+                implementation(libs.ktorServerCio)
+                implementation(libs.ktorSerialization)
+                implementation(libs.ktorServerCors)
+                implementation(libs.ktorServerContentNegotiation)
+                implementation(libs.ktorSerializationKotlinxJson)
+                implementation(libs.ktorServerCompression)
+                implementation(libs.ktorServerCallLogging)
+                implementation(libs.ktorServerAuth)
             }
         }
 
         val jvmMain by getting {
             dependsOn(jvmAndAndroidMain)
-
         }
 
         val androidMain by getting {
@@ -119,27 +96,19 @@ kotlin {
         val jvmTest by getting {
             dependencies {
                 // Koin for JUnit 4
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("com.google.truth:truth:$ver_truth")
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.jfixture)
+                implementation(libs.truth)
             }
         }
 
         val jsMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react:$ver_kotlin_react")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-react-dom:$ver_kotlin_react")
-                implementation("org.jetbrains.kotlin-wrappers:kotlin-styled:$ver_kotlin_styled")
+                implementation(libs.kotlinReact)
+                implementation(libs.kotlinReactDom)
+                implementation(libs.kotlinStyled)
                 implementation(npm("react-youtube-lite", "1.1.0"))
                 implementation(npm("react-share", "~4.4.0"))
-
-//                implementation("com.ccfraser.muirwik:muirwik-components:0.9.0") {
-//                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-styled")
-//                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react")
-//                    exclude(group = "org.jetbrains.kotlin-wrappers", module = "kotlin-react-dom")
-//                }
-                //https://github.com/CookPete/react-player
-                //implementation(npm("react-player", "2.9.0"))
             }
         }
     }

@@ -87,6 +87,7 @@ kotlin {
 //                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
                 implementation(libs.koinTestJUnit4)
                 implementation(libs.kotlinFixture)
+                implementation(libs.jfixture)
                 implementation(libs.mockkAndroid)
                 implementation(libs.mockkAgent)
             }

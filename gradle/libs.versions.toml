@@ -81,6 +81,7 @@ kotlin-react = "17.0.2-pre.289-kotlin-1.6.10"
 kotlin-styled = "5.3.3-pre.289-kotlin-1.6.10"
 batik = "1.17"
 vlcj = "4.8.2"
+logback = "1.2.3"
 
 [libraries]
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
@@ -172,15 +173,28 @@ batikTranscoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform_settings" }
 vlcj = { module = "uk.co.caprica:vlcj", version.ref = "vlcj" }
 
+# web/react
+kotlinReact = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "kotlin_react" }
+kotlinReactDom = { module = "org.jetbrains.kotlin-wrappers:kotlin-react-dom", version.ref = "kotlin_react" }
+kotlinStyled = { module = "org.jetbrains.kotlin-wrappers:kotlin-styled", version.ref = "kotlin_styled" }
+
 # ktor
 ktorClientCore = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktorClientCio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktorSerialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
 ktorClientContentNegotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktorSerializationKotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktorClientLogging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktorClientJs = { module = "io.ktor:ktor-client-js", version.ref = "ktor" }
 ktorClientDarwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
+ktorServerCore = { module = "io.ktor:ktor-server-core", version.ref = "ktor" }
+ktorServerCio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktorSerialization = { module = "io.ktor:ktor-serialization", version.ref = "ktor" }
+ktorServerCors = { module = "io.ktor:ktor-server-cors", version.ref = "ktor" }
+ktorServerContentNegotiation = { module = "io.ktor:ktor-server-content-negotiation", version.ref = "ktor" }
+ktorSerializationKotlinxJson = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktorServerCompression = { module = "io.ktor:ktor-server-compression", version.ref = "ktor" }
+ktorServerCallLogging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
+ktorServerAuth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
+logbackClassic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 androidGradlePluginClaspath = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
