@@ -10,7 +10,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 // todo move all to libs.versions.toml
-val ver_jvm: String by project
+//val ver_jvm: String by project
 val ver_fragment_ktx: String by project
 val ver_androidx_annotation: String by project
 val ver_lifecycle_viewmodel_ktx: String by project
@@ -122,7 +122,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = ver_jvm
+        jvmTarget = libs.versions.jvm.get()
         freeCompilerArgs += listOf(
             "-Xopt-in=kotlin.time.ExperimentalTime",
             "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"

@@ -1,7 +1,12 @@
 [versions]
 app-applicationId = "uk.co.sentinelweb.cuer.app"
+app-base = "uk.co.sentinelweb.cuer"
 app-versionCode = "12"
 app-versionName = "0.79"
+# todo change to 1.9.23
+kotlin = "1.9.22"
+jdk = "17"
+jvm = "17"
 agp = "8.2.0"
 android-compileSdk = "34"
 android-minSdk = "26"
@@ -19,8 +24,6 @@ composeCompiler = "1.5.11"
 composeMultiplatform = "1.6.11"
 composeThemeAdapter = "1.2.1"
 junit = "4.13.2"
-# todo change to 1.9.23
-kotlin = "1.9.22"
 google_services = "4.3.4"
 navigation = "2.5.2"
 firebase_crashlytics = "2.4.1"

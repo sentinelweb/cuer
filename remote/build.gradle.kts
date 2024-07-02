@@ -16,7 +16,7 @@ val ver_kotlinx_datetime: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_coroutines: String by project
 val ver_ktor: String by project
-val ver_jvm: String by project
+//val ver_jvm: String by project
 val ver_koin: String by project
 val ver_kotlin_react: String by project
 val ver_kotlin_styled: String by project
@@ -24,11 +24,6 @@ val ver_jfixture: String by project
 val ver_truth: String by project
 val isProduction: String by project
 val ver_logback = "1.2.3"
-
-//val app_compileSdkVersion: String by project
-//val app_targetSdkVersion: String by project
-//val app_minSdkVersion: String by project
-val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -55,7 +50,7 @@ kotlin {
     }
     androidTarget() {
         compilations.all {
-            kotlinOptions.jvmTarget = ver_jvm
+            kotlinOptions.jvmTarget = libs.versions.jvm.get()
         }
     }
     iosX64()
@@ -152,7 +147,7 @@ kotlin {
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = app_base
+    namespace = libs.versions.app.base.get()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -196,7 +191,7 @@ tasks.getByName<Jar>("jvmJar") {
 tasks {
     withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
         kotlinOptions {
-            jvmTarget = ver_jvm
+            jvmTarget = libs.versions.jvm.get()
         }
     }
 }

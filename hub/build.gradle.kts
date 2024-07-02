@@ -5,7 +5,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val ver_jvm: String by project
+//val ver_jvm: String by project
 val ver_koin: String by project
 val ver_coroutines: String by project
 val ver_ktor: String by project
@@ -79,10 +79,10 @@ compose.desktop {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = ver_jvm
+        kotlinOptions.jvmTarget = libs.versions.jvm.get()
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = ver_jvm
+        kotlinOptions.jvmTarget = libs.versions.jvm.get()
     }
 }
 

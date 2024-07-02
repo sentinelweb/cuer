@@ -20,7 +20,6 @@ val ver_kotlinx_serialization_core: String by project
 val ver_kotlinx_datetime: String by project
 val ver_koin: String by project
 val ver_mockk: String by project
-val ver_jvm: String by project
 val ver_jfixture: String by project
 val ver_junit: String by project
 val ver_truth: String by project
@@ -30,12 +29,6 @@ val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
-//val ver_compose: String by project
-
-//val app_compileSdkVersion: String by project
-//val app_targetSdkVersion: String by project
-//val app_minSdkVersion: String by project
-val app_base: String by project
 
 val ver_kotlin_fixture: String by project
 val ver_swift_tools: String by project
@@ -48,7 +41,7 @@ kotlin {
     // fixme should be this
     android {
         compilations.all {
-            kotlinOptions.jvmTarget = ver_jvm
+            kotlinOptions.jvmTarget = libs.versions.jvm.get()
         }
     }
     jvm("desktop")
@@ -185,7 +178,7 @@ kotlin {
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = app_base
+    namespace = libs.versions.app.base.get()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {

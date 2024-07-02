@@ -10,7 +10,7 @@ plugins {
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
-val ver_jvm: String by project
+//val ver_jvm: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_sqldelight: String by project
@@ -19,10 +19,6 @@ val ver_koin: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
 val ver_mockk: String by project
-//val app_compileSdkVersion: String by project
-//val app_targetSdkVersion: String by project
-//val app_minSdkVersion: String by project
-val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -31,7 +27,7 @@ kotlin {
     jvm()
     androidTarget {
         compilations.all {
-            kotlinOptions.jvmTarget = ver_jvm
+            kotlinOptions.jvmTarget = libs.versions.jvm.get()
         }
     }
     iosX64()
@@ -135,7 +131,7 @@ kotlin {
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
-    namespace = app_base
+    namespace = libs.versions.app.base.get()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
