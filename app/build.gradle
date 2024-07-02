@@ -6,6 +6,7 @@ apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: "androidx.navigation.safeargs.kotlin"
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'org.jetbrains.compose'
 
 android {
     compileSdkVersion app_compileSdkVersion as int
@@ -97,6 +98,8 @@ android {
     composeOptions {
         kotlinCompilerVersion ver_kotlin
         kotlinCompilerExtensionVersion ver_compose_compiler
+        // todo move to libs.versions.toml (getting a null error)
+//        kotlinCompilerExtensionVersion libs.versions.composeCompiler
     }
 
     buildFeatures {
@@ -135,7 +138,7 @@ android {
 
 dependencies {
     implementation project(":shared")
-    implementation project(":sharedUi")
+//    implementation project(":sharedUi")
     implementation project(':net')
     implementation project(":remote")
     implementation project(":database")// todo: remove get through shared
@@ -165,16 +168,16 @@ dependencies {
     implementation "androidx.work:work-runtime-ktx:$ver_workmanager"
 
     // Compose
-    implementation "androidx.compose.animation:animation:$ver_compose"
-    implementation "androidx.compose.runtime:runtime:$ver_compose"
-    implementation "androidx.compose.ui:ui:$ver_compose"
-    implementation "androidx.compose.foundation:foundation:$ver_compose"
-    implementation "androidx.compose.foundation:foundation-layout:$ver_compose"
-    implementation "androidx.compose.material:material:$ver_compose"
-    implementation "androidx.compose.runtime:runtime-livedata:$ver_compose"
-    implementation("androidx.compose.ui:ui-tooling:$ver_compose")
-    implementation "androidx.compose.compiler:compiler:$ver_compose_compiler"
-    implementation "com.google.android.material:compose-theme-adapter:$ver_compose_theme_adapter"
+//    implementation "com.google.android.material:compose-theme-adapter:$ver_compose_theme_adapter"
+    implementation libs.composeThemeAdapter
+    implementation compose.animation
+    implementation compose.runtime
+    implementation compose.foundation
+    implementation compose.material
+    implementation compose.ui
+    implementation compose.components.resources
+    implementation compose.components.uiToolingPreview
+    implementation libs.compose.ui.tooling.preview
 
     // mvikotlin
     debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"

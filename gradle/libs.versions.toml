@@ -1,0 +1,54 @@
+[versions]
+agp = "8.2.0"
+android-compileSdk = "34"
+android-minSdk = "24"
+android-targetSdk = "34"
+androidx-activityCompose = "1.9.0"
+androidx-appcompat = "1.6.1"
+androidx-constraintlayout = "2.1.4"
+androidx-core-ktx = "1.13.0"
+androidx-espresso-core = "3.5.1"
+androidx-material = "1.11.0"
+androidx-test-junit = "1.1.5"
+compose = "1.6.6"
+#compose-plugin = "1.6.2"
+#composeCompiler="1.5.11"
+composeMultiplatform = "1.6.11"
+composeThemeAdapter = "1.2.1"
+junit = "4.13.2"
+# todo change to 1.9.23
+kotlin = "1.9.22"
+google_services = "4.3.4"
+navigation = "2.5.2"
+firebase_crashlytics = "2.4.1"
+sqldelight = "1.5.5"
+
+[libraries]
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
+androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidx-test-junit" }
+androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "androidx-espresso-core" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
+androidx-material = { group = "com.google.android.material", name = "material", version.ref = "androidx-material" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
+#androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
+compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+composeThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
+
+androidGradlePluginClaspath = { module = "com.android.tools.build:gradle", version.ref = "agp" }
+kotlinPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlinSerializationPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
+googleServicesPluginClaspath = { module = "com.google.gms:google-services", version.ref = "google-services" }
+navigationPluginClaspath = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
+firebaseCrashlyticsPluginClaspath = { module = "com.google.firebase:firebase-crashlytics-gradle", version.ref = "firebase-crashlytics" }
+sqldelightPluginClaspath = { module = "com.squareup.sqldelight:gradle-plugin", version.ref = "sqldelight" }
+multiComposePluginClaspath = { module = "org.jetbrains.compose:compose-gradle-plugin", version.ref = "composeMultiplatform" }
+
+[plugins]
+#androidApplication = { id = "com.android.application", version.ref = "agp" }
+#androidLibrary = { id = "com.android.library", version.ref = "agp" }
+#jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "multi-compose" }
+#kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }

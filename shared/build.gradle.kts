@@ -3,13 +3,15 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // build swift release: ./gradlew :shared:updatePackageSwift
 // build swift dev: ./gradlew :shared:spmDevBuild
 plugins {
-    kotlin("multiplatform")
+//    kotlin("multiplatform")
+    id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
 //    kotlin("com.android.application")
     kotlin("plugin.serialization")
     id("co.touchlab.faktory.kmmbridge") version "0.3.4"
     kotlin("native.cocoapods")
     id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
+    id("org.jetbrains.compose")
 }
 
 val ver_native_coroutines: String by project
@@ -28,6 +30,7 @@ val ver_multiplatform_settings: String by project
 val ver_turbine: String by project
 val ver_ktor: String by project
 val ver_mockserver: String by project
+//val ver_compose: String by project
 
 val app_compileSdkVersion: String by project
 val app_targetSdkVersion: String by project
@@ -42,21 +45,17 @@ group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
 kotlin {
-    jvm()
-    js(IR) {
-        browser()
-    }
+    // fixme should be this
     android {
         compilations.all {
             kotlinOptions.jvmTarget = ver_jvm
         }
     }
-    // fixme should be this
-//    androidTarget() {
-//        compilations.all {
-//            kotlinOptions.jvmTarget = ver_jvm
-//        }
-//    }
+    jvm("desktop")
+    js(IR) {
+        browser()
+    }
+
     iosX64()
     iosArm64()
     iosSimulatorArm64()
@@ -79,12 +78,14 @@ kotlin {
 //    }
 
     sourceSets {
+
         all {
             languageSettings.optIn("kotlin.time.ExperimentalTime")
             languageSettings.optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
             languageSettings.optIn("com.russhwolf.settings.ExperimentalSettingsImplementation")
             languageSettings.optIn("kotlinx.serialization.ExperimentalSerializationApi")
         }
+        val desktopMain by getting
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
@@ -108,6 +109,16 @@ kotlin {
                 implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
                 implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
                 implementation("io.ktor:ktor-client-core:$ver_ktor")
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.ui)
+                implementation(compose.components.resources)
+                implementation(compose.components.uiToolingPreview)
+                println("---------------" + compose.runtime)
+                println("---------------" + compose.compiler.auto)
+                println("---------------" + compose.components.uiToolingPreview)
+
             }
         }
         val commonTest by getting {
@@ -120,7 +131,7 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:$ver_ktor")
                 implementation("io.insert-koin:koin-android:$ver_koin")
-
+                implementation(libs.compose.ui.tooling.preview)
             }
         }
         val androidUnitTest by getting {
@@ -163,6 +174,11 @@ kotlin {
             iosX64Test.dependsOn(this)
             iosArm64Test.dependsOn(this)
             iosSimulatorArm64Test.dependsOn(this)
+        }
+
+        desktopMain.dependencies {
+            implementation(compose.desktop.currentOs)
+
         }
     }
 }
