@@ -32,9 +32,9 @@ val ver_ktor: String by project
 val ver_mockserver: String by project
 //val ver_compose: String by project
 
-val app_compileSdkVersion: String by project
-val app_targetSdkVersion: String by project
-val app_minSdkVersion: String by project
+//val app_compileSdkVersion: String by project
+//val app_targetSdkVersion: String by project
+//val app_minSdkVersion: String by project
 val app_base: String by project
 
 val ver_kotlin_fixture: String by project
@@ -131,7 +131,7 @@ kotlin {
             dependencies {
                 implementation("io.ktor:ktor-client-cio:$ver_ktor")
                 implementation("io.insert-koin:koin-android:$ver_koin")
-                implementation(libs.compose.ui.tooling.preview)
+                implementation(libs.composeUiToolingPreview)
             }
         }
         val androidUnitTest by getting {
@@ -184,12 +184,12 @@ kotlin {
 }
 
 android {
-    compileSdk = app_compileSdkVersion.toInt()
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
-        minSdk = app_minSdkVersion.toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
 
     compileOptions {

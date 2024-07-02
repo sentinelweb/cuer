@@ -19,9 +19,9 @@ val ver_truth: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
 
-val app_compileSdkVersion: String by project
-val app_targetSdkVersion: String by project
-val app_minSdkVersion: String by project
+//val app_compileSdkVersion: String by project
+//val app_targetSdkVersion: String by project
+//val app_minSdkVersion: String by project
 val app_base: String by project
 
 val ver_swift_tools: String by project
@@ -132,11 +132,11 @@ kotlin {
 }
 
 android {
-    compileSdk = app_compileSdkVersion.toInt()
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     namespace = app_base
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = app_minSdkVersion.toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

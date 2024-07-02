@@ -1,8 +1,11 @@
 [versions]
+app-applicationId = "uk.co.sentinelweb.cuer.app"
+app-versionCode = "12"
+app-versionName = "0.79"
 agp = "8.2.0"
 android-compileSdk = "34"
-android-minSdk = "24"
-android-targetSdk = "34"
+android-minSdk = "26"
+android-targetSdk = "33"
 androidx-activityCompose = "1.9.0"
 androidx-appcompat = "1.6.1"
 androidx-constraintlayout = "2.1.4"
@@ -12,7 +15,7 @@ androidx-material = "1.11.0"
 androidx-test-junit = "1.1.5"
 compose = "1.6.6"
 #compose-plugin = "1.6.2"
-#composeCompiler="1.5.11"
+composeCompiler = "1.5.11"
 composeMultiplatform = "1.6.11"
 composeThemeAdapter = "1.2.1"
 junit = "4.13.2"
@@ -35,8 +38,11 @@ androidx-material = { group = "com.google.android.material", name = "material", 
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "androidx-constraintlayout" }
 #androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activityCompose" }
 compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
-compose-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
+composeUiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 composeThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
+
+kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
+
 
 androidGradlePluginClaspath = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

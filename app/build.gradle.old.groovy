@@ -9,7 +9,7 @@ apply plugin: 'com.google.firebase.crashlytics'
 apply plugin: 'org.jetbrains.compose'
 
 android {
-    compileSdkVersion app_compileSdkVersion as int
+    compileSdkVersion libs.versions.android.compileSdk
     namespace app_applicationId
     useLibrary 'android.test.runner'
     useLibrary 'android.test.base'
@@ -19,8 +19,8 @@ android {
 
     defaultConfig {
         applicationId app_applicationId
-        minSdkVersion app_minSdkVersion as int
-        targetSdkVersion app_targetSdkVersion as int
+        minSdkVersion libs.versions.android.minSdk
+        targetSdkVersion libs.versions.android.targetSdk
         versionCode app_versionCode as int
         versionName app_versionName
 
@@ -176,8 +176,8 @@ dependencies {
     implementation compose.material
     implementation compose.ui
     implementation compose.components.resources
-    implementation compose.components.uiToolingPreview
-    implementation libs.compose.ui.tooling.preview
+//    implementation compose.components.uiToolingPreview
+    implementation libs.composeUiToolingPreview
 
     // mvikotlin
     debugImplementation "com.arkivanov.mvikotlin:mvikotlin-android-debug:$ver_mvikotlin"
