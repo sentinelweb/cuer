@@ -129,8 +129,8 @@ tasks.register("generateBuildConfigInjectClass") {
                 val isDebug: Boolean = ${isProduction}.not()
                 val cuerRemoteEnabled: Boolean = $CUER_REMOTE_ENABLED
                 val cuerBgPlayEnabled: Boolean = $CUER_BG_PLAY
-                val versionCode: Int = $app_versionCode
-                val version: String = "$app_versionName"
+                val versionCode: Int = ${libs.versions.app.versionCode.get().toInt()}
+                val version: String = "${libs.versions.app.versionName.get()}"
                 val hubStoreKey: String = "$CUER_HUB_STORE_KEY"
                 val hubStorePass: String = "$CUER_HUB_STORE_PASS"
             }
