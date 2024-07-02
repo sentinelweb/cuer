@@ -54,6 +54,7 @@ preference = "1.2.0"
 firebase-bom = "26.1.1"
 firebase-ui = "7.1.1"
 mvikotlin = "3.0.2"
+essenty = "0.6.0"
 multiplatform-settings = "0.8.1"
 splash = "1.0.0-beta01"
 workmanager = "2.9.0"
@@ -85,8 +86,6 @@ logback = "1.2.3"
 
 [libraries]
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
-kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
-kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidx-core-ktx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidx-appcompat" }
@@ -107,10 +106,6 @@ recyclerView = { module = "androidx.recyclerview:recyclerview", version.ref = "r
 swiperefreshlayout = { module = "androidx.swiperefreshlayout:swiperefreshlayout", version.ref = "swipe-refresh" }
 preferenceKtx = { module = "androidx.preference:preference-ktx", version.ref = "preference" }
 workRuntimeKtx = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
-mvikotlin = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mvikotlin" }
-mvikotlinAndroidDebug = { module = "com.arkivanov.mvikotlin:mvikotlin-android-debug", version.ref = "mvikotlin" }
-mvikotlinAndroid = { module = "com.arkivanov.mvikotlin:mvikotlin-android", version.ref = "mvikotlin" }
-mvikotlinLogging = { module = "com.arkivanov.mvikotlin:mvikotlin-logging", version.ref = "mvikotlin" }
 navigationFragment = { module = "androidx.navigation:navigation-fragment", version.ref = "navigation" }
 navigationFragmentKtx = { module = "androidx.navigation:navigation-fragment-ktx", version.ref = "navigation" }
 navigationUi = { module = "androidx.navigation:navigation-ui-ktx", version.ref = "navigation" }
@@ -137,6 +132,10 @@ accompanistGlide = { module = "com.google.accompanist:accompanist-glide", versio
 accompanistDrawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
 coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coreSplashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splash" }
+
+# testing
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
 koinTest = { module = "io.insert-koin:koin-test", version.ref = "koin" }
 truth = { module = "com.google.truth:truth", version.ref = "truth" }
 mockitoCore = { module = "org.mockito:mockito-core", version.ref = "mockito" }
@@ -160,6 +159,8 @@ koinTestJUnit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "ko
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockkAndroid = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockkAgent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
+mockserverNetty = { module = "org.mock-server:mockserver-netty", version = "ver_mockserver" }
+mockserverClientJava = { module = "org.mock-server:mockserver-client-java", version = "ver_mockserver" }
 
 #SQLDelight
 sqldelightSqliteDriver = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqldelight" }
@@ -171,6 +172,7 @@ sqldelightSqlJsDriver = { module = "com.squareup.sqldelight:sqljs-driver", versi
 kotlinxCoroutinesJdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 batikTranscoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform_settings" }
+multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform_settings" }
 vlcj = { module = "uk.co.caprica:vlcj", version.ref = "vlcj" }
 
 # web/react
@@ -195,6 +197,16 @@ ktorServerCompression = { module = "io.ktor:ktor-server-compression", version.re
 ktorServerCallLogging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
 ktorServerAuth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 logbackClassic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+
+# mvikotlin
+mvikotlin = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mvikotlin" }
+mvikotlinAndroidDebug = { module = "com.arkivanov.mvikotlin:mvikotlin-android-debug", version.ref = "mvikotlin" }
+mvikotlinAndroid = { module = "com.arkivanov.mvikotlin:mvikotlin-android", version.ref = "mvikotlin" }
+mvikotlinLogging = { module = "com.arkivanov.mvikotlin:mvikotlin-logging", version.ref = "mvikotlin" }
+mvikotlinMain = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mvikotlin" }
+mvikotlinExtensionsCoroutines = { module = "com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines", version.ref = "mvikotlin" }
+essentyLifecycle = { module = "com.arkivanov.essenty:lifecycle", version.ref = "essenty" }
+essentyInstanceKeeper = { module = "com.arkivanov.essenty:instance-keeper", version.ref = "essenty" }
 
 androidGradlePluginClaspath = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

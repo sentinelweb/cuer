@@ -3,36 +3,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 // build swift release: ./gradlew :shared:updatePackageSwift
 // build swift dev: ./gradlew :shared:spmDevBuild
 plugins {
-//    kotlin("multiplatform")
     id("org.jetbrains.kotlin.multiplatform")
     id("com.android.library")
-//    kotlin("com.android.application")
     kotlin("plugin.serialization")
     id("co.touchlab.faktory.kmmbridge") version "0.3.4"
     kotlin("native.cocoapods")
     id("com.rickclephas.kmp.nativecoroutines") version "0.13.3" //todo use ver_native_coroutines
     id("org.jetbrains.compose")
 }
-
-val ver_native_coroutines: String by project
-val ver_coroutines: String by project
-val ver_kotlinx_serialization_core: String by project
-val ver_kotlinx_datetime: String by project
-val ver_koin: String by project
-val ver_mockk: String by project
-val ver_jfixture: String by project
-val ver_junit: String by project
-val ver_truth: String by project
-val ver_mvikotlin: String by project
-val ver_kotlinx_coroutines_test: String by project
-val ver_multiplatform_settings: String by project
-val ver_turbine: String by project
-val ver_ktor: String by project
-val ver_mockserver: String by project
-
-val ver_kotlin_fixture: String by project
-val ver_swift_tools: String by project
-val ver_ios_deploy_target: String by project
 
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
@@ -60,15 +38,8 @@ kotlin {
         }
         summary = "shared"
         homepage = "https://sentinelweb.co.uk"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
     }
-
-//    targets.withType(org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget::class.java) {
-//        binaries.all {
-//            binaryOptions["memoryModel"] = "experimental"
-//            //freeCompilerArgs += "-Xruntime-logs=gc=info -Xobjc-generics"
-//        }
-//    }
 
     sourceSets {
 
@@ -84,24 +55,21 @@ kotlin {
                 implementation(project(":domain"))
                 implementation(project(":database"))
 
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.koinCore)
+                api(libs.mvikotlin)
+                api(libs.mvikotlinMain)
+                api(libs.mvikotlinExtensionsCoroutines)
+                api(libs.essentyLifecycle)
+                api(libs.essentyInstanceKeeper)
+                implementation(libs.mvikotlinLogging)
+                implementation(libs.multiplatformSettings)
+                implementation(libs.multiplatformSettingsNoArg)
+                implementation(libs.ktorClientCore)
 
-                implementation("io.insert-koin:koin-core:$ver_koin")
-
-                api("com.arkivanov.mvikotlin:mvikotlin:$ver_mvikotlin")
-                api("com.arkivanov.mvikotlin:mvikotlin-main:$ver_mvikotlin")
-                api("com.arkivanov.mvikotlin:mvikotlin-extensions-coroutines:$ver_mvikotlin")
-                api("com.arkivanov.essenty:lifecycle:0.6.0")
-                api("com.arkivanov.essenty:instance-keeper:0.6.0")
-                // for debugging only remove
-                implementation("com.arkivanov.mvikotlin:mvikotlin-logging:$ver_mvikotlin")
-
-                implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
-                implementation("com.russhwolf:multiplatform-settings-no-arg:$ver_multiplatform_settings")
-                implementation("io.ktor:ktor-client-core:$ver_ktor")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -116,29 +84,28 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-                implementation("io.insert-koin:koin-test:$ver_koin")
-                //implementation("io.mockk:mockk:$ver_mockk")
+                implementation(libs.koinTest)
             }
         }
         val androidMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:$ver_ktor")
-                implementation("io.insert-koin:koin-android:$ver_koin")
+                implementation(libs.ktorClientCio)
+                implementation(libs.koinAndroid)
                 implementation(libs.composeUiToolingPreview)
             }
         }
         val androidUnitTest by getting {
             dependencies {
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
-                implementation("org.mock-server:mockserver-netty:$ver_mockserver")
-                implementation("org.mock-server:mockserver-client-java:$ver_mockserver")
-                implementation("io.mockk:mockk-android:$ver_mockk")
-                implementation("io.mockk:mockk-agent:$ver_mockk")
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.jfixture)
+                implementation(libs.kotlinFixture)
+                implementation(libs.truth)
+                implementation(libs.kotlinxCoroutinesTest)
+                implementation(libs.turbine)
+                implementation(libs.mockserverNetty)
+                implementation(libs.mockserverClientJava)
+                implementation(libs.mockkAndroid)
+                implementation(libs.mockkAgent)
             }
         }
         val jsMain by getting {
@@ -200,9 +167,5 @@ kmmbridge {
     githubReleaseVersions()
     spm()
     //cocoapods("git@github.com:touchlab/PublicPodspecs.git")
-    versionPrefix.set("0.6") //fixme do i need this?
+    versionPrefix.set("0.6") // fixme do i need this?
 }
-
-//tasks.withType<Test>().configureEach {
-//    jvmArgs("-javaagent:${classpath.find { it.name.contains("mockk") }?.absolutePath}")
-//}

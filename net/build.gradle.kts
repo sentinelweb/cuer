@@ -42,16 +42,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
-//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-//                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-//                implementation("io.insert-koin:koin-core:$ver_koin")
-//                implementation("io.ktor:ktor-client-core:$ver_ktor")
-//                implementation("io.ktor:ktor-serialization:$ver_ktor")
-//                implementation("io.ktor:ktor-client-content-negotiation:$ver_ktor")
-//                implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
-//                implementation("io.ktor:ktor-client-logging:$ver_ktor")
                 implementation(libs.kotlinxCoroutinesCore)
                 implementation(libs.kotlinxSerializationCore)
                 implementation(libs.kotlinxSerializationJson)
@@ -66,25 +56,18 @@ kotlin {
         }
         val commonTest by getting {
             dependencies {
-//                implementation("io.insert-koin:koin-test:$ver_koin")
                 implementation(libs.koinTest)
             }
         }
 
         val androidMain by getting {
             dependencies {
-//                implementation("io.ktor:ktor-client-cio:$ver_ktor")
                 implementation(libs.ktorClientCio)
 
             }
         }
         val androidUnitTest by getting {
             dependencies {
-//                implementation("io.insert-koin:koin-test:$ver_koin")
-//                implementation("io.mockk:mockk-android:$ver_mockk")
-//                implementation("io.mockk:mockk-agent:$ver_mockk")
-//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-//                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
                 implementation(libs.koinTestJUnit4)
                 implementation(libs.kotlinFixture)
                 implementation(libs.jfixture)
