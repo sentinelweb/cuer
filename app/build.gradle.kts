@@ -258,6 +258,7 @@ dependencies {
     testImplementation(libs.kotlinFixture)
     testImplementation(libs.kotlinxCoroutinesTest)
     testImplementation(libs.robolectric)
+    testImplementation(libs.androidxTestJUnit)
     testImplementation(libs.runner)
     testImplementation(libs.rules)
     testImplementation(libs.coreTesting)
