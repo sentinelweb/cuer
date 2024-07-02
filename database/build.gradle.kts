@@ -56,40 +56,36 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("io.insert-koin:koin-core:$ver_koin")
-
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.koinCore)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(project(":domain"))
                 implementation(kotlin("test"))
-                implementation("io.insert-koin:koin-test:$ver_koin")
-//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-//                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation(libs.koinTest)
+                implementation(libs.kotlinxCoroutinesTest)
+                implementation(libs.turbine)
             }
         }
         val androidMain by getting {
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:android-driver:$ver_sqldelight")
-                implementation("io.insert-koin:koin-android:$ver_koin")
+                implementation(libs.sqldelightAndroidDriver)
+                implementation(libs.koinAndroid)
             }
         }
         val androidUnitTest by getting {
             dependencies {
                 implementation(project(":domain"))
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("io.mockk:mockk-android:$ver_mockk")
-                implementation("io.mockk:mockk-agent:$ver_mockk")
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.sqldelightSqliteDriver)
+                implementation(libs.kotlinFixture)
+                implementation(libs.mockkAndroid)
+                implementation(libs.mockkAgent)
             }
         }
         val iosX64Main by getting
@@ -101,8 +97,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:native-driver:$ver_sqldelight")
+                implementation(libs.sqldelightNativeDriver)
             }
 
         }
@@ -117,12 +112,12 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
+                implementation(libs.sqldelightSqlJsDriver)
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
+                implementation(libs.sqldelightSqliteDriver)
             }
         }
         val jsTest by getting
