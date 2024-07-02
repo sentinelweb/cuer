@@ -79,7 +79,7 @@ kotlin {
             dependencies {
 //                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
 //                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
+//                implementation("app.cash.turbine:turbine:$ver_turbine")
                 implementation(libs.turbine)
             }
         }
