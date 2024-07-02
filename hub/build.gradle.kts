@@ -5,19 +5,7 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-//val ver_jvm: String by project
-val ver_koin: String by project
-val ver_coroutines: String by project
-val ver_ktor: String by project
-val ver_batik: String by project
-val ver_junit: String by project
-val ver_mockk: String by project
-val ver_turbine: String by project
-val ver_multiplatform_settings: String by project
-val ver_vlcj: String by project
 val isProduction: String by project
-val app_versionCode: String by project
-val app_versionName: String by project
 val CUER_BG_PLAY: String by project
 val CUER_REMOTE_ENABLED: String by project
 val CUER_HUB_STORE_KEY: String by project

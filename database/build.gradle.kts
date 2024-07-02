@@ -39,7 +39,7 @@ kotlin {
     cocoapods {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
         version = "1"
         framework {
             baseName = "database"

@@ -6,18 +6,6 @@ plugins {
     kotlin("native.cocoapods")
 }
 
-val ver_coroutines: String by project
-val ver_kotlinx_serialization_core: String by project
-val ver_kotlinx_datetime: String by project
-val ver_koin: String by project
-val ver_ktor: String by project
-val ver_mockk: String by project
-val ver_jfixture: String by project
-val ver_kotlin_fixture: String by project
-
-val ver_swift_tools: String by project
-val ver_ios_deploy_target: String by project
-
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
@@ -41,7 +29,7 @@ kotlin {
         }
         summary = "net"
         homepage = "https://sentinelweb.co.uk"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
     }
 
     sourceSets {
@@ -54,43 +42,59 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-                implementation("io.insert-koin:koin-core:$ver_koin")
-                implementation("io.ktor:ktor-client-core:$ver_ktor")
-                implementation("io.ktor:ktor-serialization:$ver_ktor")
-                implementation("io.ktor:ktor-client-content-negotiation:$ver_ktor")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
-                implementation("io.ktor:ktor-client-logging:$ver_ktor")
+//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+//                implementation("io.insert-koin:koin-core:$ver_koin")
+//                implementation("io.ktor:ktor-client-core:$ver_ktor")
+//                implementation("io.ktor:ktor-serialization:$ver_ktor")
+//                implementation("io.ktor:ktor-client-content-negotiation:$ver_ktor")
+//                implementation("io.ktor:ktor-serialization-kotlinx-json:$ver_ktor")
+//                implementation("io.ktor:ktor-client-logging:$ver_ktor")
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.koinCore)
+                implementation(libs.ktorClientCore)
+                implementation(libs.ktorSerialization)
+                implementation(libs.ktorClientContentNegotiation)
+                implementation(libs.ktorSerializationKotlinxJson)
+                implementation(libs.ktorClientLogging)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("io.insert-koin:koin-test:$ver_koin")
+//                implementation("io.insert-koin:koin-test:$ver_koin")
+                implementation(libs.koinTest)
             }
         }
 
         val androidMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+//                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation(libs.ktorClientCio)
 
             }
         }
         val androidUnitTest by getting {
             dependencies {
-                implementation("io.insert-koin:koin-test:$ver_koin")
-                //implementation("io.mockk:mockk:$ver_mockk")
-                implementation("io.mockk:mockk-android:$ver_mockk")
-                implementation("io.mockk:mockk-agent:$ver_mockk")
-                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+//                implementation("io.insert-koin:koin-test:$ver_koin")
+//                implementation("io.mockk:mockk-android:$ver_mockk")
+//                implementation("io.mockk:mockk-agent:$ver_mockk")
+//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
+//                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.kotlinFixture)
+                implementation(libs.mockkAndroid)
+                implementation(libs.mockkAgent)
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+//                implementation("io.ktor:ktor-client-cio:$ver_ktor")
+                implementation(libs.ktorClientCio)
             }
         }
         val jvmTest by getting {
@@ -99,7 +103,8 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-js:$ver_ktor")
+//                implementation("io.ktor:ktor-client-js:$ver_ktor")
+                implementation(libs.ktorClientJs)
             }
         }
         val jsTest by getting
@@ -112,7 +117,8 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:$ver_ktor")
+//                implementation("io.ktor:ktor-client-darwin:$ver_ktor")
+                implementation(libs.ktorClientDarwin)
             }
 
         }

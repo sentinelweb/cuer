@@ -8,18 +8,6 @@ plugins {
     kotlin("native.cocoapods")
 }
 
-val ver_coroutines: String by project
-val ver_kotlinx_serialization_core: String by project
-val ver_kotlinx_datetime: String by project
-val ver_koin: String by project
-val ver_mockk: String by project
-val ver_truth: String by project
-val ver_turbine: String by project
-val ver_kotlin_fixture: String by project
-
-val ver_swift_tools: String by project
-val ver_ios_deploy_target: String by project
-
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
@@ -43,7 +31,7 @@ kotlin {
         }
         summary = "domain"
         homepage = "https://sentinelweb.co.uk"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
     }
 
     sourceSets {
