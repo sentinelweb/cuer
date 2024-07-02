@@ -159,12 +159,17 @@ androidxFragmentTest = { module = "androidx.fragment:fragment-testing", version.
 mockitoInline = { module = "org.mockito:mockito-inline", version.ref = "mockito-inline" }
 androidxTestJUnit = { module = "androidx.test.ext:junit", version.ref = "androidx-test-junit" }
 koinTestJUnit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koin" }
+mockk = { module = "io.mockk:mockk", version = "mockk" }
 mockkAndroid = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockkAgent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
 sqldelightSqliteDriver = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqldelight" }
 sqldelightAndroidDriver = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelightNativeDriver = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqldelight" }
 sqldelightSqlJsDriver = { module = "com.squareup.sqldelight:sqljs-driver", version.ref = "sqldelight" }
+kotlinxCoroutinesJdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version = "coroutines" }
+batikTranscoder = { module = "org.apache.xmlgraphics:batik-transcoder", version = "batik" }
+multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version = "ver_multiplatform_settings" }
+vlcj = { module = "uk.co.caprica:vlcj", version = "vlcj" }
 
 androidGradlePluginClaspath = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlinPluginClaspath = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }

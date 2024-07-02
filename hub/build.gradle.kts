@@ -38,30 +38,44 @@ dependencies {
     implementation(project(":remote"))
     implementation(project(":net"))
     implementation(compose.desktop.currentOs)
-
-    // koin
-    implementation("io.insert-koin:koin-core:$ver_koin")
-
-    // kotlin coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
-
-    // todo upgrade ktor - sec vuln
-    implementation("io.ktor:ktor-client-core:$ver_ktor")
-    implementation("io.ktor:ktor-client-cio:$ver_ktor")
-
-    implementation("org.apache.xmlgraphics:batik-transcoder:$ver_batik")
-    implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
-
-    testImplementation("junit:junit:$ver_junit")
-    testImplementation("io.insert-koin:koin-test:$ver_koin")
-    testImplementation("io.insert-koin:koin-test-junit4:$ver_koin")
-    testImplementation("io.mockk:mockk:$ver_mockk")
-    testImplementation("app.cash.turbine:turbine:$ver_turbine")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-
-    implementation("uk.co.caprica:vlcj:$ver_vlcj")
+//
+//    // koin
+//    implementation("io.insert-koin:koin-core:$ver_koin")
+//
+//    // kotlin coroutines
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
+//    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
+//    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
+//
+//    // todo upgrade ktor - sec vuln
+//    implementation("io.ktor:ktor-client-core:$ver_ktor")
+//    implementation("io.ktor:ktor-client-cio:$ver_ktor")
+//
+//    implementation("org.apache.xmlgraphics:batik-transcoder:$ver_batik")
+//    implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
+//
+//    testImplementation("junit:junit:$ver_junit")
+//    testImplementation("io.insert-koin:koin-test:$ver_koin")
+//    testImplementation("io.insert-koin:koin-test-junit4:$ver_koin")
+//    testImplementation("io.mockk:mockk:$ver_mockk")
+//    testImplementation("app.cash.turbine:turbine:$ver_turbine")
+//    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+//
+//    implementation("uk.co.caprica:vlcj:$ver_vlcj")
+    implementation(libs.koinCore)
+    implementation(libs.kotlinxCoroutinesCore)
+    implementation(libs.kotlinxCoroutinesJdk8)
+    implementation(libs.ktorClientCore)
+    implementation(libs.ktorClientCio)
+    implementation(libs.batikTranscoder)
+    implementation(libs.multiplatformSettings)
+    testImplementation(libs.junit)
+    testImplementation(libs.koinTest)
+    testImplementation(libs.koinTestJUnit4)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinxCoroutinesTest)
+    implementation(libs.vlcj)
 
 }
 
