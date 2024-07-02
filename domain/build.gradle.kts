@@ -2,9 +2,7 @@
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
-//    kotlin("com.android.application")
     kotlin("plugin.serialization")
-//    id("co.touchlab.faktory.kmmbridge") version "0.2.2"
     kotlin("native.cocoapods")
 }
 
