@@ -55,17 +55,23 @@ kotlin {
         }
         val commonMain by getting {
             dependencies {
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-                implementation("io.insert-koin:koin-core:$ver_koin")
+//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
+//                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
+//                implementation("io.insert-koin:koin-core:$ver_koin")
 //                implementation("io.ktor:ktor-client-core:$ver_ktor")
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.koinCore)
             }
         }
         val commonTest by getting {
             dependencies {
-                implementation("io.insert-koin:koin-test:$ver_koin")
+//                implementation("io.insert-koin:koin-test:$ver_koin")
+                implementation(libs.koinTest)
             }
         }
 
@@ -74,16 +80,22 @@ kotlin {
 //                implementation ("io.ktor:ktor-client-cio:$ver_ktor")
 //                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
                 implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation(libs.turbine)
             }
         }
         val androidUnitTest by getting {
             dependencies {
                 //implementation("io.mockk:mockk:$ver_mockk")
-                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("io.mockk:mockk-android:$ver_mockk")
-                implementation("io.mockk:mockk-agent:$ver_mockk")
+//                implementation("com.google.truth:truth:$ver_truth")
+//                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
+//                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
+//                implementation("io.mockk:mockk-android:$ver_mockk")
+//                implementation("io.mockk:mockk-agent:$ver_mockk")
+                implementation(libs.truth)
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.kotlinFixture)
+                implementation(libs.mockkAndroid)
+                implementation(libs.mockkAgent)
             }
         }
         val jvmMain by getting {
