@@ -171,8 +171,8 @@ sqldelightSqlJsDriver = { module = "com.squareup.sqldelight:sqljs-driver", versi
 # hub
 kotlinxCoroutinesJdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 batikTranscoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.ref = "batik" }
-multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform_settings" }
-multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform_settings" }
+multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
+multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 vlcj = { module = "uk.co.caprica:vlcj", version.ref = "vlcj" }
 
 # web/react
@@ -199,7 +199,7 @@ ktorServerAuth = { module = "io.ktor:ktor-server-auth", version.ref = "ktor" }
 logbackClassic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 # mvikotlin
-mvikotlin = { module = "com.arkivanov.mvikotlin:mvikotlin-main", version.ref = "mvikotlin" }
+mvikotlin = { module = "com.arkivanov.mvikotlin:mvikotlin", version.ref = "mvikotlin" }
 mvikotlinAndroidDebug = { module = "com.arkivanov.mvikotlin:mvikotlin-android-debug", version.ref = "mvikotlin" }
 mvikotlinAndroid = { module = "com.arkivanov.mvikotlin:mvikotlin-android", version.ref = "mvikotlin" }
 mvikotlinLogging = { module = "com.arkivanov.mvikotlin:mvikotlin-logging", version.ref = "mvikotlin" }
