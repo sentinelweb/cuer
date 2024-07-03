@@ -9,52 +9,9 @@ plugins {
     id("com.google.firebase.crashlytics")
     id("org.jetbrains.compose")
 }
-// todo move all to libs.versions.toml
-//val ver_jvm: String by project
-val ver_fragment_ktx: String by project
-val ver_androidx_annotation: String by project
-val ver_lifecycle_viewmodel_ktx: String by project
-val ver_material: String by project
-val ver_constraintlayout: String by project
-val ver_lifecycle_extensions: String by project
-val ver_kotlinx_datetime: String by project
-val ver_recyclerview: String by project
-val ver_swipe_refresh: String by project
-val ver_preference: String by project
-val ver_workmanager: String by project
-val ver_mvikotlin: String by project
-val ver_navigation: String by project
-val ver_koin: String by project
-val ver_stetho: String by project
-val ver_android_youtube_player: String by project
-val ver_chromecast_sender: String by project
-val ver_mediarouter: String by project
-val ver_androidx_media: String by project
+
 val ver_firebase_bom: String by project
 val ver_firebase_ui: String by project
-val ver_kotlinx_serialization_core: String by project
-val ver_glide: String by project
-val ver_glide_accompanist: String by project
-val ver_accompanist: String by project
-val ver_coil: String by project
-val ver_ktor: String by project
-val ver_splash: String by project
-// test
-val ver_androidx_fragment_test: String by project
-val ver_mockk: String by project
-val ver_truth: String by project
-val ver_mockito: String by project
-val ver_mockito_inline: String by project
-val ver_mockito_kotlin: String by project
-val ver_jfixture: String by project
-val ver_kotlin_fixture: String by project
-val ver_coroutines: String by project
-val ver_robolectric: String by project
-val ver_androidx_test: String by project
-val ver_espresso_core: String by project
-val ver_android_arch_test: String by project
-val ver_turbine: String by project
-val ver_androidx_test_junit: String by project
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -79,9 +36,9 @@ android {
         val pixKey = getPropertyOrDefault("CUER_PIXABAY_API_KEY", "CUER_PIXABAY_API_KEY_DEFAULT")
         buildConfigField("String", "pixabayApiKey", "\"$pixKey\"")
         val isBgPlay = getPropertyOrDefault("CUER_BG_PLAY", "true")
-        buildConfigField("boolean", "cuerBackgroundPlay", "$isBgPlay")
+        buildConfigField("boolean", "cuerBackgroundPlay", isBgPlay)
         val isRemote = getPropertyOrDefault("CUER_REMOTE_ENABLED", "true")
-        buildConfigField("boolean", "cuerRemoteEnabled", "$isRemote")
+        buildConfigField("boolean", "cuerRemoteEnabled", isRemote)
     }
 
     signingConfigs {
@@ -112,7 +69,6 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "app-proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
-
         }
     }
 
@@ -217,11 +173,20 @@ dependencies {
     implementation(libs.media)
 
     // firebase
-    implementation(libs.firebaseBom)
-    implementation(libs.firebaseStorageKtx)
-    implementation(libs.firebaseCrashlyticsKtx)
-    implementation(libs.firebaseAnalyticsKtx)
-    implementation(libs.firebaseUiStorage)
+//    implementation(platform(libs.firebaseBom))
+//    implementation(libs.firebaseStorageKtx)
+//    implementation(libs.firebaseCrashlyticsKtx)
+//    implementation(libs.firebaseAnalyticsKtx)
+//    implementation(libs.firebaseUiStorage)
+    // FIREBASE
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:$ver_firebase_bom"))
+    // Declare the dependency for the Cloud Storage library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-crashlytics-ktx")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.firebaseui:firebase-ui-storage:$ver_firebase_ui")
 
     // serialization
     implementation(libs.kotlinxSerializationCore)

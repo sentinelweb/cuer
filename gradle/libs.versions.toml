@@ -159,8 +159,8 @@ koinTestJUnit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "ko
 mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockkAndroid = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 mockkAgent = { module = "io.mockk:mockk-agent", version.ref = "mockk" }
-mockserverNetty = { module = "org.mock-server:mockserver-netty", version = "ver_mockserver" }
-mockserverClientJava = { module = "org.mock-server:mockserver-client-java", version = "ver_mockserver" }
+mockserverNetty = { module = "org.mock-server:mockserver-netty", version.ref = "mockserver" }
+mockserverClientJava = { module = "org.mock-server:mockserver-client-java", version.ref = "mockserver" }
 
 #SQLDelight
 sqldelightSqliteDriver = { module = "com.squareup.sqldelight:sqlite-driver", version.ref = "sqldelight" }
