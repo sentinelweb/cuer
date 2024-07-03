@@ -219,6 +219,7 @@ dependencies {
     testImplementation(libs.mockitoCore)
     testImplementation(libs.mockitoInline)
     testImplementation(libs.mockitoKotlin)
+    testImplementation(libs.mockk)
     testImplementation(libs.jfixture)
     testImplementation(libs.kotlinFixture)
     testImplementation(libs.kotlinxCoroutinesTest)
