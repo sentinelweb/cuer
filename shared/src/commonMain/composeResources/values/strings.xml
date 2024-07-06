@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name" translatable="false">Cuer</string>
+    <string name="hub_app_name" translatable="false">Cuer Hub</string>
+</resources>

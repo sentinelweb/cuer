@@ -18,7 +18,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesComposeables.FilesUi
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FilesUi
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi

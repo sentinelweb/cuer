@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.hub.ui.filebrowser
+package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import uk.co.sentinelweb.cuer.domain.PlaylistAndChildrenDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
