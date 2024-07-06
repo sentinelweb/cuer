@@ -256,5 +256,4 @@ object OnboardingComposables {
             }
         }
     }
-
 }

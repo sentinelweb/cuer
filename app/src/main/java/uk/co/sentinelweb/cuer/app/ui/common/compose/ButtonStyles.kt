@@ -82,4 +82,3 @@ fun HeaderButtonSolid(
 ) {
     HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStrokeEnabler, enabled, action)
 }
-
