@@ -306,7 +306,6 @@ class PlaylistMemoryRepository constructor(
                 else -> throw NotImplementedException()
             }
 
-
         override suspend fun delete(domain: MediaDomain, options: Options): Boolean {
             throw NotImplementedException()
         }

@@ -47,7 +47,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-    private val browseHelpConfig: RemotesHelpConfig by inject()
+    private val remotesHelpConfig: RemotesHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -97,7 +97,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
-        OnboardingFragment.showIntro(this@RemotesFragment, browseHelpConfig)
+        OnboardingFragment.showIntro(this@RemotesFragment, remotesHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -130,7 +130,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         }
 
                         ActionPasteAdd -> (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
-                        ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, browseHelpConfig)
+                        ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, remotesHelpConfig)
                         Up -> log.d("Up")
                         is Message -> snackbarWrapper.make(label.msg)
                         ActionConfig -> showConfigFragment()
