@@ -20,9 +20,9 @@ import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object FilesComposeables {
     @Composable
-    fun FilesUi(coordinator: FilesContract.Interactions) {
-        val state = coordinator.modelObservable.collectAsState(initial = FilesModel.blankModel())
-        FilesView(state.value, coordinator)
+    fun FilesUi(interactions: FilesContract.Interactions) {
+        val state = interactions.modelObservable.collectAsState(initial = FilesModel.blankModel())
+        FilesView(state.value, interactions)
     }
 
     @Composable
