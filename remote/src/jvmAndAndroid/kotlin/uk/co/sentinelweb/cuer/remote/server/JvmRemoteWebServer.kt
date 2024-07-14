@@ -45,7 +45,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 
 // todo break this up into use cases
-class JvmRemoteWebServer constructor(
+class JvmRemoteWebServer(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
     private val connectMessageListener: RemoteServerContract.AvailableMessageHandler,
@@ -106,8 +106,7 @@ class JvmRemoteWebServer constructor(
                     logWrapper.d("/ : " + call.request.uri)
                 }
                 get(PLAYLISTS_API.PATH) {
-                    database.getPlaylists()
-                        .let { ResponseDomain(it) }
+                    ResponseDomain(database.getPlaylists())
                         .apply {
                             call.respondText(serialise(), ContentType.Application.Json)
                         }
@@ -117,7 +116,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get(PLAYLIST_API.PATH) {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylist(id)
                                 ?.let { ResponseDomain(it) }
@@ -134,7 +133,7 @@ class JvmRemoteWebServer constructor(
                     (call.parameters["src"] to call.parameters["id"])
                         .takeIf { it.checkNull() != null }?.checkNull()
                         ?.let {
-                            it.second.toGuidIdentifier(Source.valueOf(it.first)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                            it.second.toGuidIdentifier(Source.valueOf(it.first)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                                 .let { id ->
                                     database.getPlaylist(id)
                                         ?.let { ResponseDomain(it) }
@@ -152,7 +151,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlistItem/{id}") {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylistItem(id)
                                 ?.let { ResponseDomain(it) }
