@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 
 internal class ServiceExecutor(
     private val client: HttpClient,
@@ -23,7 +24,6 @@ internal class ServiceExecutor(
         urlParams: Map<String, Any?> = emptyMap(),
         headers: Map<String, Any?> = emptyMap(),
     ): T = try {
-
         val urlString = "${type.baseUrl}/$path"
         log.d("Execute: $urlString")
         val response: HttpResponse = client.get(urlString) {
@@ -39,6 +39,11 @@ internal class ServiceExecutor(
         throw e
     }
 
+    suspend fun getResponse(
+        path: String,
+        urlParams: Map<String, Any?> = emptyMap(),
+        headers: Map<String, Any?> = emptyMap(),
+    ): ResponseDomain = get(path, urlParams, headers)
 
     suspend inline fun <reified T : Any> post(
         path: String,

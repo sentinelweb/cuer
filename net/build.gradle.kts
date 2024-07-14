@@ -68,6 +68,7 @@ kotlin {
         }
         val androidUnitTest by getting {
             dependencies {
+                implementation(libs.kotlinxCoroutinesTest)
                 implementation(libs.koinTestJUnit4)
                 implementation(libs.kotlinFixture)
                 implementation(libs.jfixture)

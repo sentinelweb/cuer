@@ -25,5 +25,16 @@ interface RemoteWebServerContract {
         object PLAYLIST_SOURCE_API {
             val PATH = "/playlist-src/{src}/{id}"
         }
+
+        object PLAYER_COMMAND_API {
+            val P_COMMAND = "command"
+            val P_ARG0 = "arg0"
+            val PATH = "/player/{$P_COMMAND}/{$P_ARG0}"
+        }
+
+        object FOLDER_LIST_API {
+            val PATH = "/folders"
+            val P_PARAM = "p"
+        }
     }
 }

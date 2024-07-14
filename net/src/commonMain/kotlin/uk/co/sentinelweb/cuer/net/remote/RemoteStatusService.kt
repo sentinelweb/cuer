@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AV
 import uk.co.sentinelweb.cuer.remote.server.ipport
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
 
-internal class RemoteAvailableService(
+internal class RemoteStatusService(
     private val executor: ServiceExecutor
 ) {
 

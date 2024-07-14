@@ -30,6 +30,8 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.FOLDER_LIST_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
@@ -223,7 +225,8 @@ class JvmRemoteWebServer constructor(
                     logWrapper.d(call.request.uri)
                 }
                 // http://192.168.1.x:9090/player/PlayPause/true
-                get("/player/{command}/{arg0}") {
+                // todo modify arg to be a parameter not a part of the url
+                get(PLAYER_COMMAND_API.PATH) {
                     try {
                         val command = call.parameters["command"]
                         val arg0 = call.parameters["arg0"]
@@ -240,7 +243,8 @@ class JvmRemoteWebServer constructor(
                             // fixme get operation success and return the code
                             logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
                             playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
-                            call.respond(HttpStatusCode.OK)
+                                ?.also { call.respond(HttpStatusCode.OK) }
+                                ?: call.error(HttpStatusCode.BadRequest, "player session invalid")
                         } ?: call.error(HttpStatusCode.BadRequest, "url is required")
                     } catch (e: NumberFormatException) {
                         call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
@@ -248,9 +252,8 @@ class JvmRemoteWebServer constructor(
                         call.error(HttpStatusCode.InternalServerError, e.message)
                     }
                 }
-                get("/folders") {
-                    // todo rewrite paths to remove base
-                    val path = call.parameters["p"]
+                get(FOLDER_LIST_API.PATH) {
+                    val path = call.parameters[FOLDER_LIST_API.P_PARAM]
                     logWrapper.d("Folder: $path")
                     getFolderListUseCase.getFolderList(path)
                         ?.let { ResponseDomain(it) }

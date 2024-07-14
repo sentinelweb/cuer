@@ -35,8 +35,10 @@ object NetModule {
         factory { PixabayService(executor = get(named(PIXABAY))) }
 
         factory(named(REMOTE)) { ServiceExecutor(get(named(REMOTE)), REMOTE, get()) }
-        factory { RemoteAvailableService(executor = get(named(REMOTE))) }
+        factory { RemoteStatusService(executor = get(named(REMOTE))) }
         factory { RemotePlaylistsService(executor = get(named(REMOTE))) }
+        factory { RemotePlayerService(executor = get(named(REMOTE))) }
+        factory { RemoteFilesService(executor = get(named(REMOTE))) }
     }
 
     private val interactorModule = module {
@@ -73,6 +75,17 @@ object NetModule {
         factory<RemotePlaylistsInteractor> {
             RemotePlaylistsKtorInteractor(
                 remotePlaylistsService = get()
+            )
+        }
+        factory<RemotePlayerInteractor> {
+            RemotePlayerKtorInteractor(
+                service = get(),
+                log = get()
+            )
+        }
+        factory<RemoteFilesInteractor> {
+            RemoteFilesKtorInteractor(
+                remoteFilesService = get(),
             )
         }
     }
