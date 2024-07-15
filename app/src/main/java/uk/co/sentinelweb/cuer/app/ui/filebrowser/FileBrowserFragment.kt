@@ -15,7 +15,6 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -33,9 +32,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private val log: LogWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-//    private val interactions: FilesContract.Interactions by inject()
     //private val remotesHelpConfig: RemotesHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
@@ -70,7 +67,10 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            FileBrowserAppComposeables.FileBrowserAppWrapperUi(interactions = viewModel)
+            FileBrowserAppComposeables.FileBrowserAppWrapperUi(
+                interactions = viewModel,
+                appModelObservable = viewModel.appModelObservable
+            )
         }
     }
 
@@ -90,12 +90,12 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     override fun onResume() {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
-        //controller.onRefresh()
+        // controller.onRefresh()
     }
 
     override fun onStop() {
         super.onStop()
-        //playerView.showPlayer()
+        // playerView.showPlayer()
     }
 
     override fun onDestroyView() {
@@ -104,43 +104,18 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     }
 
     companion object {
-//        private val CONFIG_FRAGMENT_TAG = "config_fragment_tag"
-//
-@JvmStatic
-val fragmentModule = module {
-    scope(named<FileBrowserFragment>()) {
-        scoped {
-            FileBrowserViewModel(
-                state = FileBrowserContract.State(),
-                filesInteractor = get(),
-                remotesRepository = get(),
-                mapper = get(),
-            )
+        @JvmStatic
+        val fragmentModule = module {
+            scope(named<FileBrowserFragment>()) {
+                scoped {
+                    FileBrowserViewModel(
+                        state = FileBrowserContract.State(),
+                        filesInteractor = get(),
+                        remotesRepository = get(),
+                        mapper = get(),
+                    )
+                }
+            }
         }
-//                scoped {
-//                    RemotesStoreFactory(
-////                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
-//                        storeFactory = DefaultStoreFactory(),
-//                        strings = get(),
-//                        log = get(),
-//                        prefs = get(),
-//                        remoteServerManager = get(),
-//                        coroutines = get(),
-//                        localRepository = get(),
-//                        remoteStatusInteractor = get(),
-//                        remotesRepository = get(),
-//                        locationPermissionLaunch = get(),
-//                        wifiStateProvider = get(),
-//                        getPlaylistsFromDeviceUseCase = get(),
-//                        playlistsOrchestrator = get(),
-//                    )
-//                }
-//                scoped { RemotesModelMapper(get(), get()) }
-//                scoped { RemotesMviViewProxy(get(), get()) }
-//                scoped { navigationRouter(true, this.getFragmentActivity()) }
-//                scoped { RemotesHelpConfig(get()) }
-//                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity(), get()) }
-    }
-}
     }
 }

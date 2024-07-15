@@ -11,6 +11,11 @@ interface FileBrowserContract {
     data class State(
         var remoteId: GUID? = null,
         var node: RemoteNodeDomain? = null,
+        var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null
+    )
+
+    data class AppFilesUiModel(
+        val loading: Boolean
     )
 }

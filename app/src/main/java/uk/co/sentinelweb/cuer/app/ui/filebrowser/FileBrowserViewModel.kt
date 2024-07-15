@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.AppFilesUiModel
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -20,25 +21,33 @@ class FileBrowserViewModel(
 ) : FilesContract.Interactions, ViewModel() {
 
     override val modelObservable = MutableStateFlow(blankModel())
+    val appModelObservable = MutableStateFlow(AppFilesUiModel(loading = false))
 
     fun init(id: GUID) {
         state.remoteId = id
         state.node = remotesRepository.getById(id)
-        viewModelScope.launch {
-            state.node?.apply {
-                state.currentFolder = filesInteractor.getFolderList(this.locator(), null).data
-                state.currentFolder?.apply {
-                    modelObservable.value = mapper.map(this)
-                }
-            }
-        }
+        loadCurrentPath()
     }
 
     override fun clickFolder(folder: PlaylistDomain) {
-
+        state.path = folder.platformId
+        loadCurrentPath()
     }
 
     override fun clickFile(file: PlaylistItemDomain) {
-        TODO("Not yet implemented")
+
+    }
+
+    private fun loadCurrentPath() {
+        viewModelScope.launch {
+            appModelObservable.value = AppFilesUiModel(loading = true)
+            state.node?.apply {
+                state.currentFolder = filesInteractor.getFolderList(this.locator(), state.path).data
+                state.currentFolder?.apply {
+                    modelObservable.value = mapper.map(this)
+                }
+                appModelObservable.value = AppFilesUiModel(loading = false)
+            }
+        }
     }
 }
