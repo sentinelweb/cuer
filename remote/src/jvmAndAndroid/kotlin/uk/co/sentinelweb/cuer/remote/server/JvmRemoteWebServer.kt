@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
@@ -32,6 +33,7 @@ import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.FOLDER_LIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
@@ -57,6 +59,7 @@ class JvmRemoteWebServer(
     private val localRepository: LocalRepository by inject()
     private val playerSessionHolder: PlayerSessionHolder by inject()
     private val getFolderListUseCase: GetFolderListUseCase by inject()
+    private val playerConfigProvider: PlayerConfigProvider by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -247,6 +250,16 @@ class JvmRemoteWebServer(
                         } ?: call.error(HttpStatusCode.BadRequest, "url is required")
                     } catch (e: NumberFormatException) {
                         call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                    }
+                }
+                get(PLAYER_CONFIG_API.PATH) {
+                    try {
+                        ResponseDomain(playerConfigProvider.invoke())
+                            .apply {
+                                call.respondText(serialise(), ContentType.Application.Json)
+                            }
                     } catch (e: Exception) {
                         call.error(HttpStatusCode.InternalServerError, e.message)
                     }

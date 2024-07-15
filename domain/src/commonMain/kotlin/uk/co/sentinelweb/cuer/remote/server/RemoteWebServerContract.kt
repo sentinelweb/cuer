@@ -29,7 +29,11 @@ interface RemoteWebServerContract {
         object PLAYER_COMMAND_API {
             val P_COMMAND = "command"
             val P_ARG0 = "arg0"
-            val PATH = "/player/{$P_COMMAND}/{$P_ARG0}"
+            val PATH = "/player/command/{$P_COMMAND}/{$P_ARG0}"
+        }
+
+        object PLAYER_CONFIG_API {
+            val PATH = "/player/config"
         }
 
         object FOLDER_LIST_API {

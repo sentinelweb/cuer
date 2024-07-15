@@ -89,6 +89,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
+import uk.co.sentinelweb.cuer.core.di.AndroidDomainModule
 import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -300,4 +301,5 @@ object Modules {
         .plus(remoteModule)
         .plus(PlayerModule.localPlayerModule)
         .plus(SharedAppAndroidModule.modules)
+        .plus(AndroidDomainModule.objectModule)
 }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.net.remote
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.client.RequestFailureException
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage
@@ -26,4 +27,13 @@ internal class RemotePlayerKtorInteractor(
             NetResult.Error(e)
         }
 
+    override suspend fun getPlayerConfig(locator: Locator): NetResult<PlayerNodeDomain> =
+        try {
+            NetResult.Data(service.executeConfig(locator).payload[0] as PlayerNodeDomain)
+        } catch (failure: RequestFailureException) {
+            log.e("player config failed", failure)
+            NetResult.HttpError(failure)
+        } catch (e: Exception) {
+            NetResult.Error(e)
+        }
 }

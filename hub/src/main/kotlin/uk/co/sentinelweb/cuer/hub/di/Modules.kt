@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
 import uk.co.sentinelweb.cuer.core.di.DomainModule
+import uk.co.sentinelweb.cuer.core.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -156,6 +157,7 @@ object Modules {
         DomainModule.objectModule,
         RemoteModule.objectModule,
         SharedDomainModule.objectModule,
+        JvmDomainModule.objectModule,
     )
         .plus(SharedAppModule.modules)
         .plus(NetModule.modules)

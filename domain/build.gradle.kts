@@ -57,6 +57,7 @@ kotlin {
         val androidMain by getting {
             dependencies {
                 implementation(libs.turbine)
+                implementation(libs.koinAndroid)
             }
         }
         val androidUnitTest by getting {

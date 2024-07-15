@@ -121,6 +121,10 @@ fun RemoteNodeDomain.serialise() = domainJsonSerializer.encodeToString(RemoteNod
 
 fun deserialiseRemoteNode(input: String) = domainJsonSerializer.decodeFromString(RemoteNodeDomain.serializer(), input)
 
+fun PlayerNodeDomain.serialise() = domainJsonSerializer.encodeToString(PlayerNodeDomain.serializer(), this)
+
+fun deserialisePlayerNode(input: String) = domainJsonSerializer.decodeFromString(PlayerNodeDomain.serializer(), input)
+
 fun List<RemoteNodeDomain>.serialise() =
     domainJsonSerializer.encodeToString(ListSerializer(RemoteNodeDomain.serializer()), this)
 
@@ -129,6 +133,7 @@ fun deserialiseRemoteNodeList(input: String) =
 
 fun deserialisePlaylistAndSubs(input: String) =
     domainJsonSerializer.decodeFromString(ListSerializer(PlaylistAndChildrenDomain.serializer()), input)
+
 
 
 val domainClassDiscriminator = "domainType"
@@ -148,6 +153,8 @@ val domainSerializersModule = SerializersModule {
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
         LocalNodeDomain::class to LocalNodeDomain.serializer(),
         RemoteNodeDomain::class to RemoteNodeDomain.serializer(),
+        PlayerNodeDomain::class to PlayerNodeDomain.serializer(),
+        PlayerNodeDomain.Screen::class to PlayerNodeDomain.Screen.serializer(),
         PlaylistAndItemDomain::class to PlaylistAndItemDomain.serializer(),
         PlaylistAndChildrenDomain::class to PlaylistAndChildrenDomain.serializer(),
 
@@ -165,6 +172,7 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
     polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
     polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
+    polymorphic(Domain::class, PlayerNodeDomain::class, PlayerNodeDomain.serializer())
     polymorphic(Domain::class, PlaylistAndItemDomain::class, PlaylistAndItemDomain.serializer())
     polymorphic(Domain::class, PlaylistAndChildrenDomain::class, PlaylistAndChildrenDomain.serializer())
 

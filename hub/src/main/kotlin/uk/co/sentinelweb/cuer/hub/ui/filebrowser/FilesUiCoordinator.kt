@@ -32,6 +32,7 @@ class FilesUiCoordinator(
     init {
         log.tag(this)
     }
+
     override val scope: Scope = desktopScopeWithSource(this)
 
     private val mapper: FilesModelMapper by scope.inject()
@@ -60,13 +61,13 @@ class FilesUiCoordinator(
 
     override fun clickFile(file: PlaylistItemDomain) {
         if (listOf(VIDEO, AUDIO).contains(file.media.mediaType))
-            playVideo(file)
-        else if (FILE.equals(file.media.mediaType)) {
+            playMedia(file)
+        else if (FILE.equals(file.media.mediaType))
             showFile(file)
-        }
+
     }
 
-    private fun playVideo(item: PlaylistItemDomain) {
+    private fun playMedia(item: PlaylistItemDomain) {
         parent.showPlayer(item, modelObservable.value.list.playlist)
     }
 

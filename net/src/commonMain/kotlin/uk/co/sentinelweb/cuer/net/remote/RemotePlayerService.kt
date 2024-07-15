@@ -1,8 +1,10 @@
 package uk.co.sentinelweb.cuer.net.remote
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.ext.replaceUrlPlaceholder
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_ARG0
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
@@ -41,4 +43,9 @@ internal class RemotePlayerService(
         }
         executor.getResponse(path = locator.ipport() + command)
     }
+
+    internal suspend fun executeConfig(locator: Locator): ResponseDomain =
+        executor.getResponse(
+            path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
+        )
 }

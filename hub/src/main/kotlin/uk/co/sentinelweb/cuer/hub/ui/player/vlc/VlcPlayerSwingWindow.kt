@@ -77,7 +77,6 @@ class VlcPlayerSwingWindow(
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        log.d("screens: ${screenDevices.size}")
         val preferredScreen = 1//2//1
         val preferredExists = screenDevices.size > preferredScreen
         val selectedScreenIndex = if (preferredExists) {
@@ -87,6 +86,7 @@ class VlcPlayerSwingWindow(
         val selectedScreen = screenDevices[selectedScreenIndex]
         val config = selectedScreen.defaultConfiguration
         val bounds = config.bounds
+
         this.setLocation(bounds.x, bounds.y)
         if (preferredExists) {
             this.setSize(bounds.width, bounds.height)

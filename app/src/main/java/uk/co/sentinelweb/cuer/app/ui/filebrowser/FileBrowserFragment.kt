@@ -113,6 +113,8 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         filesInteractor = get(),
                         remotesRepository = get(),
                         mapper = get(),
+                        playerInteractor = get(),
+                        log = get(),
                     )
                 }
             }
