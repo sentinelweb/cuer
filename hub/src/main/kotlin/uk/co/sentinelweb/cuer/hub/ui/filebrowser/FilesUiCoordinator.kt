@@ -80,7 +80,7 @@ class FilesUiCoordinator(
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator(parent, get(), get()) }
             scope(named<FilesUiCoordinator>()) {
-                scoped { FilesModelMapper() }
+
             }
         }
     }

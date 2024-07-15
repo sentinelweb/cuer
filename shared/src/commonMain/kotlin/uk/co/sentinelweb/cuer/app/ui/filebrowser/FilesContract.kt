@@ -8,6 +8,7 @@ interface FilesContract {
 
     interface Interactions {
         val modelObservable: Flow<FilesModel>
+
         fun clickFolder(folder: PlaylistDomain)
 
         fun clickFile(file: PlaylistItemDomain)

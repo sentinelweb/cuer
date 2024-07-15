@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.net.client.RequestFailureException
 internal class RemoteFilesKtorInteractor(
     private val remoteFilesService: RemoteFilesService
 ) : RemoteFilesInteractor {
-    override suspend fun getFolderList(locator: Locator, path: String): NetResult<PlaylistAndChildrenDomain> = try {
+    override suspend fun getFolderList(locator: Locator, path: String?): NetResult<PlaylistAndChildrenDomain> = try {
         remoteFilesService.execFolder(locator, path)
             .let { NetResult.Data(it.payload[0] as PlaylistAndChildrenDomain) }
     } catch (e: RequestFailureException) {

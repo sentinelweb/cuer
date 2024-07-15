@@ -106,6 +106,7 @@ class RemotesStoreFactory constructor(
                 is Intent.RemoteDelete -> deleteRemote(intent)
                 is Intent.RemoteSync -> syncRemote(intent)
                 is Intent.RemotePlaylists -> getRemotePlaylists(intent)
+                is Intent.RemoteFolders -> getRemoteFolders(intent)
                 is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
             }
 
@@ -210,6 +211,11 @@ class RemotesStoreFactory constructor(
                 val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
                 log.d(playlists.toString())
             }
+        }
+
+        private fun getRemoteFolders(intent: Intent.RemoteFolders) {
+            intent.remote.id
+                ?.run { publish(Label.ActionFolders(this)) }
         }
     }
 

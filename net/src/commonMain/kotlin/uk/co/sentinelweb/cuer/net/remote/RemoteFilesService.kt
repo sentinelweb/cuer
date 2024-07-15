@@ -11,9 +11,9 @@ internal class RemoteFilesService(
     private val executor: ServiceExecutor
 ) {
 
-    internal suspend fun execFolder(locator: Locator, remoteFolderPath: String): ResponseDomain =
+    internal suspend fun execFolder(locator: Locator, remoteFolderPath: String?): ResponseDomain =
         executor.getResponse(
             path = locator.ipport() + PATH,
-            urlParams = mapOf(P_PARAM to remoteFolderPath)
+            urlParams = if (remoteFolderPath != null) mapOf(P_PARAM to remoteFolderPath) else emptyMap()
         )
 }

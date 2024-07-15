@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -36,6 +36,7 @@ class RemotesContract {
             data class RemoteSync(val remote: RemoteNodeDomain) : Intent()
             data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
             data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
+            data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
         }
 
         sealed class Label {
@@ -45,6 +46,7 @@ class RemotesContract {
             object ActionHelp : Label()
             object ActionPasteAdd : Label()
             object ActionConfig : Label()
+            data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
             data class Message(val msg: String) : Label()
 
         }
@@ -84,7 +86,7 @@ class RemotesContract {
         }
 
         data class LocalNodeModel(
-            val id: OrchestratorContract.Identifier<GUID>?,
+            val id: Identifier<GUID>?,
             val title: String,
             val address: String,
             val hostname: String,
@@ -108,7 +110,7 @@ class RemotesContract {
         }
 
         data class RemoteNodeModel(
-            val id: OrchestratorContract.Identifier<GUID>?,
+            val id: Identifier<GUID>?,
             val title: String,
             val address: String,
             val hostname: String,
@@ -134,6 +136,7 @@ class RemotesContract {
             data class OnActionDelete(val remote: RemoteNodeDomain) : Event()
             data class OnActionSync(val remote: RemoteNodeDomain) : Event()
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
+            data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
         }
     }
 }

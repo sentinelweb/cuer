@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,7 @@ import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object FilesComposeables {
+
     @Composable
     fun FilesUi(interactions: FilesContract.Interactions) {
         val state = interactions.modelObservable.collectAsState(initial = FilesModel.blankModel())
@@ -27,8 +29,11 @@ object FilesComposeables {
 
     @Composable
     private fun FilesView(model: FilesModel, view: FilesContract.Interactions) {
-        val scrollState = rememberScrollState()
-        Column(modifier = Modifier.padding(8.dp).verticalScroll(scrollState)) {
+        Column(
+            modifier = Modifier.padding(8.dp)
+                .verticalScroll(rememberScrollState())
+                .fillMaxHeight()
+        ) {
             model.list.children.forEach {
                 Row(modifier = Modifier.clickable { view.clickFolder(it) }) {
                     val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder

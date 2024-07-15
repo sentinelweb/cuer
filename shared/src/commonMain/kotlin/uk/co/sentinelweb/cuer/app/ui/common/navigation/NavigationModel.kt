@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.navigation
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.LINK
+import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.domain.*
 import kotlin.reflect.KClass
 
@@ -44,6 +45,7 @@ data class NavigationModel constructor(
         PLAYLISTS(listOf()),
         PLAYLIST_EDIT(listOf(Param.PLAYLIST_ID, Param.SOURCE), listOf()),
         PLAYLIST_CREATE(listOf(Param.SOURCE), listOf()),
+        FOLDER_LIST(listOf(Param.REMOTE_ID), listOf()),
         BROWSE,
         NAV_BACK, // use navigation to go back
         NAV_FINISH, // use navigation to finish activity
@@ -69,6 +71,7 @@ data class NavigationModel constructor(
         PLAYLIST_ITEM_ID(String::class), // guid
         PLAYLIST_ITEM((PlaylistItemDomain::class)),
         PLAYLIST_AND_ITEM((PlaylistAndItemDomain::class)),
+        REMOTE_ID(String::class), // guid
 
         //FRAGMENT_NAV_EXTRAS(FragmentNavigator.Extras::class),
         SOURCE(OrchestratorContract.Source::class),
@@ -81,7 +84,7 @@ data class NavigationModel constructor(
         APP_LIST(List::class),
         ALLOW_PLAY(Boolean::class),
         DO_AUTO_BACKUP(Boolean::class),
-        ONBOARD_CONFIG(uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract.Config::class),
+        ONBOARD_CONFIG(OnboardingContract.Config::class),
         ONBOARD_KEY(String::class),
         ;
     }

@@ -71,6 +71,7 @@ class RemotesController(
             is Event.OnActionDelete -> Intent.RemoteDelete(remote)
             is Event.OnActionSync -> Intent.RemoteSync(remote)
             is Event.OnActionPlaylists -> Intent.RemotePlaylists(remote)
+            is Event.OnActionFolders -> Intent.RemoteFolders(remote)
         }
     }
 

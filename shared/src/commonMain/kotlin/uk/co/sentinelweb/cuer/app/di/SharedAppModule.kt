@@ -31,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.IconMapper
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
@@ -219,6 +220,7 @@ object SharedAppModule {
                 log = get(),
             )
         }
+        factory { FilesModelMapper() }
     }
 
     val modules = listOf(utilModule)

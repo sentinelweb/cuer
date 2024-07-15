@@ -51,7 +51,6 @@ object BrowseComposables {
             Surface {
                 Box(contentAlignment = Alignment.Center) {
                     Column {
-                        // HelloSharedWorld()
                         CuerTopAppBarComposables.CuerAppBar(
                             text = model.title,
                             onUp = { view.dispatch(Event.OnUpClicked) },

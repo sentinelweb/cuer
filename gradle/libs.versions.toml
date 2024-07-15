@@ -94,7 +94,7 @@ androidx-constraintlayout = { group = "androidx.constraintlayout", name = "const
 androidx-fragment = { group = "androidx.fragment", name = "fragment", version.ref = "androidx-fragment-ktx" }
 androidx-fragment-ktx = { group = "androidx.fragment", name = "fragment-ktx", version.ref = "androidx-fragment-ktx" }
 androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
-compose-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
+composeUiTooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "compose" }
 composeUiToolingPreview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "compose" }
 composeThemeAdapter = { module = "com.google.android.material:compose-theme-adapter", version.ref = "composeThemeAdapter" }
 lifecycleViewModelKtx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycle-viewmodel-ktx" }

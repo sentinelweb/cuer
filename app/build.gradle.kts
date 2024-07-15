@@ -145,6 +145,7 @@ dependencies {
     implementation(compose.ui)
     implementation(compose.components.resources)
     implementation(libs.composeUiToolingPreview)
+    implementation(libs.composeUiTooling)
 
     // mvikotlin
     debugImplementation(libs.mvikotlinAndroidDebug)

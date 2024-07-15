@@ -8,6 +8,7 @@ import kotlinx.coroutines.sync.withLock
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseRemoteNodeList
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -34,6 +35,9 @@ class RemotesRepository constructor(
     init {
         coroutines.mainScope.launch { loadAll() }
     }
+
+    fun getById(guid: GUID): RemoteNodeDomain? =
+        _remoteNodes.find { it.id?.id == guid }
 
     suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()
@@ -66,7 +70,8 @@ class RemotesRepository constructor(
         _updatesFlow.value = _remoteNodes.toList()
     }
 
-    private fun summarise(node: RemoteNodeDomain) = "node: ${node.isAvailable} ${node.hostname} ${node.ipAddress} ${node.id}"
+    private fun summarise(node: RemoteNodeDomain) =
+        "node: ${node.isAvailable} ${node.hostname} ${node.ipAddress} ${node.id}"
 
     suspend fun removeNode(node: RemoteNodeDomain) = updateRemotesMutex.withLock {
         _remoteNodes

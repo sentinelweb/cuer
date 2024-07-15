@@ -6,5 +6,5 @@ import uk.co.sentinelweb.cuer.net.NetResult
 
 interface RemoteFilesInteractor {
 
-    suspend fun getFolderList(locator: Locator, path: String): NetResult<PlaylistAndChildrenDomain>
+    suspend fun getFolderList(locator: Locator, path: String?): NetResult<PlaylistAndChildrenDomain>
 }

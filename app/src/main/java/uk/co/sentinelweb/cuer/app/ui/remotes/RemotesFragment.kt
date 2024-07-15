@@ -18,6 +18,8 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.FOLDER_LIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
@@ -134,6 +136,14 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         Up -> log.d("Up")
                         is Message -> snackbarWrapper.make(label.msg)
                         ActionConfig -> showConfigFragment()
+                        is ActionFolders -> navigationProvider.navigate(
+                            NavigationModel(
+                                FOLDER_LIST,
+                                mapOf(
+                                    NavigationModel.Param.REMOTE_ID to label.remoteId.id.value
+                                )
+                            )
+                        )
                     }
                 }
             })

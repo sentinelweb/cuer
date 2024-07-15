@@ -10,31 +10,42 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.toGUID
 
 class FileBrowserFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<FileBrowserFragment>()
+    private val viewModel: FileBrowserViewModel by inject()
     private val log: LogWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-    private val interactions: FilesContract.Interactions by inject()
+//    private val interactions: FilesContract.Interactions by inject()
     //private val remotesHelpConfig: RemotesHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
 
     private var dialogFragment: DialogFragment? = null
+
+    private val remoteIdArg: GUID? by lazy {
+        NavigationModel.Param.REMOTE_ID.getString(arguments)?.toGUID()
+    }
 
     init {
         log.tag(this)
@@ -45,13 +56,6 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         override fun handleOnBackPressed() {
             //remotesMviView.dispatch(OnUpClicked)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setHasOptionsMenu(true)
-        // todo make a factory to create the controller here move this to onViewCreated see playlistsMviFrag
-        //controller.onViewCreated(listOf(remotesMviView), lifecycle.asEssentyLifecycle())
     }
 
     override fun onCreateView(
@@ -66,9 +70,8 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            FilesComposeables.FilesUi(interactions = interactions)
+            FileBrowserAppComposeables.FileBrowserAppWrapperUi(interactions = viewModel)
         }
-        observeLabels()
     }
 
     override fun onAttach(context: Context) {
@@ -81,6 +84,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onStart()
         //OnboardingFragment.showIntro(this@FileBrowserFragment, remotesHelpConfig)
         compactPlayerScroll.raisePlayer(this)
+        remoteIdArg?.apply { viewModel.init(this) }
     }
 
     override fun onResume() {
@@ -99,29 +103,20 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onDestroyView()
     }
 
-    private fun observeLabels() {
-
-    }
-
-
     companion object {
 //        private val CONFIG_FRAGMENT_TAG = "config_fragment_tag"
 //
-//        @JvmStatic
-//        val fragmentModule = module {
-//            scope(named<FileBrowserFragment>()) {
-//                scoped {
-//                    RemotesController(
-//                        storeFactory = get(),
-//                        modelMapper = get(),
-//                        lifecycle = get<FileBrowserFragment>().lifecycle.asEssentyLifecycle(),
-//                        log = get(),
-//                        wifiStateProvider = get(),
-//                        remotesRepository = get(),
-//                        coroutines = get(),
-//                        localRepository = get()
-//                    )
-//                }
+@JvmStatic
+val fragmentModule = module {
+    scope(named<FileBrowserFragment>()) {
+        scoped {
+            FileBrowserViewModel(
+                state = FileBrowserContract.State(),
+                filesInteractor = get(),
+                remotesRepository = get(),
+                mapper = get(),
+            )
+        }
 //                scoped {
 //                    RemotesStoreFactory(
 ////                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
@@ -145,7 +140,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
 //                scoped { navigationRouter(true, this.getFragmentActivity()) }
 //                scoped { RemotesHelpConfig(get()) }
 //                scoped<LocationPermissionLaunch> { LocationPermissionOpener(this.getFragmentActivity(), get()) }
-//            }
-//        }
+    }
+}
     }
 }

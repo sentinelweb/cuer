@@ -136,6 +136,18 @@ class NavigationRouter constructor(
                 //nav.params[FRAGMENT_NAV_EXTRAS] as FragmentNavigator.Extras?
             )
 
+            FOLDER_LIST -> navController?.navigate(
+                R.id.navigation_folders,
+                bundleOf(
+                    REMOTE_ID.name to nav.params[REMOTE_ID].toString()
+                ),
+                /*nav.navOpts ?: */
+                navOptions(optionsBuilder = {
+                    launchSingleTop = true
+                    popUpTo(R.id.navigation_remotes, { inclusive = false })
+                }),
+            )
+
             SHARE -> nav.getParam<String>(LINK)
                 ?.let { activity.startActivity(ShareActivity.urlIntent(activity, it)) }
                 ?: throw IllegalArgumentException("$SHARE: $LINK param required")

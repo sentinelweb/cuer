@@ -6,6 +6,7 @@
     <string name="bottomnav_title_playlists">Playlists</string>
     <string name="bottomnav_title_playlist">Playlist</string>
     <string name="bottomnav_title_player">Player</string>
+    <string name="bottomnav_title_remotes">Remotes</string>
     <string name="nav_playlist_item_edit_title">View Item</string>
 
     <string name="sharenav_title_scan">Scaning …</string>
@@ -392,6 +393,12 @@
     <string name="upcoming">Upcoming</string>
     <string name="upcoming_notif_title">Episode starts in %1$s mins</string>
 
+    <!-- remotes -->
+    <string name="remotes_menu_ping">Ping</string>
+
+    <!-- folders -->
+    <string name="folders">Folders</string>
+
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -418,5 +425,4 @@
     <string name="done">Done</string>
     <string name="finish">Finish</string>
     <string name="move">Move</string>
-    <string name="bottomnav_title_remotes">Remotes</string>
 </resources>
