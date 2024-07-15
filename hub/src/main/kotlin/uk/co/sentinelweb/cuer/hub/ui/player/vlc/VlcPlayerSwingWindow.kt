@@ -65,7 +65,6 @@ class VlcPlayerSwingWindow(
 
     init {
         log.tag(this)
-        createWindow()
     }
 
     fun assemble() {
@@ -95,7 +94,7 @@ class VlcPlayerSwingWindow(
             this.setSize(640, 480)
         }
         // fixme throwing an error but the frame should not be visible yet
-        //this.isUndecorated = preferredExists
+        this.isUndecorated = preferredExists
         this.layout = BorderLayout()
         // Handle window closing operation
         this.addWindowListener(object : WindowAdapter() {
