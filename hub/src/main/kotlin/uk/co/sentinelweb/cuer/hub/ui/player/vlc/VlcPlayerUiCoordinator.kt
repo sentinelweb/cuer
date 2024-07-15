@@ -118,10 +118,6 @@ class VlcPlayerUiCoordinator(
         })
     }
 
-//    override fun render(model: Model) {
-//        this.modelObservable.value = model
-//    }
-
     fun playerWindowDestroyed() {
         parent.killPlayer()
     }

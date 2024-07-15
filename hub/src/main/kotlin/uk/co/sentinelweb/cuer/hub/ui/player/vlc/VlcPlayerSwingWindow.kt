@@ -48,7 +48,7 @@ class VlcPlayerSwingWindow(
     private lateinit var forwardButton: JButton
     private lateinit var prevButton: JButton
     private lateinit var nextButton: JButton
-    private lateinit var seekBar: JSlider
+    private lateinit var seekBar: PromrammaticallyChangingSlider
     private lateinit var posText: JLabel
     private lateinit var durText: JLabel
 
@@ -58,9 +58,11 @@ class VlcPlayerSwingWindow(
         val source = e.source as JSlider
         if (!source.valueIsAdjusting) {
             val posValue = source.value.toFloat() // between 0 and 1000
-            coordinator.dispatch(SeekBarChanged(posValue / source.maximum))
+            val fraction = posValue / source.maximum
+            coordinator.dispatch(SeekBarChanged(fraction))
         }
     }
+
     init {
         log.tag(this)
         createWindow()
@@ -77,7 +79,7 @@ class VlcPlayerSwingWindow(
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
         log.d("screens: ${screenDevices.size}")
-        val preferredScreen = 2//1
+        val preferredScreen = 1//2//1
         val preferredExists = screenDevices.size > preferredScreen
         val selectedScreenIndex = if (preferredExists) {
             preferredScreen
@@ -150,7 +152,7 @@ class VlcPlayerSwingWindow(
                 var lastPosUpdateTime = 0L
                 override fun positionChanged(mediaPlayer: MediaPlayer?, newPosition: Float) {
                     val current = timeProvider.currentTimeMillis()
-                    if (current - lastPosUpdateTime > 200) {
+                    if (current - lastPosUpdateTime > 1000) {
                         durationMs?.let {
                             val newPositionLong = (newPosition * it).toLong()
                             coordinator.dispatch(PositionReceived(newPositionLong))
@@ -230,10 +232,9 @@ class VlcPlayerSwingWindow(
             setIcon(loadSVG("drawable/ic_player_track_f.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(TrackFwdClicked) }
         }
-        seekBar = JSlider(0, 1000, 0).apply {
+        seekBar = PromrammaticallyChangingSlider(0, 1000, 0).apply {
             seekPane.add(this, CENTER)
-
-            addChangeListener(seekChangeListner)
+            this.actualListener = seekChangeListner
         }
         posText = JLabel("00:00:00").apply {
             seekPane.add(this, WEST)
@@ -269,9 +270,7 @@ class VlcPlayerSwingWindow(
     }
 
     fun updateUiTimes(times: PlayerContract.View.Model.Times) {
-        seekBar.removeChangeListener(seekChangeListner)
         seekBar.value = (times.seekBarFraction * seekBar.maximum).toInt()
-        seekBar.addChangeListener(seekChangeListner)
         posText.text = times.positionText
         durText.text = times.durationText
     }
