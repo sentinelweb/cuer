@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast
+package uk.co.sentinelweb.cuer.app.util.chromecast
 
 import android.view.KeyEvent
 import uk.co.sentinelweb.cuer.app.ui.common.views.CastVolumeControlView

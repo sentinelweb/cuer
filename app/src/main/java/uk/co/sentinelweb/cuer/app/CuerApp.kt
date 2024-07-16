@@ -12,7 +12,7 @@ import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
-import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
+import uk.co.sentinelweb.cuer.app.util.chromecast.CuerCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationChannelCreator
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager

@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast.listener
+package uk.co.sentinelweb.cuer.app.util.chromecast.listener
 
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 

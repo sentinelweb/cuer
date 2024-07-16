@@ -14,7 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewCastVolumeBinding
-import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
+import uk.co.sentinelweb.cuer.app.util.chromecast.CuerCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper

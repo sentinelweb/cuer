@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast
+package uk.co.sentinelweb.cuer.app.util.chromecast
 
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction

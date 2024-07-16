@@ -68,7 +68,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.CastModule
+import uk.co.sentinelweb.cuer.app.util.chromecast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider

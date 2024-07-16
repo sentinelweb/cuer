@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast.listener
+package uk.co.sentinelweb.cuer.app.util.chromecast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.ChromecastYouTubePlayerContext
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.io.infrastructure.ChromecastConnectionListener
@@ -10,7 +10,7 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper

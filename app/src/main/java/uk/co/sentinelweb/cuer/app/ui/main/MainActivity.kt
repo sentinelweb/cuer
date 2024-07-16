@@ -41,8 +41,8 @@ import uk.co.sentinelweb.cuer.app.ui.onboarding.AppInstallHelpConfig
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
-import uk.co.sentinelweb.cuer.app.util.cast.CuerSimpleVolumeController
+import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.ONBOARDED_PREFIX
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper

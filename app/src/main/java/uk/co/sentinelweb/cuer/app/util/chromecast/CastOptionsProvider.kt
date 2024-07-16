@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast
+package uk.co.sentinelweb.cuer.app.util.chromecast
 
 import android.content.Context
 import com.google.android.gms.cast.framework.CastOptions

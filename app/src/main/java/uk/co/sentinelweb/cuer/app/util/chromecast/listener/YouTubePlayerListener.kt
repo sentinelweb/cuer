@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.util.cast.listener
+package uk.co.sentinelweb.cuer.app.util.chromecast.listener
 
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.PlayerConstants.*
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer

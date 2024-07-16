@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviContract.MviStore.State
-import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.CastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 
 class PlaylistMviUtil(
