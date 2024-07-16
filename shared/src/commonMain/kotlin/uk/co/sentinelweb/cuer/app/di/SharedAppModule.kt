@@ -39,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -175,6 +176,7 @@ object SharedAppModule {
         single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
         single { PlayerEventToIntentMapper }
         factory { PlayerMessageToIntentMapper(get()) }
+        single { CuerCastPlayerWatcher(get()) }
     }
 
     private val utilModule = module {

@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist.item
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistItemMviContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastYouTubePlayerContextHolderChrome
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 
@@ -12,7 +12,7 @@ class ItemPresenter(
     val interactions: ItemContract.Interactions,
     val state: ItemContract.State,
     private val textMapper: ItemTextMapper,
-    private val ytContext: ChromecastYouTubePlayerContextHolder,
+    private val ytContext: ChromecastYouTubePlayerContextHolderChrome,
     private val res: ResourceWrapper
 ) : ItemContract.Presenter, ItemContract.External {
 

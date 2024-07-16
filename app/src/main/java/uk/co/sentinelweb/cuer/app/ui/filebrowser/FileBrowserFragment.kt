@@ -14,9 +14,13 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserViewModel.Label
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -33,6 +37,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
     //private val remotesHelpConfig: RemotesHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
@@ -72,7 +77,17 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 appModelObservable = viewModel.appModelObservable
             )
         }
+        bindFlow(viewModel.labels, ::observeLabels)
     }
+
+    private fun observeLabels(label: Label) = when (label) {
+        Label.ConnectCuerCastToPlayer -> {
+            cuerCastPlayerWatcher.mainPlayerControls = (activity as MainActivity).playerControls
+        }
+
+        Label.Init -> {}
+    }
+
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -115,6 +130,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         mapper = get(),
                         playerInteractor = get(),
                         log = get(),
+                        cuerCastPlayerWatcher = get(),
                     )
                 }
             }

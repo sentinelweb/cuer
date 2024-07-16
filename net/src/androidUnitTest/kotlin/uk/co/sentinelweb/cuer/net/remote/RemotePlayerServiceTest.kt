@@ -14,8 +14,8 @@ import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.PlayPause
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.SeekToFraction
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.PlayPause
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.SeekToFraction
 
 @InternalCoroutinesApi
 class RemotePlayerServiceTest {
@@ -71,7 +71,7 @@ class RemotePlayerServiceTest {
         val fixtLocator = Locator("xxx", 222)
         val guid = "guid-xx-xx-xx"
         val fixtId = OrchestratorContract.Identifier(GUID(guid), MEMORY)
-        val fixtMessage = PlayerSessionContract.PlayerMessage.TrackSelected(fixtId, false)
+        val fixtMessage = PlayerSessionContract.PlayerCommandMessage.TrackSelected(fixtId, false)
         val fixtResponse = ResponseDomain()
         coEvery { executor.getResponse(any()) } returns fixtResponse
 

@@ -8,14 +8,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.CastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
 class PlayUseCase constructor(
     private val queue: QueueMediatorContract.Producer,
-    private val ytCastContextHolder: CastPlayerContextHolder,
+    private val ytCastContextHolder: ChromeCastPlayerContextHolder,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val floatingService: FloatingPlayerContract.Manager,

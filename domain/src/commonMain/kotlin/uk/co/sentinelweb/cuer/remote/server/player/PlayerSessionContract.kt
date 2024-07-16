@@ -22,20 +22,27 @@ interface PlayerSessionContract {
     }
 
     @Serializable
-    sealed class PlayerMessage : Message {
-        object SkipFwd : PlayerMessage()
-        object SkipBack : PlayerMessage()
-        object TrackFwd : PlayerMessage()
-        object TrackBack : PlayerMessage()
-        data class PlayPause(val isPlaying: Boolean?) : PlayerMessage()
+    sealed class PlayerCommandMessage : Message {
+        object SkipFwd : PlayerCommandMessage()
+        object SkipBack : PlayerCommandMessage()
+        object TrackFwd : PlayerCommandMessage()
+        object TrackBack : PlayerCommandMessage()
+        data class PlayPause(val isPlaying: Boolean?) : PlayerCommandMessage()
         data class TrackSelected(val itemId: OrchestratorContract.Identifier<GUID>, val resetPosition: Boolean) :
-            PlayerMessage()
+            PlayerCommandMessage()
 
-        data class SeekToFraction(val fraction: Float) : PlayerMessage()
-
+        data class SeekToFraction(val fraction: Float) : PlayerCommandMessage()
     }
 
+    @Serializable
+    data class PlayerStatusMessage(
+        val id: OrchestratorContract.Identifier<GUID>,
+        var media: MediaDomain? = null,
+        var playbackState: PlayerStateDomain? = null,
+        var liveOffset: Long? = null,
+    ) : Message
+
     interface Listener {
-        fun messageRecieved(message: PlayerMessage)
+        fun messageRecieved(message: PlayerCommandMessage)
     }
 }

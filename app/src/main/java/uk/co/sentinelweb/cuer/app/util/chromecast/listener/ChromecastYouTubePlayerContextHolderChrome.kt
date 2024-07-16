@@ -5,10 +5,10 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 
-class ChromecastYouTubePlayerContextHolder constructor(
+class ChromecastYouTubePlayerContextHolderChrome constructor(
     private val creator: YoutubePlayerContextCreator,
     private val chromeCastWrapper: ChromeCastWrapper
-) : CastPlayerContextHolder {
+) : ChromeCastPlayerContextHolder {
 
     private var context: ChromecastYouTubePlayerContext? = null
     private var listener: YoutubeCastConnectionListener? = null
@@ -24,7 +24,7 @@ class ChromecastYouTubePlayerContextHolder constructor(
         listener = creator.createConnectionListener().also { listener ->
             this.playerUi = playerUi
             creator.createContext(chromeCastWrapper.getCastContext(), listener).also { context ->
-                this@ChromecastYouTubePlayerContextHolder.context = context
+                this@ChromecastYouTubePlayerContextHolderChrome.context = context
                 listener.setContext(context)
             }
         }

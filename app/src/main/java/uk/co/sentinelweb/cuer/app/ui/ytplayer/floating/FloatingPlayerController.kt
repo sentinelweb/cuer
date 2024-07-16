@@ -50,14 +50,14 @@ class FloatingPlayerController constructor(
 
     private var wasPausedScreenLocked: Boolean = false
 
-    private val lockHandler = {
+    private val screenLockHandler = {
         log.d("Screen off -> ACTION_PAUSE")
         playerMviViw.setBlocked(true)
         handleAction(Intent(ACTION_PAUSE))
         wasPausedScreenLocked = true
     }
 
-    private val unlockHandler = {
+    private val screenUnlockHandler = {
         log.d("Unlock -> ACTION_PLAY")
         playerMviViw.setBlocked(false)
         if (wasPausedScreenLocked && multiPrefs.restartAfterUnlock) {
@@ -80,8 +80,8 @@ class FloatingPlayerController constructor(
             }
         }
         if (!BuildConfig.cuerBackgroundPlay) {
-            screenStateReceiver.screenOffCallbacks.add(lockHandler)
-            screenStateReceiver.unlockCallbacks.add(unlockHandler)
+            screenStateReceiver.screenOffCallbacks.add(screenLockHandler)
+            screenStateReceiver.unlockCallbacks.add(screenUnlockHandler)
         }
         playerMviViw.init()
         playerController.onViewCreated(listOf(playerMviViw))
@@ -90,8 +90,8 @@ class FloatingPlayerController constructor(
 
     override fun destroy() {
         if (!BuildConfig.cuerBackgroundPlay) {
-            screenStateReceiver.screenOffCallbacks.remove(lockHandler)
-            screenStateReceiver.unlockCallbacks.remove(unlockHandler)
+            screenStateReceiver.screenOffCallbacks.remove(screenLockHandler)
+            screenStateReceiver.unlockCallbacks.remove(screenUnlockHandler)
         }
         playerMviViw.cleanup()
         playerController.onStop()

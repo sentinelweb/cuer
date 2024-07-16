@@ -5,11 +5,11 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsend
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.toLocalIdentifier
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastYouTubePlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastYouTubePlayerContextHolderChrome
 
 class QueueCastConnectionListener(
     private val queue: QueueMediatorContract.Producer,
-    private val ytCastContextHolder: ChromecastYouTubePlayerContextHolder
+    private val ytCastContextHolder: ChromecastYouTubePlayerContextHolderChrome
 ) {
 
     enum class CastState { PLAYING, CONNECTING, NOT_CONNECTED }

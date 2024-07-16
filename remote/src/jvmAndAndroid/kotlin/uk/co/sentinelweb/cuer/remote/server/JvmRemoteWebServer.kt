@@ -45,7 +45,7 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 import java.io.PrintWriter
 import java.io.StringWriter

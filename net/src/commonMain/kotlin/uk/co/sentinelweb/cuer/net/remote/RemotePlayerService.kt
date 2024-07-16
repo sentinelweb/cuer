@@ -11,13 +11,13 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PL
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
 import uk.co.sentinelweb.cuer.remote.server.ipport
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
 internal class RemotePlayerService(
     private val executor: ServiceExecutor
 ) {
-    internal suspend fun executeCommand(locator: Locator, message: PlayerMessage) {
+    internal suspend fun executeCommand(locator: Locator, message: PlayerCommandMessage) {
         val command = when (message) {
             is PlayPause -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "PlayPause")
@@ -46,7 +46,7 @@ internal class RemotePlayerService(
         executor.getResponse(path = locator.ipport() + command)
     }
 
-    internal suspend fun executeConfig(locator: Locator): ResponseDomain =
+    internal suspend fun executeGetConfig(locator: Locator): ResponseDomain =
         executor.getResponse(
             path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
         )

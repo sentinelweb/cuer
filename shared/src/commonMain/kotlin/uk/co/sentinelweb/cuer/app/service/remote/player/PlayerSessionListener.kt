@@ -22,7 +22,7 @@ class PlayerSessionListener(
     val intentFlow: Flow<Intent>
         get() = _intentFlow
 
-    override fun messageRecieved(message: PlayerSessionContract.PlayerMessage) {
+    override fun messageRecieved(message: PlayerSessionContract.PlayerCommandMessage) {
         log.d("messageRecieved: $message")
         coroutines.mainScope.launch {
             _intentFlow.emit(mapper.map(message))

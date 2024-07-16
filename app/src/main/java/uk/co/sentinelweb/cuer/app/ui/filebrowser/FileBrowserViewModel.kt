@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.AppFilesUiModel
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
@@ -23,11 +24,19 @@ class FileBrowserViewModel(
     private val remotesRepository: RemotesRepository,
     private val mapper: FilesModelMapper,
     private val playerInteractor: RemotePlayerInteractor,
-    private val log: LogWrapper
+    private val log: LogWrapper,
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher
 ) : FilesContract.Interactions, ViewModel() {
 
     override val modelObservable = MutableStateFlow(blankModel())
     val appModelObservable = MutableStateFlow(AppFilesUiModel(loading = false))
+
+    sealed class Label {
+        object Init : Label()
+        object ConnectCuerCastToPlayer : Label()
+    }
+
+    val labels = MutableStateFlow<Label>(Label.Init)
 
     init {
         log.tag(this)
@@ -85,6 +94,8 @@ class FileBrowserViewModel(
                 state.selectedFile!!,
                 screen.index
             )
+            cuerCastPlayerWatcher.watchLocator = state.node?.locator()
+
             appModelObservable.value = AppFilesUiModel(loading = false)
         }
     }

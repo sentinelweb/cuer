@@ -19,11 +19,11 @@ interface Message {
 ///////////////////////////////////////////////////////////////////////////
 fun AvailableMessage.serialise() = messageJsonSerializer.encodeToString(AvailableMessage.serializer(), this)
 fun deserialiseMulti(json: String) = messageJsonSerializer.decodeFromString(AvailableMessage.serializer(), json)
-fun PlayerSessionContract.PlayerMessage.serialise() =
-    messageJsonSerializer.encodeToString(PlayerSessionContract.PlayerMessage.serializer(), this)
+fun PlayerSessionContract.PlayerCommandMessage.serialise() =
+    messageJsonSerializer.encodeToString(PlayerSessionContract.PlayerCommandMessage.serializer(), this)
 
 fun deserialisePlayer(json: String) =
-    messageJsonSerializer.decodeFromString(PlayerSessionContract.PlayerMessage.serializer(), json)
+    messageJsonSerializer.decodeFromString(PlayerSessionContract.PlayerCommandMessage.serializer(), json)
 
 fun RequestMessage.serialise() = messageJsonSerializer.encodeToString(RequestMessage.serializer(), this)
 
@@ -31,9 +31,11 @@ val messageSerializersModule = SerializersModule {
     mapOf(
         AvailableMessage::class to AvailableMessage.serializer(),
         RequestMessage::class to RequestMessage.serializer(),
-        PlayerSessionContract.PlayerMessage::class to PlayerSessionContract.PlayerMessage.serializer(),
+        PlayerSessionContract.PlayerCommandMessage::class to PlayerSessionContract.PlayerCommandMessage.serializer(),
+        PlayerSessionContract.PlayerStatusMessage::class to PlayerSessionContract.PlayerStatusMessage.serializer(),
     )
     polymorphic(Message::class, AvailableMessage::class, AvailableMessage.serializer())
+    polymorphic(Message::class, RequestMessage::class, RequestMessage.serializer())
     polymorphic(Message::class, RequestMessage::class, RequestMessage.serializer())
 
 }.plus(SerializersModule {
