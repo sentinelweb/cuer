@@ -89,16 +89,15 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
-import uk.co.sentinelweb.cuer.core.di.AndroidDomainModule
-import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
+import uk.co.sentinelweb.cuer.di.AndroidDomainModule
+import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
@@ -291,8 +290,8 @@ object Modules {
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.modules)
-        .plus(DomainModule.objectModule)
-        .plus(SharedDomainModule.objectModule)
+        .plus(DomainModule.allModules)
+        .plus(AndroidDomainModule.allModules)
         .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)
@@ -301,5 +300,4 @@ object Modules {
         .plus(remoteModule)
         .plus(PlayerModule.localPlayerModule)
         .plus(SharedAppAndroidModule.modules)
-        .plus(AndroidDomainModule.objectModule)
 }

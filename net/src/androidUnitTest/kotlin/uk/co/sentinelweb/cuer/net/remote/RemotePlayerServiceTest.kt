@@ -45,7 +45,7 @@ class RemotePlayerServiceTest {
         coVerify {
             executor.getResponse(path = capture(pathSlot))
         }
-        assertEquals("xxx:222/player/PlayPause/$fixtIsPlaying", pathSlot.captured)
+        assertEquals("xxx:222/player/command/PlayPause/$fixtIsPlaying", pathSlot.captured)
         confirmVerified(executor)
     }
 
@@ -63,7 +63,7 @@ class RemotePlayerServiceTest {
         coVerify {
             executor.getResponse(path = capture(pathSlot))
         }
-        assertEquals("xxx:222/player/SeekToFraction/$fixtFraction", pathSlot.captured)
+        assertEquals("xxx:222/player/command/SeekToFraction/$fixtFraction", pathSlot.captured)
         confirmVerified(executor)
     }
 
@@ -81,7 +81,7 @@ class RemotePlayerServiceTest {
         coVerify {
             executor.getResponse(path = capture(pathSlot))
         }
-        assertEquals("xxx:222/player/TrackSelected/$guid", pathSlot.captured)
+        assertEquals("xxx:222/player/command/TrackSelected/$guid", pathSlot.captured)
         confirmVerified(executor)
     }
 }

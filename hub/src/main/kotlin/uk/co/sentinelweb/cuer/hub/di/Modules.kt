@@ -17,16 +17,15 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
-import uk.co.sentinelweb.cuer.core.di.DomainModule
-import uk.co.sentinelweb.cuer.core.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.JvmDatabaseModule
+import uk.co.sentinelweb.cuer.di.DomainModule
+import uk.co.sentinelweb.cuer.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
@@ -148,20 +147,17 @@ object Modules {
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
     }
 
-    val allModules = listOf(
-        resourcesModule,
-        utilModule,
-        remoteModule,
-        configModule,
-        connectivityModule,
-        DomainModule.objectModule,
-        RemoteModule.objectModule,
-        SharedDomainModule.objectModule,
-        JvmDomainModule.objectModule,
-    )
+    val allModules = listOf(resourcesModule)
+        .plus(utilModule)
+        .plus(remoteModule)
+        .plus(configModule)
+        .plus(connectivityModule)
+        .plus(scopedModules)
+        .plus(DomainModule.allModules)
+        .plus(JvmDomainModule.allModules)
+        .plus(RemoteModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(NetModule.modules)
         .plus(JvmDatabaseModule.modules)
         .plus(DatabaseCommonModule.modules)
-        .plus(scopedModules)
 }
