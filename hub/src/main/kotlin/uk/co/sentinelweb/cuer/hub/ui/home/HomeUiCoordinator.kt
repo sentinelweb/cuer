@@ -7,22 +7,26 @@ import org.koin.core.parameter.parametersOf
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
-import uk.co.sentinelweb.cuer.hub.ui.player.vlc.FolderMemoryPlaylistItemLoader
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
+import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
 
-class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
+class HomeUiCoordinator :
+    UiCoordinator<HomeModel>,
+    DesktopScopeComponent,
+    RemotePlayerLaunchHost,
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
@@ -34,9 +38,6 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
     private val log: LogWrapper by inject()
 
     private var playerUiCoordinator: VlcPlayerUiCoordinator? = null
-    private val playerItemLoader: FolderMemoryPlaylistItemLoader by inject()
-    private val playlistOrchestrator: PlaylistOrchestrator by inject()
-    private val coroutines: CoroutineContextProvider by inject()
 
     override var modelObservable = MutableStateFlow(HomeModel.blankModel)
         private set
@@ -70,10 +71,23 @@ class HomeUiCoordinator : UiCoordinator<HomeModel>, DesktopScopeComponent,
         playerUiCoordinator = null
     }
 
+    // called from the webserver
+    override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int) {
+        killPlayer()
+        playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
+        val queuePlaylist = PlaylistDomain(
+            id = OrchestratorContract.Identifier(QueueTemp.id, MEMORY),
+            title = "Queue",
+            items = listOf(item)
+        )
+        playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, screenIndex)
+    }
+
     companion object {
         @JvmStatic
         val uiModule = module {
-            factory { HomeUiCoordinator() }
+            single { HomeUiCoordinator() }
+            factory<RemotePlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
             scope(named<HomeUiCoordinator>()) {
 
             }

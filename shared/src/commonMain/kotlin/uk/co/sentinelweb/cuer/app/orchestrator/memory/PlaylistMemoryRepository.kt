@@ -39,7 +39,10 @@ class PlaylistMemoryRepository constructor(
         YoutubeSearch(GUID("9ac7d9bf-32c1-4efe-a2a2-d0cd9ad6263b")),
         Starred(GUID("f54f43f7-3ad8-43cb-99f7-115d7868b20b")),
         Unfinished(GUID("0430c6c0-5153-4910-8306-562f21d6bbcc")),
-        LiveUpcoming(GUID("cb9bafba-db2f-4b77-a598-1ccc1d50130c"));
+        LiveUpcoming(GUID("cb9bafba-db2f-4b77-a598-1ccc1d50130c")),
+        QueueTemp(GUID("4f2d1f93-ddca-464b-9197-b91d9d145ca9")),
+        ;
+
 
         fun identifier() = Identifier(id, Source.MEMORY)
     }

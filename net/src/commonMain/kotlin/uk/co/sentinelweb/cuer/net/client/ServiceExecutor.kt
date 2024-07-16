@@ -6,6 +6,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 
 internal class ServiceExecutor(
@@ -68,12 +69,15 @@ internal class ServiceExecutor(
         throw e
     }
 
-    suspend inline fun <reified T : Any> put(
+    suspend inline fun <reified T : Any> post(
         path: String,
         urlParams: Map<String, Any?> = emptyMap(),
         headers: Map<String, Any?> = emptyMap(),
+        postData: Domain
     ): T = try {
-        val response: HttpResponse = client.put("${type.baseUrl}/$path") {
+        val response: HttpResponse = client.post("${type.baseUrl}/$path") {
+            contentType(ContentType.Application.Json)
+            setBody(postData)
             urlParams.forEach { parameter(it.key, it.value) }
             headers.forEach { header(it.key, it.value) }
         }
@@ -85,4 +89,12 @@ internal class ServiceExecutor(
         log.e("put", e)
         throw e
     }
+
+    suspend fun postResponse(
+        path: String,
+        urlParams: Map<String, Any?> = emptyMap(),
+        headers: Map<String, Any?> = emptyMap(),
+        postData: Domain
+    ): ResponseDomain = post(path, urlParams, headers, postData)
+
 }

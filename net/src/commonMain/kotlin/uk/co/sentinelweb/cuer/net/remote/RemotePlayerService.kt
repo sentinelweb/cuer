@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.net.remote
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.ext.replaceUrlPlaceholder
@@ -8,6 +9,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_ARG0
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
 import uk.co.sentinelweb.cuer.remote.server.ipport
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
@@ -48,4 +50,18 @@ internal class RemotePlayerService(
         executor.getResponse(
             path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
         )
+
+    internal suspend fun executeLaunchVideo(
+        locator: Locator,
+        item: PlaylistItemDomain,
+        screenIndex: Int
+    ): ResponseDomain {
+        return executor.postResponse(
+            path = locator.ipport() + PLAYER_LAUNCH_VIDEO_API.PATH,
+            urlParams = mapOf(
+                PLAYER_LAUNCH_VIDEO_API.P_SCREEN_INDEX to screenIndex.toString()
+            ),
+            postData = item
+        )
+    }
 }

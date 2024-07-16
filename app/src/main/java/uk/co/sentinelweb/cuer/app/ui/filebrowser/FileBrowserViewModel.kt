@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteFilesInteractor
@@ -51,16 +52,40 @@ class FileBrowserViewModel(
     }
 
     private fun playMedia(file: PlaylistItemDomain) {
+        state.selectedFile = file
         viewModelScope.launch {
             appModelObservable.value = AppFilesUiModel(loading = true)
             state.node?.apply {
                 state.remotePlayerConfig = playerInteractor.getPlayerConfig(this.locator()).data
                 state.remotePlayerConfig?.apply {
-                    //modelObservable.value = mapper.map(this)
-                    log.d("remotePlayerConfig:$this")
+                    // modelObservable.value = mapper.map(this)
+                    log.d("remotePlayerConfig: $this")
+                    if (this.screens.size == 1) {
+                        launchRemotePlayer(this.screens[0])
+                    } else {
+                        // fixme implement this later
+                        //selectScreenDialog()
+                        launchRemotePlayer(this.screens[this.screens.size - 1])
+                    }
                 }
                 appModelObservable.value = AppFilesUiModel(loading = false)
             }
+        }
+    }
+
+    private fun selectScreenDialog() {
+        // show screen selection dialog
+    }
+
+    private fun launchRemotePlayer(screen: PlayerNodeDomain.Screen) {
+        viewModelScope.launch {
+            appModelObservable.value = AppFilesUiModel(loading = true)
+            playerInteractor.launchPlayerVideo(
+                state.node?.locator()!!,
+                state.selectedFile!!,
+                screen.index
+            )
+            appModelObservable.value = AppFilesUiModel(loading = false)
         }
     }
 

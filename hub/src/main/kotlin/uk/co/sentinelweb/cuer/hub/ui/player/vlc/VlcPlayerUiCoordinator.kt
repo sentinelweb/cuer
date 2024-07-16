@@ -6,6 +6,7 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -42,6 +43,7 @@ import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
+@ExperimentalCoroutinesApi
 class VlcPlayerUiCoordinator(
     private val parent: HomeUiCoordinator,
 ) :
@@ -67,6 +69,7 @@ class VlcPlayerUiCoordinator(
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
+    private var screenIndex: Int = 0
 
     override fun create() {
         log.tag(this)
@@ -76,7 +79,7 @@ class VlcPlayerUiCoordinator(
         lifecycle.onResume()
         playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
-                .apply { assemble() }
+                .apply { assemble(screenIndex) }
         } else throw IllegalStateException("Can't find VLC")
     }
 
@@ -122,7 +125,7 @@ class VlcPlayerUiCoordinator(
         parent.killPlayer()
     }
 
-    fun setupPlaylistAndItem(item: PlaylistItemDomain, playlist: PlaylistDomain) {
+    fun setupPlaylistAndItem(item: PlaylistItemDomain, playlist: PlaylistDomain, screenIndex: Int = 0) {
         coroutines.mainScope.launch {
             playlistId = playlist.id
             log.d("showPlayer: id:${playlist.id}")
@@ -132,10 +135,11 @@ class VlcPlayerUiCoordinator(
             playerItemLoader.setPlaylistAndItem(
                 PlaylistAndItemDomain(
                     playlistId = playlist.id,
-                    playlistTitle = playlist.platformId,
+                    playlistTitle = playlist.title,
                     item = item
                 )
             )
+            this@VlcPlayerUiCoordinator.screenIndex = screenIndex
             create() // initialises the player controller
         }
     }

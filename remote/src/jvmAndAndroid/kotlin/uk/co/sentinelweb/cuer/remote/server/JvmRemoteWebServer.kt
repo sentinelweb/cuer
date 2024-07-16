@@ -16,6 +16,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -30,10 +31,13 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.FOLDER_LIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API.P_SCREEN_INDEX
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
@@ -60,6 +64,7 @@ class JvmRemoteWebServer(
     private val playerSessionHolder: PlayerSessionHolder by inject()
     private val getFolderListUseCase: GetFolderListUseCase by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
+    private val remotePlayerLaunchHost: RemotePlayerLaunchHost by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -206,6 +211,7 @@ class JvmRemoteWebServer(
                     }
                     logWrapper.d(call.request.uri)
                 }
+
                 post("/addItem") {
                     val post = call.receiveParameters()
                     //logWrapper.d("scan:" + post)
@@ -254,6 +260,7 @@ class JvmRemoteWebServer(
                         call.error(HttpStatusCode.InternalServerError, e.message)
                     }
                 }
+
                 get(PLAYER_CONFIG_API.PATH) {
                     try {
                         ResponseDomain(playerConfigProvider.invoke())
@@ -264,6 +271,28 @@ class JvmRemoteWebServer(
                         call.error(HttpStatusCode.InternalServerError, e.message)
                     }
                 }
+
+                post(PLAYER_LAUNCH_VIDEO_API.PATH) {
+                    val postData = call.receiveText()
+                    try {
+                        (postData)
+                            .let { deserialisePlaylistItem(it) }
+                            .also { logWrapper.d("item rx:" + it.summarise()) }
+                            .also { logWrapper.d("screen index:" + call.parameters[P_SCREEN_INDEX]) }
+                            .let { item ->
+                                remotePlayerLaunchHost.launchVideo(
+                                    item,
+                                    // todo send bad request if no P_SCREEN_INDEX
+                                    call.parameters[P_SCREEN_INDEX]?.toInt() ?: 0
+                                )
+                            }
+                            ?: call.error(HttpStatusCode.BadRequest, "item is required")
+                    } catch (e: Throwable) {
+                        call.error(HttpStatusCode.InternalServerError, null, e)
+                    }
+                    logWrapper.d(call.request.uri)
+                }
+
                 get(FOLDER_LIST_API.PATH) {
                     val path = call.parameters[FOLDER_LIST_API.P_PARAM]
                     logWrapper.d("Folder: $path")

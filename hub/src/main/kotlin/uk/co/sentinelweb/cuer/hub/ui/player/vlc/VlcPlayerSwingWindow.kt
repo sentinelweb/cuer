@@ -44,6 +44,7 @@ class VlcPlayerSwingWindow(
 
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
+    private lateinit var stopButton: JButton
     private lateinit var rewindButton: JButton
     private lateinit var forwardButton: JButton
     private lateinit var prevButton: JButton
@@ -51,6 +52,8 @@ class VlcPlayerSwingWindow(
     private lateinit var seekBar: PromrammaticallyChangingSlider
     private lateinit var posText: JLabel
     private lateinit var durText: JLabel
+    private lateinit var titleText: JLabel
+    private lateinit var bufferText: JLabel
 
     private var durationMs: Long? = null
 
@@ -67,22 +70,22 @@ class VlcPlayerSwingWindow(
         log.tag(this)
     }
 
-    fun assemble() {
-        createWindow()
+    fun assemble(screenIndex: Int = 0) {
+        createWindow(screenIndex)
         createMediaPlayer()
         createControls()
     }
-    private fun createWindow() {
+
+    private fun createWindow(preferredScreen: Int) {
         this.defaultCloseOperation = DO_NOTHING_ON_CLOSE
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        val preferredScreen = 1//2//1
         val preferredExists = screenDevices.size > preferredScreen
         val selectedScreenIndex = if (preferredExists) {
             preferredScreen
         } else 0
-        log.d("selectedScreenIndex: $selectedScreenIndex")
+        log.d("selectedScreenIndex: $selectedScreenIndex, preferredScreen: $preferredScreen")
         val selectedScreen = screenDevices[selectedScreenIndex]
         val config = selectedScreen.defaultConfiguration
         val bounds = config.bounds
@@ -128,7 +131,7 @@ class VlcPlayerSwingWindow(
                 }
 
                 override fun buffering(mediaPlayer: MediaPlayer?, newCache: Float) {
-                    log.d("event buffering")
+                    // log.d("event buffering")
                     coordinator.dispatch(PlayerStateChanged(BUFFERING))
                 }
 
@@ -221,6 +224,12 @@ class VlcPlayerSwingWindow(
             setIcon(loadSVG("drawable/ic_player_pause.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(PlayPauseClicked(true)) }
         }
+        stopButton = JButton("Stop").apply {
+            buttonsPane.add(this)
+            setIcon(loadSVG("drawable/ic_stop.svg", Black, 24).toImageIcon())
+            addActionListener { coordinator.playerWindowDestroyed() }
+            isVisible = this@VlcPlayerSwingWindow.isUndecorated
+        }
         forwardButton = JButton("Skip").apply {
             buttonsPane.add(this)
             setIcon(loadSVG("drawable/ic_player_fast_forward.svg", Black, 24).toImageIcon())
@@ -243,6 +252,18 @@ class VlcPlayerSwingWindow(
         durText = JLabel("00:00:00").apply {
             seekPane.add(this, EAST)
             foreground = Color.WHITE
+        }
+        bufferText = JLabel("[Buffering]").apply {
+            buttonsPane.add(this)
+            foreground = Color.WHITE
+            isVisible = false
+        }
+        titleText = JLabel("[No Title]").apply {
+            if (this@VlcPlayerSwingWindow.isUndecorated) {
+                controlsPane.add(this, NORTH)
+                foreground = Color.WHITE
+                isVisible = false
+            }
         }
     }
 
@@ -281,6 +302,7 @@ class VlcPlayerSwingWindow(
                 ?.also { playItem(it) }
                 ?: log.d("Cannot get full path ${command.platformId}")
         }
+
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
         is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
         is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
@@ -289,7 +311,11 @@ class VlcPlayerSwingWindow(
     }.also { log.d("command:${command::class.java.simpleName}") }
 
     fun updateTexts(texts: PlayerContract.View.Model.Texts) {
-        title = texts.title
+        if (!this@VlcPlayerSwingWindow.isUndecorated) {
+            title = texts.title
+        } else {
+            titleText.text = texts.title
+        }
         forwardButton.text = "Forward [${texts.skipFwdText}]"
         rewindButton.text = "Rewind [${texts.skipBackText}]"
     }

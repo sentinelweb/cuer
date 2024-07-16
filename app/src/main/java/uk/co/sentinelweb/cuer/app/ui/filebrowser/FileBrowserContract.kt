@@ -1,10 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import kotlinx.serialization.Serializable
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistAndChildrenDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.domain.*
 
 interface FileBrowserContract {
 
@@ -15,6 +12,7 @@ interface FileBrowserContract {
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
         var remotePlayerConfig: PlayerNodeDomain? = null,
+        var selectedFile: PlaylistItemDomain? = null
     )
 
     data class AppFilesUiModel(
