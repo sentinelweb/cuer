@@ -18,6 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -27,10 +28,7 @@ import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
 import java.awt.GraphicsEnvironment
-import java.awt.event.MouseWheelEvent
-import java.awt.event.MouseWheelListener
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
+import java.awt.event.*
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
@@ -46,6 +44,7 @@ class VlcPlayerSwingWindow(
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
     private val timeProvider: TimeProvider by inject()
+    private val timeFormatter: TimeFormatter by inject()
 
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
@@ -264,6 +263,18 @@ class VlcPlayerSwingWindow(
             seekPane.add(this, CENTER)
             this.actualListener = seekChangeListner
         }
+        seekBar.addMouseMotionListener(object : MouseAdapter() {
+            override fun mouseMoved(e: MouseEvent) {
+                val slider = e.source as JSlider
+                val mouseX = e.x
+                val value = slider.minimum + (slider.maximum - slider.minimum) * mouseX / slider.width
+                val duration = mediaPlayerComponent.mediaPlayer().media().info().duration()
+                val position = value.toDouble() / slider.maximum
+                val timeInMillis = (duration * position).toLong()
+                val timeFormatted = timeFormatter.formatTime(timeInMillis / 1000f)
+                slider.toolTipText = timeFormatted
+            }
+        })
         posText = JLabel("00:00:00").apply {
             seekPane.add(this, WEST)
             foreground = Color.WHITE
@@ -302,6 +313,9 @@ class VlcPlayerSwingWindow(
                 updateVolumeText()
             }
         }
+
+
+
         mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
         controlsPane.addMouseWheelListener(volumeWheelListener)
     }

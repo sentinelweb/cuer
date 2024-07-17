@@ -14,12 +14,10 @@ class ShowHideControls {
     private lateinit var controlsPane: JPanel
     private lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private lateinit var frame: JFrame
-    private val transparentCursor: Cursor
+    private lateinit var transparentCursor: Cursor
 
     init {
-        val toolkit = Toolkit.getDefaultToolkit()
-        val cursorImage = toolkit.createImage(ByteArray(0))
-        transparentCursor = toolkit.createCustomCursor(cursorImage, Point(0, 0), "invisibleCursor")
+
     }
 
     private val hideControls = {
@@ -38,6 +36,10 @@ class ShowHideControls {
         this.controlsPane = controlsPane
         this.frame = frame
         this.mediaPlayerComponent = mediaPlayerComponent
+
+        val toolkit = Toolkit.getDefaultToolkit()
+        val cursorImage = toolkit.createImage(ByteArray(0))
+        transparentCursor = toolkit.createCustomCursor(cursorImage, Point(0, 0), "invisibleCursor")
 
         // Mouse adapter to handle mouse events
         val activityListener = object : MouseAdapter() {
@@ -67,7 +69,7 @@ class ShowHideControls {
         if (!controlsPane.isVisible) {
             controlsPane.isVisible = true
             this.frame.cursor = Cursor.getDefaultCursor()
-            hideControlsTimer.restart()
         }
+        hideControlsTimer.restart()
     }
 }
