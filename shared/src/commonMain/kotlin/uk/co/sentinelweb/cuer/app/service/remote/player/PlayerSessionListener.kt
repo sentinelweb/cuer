@@ -28,6 +28,4 @@ class PlayerSessionListener(
             _intentFlow.emit(mapper.map(message))
         }
     }
-
-
 }

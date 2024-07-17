@@ -44,7 +44,7 @@
 
         <meta-data
             android:name="com.google.android.gms.cast.framework.OPTIONS_PROVIDER_CLASS_NAME"
-            android:value="uk.co.sentinelweb.cuer.app.util.cast.CastOptionsProvider" />
+            android:value="uk.co.sentinelweb.cuer.app.util.chromecast.CastOptionsProvider"/>
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />

@@ -263,6 +263,11 @@ object RemotesComposables {
                     }) {
                         Text(stringResource(R.string.folders))
                     }
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, OnActionCuerConnect(remote.domain))
+                    }) {
+                        Text(stringResource(R.string.remotes_cuer_connect))
+                    }
                 }
             }
         }

@@ -42,9 +42,9 @@ interface PlayerSessionContract {
     @Serializable
     data class PlayerStatusMessage(
         val id: OrchestratorContract.Identifier<GUID>,
-        var item: PlaylistItemDomain,
-        var playbackState: PlayerStateDomain,
-        var liveOffset: Long,
+        val item: PlaylistItemDomain,
+        val playbackState: PlayerStateDomain,
+        val liveOffset: Long,
     ) : Message
 
     interface Listener {

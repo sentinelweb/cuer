@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState.*
 import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -25,8 +25,8 @@ class YoutubeCastConnectionListener constructor(
     private val log: LogWrapper,
 ) : ChromecastConnectionListener {
 
-    data class State constructor(
-        var connectionState: PlayerContract.ConnectionState? = null,
+    data class State(
+        var connectionState: PlayerContract.ChromeCastConnectionState? = null,
     )
 
     private var context: ChromecastYouTubePlayerContext? = null
@@ -39,7 +39,7 @@ class YoutubeCastConnectionListener constructor(
         playlistFlowJob = queue.currentPlaylistFlow
             .onEach { updateFromQueue() }
             .launchIn(coroutines.mainScope)
-        if (state.connectionState == CC_CONNECTED) {
+        if (state.connectionState == ChromeCastDisconnected) {
             setupPlayerListener()
             youTubePlayerListener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
             updateFromQueue()
@@ -57,13 +57,13 @@ class YoutubeCastConnectionListener constructor(
         }
 
     override fun onChromecastConnecting() {
-        state.connectionState = CC_CONNECTING.also {
+        state.connectionState = ChromeCastConnecting.also {
             playerUi?.setConnectionState(it)
         }
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        state.connectionState = CC_CONNECTED.also {
+        state.connectionState = ChromeCastDisconnected.also {
             playerUi?.setConnectionState(it)
         }
         youTubePlayerListener?.let {
@@ -85,7 +85,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     override fun onChromecastDisconnected() {
-        state.connectionState = CC_DISCONNECTED.also {
+        state.connectionState = ChromeCastConnected.also {
             playerUi?.setConnectionState(it)
         }
         youTubePlayerListener?.onDisconnected()
@@ -99,7 +99,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     fun isConnected(): Boolean {
-        return state.connectionState == CC_CONNECTED
+        return state.connectionState == ChromeCastDisconnected
     }
 
     fun destroy() {

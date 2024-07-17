@@ -37,6 +37,7 @@ class RemotesContract {
             data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
             data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
             data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
+            data class CuerConnect(val remote: RemoteNodeDomain) : Intent()
         }
 
         sealed class Label {
@@ -48,6 +49,7 @@ class RemotesContract {
             object ActionConfig : Label()
             data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
             data class Message(val msg: String) : Label()
+            object CuerConnected : Label()
 
         }
 
@@ -137,6 +139,7 @@ class RemotesContract {
             data class OnActionSync(val remote: RemoteNodeDomain) : Event()
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
             data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
+            data class OnActionCuerConnect(val remote: RemoteNodeDomain) : Event()
         }
     }
 }

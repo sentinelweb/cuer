@@ -19,6 +19,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.REMOTE_ID
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.FOLDER_LIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -30,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -50,6 +52,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val remotesHelpConfig: RemotesHelpConfig by inject()
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -137,13 +140,11 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         is Message -> snackbarWrapper.make(label.msg)
                         ActionConfig -> showConfigFragment()
                         is ActionFolders -> navigationProvider.navigate(
-                            NavigationModel(
-                                FOLDER_LIST,
-                                mapOf(
-                                    NavigationModel.Param.REMOTE_ID to label.remoteId.id.value
-                                )
-                            )
+                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to label.remoteId.id.value))
                         )
+
+                        CuerConnected ->
+                            cuerCastPlayerWatcher.mainPlayerControls = (activity as MainActivity).playerControls
                     }
                 }
             })
@@ -189,6 +190,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         wifiStateProvider = get(),
                         getPlaylistsFromDeviceUseCase = get(),
                         playlistsOrchestrator = get(),
+                        cuerCastPlayerWatcher = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

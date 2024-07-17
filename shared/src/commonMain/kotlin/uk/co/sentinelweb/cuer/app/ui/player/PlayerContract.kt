@@ -214,13 +214,17 @@ interface PlayerContract {
         fun load(): PlaylistAndItemDomain?
     }
 
-    enum class ConnectionState {
-        CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
+    enum class ChromeCastConnectionState {
+        ChromeCastConnected, ChromeCastConnecting, ChromeCastDisconnected
+    }
+
+    enum class CuerCastConnectionState {
+        CuerCastConnected, CuerCastConnecting, CuerCastDisconnected
     }
 
     interface PlayerControls {
         fun initMediaRouteButton()
-        fun setConnectionState(connState: ConnectionState)
+        fun setConnectionState(connState: ChromeCastConnectionState)
         fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)

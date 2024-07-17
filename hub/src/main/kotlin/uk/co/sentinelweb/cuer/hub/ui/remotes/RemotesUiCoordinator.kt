@@ -116,7 +116,8 @@ class RemotesUiCoordinator :
                         locationPermissionLaunch = get(),
                         wifiStateProvider = get(),
                         getPlaylistsFromDeviceUseCase = get(),
-                        playlistsOrchestrator = get()
+                        playlistsOrchestrator = get(),
+                        cuerCastPlayerWatcher = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

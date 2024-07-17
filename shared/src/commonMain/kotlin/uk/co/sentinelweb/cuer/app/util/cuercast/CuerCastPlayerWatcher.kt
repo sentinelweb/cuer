@@ -1,82 +1,121 @@
 package uk.co.sentinelweb.cuer.app.util.cuercast
 
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_CONNECTED
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
 // using FloatingWindowMviView as a template
 class CuerCastPlayerWatcher(
+    private val state: State,
     private val remotePlayerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
+    private val log: LogWrapper,
 ) {
+    data class State(
+        var lastMessage: PlayerSessionContract.PlayerStatusMessage? = null,
+    )
+
+    init {
+        log.tag(this)
+    }
+
     var watchLocator: Locator? = null
     private var pollingJob: Job? = null
     var mainPlayerControls: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
+            pollingJob?.cancel()
             if (field != null && value == null) {
                 field?.removeListener(controlsListener)
-                pollingJob?.cancel()
             } else if (value != null) {
                 value.addListener(controlsListener)
-
-                pollingJob = coroutines.mainScope.launch {
-                    while (isActive && watchLocator != null) {
-                        val watcherLocator1 = watchLocator
-                        if (watcherLocator1 != null) {
-                            remotePlayerInteractor.playerSessionStatus(watcherLocator1).data
-                                ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
-                                ?.apply { mainPlayerControls?.setPlaylistItem(item) }
-                                ?.apply { mainPlayerControls?.setConnectionState(CC_CONNECTED) }
-                            delay(1000) // Pause for one second before the next poll
-                        }
-                    }
-                }
+                initPolling()
             }
             field = value
             //currentButtons?.let { value?.setButtons(it) }
         }
 
+    private fun initPolling() {
+        pollingJob = coroutines.mainScope.launch {
+            while (isActive && watchLocator != null) {
+                val watcherLocator1 = watchLocator
+                if (watcherLocator1 != null) {
+                    remotePlayerInteractor.playerSessionStatus(watcherLocator1).data
+                        ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
+                        ?.apply { mainPlayerControls?.setPlaylistItem(item) }
+                        ?.apply {
+                            item.media.duration?.let {
+                                mainPlayerControls?.setDuration(it / 1000f)
+                            }
+                        }
+//                        ?.apply { mainPlayerControls?.setConnectionState(ChromeCastDisconnected) }
+                        ?.apply {
+                            item.media.positon?.let {
+                                mainPlayerControls?.setCurrentSecond(it / 1000f)
+                            }
+                        }
+                        ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
+                        ?.apply { state.lastMessage = this }
+                    delay(1000)
+                } else {
+                    cancel()
+                }
+            }
+        }
+    }
+
     fun isWatching(): Boolean =
         watchLocator != null
 
-
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
         override fun play() {
-            //dispatch(PlayerContract.View.Event.PlayPauseClicked(null))
+            dispatchCommand(PlayPause(false))
         }
 
         override fun pause() {
-            //dispatch(PlayerContract.View.Event.PlayPauseClicked(null))
+            dispatchCommand(PlayPause(true))
         }
 
         override fun trackBack() {
-            //dispatch(PlayerContract.View.Event.TrackBackClicked)
+            dispatchCommand(TrackBack)
         }
 
         override fun trackFwd() {
-            //dispatch(PlayerContract.View.Event.TrackFwdClicked)
+            dispatchCommand(TrackFwd)
         }
 
         override fun seekTo(positionMs: Long) {
-            //dispatch(PlayerContract.View.Event.OnSeekToPosition(positionMs))
+            state.lastMessage?.item?.media?.apply {
+                duration?.also {
+                    dispatchCommand(SeekToFraction(positionMs / it.toFloat()))
+                }
+            }
+
         }
 
         override fun getLiveOffsetMs(): Long = 0
 
         override fun skipBack() {
-            //dispatch(PlayerContract.View.Event.SkipBackClicked)
+            dispatchCommand(SkipBack)
         }
 
         override fun skipFwd() {
-            //dispatch(PlayerContract.View.Event.SkipFwdClicked)
+            dispatchCommand(SkipFwd)
         }
+    }
 
+    private fun dispatchCommand(command: PlayerSessionContract.PlayerCommandMessage) {
+        coroutines.ioScope.launch {
+            watchLocator?.also { locator ->
+                // todo return player status here too for update
+                remotePlayerInteractor.playerCommand(locator, command)
+            }
+        }
     }
 }

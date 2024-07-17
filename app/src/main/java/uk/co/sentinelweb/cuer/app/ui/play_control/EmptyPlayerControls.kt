@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 class EmptyPlayerControls : PlayerContract.PlayerControls {
     override fun initMediaRouteButton() = Unit
 
-    override fun setConnectionState(connState: PlayerContract.ConnectionState) = Unit
+    override fun setConnectionState(connState: PlayerContract.ChromeCastConnectionState) = Unit
 
     override fun setPlayerState(playState: PlayerStateDomain) = Unit
 

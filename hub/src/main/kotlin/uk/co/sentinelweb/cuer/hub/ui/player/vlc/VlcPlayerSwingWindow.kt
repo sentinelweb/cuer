@@ -13,6 +13,7 @@ import uk.co.caprica.vlcj.media.MediaParsedStatus
 import uk.co.caprica.vlcj.media.MediaRef
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
+import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
@@ -163,11 +164,11 @@ class VlcPlayerSwingWindow(
 
                 override fun finished(mediaPlayer: MediaPlayer?) {
                     log.d("event finished")
-                    coordinator.dispatch(PlayerStateChanged(ENDED))
+
                 }
 
                 var lastPosUpdateTime = 0L
-                override fun positionChanged(mediaPlayer: MediaPlayer?, newPosition: Float) {
+                override fun positionChanged(mediaPlayer: MediaPlayer, newPosition: Float) {
                     val current = timeProvider.currentTimeMillis()
                     if (current - lastPosUpdateTime > 1000) {
                         durationMs?.let {
@@ -176,6 +177,8 @@ class VlcPlayerSwingWindow(
                         }
                         lastPosUpdateTime = current
                     }
+
+                    dispatchCurrentPlayState(mediaPlayer)
                 }
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
@@ -188,6 +191,20 @@ class VlcPlayerSwingWindow(
                 }
             }
         )
+    }
+
+    private fun dispatchCurrentPlayState(mediaPlayer: MediaPlayer) {
+        when (mediaPlayer.status().state()) {
+            State.NOTHING_SPECIAL -> UNKNOWN
+            State.OPENING -> VIDEO_CUED
+            State.BUFFERING -> BUFFERING
+            State.PLAYING -> PLAYING
+            State.PAUSED -> PAUSED
+            State.STOPPED -> PAUSED
+            State.ENDED -> ENDED
+            State.ERROR -> PlayerStateDomain.ERROR
+            null -> UNKNOWN
+        }.apply { coordinator.dispatch(PlayerStateChanged(this)) }
     }
 
     fun playItem(path: String) {
@@ -313,9 +330,6 @@ class VlcPlayerSwingWindow(
                 updateVolumeText()
             }
         }
-
-
-
         mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
         controlsPane.addMouseWheelListener(volumeWheelListener)
     }

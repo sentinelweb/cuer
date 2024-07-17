@@ -7,8 +7,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -124,11 +124,11 @@ class CastPlayerPresenter(
         view.initMediaRouteButton()
     }
 
-    override fun setConnectionState(connState: ConnectionState) {
+    override fun setConnectionState(connState: ChromeCastConnectionState) {
         when (connState) {
-            CC_DISCONNECTED -> view.hideBuffering()
-            CC_CONNECTING -> view.showBuffering()
-            CC_CONNECTED -> view.hideBuffering()
+            ChromeCastConnected -> view.hideBuffering()
+            ChromeCastConnecting -> view.showBuffering()
+            ChromeCastDisconnected -> view.hideBuffering()
         }
     }
 
