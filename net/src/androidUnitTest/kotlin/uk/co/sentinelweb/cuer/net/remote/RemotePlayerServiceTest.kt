@@ -37,13 +37,13 @@ class RemotePlayerServiceTest {
         val fixtIsPlaying = false
         val fixtMessage = PlayPause(fixtIsPlaying)
         val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponse(any()) } returns fixtResponse
+        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponse(path = capture(pathSlot))
+            executor.getResponseDomain(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/PlayPause/$fixtIsPlaying", pathSlot.captured)
         confirmVerified(executor)
@@ -55,31 +55,32 @@ class RemotePlayerServiceTest {
         val fixtFraction = 0.5f
         val fixtMessage = SeekToFraction(fixtFraction)
         val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponse(any()) } returns fixtResponse
+        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponse(path = capture(pathSlot))
+            executor.getResponseDomain(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/SeekToFraction/$fixtFraction", pathSlot.captured)
         confirmVerified(executor)
     }
 
+    @Test
     fun `executeCommand with TrackSelected message`() = runTest {
         val fixtLocator = Locator("xxx", 222)
         val guid = "guid-xx-xx-xx"
         val fixtId = OrchestratorContract.Identifier(GUID(guid), MEMORY)
         val fixtMessage = PlayerSessionContract.PlayerCommandMessage.TrackSelected(fixtId, false)
         val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponse(any()) } returns fixtResponse
+        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponse(path = capture(pathSlot))
+            executor.getResponseDomain(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/TrackSelected/$guid", pathSlot.captured)
         confirmVerified(executor)

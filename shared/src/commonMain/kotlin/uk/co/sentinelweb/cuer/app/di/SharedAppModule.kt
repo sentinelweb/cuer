@@ -48,6 +48,7 @@ import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 
 object SharedAppModule {
     private val queueModule = module {
@@ -175,8 +176,9 @@ object SharedAppModule {
         factory { PlayerSessionManager(get(), get()) }
         single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
         single { PlayerEventToIntentMapper }
+        single { PlayerSessionMessageMapper() }
         factory { PlayerMessageToIntentMapper(get()) }
-        single { CuerCastPlayerWatcher(get()) }
+        single { CuerCastPlayerWatcher(get(), get()) }
     }
 
     private val utilModule = module {

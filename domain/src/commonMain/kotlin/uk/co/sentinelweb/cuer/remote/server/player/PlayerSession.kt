@@ -16,6 +16,7 @@ class PlayerSession(
     val id: OrchestratorContract.Identifier<GUID>,
     var controlsListener: PlayerSessionContract.Listener,
 ) {
+    //var item: PlaylistItemDomain? = null
     var media: MediaDomain? = null
     var playlist: PlaylistDomain? = null
     var playbackState: PlayerStateDomain? = null

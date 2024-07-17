@@ -41,6 +41,10 @@ interface RemoteWebServerContract {
             val PATH = "/player/launch"
         }
 
+        object PLAYER_STATUS_API {
+            val PATH = "/player/status"
+        }
+
         object FOLDER_LIST_API {
             val PATH = "/folders"
             val P_PARAM = "p"

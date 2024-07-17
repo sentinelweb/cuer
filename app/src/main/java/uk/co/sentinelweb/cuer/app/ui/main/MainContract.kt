@@ -71,6 +71,7 @@ interface MainContract {
                         castListener = get(),
                         autoBackupFileExporter = get(),
                         notificationPermissionCheckDialog = get(),
+                        cuerCastWatcher = get(),
                     )
                 }
                 scoped {

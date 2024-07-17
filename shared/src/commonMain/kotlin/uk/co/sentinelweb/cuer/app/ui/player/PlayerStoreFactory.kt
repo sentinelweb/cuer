@@ -199,6 +199,7 @@ class PlayerStoreFactory(
             playlistAndItem
                 .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
                 .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
+                .apply { playerSessionManager.setMedia(item.media, null) }//
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
@@ -280,13 +281,13 @@ class PlayerStoreFactory(
 
         private fun PlaylistItemDomain.updatePlaybackState(playState: PlayerStateDomain) {
             mediaSessionManager.updatePlaybackState(
-                media,
+                this.media,
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist
             )
             playerSessionManager.updatePlaybackState(
-                media,
+                this.media,// todo item(this)
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist

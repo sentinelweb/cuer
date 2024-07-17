@@ -10,7 +10,9 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PL
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_ARG0
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_STATUS_API
 import uk.co.sentinelweb.cuer.remote.server.ipport
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
@@ -43,11 +45,11 @@ internal class RemotePlayerService(
             TrackFwd -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "TrackFwd")
         }
-        executor.getResponse(path = locator.ipport() + command)
+        executor.getResponseDomain(path = locator.ipport() + command)
     }
 
     internal suspend fun executeGetConfig(locator: Locator): ResponseDomain =
-        executor.getResponse(
+        executor.getResponseDomain(
             path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
         )
 
@@ -64,4 +66,9 @@ internal class RemotePlayerService(
             postData = item
         )
     }
+
+    internal suspend fun executeGetPlayerStatus(locator: Locator): ResponseMessage =
+        executor.getResponseMessage(
+            path = locator.ipport() + PLAYER_STATUS_API.PATH
+        )
 }

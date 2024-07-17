@@ -8,6 +8,7 @@ import io.ktor.http.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
 
 internal class ServiceExecutor(
     private val client: HttpClient,
@@ -40,11 +41,17 @@ internal class ServiceExecutor(
         throw e
     }
 
-    suspend fun getResponse(
+    suspend fun getResponseDomain(
         path: String,
         urlParams: Map<String, Any?> = emptyMap(),
         headers: Map<String, Any?> = emptyMap(),
     ): ResponseDomain = get(path, urlParams, headers)
+
+    suspend fun getResponseMessage(
+        path: String,
+        urlParams: Map<String, Any?> = emptyMap(),
+        headers: Map<String, Any?> = emptyMap(),
+    ): ResponseMessage = get(path, urlParams, headers)
 
     suspend inline fun <reified T : Any> post(
         path: String,

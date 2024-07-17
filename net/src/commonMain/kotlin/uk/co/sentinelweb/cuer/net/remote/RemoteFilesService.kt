@@ -12,7 +12,7 @@ internal class RemoteFilesService(
 ) {
 
     internal suspend fun execFolder(locator: Locator, remoteFolderPath: String?): ResponseDomain =
-        executor.getResponse(
+        executor.getResponseDomain(
             path = locator.ipport() + PATH,
             urlParams = if (remoteFolderPath != null) mapOf(P_PARAM to remoteFolderPath) else emptyMap()
         )

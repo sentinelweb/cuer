@@ -22,7 +22,7 @@ internal class RemoteStatusKtorInteractor(
             messageType,
             availableMessageMapper.mapToMulticastMessage(localRepository.localNode)
         )
-        val dto = availableService.sendAvailable(remote, RequestMessage(availableMessage))
+        val dto = availableService.sendAvailable(remote, RequestMessage(availableMessage)) // todo ResponseMesage?
         NetResult.Data(true)
     } catch (e: RequestFailureException) {
         NetResult.HttpError(e)

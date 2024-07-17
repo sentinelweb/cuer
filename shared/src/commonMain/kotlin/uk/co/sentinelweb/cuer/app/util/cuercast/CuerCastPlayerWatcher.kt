@@ -6,6 +6,7 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_CONNECTED
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 
@@ -29,9 +30,10 @@ class CuerCastPlayerWatcher(
                     while (isActive && watchLocator != null) {
                         val watcherLocator1 = watchLocator
                         if (watcherLocator1 != null) {
-                            val playerSessionStatus =
-                                remotePlayerInteractor.playerSessionStatus(watcherLocator1)
-
+                            remotePlayerInteractor.playerSessionStatus(watcherLocator1).data
+                                ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
+                                ?.apply { mainPlayerControls?.setPlaylistItem(item) }
+                                ?.apply { mainPlayerControls?.setConnectionState(CC_CONNECTED) }
                             delay(1000) // Pause for one second before the next poll
                         }
                     }

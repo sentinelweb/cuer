@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,6 +33,7 @@ import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
 
+@ExperimentalCoroutinesApi
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
@@ -108,8 +110,12 @@ class VlcPlayerSwingWindow(
         this.isVisible = true
     }
 
+    // https://wiki.videolan.org/VLC_command-line_help/
     private fun createMediaPlayer() {
-        mediaPlayerComponent = CallbackMediaPlayerComponent()
+        mediaPlayerComponent =
+            CallbackMediaPlayerComponent(
+                "--stereo-mode", "1"
+            )
         this.contentPane.add(mediaPlayerComponent, CENTER)
         mediaPlayerComponent.mediaPlayer().events().addMediaEventListener(
             object : MediaEventAdapter() {

@@ -6,7 +6,8 @@ import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.client.RequestFailureException
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerStatusMessage
 
 internal class RemotePlayerKtorInteractor(
     private val service: RemotePlayerService,
@@ -17,7 +18,7 @@ internal class RemotePlayerKtorInteractor(
         log.tag(this)
     }
 
-    override suspend fun playerCommand(locator: Locator, message: PlayerMessage) =
+    override suspend fun playerCommand(locator: Locator, message: PlayerCommandMessage) =
         try {
             service.executeCommand(locator, message)
             NetResult.Data(true)
@@ -28,9 +29,20 @@ internal class RemotePlayerKtorInteractor(
             NetResult.Error(e)
         }
 
+    override suspend fun playerSessionStatus(locator: Locator): NetResult<PlayerStatusMessage> =
+        try {
+            service.executeGetPlayerStatus(locator)
+            NetResult.Data(service.executeGetPlayerStatus(locator).payload as PlayerStatusMessage)
+        } catch (failure: RequestFailureException) {
+            log.e("player command failed", failure)
+            NetResult.HttpError(failure)
+        } catch (e: Exception) {
+            NetResult.Error(e)
+        }
+
     override suspend fun getPlayerConfig(locator: Locator): NetResult<PlayerNodeDomain> =
         try {
-            NetResult.Data(service.executeConfig(locator).payload[0] as PlayerNodeDomain)
+            NetResult.Data(service.executeGetConfig(locator).payload[0] as PlayerNodeDomain)
         } catch (failure: RequestFailureException) {
             log.e("player config failed", failure)
             NetResult.HttpError(failure)
