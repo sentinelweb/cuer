@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
+import SleepPreventer
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.utils.diff
@@ -80,6 +81,7 @@ class VlcPlayerUiCoordinator(
         playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
                 .apply { assemble(screenIndex) }
+                .also { SleepPreventer.preventSleep() }
         } else throw IllegalStateException("Can't find VLC")
     }
 
@@ -89,6 +91,7 @@ class VlcPlayerUiCoordinator(
                 ?.takeIf { it.source == MEMORY }
                 ?.also { playlistOrchestrator.delete(it.id, it.deepOptions()) }
             playerWindow.destroy()
+            SleepPreventer.allowSleep()
             lifecycle.onPause()
             lifecycle.onStop()
             controller.onViewDestroyed()
@@ -125,7 +128,11 @@ class VlcPlayerUiCoordinator(
         parent.killPlayer()
     }
 
-    fun setupPlaylistAndItem(item: PlaylistItemDomain, playlist: PlaylistDomain, screenIndex: Int = 0) {
+    fun setupPlaylistAndItem(
+        item: PlaylistItemDomain,
+        playlist: PlaylistDomain,
+        screenIndex: Int = PREFERRED_SCREEN_DEFAULT
+    ) {
         coroutines.mainScope.launch {
             playlistId = playlist.id
             log.d("showPlayer: id:${playlist.id}")
@@ -145,6 +152,7 @@ class VlcPlayerUiCoordinator(
     }
 
     companion object {
+        const val PREFERRED_SCREEN_DEFAULT = 1
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> VlcPlayerUiCoordinator(parent) }
             factory<AppPlaylistInteractor.CustomisationResources>(named(NewItems)) { EmptyCustomisationResources() }

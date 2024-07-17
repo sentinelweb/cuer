@@ -21,7 +21,6 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(project(":database"))
     implementation(project(":shared"))
-//    implementation(project(":sharedUi"))
     implementation(project(":domain"))
     implementation(project(":remote"))
     implementation(project(":net"))
@@ -34,13 +33,16 @@ dependencies {
     implementation(libs.ktorClientCio)
     implementation(libs.batikTranscoder)
     implementation(libs.multiplatformSettings)
+    implementation(libs.vlcj)
+    implementation(libs.jna)
+    implementation(libs.jnaPlatform)
+
     testImplementation(libs.junit)
     testImplementation(libs.koinTest)
     testImplementation(libs.koinTestJUnit4)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinxCoroutinesTest)
-    implementation(libs.vlcj)
 }
 
 compose.desktop {

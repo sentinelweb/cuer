@@ -83,6 +83,7 @@ kotlin-styled = "5.3.3-pre.289-kotlin-1.6.10"
 batik = "1.17"
 vlcj = "4.8.2"
 logback = "1.2.3"
+jna = "5.14.0"
 
 [libraries]
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
@@ -174,6 +175,8 @@ batikTranscoder = { module = "org.apache.xmlgraphics:batik-transcoder", version.
 multiplatformSettings = { module = "com.russhwolf:multiplatform-settings", version.ref = "multiplatform-settings" }
 multiplatformSettingsNoArg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatform-settings" }
 vlcj = { module = "uk.co.caprica:vlcj", version.ref = "vlcj" }
+jna = { module = "net.java.dev.jna:jna", version.ref = "jna" }
+jnaPlatform = { module = "net.java.dev.jna:jna-platform", version.ref = "jna" }
 
 # web/react
 kotlinReact = { module = "org.jetbrains.kotlin-wrappers:kotlin-react", version.ref = "kotlin_react" }
