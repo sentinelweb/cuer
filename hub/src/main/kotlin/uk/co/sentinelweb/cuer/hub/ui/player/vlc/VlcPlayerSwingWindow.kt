@@ -43,7 +43,6 @@ class VlcPlayerSwingWindow(
     private val showHideControls: ShowHideControls,
 ) : JFrame(), KoinComponent {
 
-
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
     private val timeProvider: TimeProvider by inject()
