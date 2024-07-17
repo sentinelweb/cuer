@@ -23,9 +23,14 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
-import java.awt.*
+import java.awt.BorderLayout
 import java.awt.BorderLayout.*
-import java.awt.event.*
+import java.awt.Color
+import java.awt.GraphicsEnvironment
+import java.awt.event.MouseWheelEvent
+import java.awt.event.MouseWheelListener
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
@@ -35,6 +40,7 @@ import javax.swing.event.ChangeEvent
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
+    private val showHideControls: ShowHideControls,
 ) : JFrame(), KoinComponent {
 
 
@@ -76,7 +82,7 @@ class VlcPlayerSwingWindow(
         createWindow(screenIndex)
         createMediaPlayer()
         createControls()
-        setInactivityTimer()
+        showHideControls.setupInactivityTimer(this, mediaPlayerComponent, controlsPane)
     }
 
     private fun createWindow(preferredScreen: Int) {
@@ -293,62 +299,12 @@ class VlcPlayerSwingWindow(
                 val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
                 val newVolume = (currentVolume + e.wheelRotation * 4).coerceIn(0, 200)
                 mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume)
-                controlsPane.isVisible = true
+                showHideControls.showControls()
                 updateVolumeText()
             }
         }
         mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
         controlsPane.addMouseWheelListener(volumeWheelListener)
-    }
-
-    private fun setInactivityTimer() {
-        // Create a transparent cursor
-        val toolkit = Toolkit.getDefaultToolkit()
-        val cursorImage = toolkit.createImage(ByteArray(0))
-        val transparentCursor = toolkit.createCustomCursor(cursorImage, Point(0, 0), "invisibleCursor")
-
-        val hideControls = {
-            controlsPane.isVisible = false
-            this@VlcPlayerSwingWindow.cursor = transparentCursor
-        }
-        val showControls = {
-            controlsPane.isVisible = true
-            this@VlcPlayerSwingWindow.cursor = Cursor.getDefaultCursor()
-        }
-        val hideControlsTimer = Timer(3000, { hideControls() })
-        hideControlsTimer.isRepeats = false
-
-        // Mouse adapter to handle mouse events
-        val activityListener = object : MouseAdapter() {
-            override fun mouseMoved(e: MouseEvent?) {
-                if (!controlsPane.isVisible) {
-                    showControls()
-                }
-                hideControlsTimer.restart()
-            }
-
-            override fun mouseClicked(e: MouseEvent?) {
-                if (!controlsPane.isVisible) {
-                    showControls()
-                }
-                hideControlsTimer.restart()
-            }
-
-            override fun mouseEntered(e: MouseEvent?) {
-                if (!controlsPane.isVisible) {
-                    showControls()
-                }
-                hideControlsTimer.restart()
-            }
-
-            override fun mouseExited(e: MouseEvent?) {
-                hideControlsTimer.restart()
-            }
-        }
-        mediaPlayerComponent.videoSurfaceComponent().addMouseMotionListener(activityListener)
-        mediaPlayerComponent.videoSurfaceComponent().addMouseListener(activityListener)
-
-        hideControlsTimer.restart()
     }
 
     fun updateUiPlayState(state: PlayerStateDomain) {

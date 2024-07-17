@@ -206,7 +206,7 @@ class VlcPlayerUiCoordinator(
                     )
                 }
                 factory {
-                    VlcPlayerSwingWindow(get(), get())
+                    VlcPlayerSwingWindow(get(), get(), ShowHideControls())
                 }
             }
         }
