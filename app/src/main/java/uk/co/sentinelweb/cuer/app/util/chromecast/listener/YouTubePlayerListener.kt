@@ -69,7 +69,7 @@ class YouTubePlayerListener(
         youTubePlayer = null
         queue.currentItem?.apply {
             playerUi?.setPlaylistItem(this)
-            playerUi?.setConnectionState(PlayerContract.ChromeCastConnectionState.ChromeCastConnected)
+            playerUi?.setConnectionState(PlayerContract.CastConnectionState.Connected)
             playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
             playerUi?.setCurrentSecond(0f)
             playerUi?.setButtons(buildButtons(this))

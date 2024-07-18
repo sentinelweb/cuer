@@ -40,7 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserFragment
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
@@ -122,7 +122,7 @@ object Modules {
         PlaylistsMviFragment.fragmentModule,
         PlaylistsDialogFragment.fragmentModule,
         MainContract.activityModule,
-        CastPlayerContract.viewModule,
+        CastPlayerFragment.viewModule,
         ShareContract.activityModule,
         ScanContract.fragmentModule,
         PlaylistItemEditContract.fragmentModule,

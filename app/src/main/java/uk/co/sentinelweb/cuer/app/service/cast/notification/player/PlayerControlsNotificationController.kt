@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState.ChromeCastConnected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -142,8 +142,8 @@ class PlayerControlsNotificationController constructor(
         state.title = title
     }
 
-    override fun setConnectionState(connState: PlayerContract.ChromeCastConnectionState) {
-        if (connState == ChromeCastConnected) {
+    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
+        if (connState == Connected) {
             view.stopSelf()
         }
     }

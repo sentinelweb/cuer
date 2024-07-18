@@ -1,21 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ChromeCastConnectionState.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 
@@ -25,17 +18,16 @@ class CastPlayerPresenter(
     private val mapper: CastPlayerUiMapper,
     private val log: LogWrapper,
     private val skipControl: SkipContract.External,
-    private val res: ResourceWrapper,
     private val playUseCase: PlayUseCase,
     private val playlistAndItemMapper: PlaylistAndItemMapper,
-) : CastPlayerContract.Presenter, PlayerControls, SkipContract.Listener {
+) : CastPlayerContract.Presenter, PlayerContract.PlayerControls, SkipContract.Listener {
 
     init {
         log.tag(this)
         skipControl.listener = this
     }
 
-    private var listener: PlayerControls.Listener? = null
+    private var listener: PlayerContract.PlayerControls.Listener? = null
 
     override fun initialise() {
         state.isDestroyed = false
@@ -65,8 +57,8 @@ class CastPlayerPresenter(
     override fun onPlayPausePressed() {
         listener?.apply {
             when (state.playState) {
-                PLAYING -> listener?.pause()
-                VIDEO_CUED, UNSTARTED, PAUSED, UNKNOWN -> listener?.play()
+                PlayerStateDomain.PLAYING -> listener?.pause()
+                PlayerStateDomain.VIDEO_CUED, PlayerStateDomain.UNSTARTED, PlayerStateDomain.PAUSED, PlayerStateDomain.UNKNOWN -> listener?.play()
                 else -> Unit
             }
         } ?: run {
@@ -81,11 +73,11 @@ class CastPlayerPresenter(
         state.isDestroyed = true
     }
 
-    override fun addListener(l: PlayerControls.Listener) {
+    override fun addListener(l: PlayerContract.PlayerControls.Listener) {
         listener = l
     }
 
-    override fun removeListener(l: PlayerControls.Listener) {
+    override fun removeListener(l: PlayerContract.PlayerControls.Listener) {
         if (listener == l) {
             listener = null
         }
@@ -115,7 +107,7 @@ class CastPlayerPresenter(
     }
 
     override fun onSeekFinished() {
-        state.playState = BUFFERING
+        state.playState = PlayerStateDomain.BUFFERING
         listener?.seekTo(state.seekPositionMs)
         state.seekPositionMs = 0
     }
@@ -124,11 +116,11 @@ class CastPlayerPresenter(
         view.initMediaRouteButton()
     }
 
-    override fun setConnectionState(connState: ChromeCastConnectionState) {
+    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
         when (connState) {
-            ChromeCastConnected -> view.hideBuffering()
-            ChromeCastConnecting -> view.showBuffering()
-            ChromeCastDisconnected -> view.hideBuffering()
+            Connected -> view.hideBuffering()
+            Connecting -> view.showBuffering()
+            Disconnected -> view.hideBuffering()
         }
     }
 
@@ -137,15 +129,15 @@ class CastPlayerPresenter(
         log.d("playState = $playState")
         skipControl.stateChange(playState)
         when (playState) {
-            PLAYING -> view.setPlaying()
-            ENDED -> view.setPaused()
-            PAUSED -> view.setPaused()
-            UNKNOWN,
-            UNSTARTED,
-            BUFFERING -> view.showBuffering()
+            PlayerStateDomain.PLAYING -> view.setPlaying()
+            PlayerStateDomain.ENDED -> view.setPaused()
+            PlayerStateDomain.PAUSED -> view.setPaused()
+            PlayerStateDomain.UNKNOWN,
+            PlayerStateDomain.UNSTARTED,
+            PlayerStateDomain.BUFFERING -> view.showBuffering()
 
-            VIDEO_CUED -> Unit
-            ERROR -> {
+            PlayerStateDomain.VIDEO_CUED -> Unit
+            PlayerStateDomain.ERROR -> {
                 view.setPaused(); view.showMessage("An error occurred")
             }
         }
@@ -158,7 +150,7 @@ class CastPlayerPresenter(
         if (state.durationMs > 0) {
             if (!state.isLiveStream) {
                 view.setPosition(mapper.formatTime(state.positionMs))
-                if (state.playState != BUFFERING) {
+                if (state.playState != PlayerStateDomain.BUFFERING) {
                     view.updateSeekPosition(state.positionMs / state.durationMs.toFloat())
                 }
                 view.setLiveTime(null)
@@ -193,11 +185,13 @@ class CastPlayerPresenter(
     override fun reset() {
         if (!state.isDestroyed) {
             state.title = "No media".apply { view.setTitle(this) }
-            state.positionMs = 0L.apply { view.setPosition("-:-") }
-            state.durationMs = 0L.apply { view.setDuration("-:-") }
+            state.positionMs = 0L
+            view.setPosition("-:-")
+            state.durationMs = 0L
+            view.setDuration("-:-")
             view.clearImage()
             view.setPaused()
-            view.setDurationColors(R.color.text_primary, R.color.transparent)
+            view.setDurationStyle(Normal)
             view.updateSeekPosition(0f)
             view.setLiveTime(null)
             updateButtons()
@@ -230,17 +224,15 @@ class CastPlayerPresenter(
             if (state.isLiveStream) {
                 view.setPosition("-")
                 if (state.isUpcoming) {
-                    view.setDuration(res.getString(R.string.upcoming))
-                    view.setDurationColors(R.color.white, R.color.upcoming_background)
+                    view.setDurationStyle(Upcoming)
                 } else {
-                    view.setDuration(res.getString(R.string.live))
-                    view.setDurationColors(R.color.white, R.color.live_background)
+                    view.setDurationStyle(Live)
                 }
                 view.updateSeekPosition(1f)
 
             } else {
                 view.setDuration(mapper.formatTime(state.durationMs))
-                view.setDurationColors(R.color.text_primary, R.color.transparent)
+                view.setDurationStyle(Normal)
             }
 //            view.setSeekEnabled(!state.isLiveStream)
         }
@@ -254,8 +246,12 @@ class CastPlayerPresenter(
         state.playlistItem?.playlistId?.let {
             view.navigate(
                 NavigationModel(
-                    PLAYLIST,
-                    mapOf(PLAYLIST_ID to it.id.value, PLAY_NOW to false, SOURCE to it.source)
+                    NavigationModel.Target.PLAYLIST,
+                    mapOf(
+                        NavigationModel.Param.PLAYLIST_ID to it.id.value,
+                        NavigationModel.Param.PLAY_NOW to false,
+                        NavigationModel.Param.SOURCE to it.source
+                    )
                 )
             )
         }
@@ -265,11 +261,11 @@ class CastPlayerPresenter(
         state.playlistItem?.let {
             view.navigate(
                 NavigationModel(
-                    PLAYLIST_ITEM,
+                    NavigationModel.Target.PLAYLIST_ITEM,
                     mapOf(
                         NavigationModel.Param.PLAYLIST_ITEM to it,
                         //FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
-                        SOURCE to it.id!!.source
+                        NavigationModel.Param.SOURCE to it.id!!.source
                     )
                 )
             )
