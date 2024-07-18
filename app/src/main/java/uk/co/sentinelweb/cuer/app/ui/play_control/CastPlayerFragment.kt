@@ -76,6 +76,7 @@ class CastPlayerFragment() :
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
         binding.castPlayerImage.setOnClickListener { presenter.onPlaylistItemClick() }
         binding.castPlayerSupport.setOnClickListener { presenter.onSupport() }
+        binding.cuerCastButton.setOnClickListener { switchCureCast() }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -89,6 +90,16 @@ class CastPlayerFragment() :
             }
         })
         presenter.initialise()
+    }
+
+    private var toggleCC = true
+    private fun switchCureCast() {
+        if (toggleCC) {
+            binding.cuerCastButton.setImageResource(R.drawable.ic_cuer_cast)
+        } else {
+            binding.cuerCastButton.setImageResource(R.drawable.ic_cuer_cast_connected)
+        }
+        toggleCC = !toggleCC
     }
 
     override fun showSupport(media: MediaDomain) {
