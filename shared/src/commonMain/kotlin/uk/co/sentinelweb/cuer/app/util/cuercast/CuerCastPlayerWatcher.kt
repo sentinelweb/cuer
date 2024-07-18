@@ -2,7 +2,11 @@ package uk.co.sentinelweb.cuer.app.util.cuercast
 
 import kotlinx.coroutines.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Disconnected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -33,8 +37,10 @@ class CuerCastPlayerWatcher(
             pollingJob?.cancel()
             if (field != null && value == null) {
                 field?.removeListener(controlsListener)
+                field?.setCastDetails(CastDetails(CuerCast, Disconnected))
             } else if (value != null) {
                 value.addListener(controlsListener)
+                value.setCastDetails(CastDetails(CuerCast, Connected))
                 initPolling()
             }
             field = value
@@ -64,6 +70,7 @@ class CuerCastPlayerWatcher(
                         ?.apply { state.lastMessage = this }
                     delay(1000)
                 } else {
+                    mainPlayerControls?.setCastDetails(CastDetails(CuerCast, Disconnected))
                     cancel()
                 }
             }

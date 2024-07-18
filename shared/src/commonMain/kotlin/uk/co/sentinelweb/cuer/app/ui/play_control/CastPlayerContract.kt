@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Disconnected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.None
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -26,6 +27,7 @@ interface CastPlayerContract {
         fun onSeekSelectTimeFwdPressed(): Boolean
         fun onResume()
         fun onSupport()
+        fun onCastClick()
     }
 
     enum class DurationStyle {
@@ -34,7 +36,8 @@ interface CastPlayerContract {
 
     interface View {
         val playerControls: PlayerContract.PlayerControls
-        fun initMediaRouteButton()
+
+        //fun initMediaRouteButton()
         fun setPosition(second: String)
         fun setLiveTime(second: String?)
         fun setDuration(duration: String)
@@ -61,6 +64,7 @@ interface CastPlayerContract {
         fun showSupport(media: MediaDomain)
         fun setNextTrackEnabled(nextTrackEnabled: Boolean)
         fun setPrevTrackEnabled(prevTrackEnabled: Boolean)
+        fun setCastDetails(details: State.CastDetails)
     }
 
     data class State(
@@ -75,12 +79,12 @@ interface CastPlayerContract {
         var isUpcoming: Boolean = false,
         var playlistName: String? = null,
         var buttons: PlayerContract.View.Model.Buttons? = null,
-        val castState: CastState = CastState()
+        var castDetails: CastDetails = CastDetails()
     ) {
-        data class CastState(
-            var target: PlayerContract.ControlTarget? = null,
-            var chromeCastConnectionState: CastConnectionState = Disconnected,
-            var cuerCastConnectionState: CastConnectionState = Disconnected,
+        data class CastDetails(
+            val target: PlayerContract.ControlTarget = None,
+            val connectionState: CastConnectionState = Disconnected,
+            val name: String? = null
         )
     }
 }

@@ -9,8 +9,11 @@ import com.bumptech.glide.request.transition.Transition
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -43,16 +46,22 @@ class PlayerControlsNotificationController constructor(
         when (action) {
             ACTION_PAUSE ->
                 listener?.pause()
+
             ACTION_PLAY ->
                 listener?.play()
+
             ACTION_SKIPF ->
                 skipControl.skipFwd()
+
             ACTION_SKIPB ->
                 skipControl.skipBack()
+
             ACTION_TRACKB ->
                 listener?.trackBack()
+
             ACTION_TRACKF ->
                 listener?.trackFwd()
+
             else -> Unit
         }
     }
@@ -142,12 +151,6 @@ class PlayerControlsNotificationController constructor(
         state.title = title
     }
 
-    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
-        if (connState == Connected) {
-            view.stopSelf()
-        }
-    }
-
     override fun setPlaylistName(name: String) {
         state.playlistName = name
     }
@@ -185,7 +188,18 @@ class PlayerControlsNotificationController constructor(
         updateNotification()
     }
 
-    override fun initMediaRouteButton() = Unit
+//    override fun initMediaRouteButton() = Unit
+
+    //    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
+//        if (connState == Connected) {
+//            view.stopSelf()
+//        }
+//    }
+    override fun setCastDetails(details: CastDetails) {
+        if (listOf(ChromeCast, CuerCast).contains(details.target) && details.connectionState == Connected) {
+            //view.stopSelf()
+        }
+    }
 
     override fun restoreState() = Unit
 

@@ -56,7 +56,7 @@ class MainPresenter(
             initialiseCastContext()
         }
         if (!state.playControlsInit) {
-            view.playerControls.initMediaRouteButton()
+            //view.playerControls.initMediaRouteButton()
             view.playerControls.reset()
             state.playControlsInit = true
         }

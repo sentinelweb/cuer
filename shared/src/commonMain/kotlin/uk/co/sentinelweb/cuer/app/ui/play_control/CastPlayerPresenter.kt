@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
+import uk.co.sentinelweb.cuer.app.usecase.CastUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -20,6 +20,7 @@ class CastPlayerPresenter(
     private val skipControl: SkipContract.External,
     private val playUseCase: PlayUseCase,
     private val playlistAndItemMapper: PlaylistAndItemMapper,
+    private val castUseCase: CastUseCase,
 ) : CastPlayerContract.Presenter, PlayerContract.PlayerControls, SkipContract.Listener {
 
     init {
@@ -83,6 +84,15 @@ class CastPlayerPresenter(
         }
     }
 
+    override fun setCastDetails(details: CastPlayerContract.State.CastDetails) {
+        state.castDetails = details
+        view.setCastDetails(details)
+    }
+
+    override fun onCastClick() {
+        castUseCase.showCastDialog()
+    }
+
     override fun onSeekBackPressed() {
         skipControl.skipBack()
     }
@@ -112,17 +122,9 @@ class CastPlayerPresenter(
         state.seekPositionMs = 0
     }
 
-    override fun initMediaRouteButton() {
-        view.initMediaRouteButton()
-    }
-
-    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
-        when (connState) {
-            Connected -> view.hideBuffering()
-            Connecting -> view.showBuffering()
-            Disconnected -> view.hideBuffering()
-        }
-    }
+//    override fun initMediaRouteButton() {
+//        view.initMediaRouteButton()
+//    }
 
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState

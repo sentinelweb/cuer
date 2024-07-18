@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
@@ -69,7 +70,8 @@ class YouTubePlayerListener(
         youTubePlayer = null
         queue.currentItem?.apply {
             playerUi?.setPlaylistItem(this)
-            playerUi?.setConnectionState(PlayerContract.CastConnectionState.Connected)
+            //playerUi?.setConnectionState(PlayerContract.CastConnectionState.Connected)
+            playerUi?.setCastDetails(CastDetails())
             playerUi?.setPlayerState(PlayerStateDomain.PAUSED)
             playerUi?.setCurrentSecond(0f)
             playerUi?.setButtons(buildButtons(this))

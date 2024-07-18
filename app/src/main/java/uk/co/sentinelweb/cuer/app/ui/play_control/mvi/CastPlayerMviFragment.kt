@@ -101,9 +101,9 @@ class CastPlayerMviFragment() :
         super.onResume()
     }
 
-    fun initMediaRouteButton() {
-        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
-    }
+//    fun initMediaRouteButton() {
+//        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
+//    }
 
     fun setPosition(second: String) {
         binding.castPlayerPosition.text = second

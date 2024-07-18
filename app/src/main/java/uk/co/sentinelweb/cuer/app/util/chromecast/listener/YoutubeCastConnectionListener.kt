@@ -8,8 +8,10 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
 import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -57,15 +59,14 @@ class YoutubeCastConnectionListener constructor(
         }
 
     override fun onChromecastConnecting() {
-        state.connectionState = Connecting.also {
-            playerUi?.setConnectionState(it)
-        }
+        state.connectionState = Connecting
+        playerUi?.setCastDetails(CastDetails(ChromeCast, Connecting))
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        state.connectionState = Disconnected.also {
-            playerUi?.setConnectionState(it)
-        }
+        state.connectionState = Disconnected
+        playerUi?.setCastDetails(CastDetails(ChromeCast, Disconnected))
+
         youTubePlayerListener?.let {
             it.playerUi = playerUi
             mediaSessionManager.checkCreateMediaSession(it)
@@ -85,16 +86,16 @@ class YoutubeCastConnectionListener constructor(
     }
 
     override fun onChromecastDisconnected() {
-        state.connectionState = Connected.also {
-            playerUi?.setConnectionState(it)
-        }
+        state.connectionState = Connected
+        playerUi?.setCastDetails(CastDetails(ChromeCast, Disconnected))
+
         youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
         mediaSessionManager.destroyMediaSession()
     }
 
     private fun restoreState() {
-        state.connectionState?.apply { playerUi?.setConnectionState(this) }
+        state.connectionState?.apply { playerUi?.setCastDetails(CastDetails(ChromeCast, this)) }
         updateFromQueue()
     }
 
@@ -113,7 +114,6 @@ class YoutubeCastConnectionListener constructor(
             playerUi?.apply {
                 if (youTubePlayerListener != null) {
                     queue.currentItem?.apply {
-                        //setPlayerState(PlayerStateDomain.PAUSED)
                         setCurrentSecond((media.positon?.toFloat() ?: 0f) / 1000f)
                     }
                 }

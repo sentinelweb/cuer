@@ -31,6 +31,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.*
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -91,7 +93,7 @@ class CastPlayerFragment() :
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
         binding.castPlayerImage.setOnClickListener { presenter.onPlaylistItemClick() }
         binding.castPlayerSupport.setOnClickListener { presenter.onSupport() }
-        binding.cuerCastButton.setOnClickListener { switchCureCast() }
+        binding.castButton.setOnClickListener { presenter.onCastClick() }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -107,16 +109,6 @@ class CastPlayerFragment() :
         presenter.initialise()
     }
 
-    private var toggleCC = true
-    private fun switchCureCast() {
-        if (toggleCC) {
-            binding.cuerCastButton.setImageResource(R.drawable.ic_cuer_cast)
-        } else {
-            binding.cuerCastButton.setImageResource(R.drawable.ic_cuer_cast_connected)
-        }
-        toggleCC = !toggleCC
-    }
-
     override fun showSupport(media: MediaDomain) {
         SupportDialogFragment.show(requireActivity(), media)
     }
@@ -127,6 +119,27 @@ class CastPlayerFragment() :
 
     override fun setPrevTrackEnabled(prevTrackEnabled: Boolean) {
         binding.castPlayerTrackLast.isEnabled = prevTrackEnabled
+    }
+
+    override fun setCastDetails(details: CastPlayerContract.State.CastDetails) {
+        when (details.target) {
+            None -> binding.castButton.setImageResource(R.drawable.ic_chromecast_24)
+            ChromeCast -> when (details.connectionState) {
+                Connected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_connected_24)
+                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_24)
+            }
+
+            CuerCast -> when (details.connectionState) {
+                Connected -> binding.castButton.setImageResource(R.drawable.ic_cuer_cast_connected)
+                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_cuer_cast)
+            }
+
+            FloatingWindow -> binding.castButton.setImageResource(R.drawable.ic_picture_in_picture)
+        }
+        when (details.connectionState) {
+            Connected, Disconnected -> hideBuffering()
+            Connecting -> showBuffering()
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -145,9 +158,9 @@ class CastPlayerFragment() :
         presenter.onResume()
     }
 
-    override fun initMediaRouteButton() {
-        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
-    }
+//    override fun initMediaRouteButton() {
+//        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
+//    }
 
     override fun setPosition(second: String) {
         binding.castPlayerPosition.text = second
@@ -284,7 +297,8 @@ class CastPlayerFragment() :
                         log = get(),
                         skipControl = get(),
                         playUseCase = get(),
-                        playlistAndItemMapper = get()
+                        playlistAndItemMapper = get(),
+                        castUseCase = get()
                     )
                 }
                 scoped<SkipContract.External> {
