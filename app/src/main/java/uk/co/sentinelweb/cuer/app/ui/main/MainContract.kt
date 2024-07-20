@@ -6,6 +6,8 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
+import uk.co.sentinelweb.cuer.app.ui.cast.AndroidCastDialogLauncher
+import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -96,7 +98,8 @@ interface MainContract {
 
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
                 scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
-                scoped { CastController(get(), get(), get(), get()) }
+                scoped { CastController(get(), get(), get(), get(), get()) }
+                scoped<CastContract.CastDialogLauncher> { AndroidCastDialogLauncher(get<MainActivity>()) }
             }
         }
     }

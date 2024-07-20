@@ -20,7 +20,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/dp_chromecast"
         style="@style/Cuer.MaterialAlertDialog.Item"
-        android:drawableStart="@drawable/ic_chromecast_24"
+        android:drawableStart="@drawable/ic_chromecast"
         android:text="@string/dialog_play_chromecast"
         android:textAppearance="@style/TextAppearance.App.Headline5" />
 

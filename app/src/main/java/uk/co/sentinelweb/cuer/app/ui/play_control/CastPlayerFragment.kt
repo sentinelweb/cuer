@@ -125,10 +125,10 @@ class CastPlayerFragment() :
 
     override fun setCastDetails(details: CastPlayerContract.State.CastDetails) {
         when (details.target) {
-            None -> binding.castButton.setImageResource(R.drawable.ic_chromecast_24)
+            None -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
             ChromeCast -> when (details.connectionState) {
-                Connected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_connected_24)
-                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_24)
+                Connected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_connected)
+                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
             }
 
             CuerCast -> when (details.connectionState) {
@@ -351,6 +351,7 @@ class CastPlayerFragment() :
                 }
                 scoped { ItemFactory(get(), get(), get()) }
                 scoped { ItemModelMapper(get(), get(), get(), get()) }
+
             }
         }
     }

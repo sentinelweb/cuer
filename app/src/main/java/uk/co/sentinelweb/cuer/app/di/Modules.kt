@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
+import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -148,6 +149,7 @@ object Modules {
         LocalFragment.fragmentModule,
         UpdateService.serviceModule,
         FileBrowserFragment.fragmentModule,
+        CastDialogFragment.fragmentModule,
     )
 
     private val uiModule = module {

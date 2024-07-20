@@ -11,10 +11,11 @@ class CastController(
     private val chromeCastHolder: ChromeCastPlayerContextHolder,
     private val floatingManager: FloatingPlayerContract.Manager,
     private val playerControls: PlayerContract.PlayerControls,
+    private val castDialogLauncher: CastContract.CastDialogLauncher,
 ) {
 
     fun showCastDialog() {
-
+        castDialogLauncher.launchCastDialog()
     }
 
     fun checkCastConnection() {

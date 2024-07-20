@@ -1,4 +1,7 @@
 <resources>
-    <string name="app_name" translatable="false">Cuer</string>
-    <string name="hub_app_name" translatable="false">Cuer Hub</string>
+    <string name="app_name">Cuer</string>
+    <string name="hub_app_name">Cuer Hub</string>
+
+    <string name="cast_dialog_not_connected">Not Connected</string>
+    <string name="cast_dialog_title">Cast Status</string>
 </resources>
