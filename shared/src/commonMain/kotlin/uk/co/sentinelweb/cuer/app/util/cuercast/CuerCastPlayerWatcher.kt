@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
@@ -43,7 +44,7 @@ class CuerCastPlayerWatcher(
                 field?.setCastDetails(CastDetails(CuerCast, Disconnected))
             } else if (value != null) {
                 value.addListener(controlsListener)
-                value.setCastDetails(CastDetails(CuerCast, Connected))
+                value.setCastDetails(CastDetails(CuerCast, Connected, remoteNode?.name()))
                 initPolling()
             }
             field = value

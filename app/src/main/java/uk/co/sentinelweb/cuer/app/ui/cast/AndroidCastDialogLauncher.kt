@@ -6,10 +6,16 @@ import androidx.fragment.app.FragmentActivity
 class AndroidCastDialogLauncher(
     private val activity: FragmentActivity
 ) : CastContract.CastDialogLauncher {
+
     private var dialogFragment: DialogFragment? = null
     override fun launchCastDialog() {
         dialogFragment = CastDialogFragment.newInstance()
         dialogFragment?.show(activity.supportFragmentManager, CAST_DIALOG_FRAGMENT_TAG)
+    }
+
+    override fun hideCastDialog() {
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = null
     }
 
     companion object {

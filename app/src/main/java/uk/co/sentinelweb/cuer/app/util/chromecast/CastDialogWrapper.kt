@@ -1,24 +1,27 @@
 package uk.co.sentinelweb.cuer.app.util.chromecast
 
-import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentTransaction
 import androidx.mediarouter.app.MediaRouteChooserDialogFragment
 import androidx.mediarouter.app.MediaRouteDialogFactory
 import com.google.android.gms.cast.framework.CastContext
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
 
-class CastDialogWrapper constructor(
+class CastDialogWrapper(
+    private val activity: FragmentActivity,
     private val chromeCastWrapper: ChromeCastWrapper
-) {
+) : ChromeCastContract.DialogWrapper {
     private val castContext: CastContext
         get() = chromeCastWrapper.getCastContext()
 
-    fun showRouteSelector(fragmentManager: FragmentManager) {
+    override fun showRouteSelector() {
         castContext.mergedSelector.apply {
-            val f: MediaRouteChooserDialogFragment = MediaRouteDialogFactory.getDefault().onCreateChooserDialogFragment()
+            val f: MediaRouteChooserDialogFragment =
+                MediaRouteDialogFactory.getDefault().onCreateChooserDialogFragment()
             f.routeSelector = this
             //f.setUseDynamicGroup(false)
 
-            val transaction: FragmentTransaction = fragmentManager.beginTransaction()
+            val transaction: FragmentTransaction = activity.supportFragmentManager.beginTransaction()
             transaction.add(f, CHOOSER_FRAGMENT_TAG)
             transaction.commitAllowingStateLoss()
         }

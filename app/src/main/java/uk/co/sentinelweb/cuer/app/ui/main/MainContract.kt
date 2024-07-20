@@ -19,6 +19,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
+import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
@@ -98,8 +100,9 @@ interface MainContract {
 
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
                 scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
-                scoped { CastController(get(), get(), get(), get(), get()) }
+                scoped { CastController(get(), get(), get(), get(), get(), get(), get()) }
                 scoped<CastContract.CastDialogLauncher> { AndroidCastDialogLauncher(get<MainActivity>()) }
+                scoped<ChromeCastContract.DialogWrapper> { CastDialogWrapper(get<MainActivity>(), get()) }
             }
         }
     }

@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -12,7 +12,7 @@ class MainPresenter(
     private val view: MainContract.View,
     private val state: MainContract.State,
     private val ytServiceManager: YoutubeCastServiceManager,
-    private val ytContextHolder: ChromeCastPlayerContextHolder,
+    private val ytContextHolder: ChromeCastContract.PlayerContextHolder,
     private val floatingPlayerServiceManager: FloatingPlayerContract.Manager,
     private val castListener: FloatingPlayerCastListener,
     private val log: LogWrapper,

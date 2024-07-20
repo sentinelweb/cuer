@@ -12,10 +12,11 @@ import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.*
 import com.google.android.gms.common.images.WebImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 
-class ChromeCastWrapper(private val application: Application) {
+class ChromeCastWrapper(private val application: Application) : ChromeCastContract.Wrapper {
 
     fun initMediaRouteButton(view: View) {
         val mediaRouteButton = view as androidx.mediarouter.app.MediaRouteButton
@@ -33,7 +34,8 @@ class ChromeCastWrapper(private val application: Application) {
 
     fun getCastContext(): CastContext = CastContext.getSharedInstance(application)
 
-    fun killCurrentSession() = getCastContext().sessionManager.endCurrentSession(true)
+    override fun killCurrentSession() = getCastContext().sessionManager.endCurrentSession(true)
+    override fun getCastDeviceName() = getCastSession()?.castDevice?.friendlyName
 
     fun addSessionListener(listener: SessionManagerListener<CastSession>) =
         getCastContext().sessionManager.addSessionManagerListener(listener, CastSession::class.java)

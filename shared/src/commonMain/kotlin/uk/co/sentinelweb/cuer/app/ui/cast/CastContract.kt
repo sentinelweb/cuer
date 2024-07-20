@@ -4,5 +4,7 @@ interface CastContract {
 
     interface CastDialogLauncher {
         fun launchCastDialog()
+
+        fun hideCastDialog()
     }
 }
