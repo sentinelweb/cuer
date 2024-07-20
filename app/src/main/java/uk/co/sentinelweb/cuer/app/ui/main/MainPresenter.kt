@@ -2,9 +2,9 @@ package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastYouTubePlayerContextHolderChrome
-import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -12,13 +12,13 @@ class MainPresenter(
     private val view: MainContract.View,
     private val state: MainContract.State,
     private val ytServiceManager: YoutubeCastServiceManager,
-    private val ytContextHolder: ChromecastYouTubePlayerContextHolderChrome,
+    private val ytContextHolder: ChromeCastPlayerContextHolder,
     private val floatingPlayerServiceManager: FloatingPlayerContract.Manager,
     private val castListener: FloatingPlayerCastListener,
     private val log: LogWrapper,
     private val autoBackupFileExporter: AutoBackupFileExporter,
     private val notificationPermissionCheckDialog: NotificationPermissionCheckDialog,
-    private val cuerCastWatcher: CuerCastPlayerWatcher,
+    private val castController: CastController,
 ) : MainContract.Presenter {
 
     init {
@@ -60,18 +60,9 @@ class MainPresenter(
             view.playerControls.reset()
             state.playControlsInit = true
         }
-        // todo check priorities maybe chromecast is lower?
-        if (ytContextHolder.isCreated() && ytContextHolder.isConnected()) {
-            ytContextHolder.playerUi = view.playerControls
-        } else if (floatingPlayerServiceManager.isRunning()) {
-            floatingPlayerServiceManager.get()?.external?.mainPlayerControls = view.playerControls
-        } else if (cuerCastWatcher.isWatching()) {
-            cuerCastWatcher.mainPlayerControls = view.playerControls
-        }
+        castController.checkCastConnection()
 
-        autoBackupFileExporter.attemptAutoBackup { result ->
-            view.promptToBackup(result)
-        }
+        autoBackupFileExporter.attemptAutoBackup { result -> view.promptToBackup(result) }
 
         notificationPermissionCheckDialog.checkToShow()
     }

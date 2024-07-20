@@ -20,6 +20,7 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
@@ -61,6 +62,7 @@ class CastPlayerFragment() :
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val log: LogWrapper by inject()
+    private val castController: CastController by scope.inject()
 
     init {
         log.tag(this)
@@ -145,6 +147,8 @@ class CastPlayerFragment() :
     override fun onAttach(context: Context) {
         super.onAttach(context)
         linkScopeToActivity()
+        // should be a better way to inject castController but seems to be a lot of circular refs
+        presenter.setCastController(castController)
     }
 
     override fun onDestroyView() {
@@ -298,7 +302,6 @@ class CastPlayerFragment() :
                         skipControl = get(),
                         playUseCase = get(),
                         playlistAndItemMapper = get(),
-                        castUseCase = get()
                     )
                 }
                 scoped<SkipContract.External> {

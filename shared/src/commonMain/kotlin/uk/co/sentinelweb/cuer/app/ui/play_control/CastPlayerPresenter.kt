@@ -1,10 +1,10 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.usecase.CastUseCase
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -20,12 +20,17 @@ class CastPlayerPresenter(
     private val skipControl: SkipContract.External,
     private val playUseCase: PlayUseCase,
     private val playlistAndItemMapper: PlaylistAndItemMapper,
-    private val castUseCase: CastUseCase,
 ) : CastPlayerContract.Presenter, PlayerContract.PlayerControls, SkipContract.Listener {
+
+    private lateinit var castController: CastController
 
     init {
         log.tag(this)
         skipControl.listener = this
+    }
+
+    override fun setCastController(castController: CastController) {
+        this.castController = castController
     }
 
     private var listener: PlayerContract.PlayerControls.Listener? = null
@@ -90,7 +95,7 @@ class CastPlayerPresenter(
     }
 
     override fun onCastClick() {
-        castUseCase.showCastDialog()
+        castController.showCastDialog()
     }
 
     override fun onSeekBackPressed() {

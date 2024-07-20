@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState
@@ -12,6 +13,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 interface CastPlayerContract {
 
     interface Presenter {
+        fun setCastController(castController: CastController)
         fun onSeekBackPressed()
         fun onSeekFwdPressed()
         fun onTrackBackPressed()
