@@ -9,14 +9,14 @@ import uk.co.sentinelweb.cuer.app.ui.common.views.CastVolumeControlView
  * - there is probably a better way to do it with cast API or a MediaButtonReceiver
  */
 class CuerSimpleVolumeController constructor(
-    private val cuerCastSessionListener: CuerCastSessionListener
+    private val chromeCastSessionListener: ChromeCastSessionListener
 ) {
     var controlView: CastVolumeControlView? = null
 
     fun handleVolumeKey(event: KeyEvent): Boolean {
         val action: Int = event.getAction()
         val keyCode: Int = event.getKeyCode()
-        return cuerCastSessionListener.currentCastSession?.let { castSession ->
+        return chromeCastSessionListener.currentCastSession?.let { castSession ->
             when (keyCode) {
                 KeyEvent.KEYCODE_VOLUME_UP -> {
                     if (action == KeyEvent.ACTION_DOWN) {

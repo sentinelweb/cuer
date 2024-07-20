@@ -64,8 +64,8 @@ class YoutubeCastConnectionListener constructor(
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
-        state.connectionState = Disconnected
-        playerUi?.setCastDetails(CastDetails(ChromeCast, Disconnected))
+        state.connectionState = Connected
+        playerUi?.setCastDetails(CastDetails(ChromeCast, Connected, castWrapper.getCastDeviceName()))
 
         youTubePlayerListener?.let {
             it.playerUi = playerUi
@@ -86,7 +86,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     override fun onChromecastDisconnected() {
-        state.connectionState = Connected
+        state.connectionState = Disconnected
         playerUi?.setCastDetails(CastDetails(ChromeCast, Disconnected))
 
         youTubePlayerListener?.onDisconnected()
@@ -95,7 +95,15 @@ class YoutubeCastConnectionListener constructor(
     }
 
     private fun restoreState() {
-        state.connectionState?.apply { playerUi?.setCastDetails(CastDetails(ChromeCast, this)) }
+        state.connectionState?.apply {
+            playerUi?.setCastDetails(
+                CastDetails(
+                    ChromeCast,
+                    this,
+                    castWrapper.getCastDeviceName()
+                )
+            )
+        }
         updateFromQueue()
     }
 

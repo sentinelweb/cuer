@@ -9,6 +9,10 @@ class CastDialogViewModel(
     private val _model = MutableStateFlow(CastDialogModel.blank)
     val model: Flow<CastDialogModel> = _model
 
+    init {
+        _model.value = castController.map()
+    }
+
     fun connectCuerCast() {
         // show remote nodes
     }
@@ -20,6 +24,7 @@ class CastDialogViewModel(
 
     fun connectChromeCast() {
         castController.connectChromeCast()
+        _model.value = castController.map()
     }
 
     fun disconnectChromeCast() {

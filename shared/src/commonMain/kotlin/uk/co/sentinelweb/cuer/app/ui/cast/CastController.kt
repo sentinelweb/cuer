@@ -55,7 +55,7 @@ class CastController(
         val connectedStatus = if (cuerCastPlayerWatcher.isWatching()) {
             "Cuer: " + cuerCastPlayerWatcher.remoteNode?.name()
         } else if (chromeCastHolder.isConnected()) {
-            "Chromecast:" + chromeCastWrapper.getCastDeviceName()
+            "Chromecast: " + chromeCastWrapper.getCastDeviceName()
         } else "Not Connected"
         return CastDialogModel(
             connectedStatus,

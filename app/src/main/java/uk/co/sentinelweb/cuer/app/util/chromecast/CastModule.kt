@@ -15,7 +15,7 @@ object CastModule {
     val castModule = module {
         single { ChromecastYouTubePlayerContextHolder(get(), get()) }
         single<ChromeCastContract.PlayerContextHolder> { get<ChromecastYouTubePlayerContextHolder>() }
-        single { CuerCastSessionListener(get(), get()) }
+        single { ChromeCastSessionListener(get(), get()) }
         factory { ChromeCastWrapper(androidApplication()) }
         factory<ChromeCastContract.Wrapper> { get<ChromeCastWrapper>() }
         factory { CuerSimpleVolumeController(get()) }

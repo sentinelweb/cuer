@@ -35,6 +35,7 @@ class ChromeCastWrapper(private val application: Application) : ChromeCastContra
     fun getCastContext(): CastContext = CastContext.getSharedInstance(application)
 
     override fun killCurrentSession() = getCastContext().sessionManager.endCurrentSession(true)
+
     override fun getCastDeviceName() = getCastSession()?.castDevice?.friendlyName
 
     fun addSessionListener(listener: SessionManagerListener<CastSession>) =

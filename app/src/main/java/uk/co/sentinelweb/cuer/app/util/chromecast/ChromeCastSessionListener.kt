@@ -5,7 +5,7 @@ import com.google.android.gms.cast.framework.SessionManagerListener
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 // https://developers.google.com/android/reference/com/google/android/gms/cast/framework/CastSession
-class CuerCastSessionListener constructor(
+class ChromeCastSessionListener constructor(
     private val chromeCastWrapper: ChromeCastWrapper,
     private val log: LogWrapper
 ) : SessionManagerListener<CastSession> {
