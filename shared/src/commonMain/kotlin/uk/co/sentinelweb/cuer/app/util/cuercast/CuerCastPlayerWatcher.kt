@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.cuercast
 
 import kotlinx.coroutines.*
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
@@ -10,7 +9,9 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCas
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
@@ -29,8 +30,10 @@ class CuerCastPlayerWatcher(
         log.tag(this)
     }
 
-    var watchLocator: Locator? = null
+    var remoteNode: RemoteNodeDomain? = null
+
     private var pollingJob: Job? = null
+
     var mainPlayerControls: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
@@ -49,10 +52,10 @@ class CuerCastPlayerWatcher(
 
     private fun initPolling() {
         pollingJob = coroutines.mainScope.launch {
-            while (isActive && watchLocator != null) {
-                val watcherLocator1 = watchLocator
+            while (isActive && remoteNode != null) {
+                val watcherLocator1 = remoteNode
                 if (watcherLocator1 != null) {
-                    remotePlayerInteractor.playerSessionStatus(watcherLocator1).data
+                    remotePlayerInteractor.playerSessionStatus(watcherLocator1.locator()).data
                         ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                         ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                         ?.apply {
@@ -78,7 +81,7 @@ class CuerCastPlayerWatcher(
     }
 
     fun isWatching(): Boolean =
-        watchLocator != null
+        remoteNode != null
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
         override fun play() {
@@ -119,9 +122,9 @@ class CuerCastPlayerWatcher(
 
     private fun dispatchCommand(command: PlayerSessionContract.PlayerCommandMessage) {
         coroutines.ioScope.launch {
-            watchLocator?.also { locator ->
+            remoteNode?.also { remoteNode ->
                 // todo return player status here too for update
-                remotePlayerInteractor.playerCommand(locator, command)
+                remotePlayerInteractor.playerCommand(remoteNode.locator(), command)
             }
         }
     }

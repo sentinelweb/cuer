@@ -18,7 +18,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserViewModel.Label
-import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -81,10 +80,6 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     }
 
     private fun observeLabels(label: Label) = when (label) {
-        Label.ConnectCuerCastToPlayer -> {
-            cuerCastPlayerWatcher.mainPlayerControls = (activity as MainActivity).playerControls
-        }
-
         Label.Init -> {}
     }
 
@@ -130,7 +125,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         mapper = get(),
                         playerInteractor = get(),
                         log = get(),
-                        cuerCastPlayerWatcher = get(),
+                        castController = get(),
                     )
                 }
             }

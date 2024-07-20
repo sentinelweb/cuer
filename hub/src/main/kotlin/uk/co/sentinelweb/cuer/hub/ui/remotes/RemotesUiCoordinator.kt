@@ -10,6 +10,7 @@ import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
@@ -116,11 +117,11 @@ class RemotesUiCoordinator :
                         locationPermissionLaunch = get(),
                         wifiStateProvider = get(),
                         getPlaylistsFromDeviceUseCase = get(),
-                        playlistsOrchestrator = get(),
-                        cuerCastPlayerWatcher = get(),
+                        castController = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
+                scoped { CastController(get(), get(), get(), get()) }
             }
         }
     }

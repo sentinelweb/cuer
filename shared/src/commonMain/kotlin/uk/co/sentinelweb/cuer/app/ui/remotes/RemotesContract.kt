@@ -49,7 +49,7 @@ class RemotesContract {
             object ActionConfig : Label()
             data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
             data class Message(val msg: String) : Label()
-            object CuerConnected : Label()
+            data class CuerConnected(val node: RemoteNodeDomain) : Label()
 
         }
 

@@ -396,6 +396,7 @@
     <!-- remotes -->
     <string name="remotes_menu_ping">Ping</string>
     <string name="remotes_cuer_connect">Connect</string>
+    <string name="remotes_cuer_connected">Connected to : %1$s</string>
 
     <!-- folders -->
     <string name="folders">Folders</string>

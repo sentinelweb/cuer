@@ -332,7 +332,8 @@ class CastPlayerFragment() :
                         coroutines = get(),
                         floatingService = get(),
                         playDialog = get(),
-                        strings = get()
+                        strings = get(),
+                        cuerCastPlayerWatcher = get()
                     )
                 }
                 scoped<PlayUseCase.Dialog> {

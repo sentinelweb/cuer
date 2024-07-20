@@ -10,13 +10,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.usecase.GetPlaylistsFromDeviceUseCase
-import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
@@ -24,7 +23,10 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteStatusInteractor
-import uk.co.sentinelweb.cuer.remote.server.*
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
+import uk.co.sentinelweb.cuer.remote.server.ServerState
+import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Ping
 
 class RemotesStoreFactory constructor(
@@ -40,8 +42,7 @@ class RemotesStoreFactory constructor(
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
     private val getPlaylistsFromDeviceUseCase: GetPlaylistsFromDeviceUseCase,
-    private val playlistsOrchestrator: PlaylistOrchestrator,
-    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher
+    private val castController: CastController,
 ) {
 
     init {
@@ -111,8 +112,8 @@ class RemotesStoreFactory constructor(
             }
 
         private fun cuerConnect(intent: Intent.CuerConnect) {
-            cuerCastPlayerWatcher.watchLocator = intent.remote.locator()
-            publish(Label.CuerConnected)
+            castController.connectCuerCast(intent.remote)
+            publish(Label.CuerConnected(intent.remote))
         }
 
         private fun deleteRemote(intent: Intent.RemoteDelete) {

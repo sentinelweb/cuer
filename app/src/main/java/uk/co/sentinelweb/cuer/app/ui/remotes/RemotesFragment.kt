@@ -40,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionOpener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.name
 
 class RemotesFragment : Fragment(), AndroidScopeComponent {
 
@@ -143,8 +144,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                             NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to label.remoteId.id.value))
                         )
 
-                        CuerConnected ->
-                            cuerCastPlayerWatcher.mainPlayerControls = (activity as MainActivity).playerControls
+                        is CuerConnected ->
+                            snackbarWrapper.make(getString(R.string.remotes_cuer_connected, label.node.name()))
                     }
                 }
             })
@@ -189,8 +190,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         locationPermissionLaunch = get(),
                         wifiStateProvider = get(),
                         getPlaylistsFromDeviceUseCase = get(),
-                        playlistsOrchestrator = get(),
-                        cuerCastPlayerWatcher = get(),
+                        castController = get(),
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }

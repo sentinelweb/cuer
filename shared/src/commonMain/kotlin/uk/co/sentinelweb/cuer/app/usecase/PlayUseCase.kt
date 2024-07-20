@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
@@ -21,6 +22,7 @@ class PlayUseCase constructor(
     private val floatingService: FloatingPlayerContract.Manager,
     private val playDialog: Dialog,
     private val strings: StringDecoder,
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
 ) {
 
     interface Dialog {
@@ -42,6 +44,10 @@ class PlayUseCase constructor(
         } else if (ytCastContextHolder.isConnected()) {
             playlistAndItem
                 .let { playItem(it, resetPos) }
+            // fixme enable when can play via cuer cast
+//        } else if (cuerCastPlayerWatcher.isWatching()) {
+//            playlistAndItem
+//                .let { playItem(it, resetPos) }
         } else {
             playDialog.showPlayDialog(playlistAndItem)
         }
