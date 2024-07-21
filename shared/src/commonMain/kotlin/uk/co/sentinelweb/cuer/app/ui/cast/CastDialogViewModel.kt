@@ -19,10 +19,12 @@ class CastDialogViewModel(
     }
 
     fun connectCuerCast() {
-        remotesLauncher.launchRemotesDialog { remoteNode ->
-            // todo screen selection
-            remotesLauncher.hideRemotesDialog()
-            castController.connectCuerCast(remoteNode)
+        if (!_model.value.cuerCastStatus.isConnected) {
+            remotesLauncher.launchRemotesDialog { remoteNode ->
+                // todo screen selection
+                remotesLauncher.hideRemotesDialog()
+                castController.connectCuerCast(remoteNode)
+            }
         }
     }
 
@@ -39,8 +41,10 @@ class CastDialogViewModel(
     }
 
     fun connectChromeCast() {
-        castController.connectChromeCast()
-        _model.value = castController.map()
+        if (!_model.value.chromeCastStatus.isConnected) {
+            castController.connectChromeCast()
+            _model.value = castController.map()
+        }
     }
 
     fun disconnectChromeCast() {

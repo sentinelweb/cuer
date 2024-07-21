@@ -82,7 +82,7 @@ object CastDialogComposeables {
                 .height(64.dp)
                 .clickable { viewModel.connectCuerCast() }
             ) {
-                val icon = if (model.connected) Res.drawable.ic_cuer_cast_connected else Res.drawable.ic_cuer_cast
+                val icon = if (model.isConnected) Res.drawable.ic_cuer_cast_connected else Res.drawable.ic_cuer_cast
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Cuer cast Icon",
@@ -95,7 +95,7 @@ object CastDialogComposeables {
                 Column(
                     Modifier
                         .align(Alignment.CenterVertically)
-                        .fillMaxWidth(if (model.connected) 0.8f else 1.0f)
+                        .fillMaxWidth(if (model.isConnected) 0.8f else 1.0f)
                 ) {
                     Text(
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
@@ -106,7 +106,7 @@ object CastDialogComposeables {
                 }
 
             }
-            if (model.connected) {
+            if (model.isConnected) {
                 Row(
                     Modifier
                         .align(Alignment.CenterEnd)
@@ -150,7 +150,7 @@ object CastDialogComposeables {
                 .height(64.dp)
                 .clickable { viewModel.connectChromeCast() }
             ) {
-                val icon = if (model.connected) Res.drawable.ic_chromecast_connected else Res.drawable.ic_chromecast
+                val icon = if (model.isConnected) Res.drawable.ic_chromecast_connected else Res.drawable.ic_chromecast
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Cuer cast Icon",
@@ -162,7 +162,7 @@ object CastDialogComposeables {
                 Column(
                     Modifier
                         .align(Alignment.CenterVertically)
-                        .fillMaxWidth(if (model.connected) 0.8f else 1.0f)
+                        .fillMaxWidth(if (model.isConnected) 0.8f else 1.0f)
                 ) {
                     Text(
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
@@ -172,7 +172,7 @@ object CastDialogComposeables {
                     )
                 }
             }
-            if (model.connected) {
+            if (model.isConnected) {
                 Icon(
                     Icons.Default.Clear,
                     contentDescription = "Cuer cast disconnect",
