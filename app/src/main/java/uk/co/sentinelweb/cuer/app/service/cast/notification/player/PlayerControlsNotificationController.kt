@@ -29,7 +29,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class PlayerControlsNotificationController constructor(
+class PlayerControlsNotificationController(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationContract.State,
     private val toastWrapper: ToastWrapper,
@@ -37,7 +37,7 @@ class PlayerControlsNotificationController constructor(
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionContract.Manager,
-) : External, Controller, SkipContract.Listener {
+) : External, Controller, SkipContract.Listener, PlayerContract.PlayerControls {
 
     private var listener: Listener? = null
 
@@ -201,6 +201,7 @@ class PlayerControlsNotificationController constructor(
 //    }
     override fun setCastDetails(details: CastDetails) {
         if (listOf(ChromeCast, CuerCast).contains(details.target) && details.connectionState == Connected) {
+            // fixme check if this should uncomment
             //view.stopSelf()
         }
     }

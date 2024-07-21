@@ -5,15 +5,13 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 interface ChromecastContract {
     interface PlayerContextHolder {
 
-        var playerUi: PlayerContract.PlayerControls?
+        var mainPlayerControls: PlayerContract.PlayerControls?
 
         fun create()
 
         fun isCreated(): Boolean
 
         fun isConnected(): Boolean
-
-        fun onDisconnected()
 
         fun destroy()
     }

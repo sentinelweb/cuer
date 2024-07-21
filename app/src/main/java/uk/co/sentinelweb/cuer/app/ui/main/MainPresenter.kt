@@ -66,9 +66,9 @@ class MainPresenter(
 
     override fun onStop() {
         floatingPlayerServiceManager.get()?.external?.mainPlayerControls = null
-        ytContextHolder.playerUi = null
+        ytContextHolder.mainPlayerControls = null
         if (!view.isRecreating()) {
-            castController.switchToNotification()
+            castController.switchToService()
         }
     }
 

@@ -1,12 +1,11 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
 interface PlayerControlsNotificationContract {
 
-    interface External : PlayerContract.PlayerControls {
+    interface External {
         fun handleAction(action: String?)
         fun destroy()
         fun setIcon(icon: Int)

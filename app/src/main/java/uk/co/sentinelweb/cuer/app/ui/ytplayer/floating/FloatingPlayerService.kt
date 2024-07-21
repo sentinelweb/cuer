@@ -23,7 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
@@ -124,7 +124,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         skip = get(),
                         coroutines = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        livePlaybackController = get(named(LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         mediaSessionListener = get(),
                         mediaOrchestrator = get(),
@@ -133,7 +133,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         playerSessionListener = get(),
                     ).create()
                 }
-                scoped { FloatingWindowMviView(get(), get(), get(), get()) }
+                scoped { FloatingWindowMviView(get(), get(), get(), get(), get()) }
                 scoped { FloatingWindowManagement(get(), get(), get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
@@ -153,13 +153,13 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         toastWrapper = get(),
                         skipControl = EmptySkipPresenter(),
                         mediaSessionManager = get(),
-                        res = get()
+//                        res = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {
                     get<PlayerControlsNotificationController>()
                 }
-                scoped<PlayerControlsNotificationContract.Controller> {
+                scoped<PlayerContract.PlayerControls> {
                     get<PlayerControlsNotificationController>()
                 }
                 scoped<PlayerControlsNotificationContract.View> {

@@ -20,6 +20,7 @@ class FloatingWindowMviView(
     private val aytViewHolder: AytViewHolder,
     private val windowManagement: FloatingWindowManagement,
     private val notification: PlayerControlsNotificationContract.External,
+    private val playerControls: PlayerContract.PlayerControls,
 ) : BaseMviView<Model, Event>(),
     PlayerContract.View {
 
@@ -51,7 +52,7 @@ class FloatingWindowMviView(
 
     override val renderer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
-            notification.setPlayerState(it)
+            playerControls.setPlayerState(it)
             mainPlayControls
                 ?.apply { setPlayerState(it) }
             windowManagement.setPlayerState(it)
@@ -62,7 +63,7 @@ class FloatingWindowMviView(
         })
         diff(get = Model::playlistAndItem, set = { playlistAndItem ->
             currentItem = playlistAndItem
-            notification.setPlaylistItem(playlistAndItem?.item)
+            playerControls.setPlaylistItem(playlistAndItem?.item)
             mainPlayControls?.apply {
                 playlistAndItem?.item?.also { item ->
                     item.media.duration?.let { setDuration(it / 1000f) }

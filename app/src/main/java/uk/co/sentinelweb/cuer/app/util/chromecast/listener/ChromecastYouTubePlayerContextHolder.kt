@@ -13,7 +13,7 @@ class ChromecastYouTubePlayerContextHolder(
     private var context: ChromecastYouTubePlayerContext? = null
     private var listener: YoutubeCastConnectionListener? = null
 
-    override var playerUi: PlayerContract.PlayerControls? = null
+    override var mainPlayerControls: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
             field = value
@@ -22,7 +22,7 @@ class ChromecastYouTubePlayerContextHolder(
 
     override fun create() {
         listener = creator.createConnectionListener().also { listener ->
-            this.playerUi = playerUi
+            this.mainPlayerControls = mainPlayerControls
             creator.createContext(chromeCastWrapper.getCastContext(), listener).also { context ->
                 this@ChromecastYouTubePlayerContextHolder.context = context
                 listener.setContext(context)
@@ -32,10 +32,7 @@ class ChromecastYouTubePlayerContextHolder(
 
     override fun isCreated() = context != null
 
-    override fun isConnected() =
-        listener?.isConnected() ?: false
-
-    override fun onDisconnected(): Unit = TODO()
+    override fun isConnected() = listener?.isConnected() ?: false
 
     override fun destroy() {
         listener?.destroy()

@@ -69,7 +69,6 @@ import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 import java.util.prefs.Preferences
 
-
 object Modules {
 
     private val scopedModules = listOf(

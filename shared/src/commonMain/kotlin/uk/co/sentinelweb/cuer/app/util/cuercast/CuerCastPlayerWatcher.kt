@@ -145,7 +145,7 @@ class CuerCastPlayerWatcher(
         cleanup()
     }
 
-    private fun cleanup() {
+    fun cleanup() {
         pollingJob?.cancel()
         pollingJob = null
         mainPlayerControls?.reset()

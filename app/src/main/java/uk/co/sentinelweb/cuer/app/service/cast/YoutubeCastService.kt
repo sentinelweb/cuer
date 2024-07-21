@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -78,10 +79,11 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
                 scoped<YoutubeCastServiceContract.Controller> {
                     YoutubeCastServiceController(
                         service = get<YoutubeCastService>(),
-                        ytContextHolder = get(),
+//                        ytContextHolder = get(),
                         notification = get(),
-                        chromeCastWrapper = get(),
-                        log = get()
+//                        chromeCastWrapper = get(),
+                        castController = get(),
+                        log = get(),
                     )
                 }
                 scoped {
@@ -95,6 +97,12 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
                         mediaSessionManager = get(),
                     )
                 }
+                scoped<PlayerControlsNotificationContract.External> {
+                    get<PlayerControlsNotificationController>()
+                }
+                scoped<PlayerContract.PlayerControls> {
+                    get<PlayerControlsNotificationController>()
+                }
                 scoped<SkipContract.External> {
                     SkipPresenter(
                         view = EmptySkipView(),
@@ -103,9 +111,6 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
                         mapper = get(),
                         prefsWrapper = get()
                     )
-                }
-                scoped<PlayerControlsNotificationContract.External> {
-                    get<PlayerControlsNotificationController>()
                 }
                 scoped<PlayerControlsNotificationContract.View> {
                     PlayerControlsNotificationMedia(

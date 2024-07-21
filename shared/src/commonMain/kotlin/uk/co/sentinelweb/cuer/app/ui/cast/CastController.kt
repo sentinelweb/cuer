@@ -28,7 +28,7 @@ class CastController(
         ytServiceManager.stop()
         // todo check priorities maybe chromecast is lower?
         if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
-            chromeCastHolder.playerUi = playerControls
+            chromeCastHolder.mainPlayerControls = playerControls
         } else if (floatingManager.isRunning()) {
             floatingManager.get()?.external?.mainPlayerControls = playerControls
         } else if (cuerCastPlayerWatcher.isWatching()) {
@@ -36,13 +36,42 @@ class CastController(
         }
     }
 
-    fun switchToNotification() {
-        // todo handle cuer cast
-        if (chromeCastHolder.isCreated() && !chromeCastHolder.isConnected()) {
-            chromeCastHolder.destroy()
-        } else {
-            ytServiceManager.start()
+    fun initialiseForService() {
+        if (cuerCastPlayerWatcher.isWatching()) {
+            cuerCastPlayerWatcher.mainPlayerControls = playerControls
+        } else if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
+            chromeCastHolder.mainPlayerControls = playerControls
         }
+    }
+
+    // rules:
+    // if cuercast then switch that to service - start svc
+    // else if chromecast then switch to that - start svc
+    // else - dont start service
+    fun switchToService() {
+        if (cuerCastPlayerWatcher.isWatching()) {
+            cuerCastPlayerWatcher.mainPlayerControls = null
+            ytServiceManager.start()
+            chromeCastHolder.destroy() // kills any existing chromecast session
+        } else if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
+            ytServiceManager.start()
+        } else {
+            cuerCastPlayerWatcher.cleanup()
+            chromeCastHolder.destroy()
+        }
+    }
+
+    // player controls is notification in the service instance of this class
+    // todo check this is needed - possibly for floting player?
+    fun onServiceDestroy() {
+        if (chromeCastHolder.mainPlayerControls == playerControls) {
+            chromeCastHolder.destroy()
+        }
+    }
+
+    fun killCurrentSession() {
+        chromeCastHolder.destroy()
+        cuerCastPlayerWatcher.cleanup()
     }
 
     fun connectCuerCast(node: RemoteNodeDomain?) {
