@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.app.ui.cast
+package uk.co.sentinelweb.cuer.app.ui.remotes.selector
 
 import android.content.Context
 import android.os.Bundle
@@ -13,15 +13,20 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
-class CastDialogFragment : DialogFragment(), AndroidScopeComponent {
+class RemotesDialogFragment(
+    private val selectedListener: (RemoteNodeDomain) -> Unit
+) : DialogFragment(), AndroidScopeComponent {
 
-    override val scope: Scope by fragmentScopeWithSource<CastDialogFragment>()
-    private val viewModel: CastDialogViewModel by inject()
+    override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
+    private val viewModel: RemotesDialogViewModel by inject()
     private val log: LogWrapper by inject()
+    private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -53,8 +58,9 @@ class CastDialogFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewModel.listener = selectedListener
         binding.composeView.setContent {
-            CastDialogComposeables.CastDialogUi(viewModel)
+            RemotesDialogComposeables.RemotesDialogUi(viewModel)
         }
     }
 
@@ -66,6 +72,7 @@ class CastDialogFragment : DialogFragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
+        compactPlayerScroll.raisePlayer(this)
     }
 
     override fun onResume() {
@@ -78,17 +85,18 @@ class CastDialogFragment : DialogFragment(), AndroidScopeComponent {
     }
 
     companion object {
-        fun newInstance(): CastDialogFragment {
-            return CastDialogFragment()
+        fun newInstance(selected: (RemoteNodeDomain) -> Unit): RemotesDialogFragment {
+            return RemotesDialogFragment(selected)
         }
 
         @JvmStatic
         val fragmentModule = module {
-            scope(named<CastDialogFragment>()) {
+            scope(named<RemotesDialogFragment>()) {
                 scoped {
-                    CastDialogViewModel(
-                        castController = get(),
-                        remotesLauncher = get()
+                    RemotesDialogViewModel(
+                        repo = get(),
+                        mapper = get(),
+                        coroutines = get()
                     )
                 }
             }

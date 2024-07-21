@@ -28,7 +28,7 @@ class RemotesModelMapper constructor(
     }
 
     // todo different model type for remote
-    private fun mapRemoteNode(it: RemoteNodeDomain): RemoteNodeModel =
+    fun mapRemoteNode(it: RemoteNodeDomain): RemoteNodeModel =
         RemoteNodeModel(
             id = it.id,
             title = it.hostname ?: it.ipAddress,

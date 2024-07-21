@@ -36,6 +36,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
@@ -166,6 +167,7 @@ object SharedAppModule {
                 log = get(),
             )
         }
+
     }
 
     private val playerModule = module {
@@ -225,6 +227,7 @@ object SharedAppModule {
             )
         }
         factory { FilesModelMapper() }
+        factory { RemotesModelMapper(get(), get()) }
     }
 
     val modules = listOf(utilModule)

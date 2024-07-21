@@ -193,7 +193,6 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         castController = get(),
                     )
                 }
-                scoped { RemotesModelMapper(get(), get()) }
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }

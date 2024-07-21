@@ -49,6 +49,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesFragment
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -150,6 +151,7 @@ object Modules {
         UpdateService.serviceModule,
         FileBrowserFragment.fragmentModule,
         CastDialogFragment.fragmentModule,
+        RemotesDialogFragment.fragmentModule,
     )
 
     private val uiModule = module {

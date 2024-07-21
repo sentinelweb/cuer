@@ -12,11 +12,12 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
@@ -36,9 +37,7 @@ import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
-import uk.co.sentinelweb.cuer.hub.ui.player.EmptyChromeCastPlayerContextHolder
-import uk.co.sentinelweb.cuer.hub.ui.player.EmptyFloatingPlayerManager
-import uk.co.sentinelweb.cuer.hub.ui.player.EmptyPlayerControls
+import uk.co.sentinelweb.cuer.hub.ui.player.cast.*
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
@@ -152,8 +151,11 @@ object Modules {
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
         factory<PlayerContract.PlayerControls> { EmptyPlayerControls() }
-        factory<ChromeCastPlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
+        factory<ChromeCastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
         factory<FloatingPlayerContract.Manager> { EmptyFloatingPlayerManager() }
+        factory<ChromeCastContract.DialogWrapper> { EmptyChromeCastDialogWrapper() }
+        factory<ChromeCastContract.Wrapper> { EmptyChromeCastWrapper() }
+        factory<CastContract.CastDialogLauncher> { EmptyCastDialogLauncher() }
     }
 
     val allModules = listOf(resourcesModule)

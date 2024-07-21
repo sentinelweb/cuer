@@ -56,6 +56,7 @@ class CuerCastPlayerWatcher(
             while (isActive && remoteNode != null) {
                 val watcherLocator1 = remoteNode
                 if (watcherLocator1 != null) {
+                    log.d("poll remotePlayerInteractor.playerSessionStatus")
                     remotePlayerInteractor.playerSessionStatus(watcherLocator1.locator()).data
                         ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                         ?.apply { mainPlayerControls?.setPlaylistItem(item) }

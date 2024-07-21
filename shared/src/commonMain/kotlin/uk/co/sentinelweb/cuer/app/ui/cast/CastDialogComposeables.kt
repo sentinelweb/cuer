@@ -20,6 +20,7 @@ import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object CastDialogComposeables {
+
     @Composable
     fun CastDialogUi(viewModel: CastDialogViewModel) {
         val state = viewModel.model.collectAsState(initial = CastDialogModel.blank)
@@ -81,7 +82,7 @@ object CastDialogComposeables {
                 .height(64.dp)
                 .clickable { viewModel.connectCuerCast() }
             ) {
-                val icon = if (model.connected) Res.drawable.ic_cuer_cast else Res.drawable.ic_cuer_cast_connected
+                val icon = if (model.connected) Res.drawable.ic_cuer_cast_connected else Res.drawable.ic_cuer_cast
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Cuer cast Icon",
@@ -131,7 +132,7 @@ object CastDialogComposeables {
                 .height(64.dp)
                 .clickable { viewModel.connectChromeCast() }
             ) {
-                val icon = if (model.connected) Res.drawable.ic_chromecast else Res.drawable.ic_chromecast_connected
+                val icon = if (model.connected) Res.drawable.ic_chromecast_connected else Res.drawable.ic_chromecast
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Cuer cast Icon",
@@ -139,7 +140,6 @@ object CastDialogComposeables {
                         .size(48.dp)
                         .padding(8.dp)
                         .align(Alignment.CenterVertically)
-
                 )
                 Column(
                     Modifier
@@ -153,7 +153,6 @@ object CastDialogComposeables {
                             .padding(16.dp),
                     )
                 }
-
             }
             if (model.connected) {
                 Icon(

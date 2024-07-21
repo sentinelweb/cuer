@@ -6,9 +6,9 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
-import uk.co.sentinelweb.cuer.app.ui.cast.AndroidCastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
@@ -18,6 +18,8 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
@@ -101,8 +103,9 @@ interface MainContract {
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
                 scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
                 scoped { CastController(get(), get(), get(), get(), get(), get(), get()) }
-                scoped<CastContract.CastDialogLauncher> { AndroidCastDialogLauncher(get<MainActivity>()) }
+                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(get<MainActivity>()) }
                 scoped<ChromeCastContract.DialogWrapper> { CastDialogWrapper(get<MainActivity>(), get()) }
+                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get<MainActivity>()) }
             }
         }
     }

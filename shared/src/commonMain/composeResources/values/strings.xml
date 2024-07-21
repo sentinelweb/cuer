@@ -4,4 +4,8 @@
 
     <string name="cast_dialog_not_connected">Not Connected</string>
     <string name="cast_dialog_title">Cast Status</string>
+
+    <!-- remotes -->
+    <string name="remotes_dialog_title">Select Remote</string>
+
 </resources>

@@ -3,7 +3,8 @@ package uk.co.sentinelweb.cuer.app.ui.cast
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 
-class AndroidCastDialogLauncher(
+// fixme memory leak somewhere - see leak canary
+class CastDialogLauncher(
     private val activity: FragmentActivity
 ) : CastContract.CastDialogLauncher {
 

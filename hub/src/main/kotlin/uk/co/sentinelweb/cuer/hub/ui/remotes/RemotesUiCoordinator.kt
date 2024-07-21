@@ -121,7 +121,7 @@ class RemotesUiCoordinator :
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
-                scoped { CastController(get(), get(), get(), get()) }
+                scoped { CastController(get(), get(), get(), get(), get(), get(), get()) }
             }
         }
     }

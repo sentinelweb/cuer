@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.hub.ui.player
+package uk.co.sentinelweb.cuer.hub.ui.player.cast
 
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
