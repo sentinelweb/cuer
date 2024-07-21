@@ -179,7 +179,7 @@ object SharedAppModule {
         single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
         single { PlayerEventToIntentMapper }
         single { PlayerSessionMessageMapper() }
-        factory { PlayerMessageToIntentMapper(get()) }
+        factory { PlayerMessageToIntentMapper(get(), get()) }
         single { CuerCastPlayerWatcher(CuerCastPlayerWatcher.State(), get(), get(), get()) }
     }
 

@@ -24,7 +24,7 @@ fun deserialiseMulti(json: String) = messageJsonSerializer.decodeFromString(Avai
 fun PlayerCommandMessage.serialise() =
     messageJsonSerializer.encodeToString(PlayerCommandMessage.serializer(), this)
 
-fun deserialisePlayer(json: String) =
+fun deserialisePlayerCommandMessage(json: String) =
     messageJsonSerializer.decodeFromString(PlayerCommandMessage.serializer(), json)
 
 fun RequestMessage.serialise() = messageJsonSerializer.encodeToString(RequestMessage.serializer(), this)

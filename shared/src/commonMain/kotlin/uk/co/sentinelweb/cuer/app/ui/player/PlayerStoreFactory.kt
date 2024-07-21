@@ -141,6 +141,7 @@ class PlayerStoreFactory(
                 Intent.StarClick -> toggleStar(getState().item).let { Unit }
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
+                Intent.Stop -> publish(Label.Stop)
             }
 
         private fun receiveDuration(intent: Intent.Duration) {

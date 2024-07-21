@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerC
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerStatusMessage
 
 interface RemotePlayerInteractor {
-    suspend fun playerCommand(locator: Locator, message: PlayerCommandMessage): NetResult<Boolean>
+    suspend fun playerCommand(locator: Locator, message: PlayerCommandMessage): NetResult<PlayerStatusMessage>
 
     suspend fun getPlayerConfig(locator: Locator): NetResult<PlayerNodeDomain>
 

@@ -5,10 +5,10 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.ext.replaceUrlPlaceholder
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_ARG0
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_STATUS_API
 import uk.co.sentinelweb.cuer.remote.server.ipport
@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerC
 internal class RemotePlayerService(
     private val executor: ServiceExecutor
 ) {
-    internal suspend fun executeCommand(locator: Locator, message: PlayerCommandMessage) {
+    internal suspend fun executeCommand(locator: Locator, message: PlayerCommandMessage): ResponseMessage {
         val command = when (message) {
             is PlayPause -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "PlayPause")
@@ -44,13 +44,16 @@ internal class RemotePlayerService(
 
             TrackFwd -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "TrackFwd")
+
+            Stop -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "Stop")
         }
-        executor.getResponseDomain(path = locator.ipport() + command)
+        return executor.getResponseMessage(path = locator.ipport() + command)
     }
 
     internal suspend fun executeGetConfig(locator: Locator): ResponseDomain =
         executor.getResponseDomain(
-            path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
+            path = locator.ipport() + PLAYER_CONFIG_API.PATH
         )
 
     internal suspend fun executeLaunchVideo(

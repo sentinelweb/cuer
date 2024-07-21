@@ -300,7 +300,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
                     )
                     finish()
                 }
-
+                is Stop -> finish()
                 else -> Unit
             }
         }

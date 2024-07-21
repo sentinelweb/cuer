@@ -107,15 +107,33 @@ object CastDialogComposeables {
 
             }
             if (model.connected) {
-                Icon(
-                    Icons.Default.Clear,
-                    contentDescription = "Cuer cast disconnect",
-                    modifier = Modifier
-                        .height(48.dp)
-                        .padding(8.dp)
+                Row(
+                    Modifier
                         .align(Alignment.CenterEnd)
-                        .clickable { viewModel.disconnectCuerCast() }
-                )
+                        .height(64.dp)
+                ) {
+                    if (model.isPlaying) {
+                        Image(
+                            painter = painterResource(Res.drawable.ic_stop),
+                            contentDescription = "Cuer cast Icon",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(8.dp)
+                                .align(Alignment.CenterVertically)
+                                .clickable { viewModel.stopCuerCast() }
+                        )
+                    }
+                    Icon(
+                        Icons.Default.Clear,
+                        contentDescription = "Cuer cast disconnect",
+                        modifier = Modifier
+                            .height(48.dp)
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically)
+                            .clickable { viewModel.disconnectCuerCast() }
+                    )
+
+                }
             }
         }
     }

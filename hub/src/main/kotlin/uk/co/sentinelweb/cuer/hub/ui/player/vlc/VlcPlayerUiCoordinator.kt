@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Stop
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -105,6 +106,7 @@ class VlcPlayerUiCoordinator(
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
         when (label) {
             is Command -> playerWindow.playStateChanged(label.command)
+            Stop -> destroyPlayerWindow()
             else -> log.d("Unprocessed label: $label")
         }
     }
@@ -124,14 +126,14 @@ class VlcPlayerUiCoordinator(
         })
     }
 
-    fun playerWindowDestroyed() {
+    fun destroyPlayerWindow() {
         parent.killPlayer()
     }
 
     fun setupPlaylistAndItem(
         item: PlaylistItemDomain,
         playlist: PlaylistDomain,
-        screenIndex: Int = PREFERRED_SCREEN_DEFAULT
+        screenIndex: Int?
     ) {
         coroutines.mainScope.launch {
             playlistId = playlist.id
@@ -146,7 +148,7 @@ class VlcPlayerUiCoordinator(
                     item = item
                 )
             )
-            this@VlcPlayerUiCoordinator.screenIndex = screenIndex
+            this@VlcPlayerUiCoordinator.screenIndex = screenIndex ?: PREFERRED_SCREEN_DEFAULT
             create() // initialises the player controller
         }
     }

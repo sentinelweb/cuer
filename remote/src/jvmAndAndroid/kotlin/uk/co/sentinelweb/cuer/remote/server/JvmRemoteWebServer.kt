@@ -247,15 +247,19 @@ class JvmRemoteWebServer(
                             SkipBack::class.java.simpleName -> SkipBack
                             TrackFwd::class.java.simpleName -> TrackFwd
                             TrackBack::class.java.simpleName -> TrackBack
+                            Stop::class.java.simpleName -> Stop
                             PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
                             SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
                             else -> null
                         }?.also {
                             // fixme get operation success and return the code
                             logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
-                            playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
-                                ?.also { call.respond(HttpStatusCode.OK) }
-                                ?: call.error(HttpStatusCode.BadRequest, "player session invalid")
+                            playerSessionHolder.playerSession
+                                ?.apply { controlsListener.messageRecieved(it) }
+                                ?.let { playerSessionMessageMapper.map(it) }
+                                ?.let { ResponseMessage(it) }
+                                ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                                ?: call.error(HttpStatusCode.ServiceUnavailable, "player session not available")
                         } ?: call.error(HttpStatusCode.BadRequest, "url is required")
                     } catch (e: NumberFormatException) {
                         call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
@@ -271,7 +275,7 @@ class JvmRemoteWebServer(
                             //?.also{logWrapper.d("Mapped player status message: $it")}
                             ?.let { ResponseMessage(it) }
                             ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
-                            ?: call.error(HttpStatusCode.BadRequest, "player session invalid")
+                            ?: call.error(HttpStatusCode.ServiceUnavailable, "player session invalid")
                     } catch (e: NumberFormatException) {
                         call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
                     } catch (e: Exception) {
@@ -296,13 +300,11 @@ class JvmRemoteWebServer(
                     try {
                         (postData)
                             .let { deserialisePlaylistItem(it) }
-//                            .also { logWrapper.d("item rx:" + it.summarise()) }
-//                            .also { logWrapper.d("screen index:" + call.parameters[P_SCREEN_INDEX]) }
                             .let { item ->
                                 remotePlayerLaunchHost.launchVideo(
                                     item,
                                     // todo send bad request if no P_SCREEN_INDEX
-                                    call.parameters[P_SCREEN_INDEX]?.toInt() ?: 0
+                                    call.parameters[P_SCREEN_INDEX]?.toInt()
                                 )
                             }
                             .also { call.respond(HttpStatusCode.OK) }

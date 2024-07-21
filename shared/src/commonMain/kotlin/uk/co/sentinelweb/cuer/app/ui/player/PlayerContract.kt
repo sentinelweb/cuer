@@ -29,6 +29,7 @@ interface PlayerContract {
             object PipPlayerOpen : Intent()
             object Support : Intent()
             object StarClick : Intent()
+            object Stop : Intent()
 
             object OpenInApp : Intent()
             object Share : Intent()
@@ -49,6 +50,7 @@ interface PlayerContract {
         }
 
         sealed class Label {
+            object Stop : Label()
             data class Command(val command: PlayerCommand) : Label()
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Label()
             data class ChannelOpen(val channel: ChannelDomain) : Label()

@@ -254,6 +254,8 @@ class AytLandActivity : AppCompatActivity(),
                 }
 
                 is ShowSupport -> SupportDialogFragment.show(this@AytLandActivity, label.item.media)
+
+                is Stop -> finish()
                 else -> Unit
             }
         }

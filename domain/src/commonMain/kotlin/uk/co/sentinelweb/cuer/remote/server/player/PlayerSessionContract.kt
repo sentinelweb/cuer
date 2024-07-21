@@ -32,6 +32,7 @@ interface PlayerSessionContract {
         object SkipBack : PlayerCommandMessage()
         object TrackFwd : PlayerCommandMessage()
         object TrackBack : PlayerCommandMessage()
+        object Stop : PlayerCommandMessage()
         data class PlayPause(val isPlaying: Boolean?) : PlayerCommandMessage()
         data class TrackSelected(val itemId: OrchestratorContract.Identifier<GUID>, val resetPosition: Boolean) :
             PlayerCommandMessage()

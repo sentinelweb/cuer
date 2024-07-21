@@ -23,13 +23,17 @@ class YoutubeCastServiceController constructor(
 
     override fun initialise() {
 //        notification.setIcon(R.drawable.ic_notif_status_cast_conn_white)
+
+        // fixme why is this here?
         notification.setIcon(R.drawable.ic_play_yang_combined)
+        // todo set into castcontroller (create inject from service di config)
         ytContextHolder.playerUi = notification
     }
 
     override fun handleAction(action: String?) {
         when (action) {
             ACTION_DISCONNECT -> {
+                // todo unify this in cast controller
                 chromeCastWrapper.killCurrentSession()
                 service.stopSelf()
             }

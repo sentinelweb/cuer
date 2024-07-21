@@ -110,7 +110,7 @@ class VlcPlayerSwingWindow(
         // Handle window closing operation
         this.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent) {
-                coordinator.playerWindowDestroyed()
+                coordinator.destroyPlayerWindow()
             }
         })
         this.isVisible = true
@@ -263,7 +263,7 @@ class VlcPlayerSwingWindow(
         stopButton = JButton("Stop").apply {
             buttonsPane.add(this)
             setIcon(loadSVG("drawable/ic_stop.svg", Black, 24).toImageIcon())
-            addActionListener { coordinator.playerWindowDestroyed() }
+            addActionListener { coordinator.destroyPlayerWindow() }
             isVisible = this@VlcPlayerSwingWindow.isUndecorated
         }
         forwardButton = JButton("Skip").apply {

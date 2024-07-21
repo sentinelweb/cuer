@@ -11,7 +11,8 @@ class PlayerSessionMessageMapper {
             item = PlaylistItemDomain(
                 media = session.media!!, // fixme remove !!
                 dateAdded = Clock.System.now(),
-                order = 0, playlistId = null
+                order = 0,
+                playlistId = null
             ),
             liveOffset = session.liveOffset ?: 0,
             playbackState = session.playbackState ?: PlayerStateDomain.UNKNOWN

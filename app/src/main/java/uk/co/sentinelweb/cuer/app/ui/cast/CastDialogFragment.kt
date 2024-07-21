@@ -88,7 +88,8 @@ class CastDialogFragment : DialogFragment(), AndroidScopeComponent {
                 scoped {
                     CastDialogViewModel(
                         castController = get(),
-                        remotesLauncher = get()
+                        remotesLauncher = get(),
+                        coroutines = get()
                     )
                 }
             }

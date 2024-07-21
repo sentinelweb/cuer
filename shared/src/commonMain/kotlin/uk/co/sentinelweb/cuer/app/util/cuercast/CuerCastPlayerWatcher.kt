@@ -9,8 +9,10 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCas
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
+import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
@@ -51,28 +53,18 @@ class CuerCastPlayerWatcher(
             //currentButtons?.let { value?.setButtons(it) }
         }
 
+    fun isWatching(): Boolean = remoteNode != null
+
+    fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
+
     private fun initPolling() {
         pollingJob = coroutines.mainScope.launch {
             while (isActive && remoteNode != null) {
                 val watcherLocator1 = remoteNode
                 if (watcherLocator1 != null) {
-                    log.d("poll remotePlayerInteractor.playerSessionStatus")
-                    remotePlayerInteractor.playerSessionStatus(watcherLocator1.locator()).data
-                        ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
-                        ?.apply { mainPlayerControls?.setPlaylistItem(item) }
-                        ?.apply {
-                            item.media.duration?.let {
-                                mainPlayerControls?.setDuration(it / 1000f)
-                            }
-                        }
-//                        ?.apply { mainPlayerControls?.setConnectionState(ChromeCastDisconnected) }
-                        ?.apply {
-                            item.media.positon?.let {
-                                mainPlayerControls?.setCurrentSecond(it / 1000f)
-                            }
-                        }
-                        ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
-                        ?.apply { state.lastMessage = this }
+                    remotePlayerInteractor
+                        .playerSessionStatus(watcherLocator1.locator())
+                        .also { updatePlayerState(it) }
                     delay(1000)
                 } else {
                     mainPlayerControls?.setCastDetails(CastDetails(CuerCast, Disconnected))
@@ -82,8 +74,21 @@ class CuerCastPlayerWatcher(
         }
     }
 
-    fun isWatching(): Boolean =
-        remoteNode != null
+    private suspend fun updatePlayerState(result: NetResult<PlayerSessionContract.PlayerStatusMessage>) =
+        withContext(coroutines.Main) {
+            // todo process errors
+            result.takeIf { it.isSuccessful }?.data
+                ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
+                ?.apply { mainPlayerControls?.setPlaylistItem(item) }
+                ?.apply {
+                    item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) }
+                }
+                ?.apply {
+                    item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) }
+                }
+                ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
+                ?.apply { state.lastMessage = this }
+        }
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
         override fun play() {
@@ -124,10 +129,27 @@ class CuerCastPlayerWatcher(
 
     private fun dispatchCommand(command: PlayerSessionContract.PlayerCommandMessage) {
         coroutines.ioScope.launch {
-            remoteNode?.also { remoteNode ->
-                // todo return player status here too for update
-                remotePlayerInteractor.playerCommand(remoteNode.locator(), command)
-            }
+            sendCommand(command)
         }
+    }
+
+    private suspend fun sendCommand(command: PlayerSessionContract.PlayerCommandMessage) {
+        remoteNode?.also { remoteNode ->
+            remotePlayerInteractor.playerCommand(remoteNode.locator(), command)
+                .also { updatePlayerState(it) }
+        }
+    }
+
+    suspend fun sendStop() = withContext(coroutines.IO) {
+        sendCommand(Stop)
+        cleanup()
+    }
+
+    private fun cleanup() {
+        pollingJob?.cancel()
+        pollingJob = null
+        mainPlayerControls?.reset()
+        mainPlayerControls = null
+        remoteNode = null
     }
 }

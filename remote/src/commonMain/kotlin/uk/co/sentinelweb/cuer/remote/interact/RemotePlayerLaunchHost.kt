@@ -4,5 +4,5 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface RemotePlayerLaunchHost {
 
-    fun launchVideo(item: PlaylistItemDomain, screenIndex: Int)
+    fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?)
 }

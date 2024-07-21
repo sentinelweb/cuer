@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControl
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Stop
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
@@ -82,7 +83,7 @@ class FloatingWindowMviView(
             is Command -> {
                 label.command.let { aytViewHolder.processCommand(it) }
             }
-
+            is Stop -> service.stopSelf()
             else -> Unit
         }
     }
@@ -130,7 +131,5 @@ class FloatingWindowMviView(
         override fun skipFwd() {
             dispatch(Event.SkipFwdClicked)
         }
-
     }
-
 }

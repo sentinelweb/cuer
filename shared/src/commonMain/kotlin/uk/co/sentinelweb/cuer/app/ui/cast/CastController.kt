@@ -39,6 +39,11 @@ class CastController(
         castDialogLauncher.hideCastDialog()
     }
 
+    suspend fun stopCuerCast() {
+        cuerCastPlayerWatcher.sendStop()
+
+    }
+
     fun connectChromeCast() {
         castDialogLauncher.hideCastDialog()
         if (!chromeCastHolder.isConnected()) {
@@ -61,7 +66,11 @@ class CastController(
         return CastDialogModel(
             connectedStatus,
             cuerCastPlayerWatcher.run {
-                CuerCastStatus(isWatching(), remoteNode?.name())
+                CuerCastStatus(
+                    isWatching(),
+                    remoteNode?.name(),
+                    isPlaying()
+                )
             },
             CastDialogModel.ChromeCastStatus(chromeCastHolder.isConnected(), chromeCastWrapper.getCastDeviceName()),
             floatingManager.isRunning()

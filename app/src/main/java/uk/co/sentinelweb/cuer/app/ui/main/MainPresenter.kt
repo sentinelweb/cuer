@@ -71,6 +71,7 @@ class MainPresenter(
         floatingPlayerServiceManager.get()?.external?.mainPlayerControls = null
         ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
+            // todo manage this in castcontroller
             if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
                 ytContextHolder.destroy()
             } else {
@@ -79,9 +80,9 @@ class MainPresenter(
         }
     }
 
-    override fun restartYtCastContext() {
-        ytContextHolder.destroy()
-        ytContextHolder.create()
-    }
+//    override fun restartYtCastContext() {
+//        ytContextHolder.destroy()
+//        ytContextHolder.create()
+//    }
 
 }

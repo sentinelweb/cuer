@@ -19,8 +19,7 @@ class PlayerSessionListener(
     }
 
     private val _intentFlow = MutableSharedFlow<Intent>()
-    val intentFlow: Flow<Intent>
-        get() = _intentFlow
+    val intentFlow: Flow<Intent> = _intentFlow
 
     override fun messageRecieved(message: PlayerSessionContract.PlayerCommandMessage) {
         log.d("messageRecieved: $message")

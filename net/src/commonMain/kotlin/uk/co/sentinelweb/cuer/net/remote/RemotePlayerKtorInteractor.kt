@@ -18,10 +18,13 @@ internal class RemotePlayerKtorInteractor(
         log.tag(this)
     }
 
-    override suspend fun playerCommand(locator: Locator, message: PlayerCommandMessage) =
+    override suspend fun playerCommand(
+        locator: Locator,
+        message: PlayerCommandMessage
+    ): NetResult<PlayerStatusMessage> =
         try {
-            service.executeCommand(locator, message)
-            NetResult.Data(true)
+
+            NetResult.Data(service.executeCommand(locator, message).payload as PlayerStatusMessage)
         } catch (failure: RequestFailureException) {
             log.e("player command failed", failure)
             NetResult.HttpError(failure)
@@ -31,10 +34,9 @@ internal class RemotePlayerKtorInteractor(
 
     override suspend fun playerSessionStatus(locator: Locator): NetResult<PlayerStatusMessage> =
         try {
-            service.executeGetPlayerStatus(locator)
             NetResult.Data(service.executeGetPlayerStatus(locator).payload as PlayerStatusMessage)
         } catch (failure: RequestFailureException) {
-            log.e("player command failed", failure)
+            log.e("player status failed", failure)
             NetResult.HttpError(failure)
         } catch (e: Exception) {
             NetResult.Error(e)
@@ -59,7 +61,7 @@ internal class RemotePlayerKtorInteractor(
             service.executeLaunchVideo(locator, item, screenIndex)
             NetResult.Data(true)
         } catch (failure: RequestFailureException) {
-            log.e("player config failed", failure)
+            log.e("player launch failed", failure)
             NetResult.HttpError(failure)
         } catch (e: Exception) {
             NetResult.Error(e)

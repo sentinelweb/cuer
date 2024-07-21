@@ -9,6 +9,7 @@ data class CastDialogModel(
     data class CuerCastStatus(
         val connected: Boolean = false,
         val connectedHost: String? = null,
+        val isPlaying: Boolean = false
     )
 
     data class ChromeCastStatus(
