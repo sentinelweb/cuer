@@ -6,6 +6,12 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -16,7 +22,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeC
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -32,7 +37,6 @@ class PlayerControlsNotificationController constructor(
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val res: ResourceWrapper,
 ) : External, Controller, SkipContract.Listener {
 
     private var listener: Listener? = null
@@ -207,14 +211,4 @@ class PlayerControlsNotificationController constructor(
 
     override fun skipSetFwdText(text: String) = Unit
 
-    companion object {
-        const val ACTION_PAUSE = "pause"
-        const val ACTION_PLAY = "play"
-        const val ACTION_SKIPF = "skipf"
-        const val ACTION_SKIPB = "skipb"
-        const val ACTION_TRACKF = "trackf"
-        const val ACTION_TRACKB = "trackb"
-        const val ACTION_DISCONNECT = "disconnect"
-        const val ACTION_STAR = "star"
-    }
 }

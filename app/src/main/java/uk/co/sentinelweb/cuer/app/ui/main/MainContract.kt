@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
@@ -71,11 +71,10 @@ interface MainContract {
                     MainPresenter(
                         view = get(),
                         state = get(),
-                        ytServiceManager = get(),
                         ytContextHolder = get(),
                         log = get(),
                         floatingPlayerServiceManager = get(),
-                        castListener = get(),
+                        floatingPlayerCastListener = get(),
                         autoBackupFileExporter = get(),
                         notificationPermissionCheckDialog = get(),
                         castController = get()
@@ -102,9 +101,9 @@ interface MainContract {
 
                 scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
                 scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
-                scoped { CastController(get(), get(), get(), get(), get(), get(), get()) }
+                scoped { CastController(get(), get(), get(), get(), get(), get(), get(), get()) }
                 scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(get<MainActivity>()) }
-                scoped<ChromeCastContract.DialogWrapper> { CastDialogWrapper(get<MainActivity>(), get()) }
+                scoped<ChromecastContract.DialogWrapper> { CastDialogWrapper(get<MainActivity>(), get()) }
                 scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get<MainActivity>()) }
             }
         }

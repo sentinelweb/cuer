@@ -6,19 +6,20 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPF
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_DISCONNECT
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_STAR
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -103,7 +104,7 @@ class PlayerControlsNotificationMedia constructor(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        state.bitmap?.apply { builder.setLargeIcon(this) }
+        (state.bitmap as? Bitmap?)?.apply { builder.setLargeIcon(this) }
 
         //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0

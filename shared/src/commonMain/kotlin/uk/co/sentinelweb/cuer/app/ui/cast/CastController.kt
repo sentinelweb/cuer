@@ -1,28 +1,31 @@
 package uk.co.sentinelweb.cuer.app.ui.cast
 
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogModel.CuerCastStatus
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 
 class CastController(
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
-    private val chromeCastHolder: ChromeCastContract.PlayerContextHolder,
-    private val chromeCastDialogWrapper: ChromeCastContract.DialogWrapper,
-    private val chromeCastWrapper: ChromeCastContract.Wrapper,
+    private val chromeCastHolder: ChromecastContract.PlayerContextHolder,
+    private val chromeCastDialogWrapper: ChromecastContract.DialogWrapper,
+    private val chromeCastWrapper: ChromecastContract.Wrapper,
     private val floatingManager: FloatingPlayerContract.Manager,
     private val playerControls: PlayerContract.PlayerControls,
     private val castDialogLauncher: CastContract.CastDialogLauncher,
+    private val ytServiceManager: YoutubeCastServiceContract.Manager,
 ) {
 
     fun showCastDialog() {
         castDialogLauncher.launchCastDialog()
     }
 
-    fun checkCastConnection() {
+    fun checkCastConnectionToActivity() {
+        ytServiceManager.stop()
         // todo check priorities maybe chromecast is lower?
         if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
             chromeCastHolder.playerUi = playerControls
@@ -30,6 +33,15 @@ class CastController(
             floatingManager.get()?.external?.mainPlayerControls = playerControls
         } else if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.mainPlayerControls = playerControls
+        }
+    }
+
+    fun switchToNotification() {
+        // todo handle cuer cast
+        if (chromeCastHolder.isCreated() && !chromeCastHolder.isConnected()) {
+            chromeCastHolder.destroy()
+        } else {
+            ytServiceManager.start()
         }
     }
 

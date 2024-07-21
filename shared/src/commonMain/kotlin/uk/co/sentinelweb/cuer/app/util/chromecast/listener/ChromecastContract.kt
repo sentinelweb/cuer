@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.util.chromecast.listener
 
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 
-interface ChromeCastContract {
+interface ChromecastContract {
     interface PlayerContextHolder {
 
         var playerUi: PlayerContract.PlayerControls?

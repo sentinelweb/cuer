@@ -5,12 +5,12 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.mediarouter.app.MediaRouteChooserDialogFragment
 import androidx.mediarouter.app.MediaRouteDialogFactory
 import com.google.android.gms.cast.framework.CastContext
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 
 class CastDialogWrapper(
     private val activity: FragmentActivity,
     private val chromeCastWrapper: ChromeCastWrapper
-) : ChromeCastContract.DialogWrapper {
+) : ChromecastContract.DialogWrapper {
     private val castContext: CastContext
         get() = chromeCastWrapper.getCastContext()
 

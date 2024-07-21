@@ -12,11 +12,11 @@ import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.*
 import com.google.android.gms.common.images.WebImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 
-class ChromeCastWrapper(private val application: Application) : ChromeCastContract.Wrapper {
+class ChromeCastWrapper(private val application: Application) : ChromecastContract.Wrapper {
 
     fun initMediaRouteButton(view: View) {
         val mediaRouteButton = view as androidx.mediarouter.app.MediaRouteButton

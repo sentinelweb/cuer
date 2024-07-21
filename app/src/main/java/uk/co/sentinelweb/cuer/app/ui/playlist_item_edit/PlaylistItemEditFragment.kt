@@ -40,7 +40,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -58,7 +58,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private val navRouter: NavigationRouter by inject()
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
-    private val castDialogWrapper: ChromeCastContract.DialogWrapper by inject()
+    private val castDialogWrapper: ChromecastContract.DialogWrapper by inject()
     private val alertDialogCreator: AlertDialogCreator by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()

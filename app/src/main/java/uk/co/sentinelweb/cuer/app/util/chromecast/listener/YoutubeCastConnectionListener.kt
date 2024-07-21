@@ -108,7 +108,7 @@ class YoutubeCastConnectionListener constructor(
     }
 
     fun isConnected(): Boolean {
-        return state.connectionState == Disconnected
+        return state.connectionState == Connected
     }
 
     fun destroy() {

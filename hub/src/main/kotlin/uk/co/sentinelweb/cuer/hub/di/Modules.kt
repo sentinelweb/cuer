@@ -11,13 +11,13 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
@@ -100,12 +100,25 @@ object Modules {
     }
 
     private val connectivityModule = module {
-        single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
+        single<ConnectivityWrapper> {
+            DesktopConnectivityWrapper(
+                coroutines = get(),
+                monitor = get(),
+                timeProvider = get(),
+                log = get()
+            )
+        }
 //        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
-        single<WifiStateProvider> { PlatformWifiStateProvider(get(), get(), get()) }
+        single<WifiStateProvider> {
+            PlatformWifiStateProvider(
+                wifiStartChecker = get(),
+                platformWifiInfo = get(),
+                log = get()
+            )
+        }
         single { PlatformWifiInfo() }
-        single { ConnectivityCheckManager(get(), get(), get()) }
-        single { ConnectivityMonitor(get(), get(), get()) }
+        single { ConnectivityCheckManager(coroutines = get(), monitor = get(), log = get()) }
+        single { ConnectivityMonitor(connectivityCheckTimer = get(), checker = get(), coroutines = get()) }
         single { ConnectivityCheckTimer() }
         single { ConnectivityChecker() }
     }
@@ -138,24 +151,39 @@ object Modules {
             "localNode.json"
                 .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get(), get(), get()) }
+                .let {
+                    LocalRepository(
+                        it,
+                        coroutineContext = get(),
+                        guidCreator = get(),
+                        buildConfigDomain = get(),
+                        log = get()
+                    )
+                }
         }
         single {
             "remoteNodes.json"
                 .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { RemotesRepository(it, get(), get(), get()) }
+                .let {
+                    RemotesRepository(
+                        jsonFileInteractor = it,
+                        localNodeRepo = get(),
+                        coroutines = get(),
+                        log = get()
+                    )
+                }
         }
         factory<WakeLockManager> { EmptyWakeLockManager() }
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
+
         factory<PlayerContract.PlayerControls> { EmptyPlayerControls() }
-        factory<ChromeCastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
+        factory<ChromecastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
         factory<FloatingPlayerContract.Manager> { EmptyFloatingPlayerManager() }
-        factory<ChromeCastContract.DialogWrapper> { EmptyChromeCastDialogWrapper() }
-        factory<ChromeCastContract.Wrapper> { EmptyChromeCastWrapper() }
-        factory<CastContract.CastDialogLauncher> { EmptyCastDialogLauncher() }
+        factory<ChromecastContract.Wrapper> { EmptyChromeCastWrapper() }
+        factory<YoutubeCastServiceContract.Manager> { EmptyYoutubeCastServiceManager() }
     }
 
     val allModules = listOf(resourcesModule)

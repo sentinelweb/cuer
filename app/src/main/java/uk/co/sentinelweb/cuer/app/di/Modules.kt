@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.receiver.WifiStateReceiver
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
@@ -129,7 +129,7 @@ object Modules {
         ScanContract.fragmentModule,
         PlaylistItemEditContract.fragmentModule,
         PlaylistEditContract.fragmentModule,
-        YoutubeCastServiceContract.serviceModule,
+        YoutubeCastService.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
         PrefPlayerContract.fragmentModule,

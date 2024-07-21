@@ -11,12 +11,14 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesController
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesStoreFactory
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
@@ -121,7 +123,18 @@ class RemotesUiCoordinator :
                     )
                 }
                 scoped { RemotesModelMapper(get(), get()) }
-                scoped { CastController(get(), get(), get(), get(), get(), get(), get()) }
+                scoped {
+                    CastController(
+                        cuerCastPlayerWatcher = get(),
+                        chromeCastHolder = get(),
+                        chromeCastDialogWrapper = EmptyChromecastDialogWrapper(),
+                        chromeCastWrapper = get(),
+                        floatingManager = get(),
+                        playerControls = get(),
+                        castDialogLauncher = EmptyCastDialogLauncher(),
+                        ytServiceManager = get()
+                    )
+                }
             }
         }
     }

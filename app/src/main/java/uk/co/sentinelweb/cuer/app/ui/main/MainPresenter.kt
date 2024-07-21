@@ -1,20 +1,18 @@
 package uk.co.sentinelweb.cuer.app.ui.main
 
 import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
-import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class MainPresenter(
     private val view: MainContract.View,
     private val state: MainContract.State,
-    private val ytServiceManager: YoutubeCastServiceManager,
-    private val ytContextHolder: ChromeCastContract.PlayerContextHolder,
+    private val ytContextHolder: ChromecastContract.PlayerContextHolder,
     private val floatingPlayerServiceManager: FloatingPlayerContract.Manager,
-    private val castListener: FloatingPlayerCastListener,
+    private val floatingPlayerCastListener: FloatingPlayerCastListener,
     private val log: LogWrapper,
     private val autoBackupFileExporter: AutoBackupFileExporter,
     private val notificationPermissionCheckDialog: NotificationPermissionCheckDialog,
@@ -30,7 +28,7 @@ class MainPresenter(
             view.checkPlayServices()
             state.playServiceCheckDone = true
         }
-        castListener.observeConnection()
+        floatingPlayerCastListener.observeConnection()
     }
 
     override fun onPlayServicesOk() {
@@ -51,16 +49,15 @@ class MainPresenter(
 
     override fun onStart() {
         log.d("onStart()")
-        ytServiceManager.stop()
         if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
             initialiseCastContext()
         }
         if (!state.playControlsInit) {
-            //view.playerControls.initMediaRouteButton()
+            // view.playerControls.initMediaRouteButton()
             view.playerControls.reset()
             state.playControlsInit = true
         }
-        castController.checkCastConnection()
+        castController.checkCastConnectionToActivity()
 
         autoBackupFileExporter.attemptAutoBackup { result -> view.promptToBackup(result) }
 
@@ -71,12 +68,7 @@ class MainPresenter(
         floatingPlayerServiceManager.get()?.external?.mainPlayerControls = null
         ytContextHolder.playerUi = null
         if (!view.isRecreating()) {
-            // todo manage this in castcontroller
-            if (ytContextHolder.isCreated() && !ytContextHolder.isConnected()) {
-                ytContextHolder.destroy()
-            } else {
-                ytServiceManager.start()
-            }
+            castController.switchToNotification()
         }
     }
 

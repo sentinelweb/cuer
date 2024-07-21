@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 class ChromecastYouTubePlayerContextHolder(
     private val creator: YoutubePlayerContextCreator,
     private val chromeCastWrapper: ChromeCastWrapper
-) : ChromeCastContract.PlayerContextHolder {
+) : ChromecastContract.PlayerContextHolder {
 
     private var context: ChromecastYouTubePlayerContext? = null
     private var listener: YoutubeCastConnectionListener? = null

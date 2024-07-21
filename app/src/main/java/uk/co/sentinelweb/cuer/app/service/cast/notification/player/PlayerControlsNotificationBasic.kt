@@ -4,15 +4,16 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract.Companion.ACTION_SKIPF
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
@@ -76,9 +77,9 @@ class PlayerControlsNotificationBasic constructor(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        state.bitmap?.apply { builder.setLargeIcon(this) }
+        (state.bitmap as Bitmap?)?.apply { builder.setLargeIcon(this) }
 
-        builder.addAction(R.drawable.ic_player_pause, "+30s", skipfPendingIntent)
+        builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent)
 
         when (state.playState) {
             PLAYING ->
@@ -95,7 +96,7 @@ class PlayerControlsNotificationBasic constructor(
 
             else -> Unit
         }
-        builder.addAction(R.drawable.ic_player_pause, "-30s", skipbPendingIntent)
+        builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent)
         return builder.build()
     }
 

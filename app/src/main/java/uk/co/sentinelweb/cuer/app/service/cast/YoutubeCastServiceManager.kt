@@ -5,23 +5,23 @@ import android.content.Intent
 
 class YoutubeCastServiceManager constructor(
     private val app: Application
-) {
+) : YoutubeCastServiceContract.Manager {
 
-    fun start() {
+    override fun start() {
         if (!isRunning()) {
             app.startForegroundService(intent())
         }
     }
 
-    fun stop() {
+    override fun stop() {
         if (isRunning()) {
             app.stopService(intent())
         }
     }
 
-    fun get(): YoutubeCastService? = YoutubeCastService.instance()
+    override fun get(): YoutubeCastService? = YoutubeCastService.instance()
 
-    fun isRunning(): Boolean = YoutubeCastService.instance() != null
+    override fun isRunning(): Boolean = YoutubeCastService.instance() != null
 
     private fun intent() = Intent(app, YoutubeCastService::class.java)
 
