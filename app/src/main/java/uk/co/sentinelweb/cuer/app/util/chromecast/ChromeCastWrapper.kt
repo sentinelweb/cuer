@@ -3,10 +3,12 @@ package uk.co.sentinelweb.cuer.app.util.chromecast
 import android.app.Activity
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.annotation.IdRes
+import androidx.mediarouter.media.MediaRouter
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.*
@@ -64,5 +66,30 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
     fun isCastConnected() = getCastContext().castState == CastState.CONNECTED
 
     fun getCastSession() = getCastContext().sessionManager.currentCastSession
+
+    /*
+    description:Cuer
+    name:Living Room TV
+    connectionState:2
+    presentationDisplay.name:null
+    volume:20
+    volumeMax:20
+     */
+    override fun logRoutes() {
+        MediaRouter.getInstance(application).routes.forEach {
+            Log.d(
+                "MediaRoutes", """"
+                MediaRoutes:
+                description:${it.description}
+                id:${it.id}
+                name:${it.name}
+                connectionState:${it.connectionState}
+                presentationDisplay.name:${it.presentationDisplay?.name}
+                volume:${it.volume}
+                volumeMax:${it.volumeMax}
+            """.trimIndent()
+            )
+        }
+    }
 
 }

@@ -23,5 +23,6 @@ interface ChromecastContract {
     interface Wrapper {
         fun killCurrentSession()
         fun getCastDeviceName(): String?
+        fun logRoutes()
     }
 }
