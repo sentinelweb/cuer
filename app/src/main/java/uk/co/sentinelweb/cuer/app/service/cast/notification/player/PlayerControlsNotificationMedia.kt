@@ -96,7 +96,6 @@ class PlayerControlsNotificationMedia constructor(
                             actionIndexes.add(4) // #4: next button
                         }
                         setShowActionsInCompactView(*actionIndexes.toIntArray())
-
                     }
             )
             .setContentTitle(buildTitle(state))

@@ -16,18 +16,6 @@ class ShowHideControls {
     private lateinit var frame: JFrame
     private lateinit var transparentCursor: Cursor
 
-    init {
-
-    }
-
-    private val hideControls = {
-        controlsPane.isVisible = false
-        this.frame.cursor = transparentCursor
-    }
-
-    private val hideControlsTimer = Timer(3000, { hideControls() })
-        .apply { isRepeats = false }
-
     fun setupInactivityTimer(
         frame: JFrame,
         mediaPlayerComponent: CallbackMediaPlayerComponent,
@@ -41,7 +29,6 @@ class ShowHideControls {
         val cursorImage = toolkit.createImage(ByteArray(0))
         transparentCursor = toolkit.createCustomCursor(cursorImage, Point(0, 0), "invisibleCursor")
 
-        // Mouse adapter to handle mouse events
         val activityListener = object : MouseAdapter() {
             override fun mouseMoved(e: MouseEvent?) {
                 showControls()
@@ -63,6 +50,14 @@ class ShowHideControls {
         mediaPlayerComponent.videoSurfaceComponent().addMouseListener(activityListener)
 
         hideControlsTimer.restart()
+    }
+
+    private val hideControlsTimer = Timer(3000, { hideControls() })
+        .apply { isRepeats = false }
+
+    private val hideControls = {
+        controlsPane.isVisible = false
+        this.frame.cursor = transparentCursor
     }
 
     fun showControls() {
