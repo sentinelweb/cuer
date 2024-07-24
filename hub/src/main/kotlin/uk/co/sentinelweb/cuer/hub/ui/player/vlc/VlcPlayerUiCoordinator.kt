@@ -212,7 +212,12 @@ class VlcPlayerUiCoordinator(
                     )
                 }
                 factory {
-                    VlcPlayerSwingWindow(get(), get(), ShowHideControls())
+                    VlcPlayerSwingWindow(
+                        coordinator = get(),
+                        folderListUseCase = get(),
+                        showHideControls = VlcPlayerShowHideControls(),
+                        keyMap = VlcPlayerKeyMap()
+                    )
                 }
             }
         }

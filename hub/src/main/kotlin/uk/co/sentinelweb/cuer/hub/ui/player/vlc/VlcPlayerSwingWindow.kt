@@ -39,7 +39,8 @@ import javax.swing.event.ChangeEvent
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
-    private val showHideControls: ShowHideControls,
+    private val showHideControls: VlcPlayerShowHideControls,
+    private val keyMap: VlcPlayerKeyMap,
 ) : JFrame(), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
@@ -84,6 +85,7 @@ class VlcPlayerSwingWindow(
         createMediaPlayer()
         createControls()
         showHideControls.setupInactivityTimer(this, mediaPlayerComponent, controlsPane)
+        keyMap.initialiseKeyMap(mediaPlayerComponent, this, coordinator)
     }
 
     private fun createWindow(preferredScreen: Int) {

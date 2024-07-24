@@ -10,7 +10,7 @@ import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.Timer
 
-class ShowHideControls {
+class VlcPlayerShowHideControls {
     private lateinit var controlsPane: JPanel
     private lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private lateinit var frame: JFrame
