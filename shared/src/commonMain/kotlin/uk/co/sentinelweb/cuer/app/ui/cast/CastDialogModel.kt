@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.cast
 
 data class CastDialogModel(
-    val connectionStatus: String,
+    val connectionSummary: String,
     val cuerCastStatus: CuerCastStatus,
     val chromeCastStatus: ChromeCastStatus,
     val floatingStatus: Boolean,
@@ -9,20 +9,22 @@ data class CastDialogModel(
     data class CuerCastStatus(
         val isConnected: Boolean = false,
         val connectedHost: String? = null,
-        val isPlaying: Boolean = false
+        val isPlaying: Boolean = false,
+        val volumePercent: String = "0%",
     )
 
     data class ChromeCastStatus(
         val isConnected: Boolean = false,
         val connectedHost: String? = null,
+        val volumePercent: String = "0%",
     )
 
     companion object {
         val blank = CastDialogModel(
-            connectionStatus = "Not connected",
+            connectionSummary = "Not connected",
             cuerCastStatus = CuerCastStatus(),
             chromeCastStatus = ChromeCastStatus(),
-            floatingStatus = false
+            floatingStatus = false,
         )
     }
 }

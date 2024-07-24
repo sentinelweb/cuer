@@ -37,6 +37,12 @@ class CuerCastPlayerWatcher(
 
     private var pollingJob: Job? = null
 
+    val volume: Float
+        get() = state.lastMessage?.volume ?: 0f
+
+    val volumeMax: Float
+        get() = state.lastMessage?.volumeMax ?: 100f
+
     var mainPlayerControls: PlayerContract.PlayerControls? = null
         get() = field
         set(value) {
@@ -77,17 +83,15 @@ class CuerCastPlayerWatcher(
     private suspend fun updatePlayerState(result: NetResult<PlayerSessionContract.PlayerStatusMessage>) =
         withContext(coroutines.Main) {
             // todo process errors
+            // if 503 - either disconnect or set unavailable flag in state
             result.takeIf { it.isSuccessful }?.data
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
-                ?.apply {
-                    item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) }
-                }
-                ?.apply {
-                    item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) }
-                }
+                ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
+                ?.apply { item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) } }
                 ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
                 ?.apply { state.lastMessage = this }
+                ?.apply { log.d("from host: volume:${state.lastMessage?.volume} max:${state.lastMessage?.volumeMax}") }
         }
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
@@ -142,7 +146,7 @@ class CuerCastPlayerWatcher(
 
     suspend fun sendStop() = withContext(coroutines.IO) {
         sendCommand(Stop)
-        cleanup()
+        withContext(coroutines.Main) { cleanup() }
     }
 
     fun cleanup() {
@@ -151,5 +155,9 @@ class CuerCastPlayerWatcher(
         mainPlayerControls?.reset()
         mainPlayerControls = null
         remoteNode = null
+    }
+
+    fun sendVolume(volume: Float) = coroutines.ioScope.launch {
+        sendCommand(Volume(volume))
     }
 }

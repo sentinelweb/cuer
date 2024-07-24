@@ -47,6 +47,10 @@ internal class RemotePlayerService(
 
             Stop -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "Stop")
+
+            is Volume -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "Volume")
+                .replaceUrlPlaceholder(P_ARG0, message.volume.toString())
         }
         return executor.getResponseMessage(path = locator.ipport() + command)
     }

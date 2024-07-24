@@ -6,6 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 
@@ -18,21 +19,24 @@ class CastController(
     private val playerControls: PlayerContract.PlayerControls,
     private val castDialogLauncher: CastContract.CastDialogLauncher,
     private val ytServiceManager: YoutubeCastServiceContract.Manager,
+    private val log: LogWrapper,
 ) {
 
+    init {
+        log.tag(this)
+    }
     fun showCastDialog() {
         castDialogLauncher.launchCastDialog()
     }
 
     fun checkCastConnectionToActivity() {
         ytServiceManager.stop()
-        // todo check priorities maybe chromecast is lower?
-        if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
+        if (cuerCastPlayerWatcher.isWatching()) {
+            cuerCastPlayerWatcher.mainPlayerControls = playerControls
+        } else if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
             chromeCastHolder.mainPlayerControls = playerControls
         } else if (floatingManager.isRunning()) {
             floatingManager.get()?.external?.mainPlayerControls = playerControls
-        } else if (cuerCastPlayerWatcher.isWatching()) {
-            cuerCastPlayerWatcher.mainPlayerControls = playerControls
         }
     }
 
@@ -98,11 +102,33 @@ class CastController(
         }
     }
 
-    fun map(): CastDialogModel {
-        val connectedStatus = if (cuerCastPlayerWatcher.isWatching()) {
-            "Cuer: " + cuerCastPlayerWatcher.remoteNode?.name()
+    fun getVolume(): Float = // 0..1
+        if (cuerCastPlayerWatcher.isWatching()) {
+            cuerCastPlayerWatcher.volume / cuerCastPlayerWatcher.volumeMax
         } else if (chromeCastHolder.isConnected()) {
-            "Chromecast: " + chromeCastWrapper.getCastDeviceName()
+            (chromeCastWrapper.getVolume() / chromeCastWrapper.getMaxVolume()).toFloat()
+        } else 0f
+
+    fun setVolume(volume: Float) { // 0 .. 1
+        if (cuerCastPlayerWatcher.isWatching() && volume < 1) {
+            val newVolume = volume * cuerCastPlayerWatcher.volumeMax
+            log.d("cuercast newVolume:$newVolume max=${cuerCastPlayerWatcher.volumeMax}")
+            cuerCastPlayerWatcher.sendVolume(newVolume)
+        } else if (chromeCastHolder.isConnected() && volume < 1) {
+            val maxVolume = chromeCastWrapper.getMaxVolume().toFloat()
+            val newVolume = volume * maxVolume
+            log.d("chromecast newVolume:$newVolume max=${maxVolume}")
+            chromeCastWrapper.setVolume(newVolume)
+        }
+    }
+
+    fun map(): CastDialogModel {
+//        chromeCastWrapper.logCastDevice()
+//        chromeCastWrapper.logRoutes()
+        val connectedStatus = if (cuerCastPlayerWatcher.isWatching()) {
+            "CuerCast: " + cuerCastPlayerWatcher.remoteNode?.name()
+        } else if (chromeCastHolder.isConnected()) {
+            "ChromeCast: " + chromeCastWrapper.getCastDeviceName()
         } else "Not Connected"
         return CastDialogModel(
             connectedStatus,
@@ -110,10 +136,23 @@ class CastController(
                 CuerCastStatus(
                     isWatching(),
                     remoteNode?.name(),
-                    isPlaying()
+                    isPlaying(),
+                    if (isWatching()) {
+                        (volume / volumeMax * 100).toString() + " %"
+                    } else {
+                        "--"
+                    },
                 )
             },
-            CastDialogModel.ChromeCastStatus(chromeCastHolder.isConnected(), chromeCastWrapper.getCastDeviceName()),
+            CastDialogModel.ChromeCastStatus(
+                chromeCastHolder.isConnected(),
+                chromeCastWrapper.getCastDeviceName(),
+                if (chromeCastHolder.isConnected()) {
+                    (chromeCastWrapper.getVolume() / chromeCastWrapper.getMaxVolume() * 100).toInt().toString() + " %"
+                } else {
+                    "--"
+                },
+            ),
             floatingManager.isRunning()
         )
     }

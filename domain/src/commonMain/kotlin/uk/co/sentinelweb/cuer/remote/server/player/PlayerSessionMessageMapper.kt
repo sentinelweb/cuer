@@ -15,6 +15,8 @@ class PlayerSessionMessageMapper {
                 playlistId = null
             ),
             liveOffset = session.liveOffset ?: 0,
-            playbackState = session.playbackState ?: PlayerStateDomain.UNKNOWN
+            playbackState = session.playbackState ?: PlayerStateDomain.UNKNOWN,
+            volume = session.volume,
+            volumeMax = session.volumeMax
         )
 }

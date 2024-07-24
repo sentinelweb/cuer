@@ -24,5 +24,9 @@ interface ChromecastContract {
         fun killCurrentSession()
         fun getCastDeviceName(): String?
         fun logRoutes()
+        fun getVolume(): Double
+        fun getMaxVolume(): Double
+        fun logCastDevice()
+        fun setVolume(volume: Float)
     }
 }

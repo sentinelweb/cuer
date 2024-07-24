@@ -115,6 +115,9 @@ class VlcPlayerUiCoordinator(
         diff(get = Model::playState, set = {
             playerWindow.updateUiPlayState(it)
         })
+        diff(get = Model::volume, set = {
+            playerWindow.updateVolume(it)
+        })
         diff(get = Model::times, set = {
             playerWindow.updateUiTimes(it)
         })
@@ -196,6 +199,7 @@ class VlcPlayerUiCoordinator(
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(maxVolume = 200f),
                     ).create()
                 }
                 scoped<SkipContract.External> {

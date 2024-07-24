@@ -9,6 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.mediarouter.media.MediaRouter
+import com.google.android.gms.cast.CastDevice
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
 import com.google.android.gms.cast.framework.*
@@ -66,20 +67,32 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
     fun isCastConnected() = getCastContext().castState == CastState.CONNECTED
 
     fun getCastSession() = getCastContext().sessionManager.currentCastSession
+    override fun getVolume(): Double = getCastSession()
+        ?.castDevice
+        ?.let { getRoute(it)?.volume?.toDouble() }
+        ?: 100.0
 
+    override fun getMaxVolume(): Double = getCastSession()
+        ?.castDevice
+        ?.let { getRoute(it)?.volumeMax?.toDouble() }
+        ?: 100.0
+
+    override fun setVolume(volume: Float) {
+        getCastSession()?.volume = volume.toDouble()
+    }
     /*
-    description:Cuer
-    name:Living Room TV
-    connectionState:2
-    presentationDisplay.name:null
-    volume:20
-    volumeMax:20
-     */
+        description:Cuer
+        name:Living Room TV
+        connectionState:2
+        presentationDisplay.name:null
+        volume:20
+        volumeMax:20
+         */
     override fun logRoutes() {
         MediaRouter.getInstance(application).routes.forEach {
             Log.d(
-                "MediaRoutes", """"
-                MediaRoutes:
+                "MediaRoutes",
+                """MediaRoutes:
                 description:${it.description}
                 id:${it.id}
                 name:${it.name}
@@ -92,4 +105,25 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
         }
     }
 
+    fun getRoute(castDevice: CastDevice): MediaRouter.RouteInfo? =
+        MediaRouter.getInstance(application)
+            .routes
+            .find { it.id.endsWith(castDevice.deviceId) }
+
+    override fun logCastDevice() {
+        getCastSession()?.castDevice?.also { castDevice ->
+            Log.d(
+                "CastDevice",
+                """CastDevice:
+                   deviceId: ${castDevice.deviceId}
+                   friendlyName: ${castDevice.friendlyName}
+                   deviceVersion: ${castDevice.deviceVersion}
+                   inetAddress: ${castDevice.inetAddress}
+                   isOnLocalNetwork: ${castDevice.isOnLocalNetwork}
+                   modelName: ${castDevice.modelName}
+                   servicePort: ${castDevice.servicePort}
+                """.trimIndent()
+            )
+        }
+    }
 }

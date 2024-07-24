@@ -11,6 +11,10 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 
 interface PlayerContract {
 
+    data class PlayerConfig(
+        val maxVolume: Float
+    )
+
     interface MviStore : Store<Intent, State, Label> {
         fun endSession()
 
@@ -44,6 +48,7 @@ interface PlayerContract {
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekToFraction(val fraction: Float) : Intent()
             data class SeekToPosition(val ms: Long) : Intent()
+            data class VolumeChanged(val vol: Float) : Intent()
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
@@ -72,6 +77,7 @@ interface PlayerContract {
             val skipBackText: String = "-",
             val content: Content = Content.DESCRIPTION,
             val position: Long = -1,
+            val volume: Float = 0f,
         ) {
             fun playlistAndItem(): PlaylistAndItemDomain? = item?.let {
                 PlaylistAndItemDomain(
@@ -96,6 +102,7 @@ interface PlayerContract {
             val content: Content,
             val playlistItem: PlaylistItemDomain?,
             val playlistAndItem: PlaylistAndItemDomain? = null,
+            val volume: Float = 0f,
         ) {
             data class Buttons(
                 val nextTrackEnabled: Boolean,
@@ -111,6 +118,7 @@ interface PlayerContract {
                 val lastTrackText: String?,
                 val skipFwdText: String?,
                 val skipBackText: String?,
+                val volumeText: String,
             )
 
             data class Times(
@@ -131,6 +139,7 @@ interface PlayerContract {
                         lastTrackText = "lastTrackText",
                         skipFwdText = "skipFwdText",
                         skipBackText = "skipBackText",
+                        volumeText = "0",
                     ),
                     buttons = Buttons(false, false, false),
                     description = DescriptionModel(
@@ -190,6 +199,7 @@ interface PlayerContract {
             object ShareClick : Event()
             object OpenClick : Event()
 
+            data class VolumeChanged(val vol: Float) : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class PositionReceived(val ms: Long) : Event()

@@ -175,7 +175,7 @@ object SharedAppModule {
         single { MediaSessionListener(get(), get()) }
         factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
         single { PlayerSessionHolder() }
-        factory { PlayerSessionManager(get(), get()) }
+        factory { PlayerSessionManager(get(), get(), get()) }
         single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
         single { PlayerEventToIntentMapper }
         single { PlayerSessionMessageMapper() }

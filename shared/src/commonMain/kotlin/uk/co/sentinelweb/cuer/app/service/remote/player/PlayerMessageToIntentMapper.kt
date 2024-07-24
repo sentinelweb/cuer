@@ -28,5 +28,6 @@ class PlayerMessageToIntentMapper(
         }
 
         PlayerCommandMessage.Stop -> Intent.Stop
+        is PlayerCommandMessage.Volume -> Intent.VolumeChanged(message.volume)
     }
 }

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.service.remote.player
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -12,8 +13,13 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 
 class PlayerSessionManager(
     private val guidCreator: GuidCreator,
-    private val playerSessionHolder: PlayerSessionHolder
+    private val playerSessionHolder: PlayerSessionHolder,
+    private val log: LogWrapper,
 ) : PlayerSessionContract.Manager {
+
+    init {
+        log.tag(this)
+    }
 
     override fun checkCreateMediaSession(controls: PlayerSessionContract.Listener) {
         if (playerSessionHolder.playerSession == null) {
@@ -45,5 +51,15 @@ class PlayerSessionManager(
         playerSessionHolder.playerSession?.playlist = playlist
         playerSessionHolder.playerSession?.liveOffset = liveOffset
         playerSessionHolder.playerSession?.playbackState = state
+    }
+
+    override fun setVolume(volume: Float) {
+        //log.d("session volume: $volume")
+        playerSessionHolder.playerSession?.volume = volume
+    }
+
+    override fun setVolumeMax(volumeMax: Float) {
+        //log.d("session volumeMax: $volumeMax")
+        playerSessionHolder.playerSession?.volumeMax = volumeMax
     }
 }

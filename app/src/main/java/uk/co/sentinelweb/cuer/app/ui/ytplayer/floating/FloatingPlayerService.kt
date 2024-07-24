@@ -131,6 +131,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
                     ).create()
                 }
                 scoped { FloatingWindowMviView(get(), get(), get(), get(), get()) }

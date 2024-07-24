@@ -62,6 +62,8 @@ class VlcPlayerSwingWindow(
     private lateinit var volumeText: JLabel
     private lateinit var controlsPane: JPanel
 
+    private var lastVolumeUpdateTime = 0L
+
     private var durationMs: Long? = null
 
     val seekChangeListner: (e: ChangeEvent) -> Unit = { e ->
@@ -164,7 +166,7 @@ class VlcPlayerSwingWindow(
 
                 override fun finished(mediaPlayer: MediaPlayer?) {
                     log.d("event finished")
-
+                    coordinator.dispatch(PlayerStateChanged(ENDED))
                 }
 
                 var lastPosUpdateTime = 0L
@@ -177,7 +179,6 @@ class VlcPlayerSwingWindow(
                         }
                         lastPosUpdateTime = current
                     }
-
                     dispatchCurrentPlayState(mediaPlayer)
                 }
 
@@ -188,6 +189,18 @@ class VlcPlayerSwingWindow(
 
                 override fun error(mediaPlayer: MediaPlayer?) {
                     coordinator.dispatch(PlayerStateChanged(PlayerStateDomain.ERROR))
+                }
+
+
+                override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
+                    val current = timeProvider.currentTimeMillis()
+                    if (current - lastVolumeUpdateTime > 1000) {
+                        super.volumeChanged(mediaPlayer, volume)
+                        val sendVolume = volume * 100 //* 200 // todo getMax
+                        //log.d("mediaPlayer.volumeChanged: $volume $sendVolume")
+                        coordinator.dispatch(VolumeChanged(sendVolume))
+                        lastVolumeUpdateTime = current
+                    }
                 }
             }
         )
@@ -325,9 +338,11 @@ class VlcPlayerSwingWindow(
             override fun mouseWheelMoved(e: MouseWheelEvent) {
                 val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
                 val newVolume = (currentVolume + e.wheelRotation * 4).coerceIn(0, 200)
-                mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume)
+
+                //mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume)
+                coordinator.dispatch(VolumeChanged(newVolume.toFloat()))
                 showHideControls.showControls()
-                updateVolumeText()
+                // updateVolumeText()
             }
         }
         mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
@@ -385,18 +400,23 @@ class VlcPlayerSwingWindow(
         }
         forwardButton.text = "Forward [${texts.skipFwdText}]"
         rewindButton.text = "Rewind [${texts.skipBackText}]"
-        updateVolumeText()
+        updateVolumeText(texts.volumeText)
     }
 
-    fun updateVolumeText() {
-        val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
-        volumeText.text = "Volume: $currentVolume"
+    private fun updateVolumeText(text: String?) {
+        volumeText.text = "Volume: $text"
     }
 
     fun updateButtons(it: PlayerContract.View.Model.Buttons) {
         nextButton.isEnabled = it.nextTrackEnabled
         prevButton.isEnabled = it.prevTrackEnabled
         seekBar.isEnabled = it.seekEnabled
+    }
+
+    fun updateVolume(newVolume: Float) {
+        //log.d("updateVolume: (${newVolume})")
+        lastVolumeUpdateTime = timeProvider.currentTimeMillis()
+        mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume.toInt())
     }
 
     companion object {

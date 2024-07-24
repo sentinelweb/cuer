@@ -250,6 +250,7 @@ class JvmRemoteWebServer(
                             Stop::class.java.simpleName -> Stop
                             PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
                             SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
+                            Volume::class.java.simpleName -> Volume(volume = arg0?.toFloat() ?: 0f)
                             else -> null
                         }?.also {
                             // fixme get operation success and return the code

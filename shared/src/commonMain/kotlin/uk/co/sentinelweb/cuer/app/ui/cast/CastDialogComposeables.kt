@@ -61,7 +61,7 @@ object CastDialogComposeables {
                     .padding(16.dp),
             )
             Text(
-                text = model.connectionStatus,
+                text = model.connectionSummary,
                 color = Color.White,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
@@ -101,8 +101,16 @@ object CastDialogComposeables {
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
                         color = Color.Black,
                         modifier = Modifier
-                            .padding(16.dp),
+                            .padding(2.dp),
                     )
+                    if (model.isConnected) {
+                        Text(
+                            text = stringResource(Res.string.cast_dialog_volume, model.volumePercent),
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(2.dp),
+                        )
+                    }
                 }
 
             }
@@ -153,7 +161,7 @@ object CastDialogComposeables {
                 val icon = if (model.isConnected) Res.drawable.ic_chromecast_connected else Res.drawable.ic_chromecast
                 Image(
                     painter = painterResource(icon),
-                    contentDescription = "Cuer cast Icon",
+                    contentDescription = "Chrome cast Icon",
                     modifier = Modifier
                         .size(48.dp)
                         .padding(8.dp)
@@ -168,8 +176,16 @@ object CastDialogComposeables {
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
                         color = Color.Black,
                         modifier = Modifier
-                            .padding(16.dp),
+                            .padding(2.dp),
                     )
+                    if (model.isConnected) {
+                        Text(
+                            text = stringResource(Res.string.cast_dialog_volume, model.volumePercent),
+                            color = Color.Black,
+                            modifier = Modifier
+                                .padding(2.dp),
+                        )
+                    }
                 }
             }
             if (model.isConnected) {

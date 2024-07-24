@@ -18,7 +18,6 @@ object CastModule {
         single { ChromeCastSessionListener(get(), get()) }
         factory { ChromeCastWrapper(androidApplication()) }
         factory<ChromecastContract.Wrapper> { get<ChromeCastWrapper>() }
-        factory { CuerSimpleVolumeController(get()) }
         factory {
             YoutubePlayerContextCreator(
                 queue = get(),

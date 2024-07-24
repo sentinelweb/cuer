@@ -22,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheckDialog
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
@@ -85,26 +86,71 @@ interface MainContract {
                         .supportFragmentManager
                         .findFragmentById(R.id.cast_player_fragment) as CastPlayerFragment).playerControls
                 }
-                scoped { navigationRouter(false, get<MainActivity>()) }
+                scoped { navigationRouter(isFragment = false, sourceActivity = get<MainActivity>()) }
                 viewModel { State() }
-                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(get<MainActivity>(), get()) }
-                scoped { FloatingPlayerCastListener(get(), get(), get()) }
-                scoped { AlertDialogCreator(get<MainActivity>(), get()) }
-                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), true) }
-                scoped { EmailWrapper(get<MainActivity>()) }
-                scoped { AndroidShareWrapper(get<MainActivity>()) }
+                scoped<SnackbarWrapper> { AndroidSnackbarWrapper(a = get<MainActivity>(), res = get()) }
+                scoped {
+                    FloatingPlayerCastListener(
+                        activity = get(),
+                        wrapper = get(),
+                        floatingPlayerServiceManager = get()
+                    )
+                }
+                scoped { AlertDialogCreator(context = get<MainActivity>(), strings = get()) }
+                scoped {
+                    LinkNavigator(
+                        navRouter = get(),
+                        linkScanner = get(),
+                        shareNavigationHack = get(),
+                        playlistItemOrchestrator = get(),
+                        playlistOrchestrator = get(),
+                        coroutines = get(),
+                        isMain = true
+                    )
+                }
+                scoped { EmailWrapper(activity = get<MainActivity>()) }
+                scoped { AndroidShareWrapper(activity = get<MainActivity>()) }
 
                 // ALL SHARE HACKS
-                scoped<DoneNavigation> { MainDoneNavigation(get<MainActivity>()) }
+                scoped<DoneNavigation> { MainDoneNavigation(mainActivity = get<MainActivity>()) }
                 scoped<CommitHost> { EmptyCommitHost() }
                 scoped { ShareNavigationHack() }
 
-                scoped<NavigationProvider> { MainNavigationProvider(get<MainActivity>(), get(), get()) }
-                scoped { NotificationPermissionCheckDialog(get<MainActivity>(), get(), get()) }
-                scoped { CastController(get(), get(), get(), get(), get(), get(), get(), get()) }
-                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(get<MainActivity>()) }
-                scoped<ChromecastContract.DialogWrapper> { CastDialogWrapper(get<MainActivity>(), get()) }
-                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get<MainActivity>()) }
+                scoped<NavigationProvider> {
+                    MainNavigationProvider(
+                        mainActivity = get<MainActivity>(),
+                        navRouter = get(),
+                        log = get()
+                    )
+                }
+                scoped {
+                    NotificationPermissionCheckDialog(
+                        activity = get<MainActivity>(),
+                        notificationPermissionCheck = get(),
+                        log = get()
+                    )
+                }
+                scoped {
+                    CastController(
+                        cuerCastPlayerWatcher = get(),
+                        chromeCastHolder = get(),
+                        chromeCastDialogWrapper = get(),
+                        chromeCastWrapper = get(),
+                        floatingManager = get(),
+                        playerControls = get(),
+                        castDialogLauncher = get(),
+                        ytServiceManager = get(), log = get(),
+                    )
+                }
+                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(activity = get<MainActivity>()) }
+                scoped<ChromecastContract.DialogWrapper> {
+                    CastDialogWrapper(
+                        activity = get<MainActivity>(),
+                        chromeCastWrapper = get()
+                    )
+                }
+                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<MainActivity>()) }
+                scoped { CuerSimpleVolumeController(castController = get(), log = get()) }
             }
         }
     }

@@ -45,8 +45,8 @@ class PlayerStoreFactory(
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
     private val playerSessionManager: PlayerSessionManager,
     private val playerSessionListener: PlayerSessionListener,
-
-    ) {
+    private val config: PlayerContract.PlayerConfig,
+) {
 
     private sealed class Result {
         object NoVideo : Result()
@@ -56,6 +56,7 @@ class PlayerStoreFactory(
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
         data class Screen(val content: Content) : Result()
         data class Position(val pos: Long) : Result()
+        data class Volume(val vol: Float) : Result()
     }
 
     private sealed class Action {
@@ -82,6 +83,7 @@ class PlayerStoreFactory(
                 )
 
                 is Result.Position -> copy(position = msg.pos)
+                is Result.Volume -> copy(volume = msg.vol)
             }
     }
 
@@ -142,7 +144,14 @@ class PlayerStoreFactory(
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
                 Intent.Stop -> publish(Label.Stop)
+                is Intent.VolumeChanged -> volumeChanged(intent)
             }
+
+        private fun volumeChanged(intent: Intent.VolumeChanged) {
+            //log.d("volumeChanged: ${intent.vol}")
+            playerSessionManager.setVolume(intent.vol)
+            dispatch(Result.Volume(intent.vol))
+        }
 
         private fun receiveDuration(intent: Intent.Duration) {
             livePlaybackController.gotDuration(intent.ms)
@@ -200,7 +209,9 @@ class PlayerStoreFactory(
             playlistAndItem
                 .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
                 .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
-                .apply { playerSessionManager.setMedia(item.media, null) }//
+                .apply { playerSessionManager.setMedia(item.media, null) }
+                //.apply { log.d("config.maxVolume: ${config.maxVolume}") }
+                .apply { playerSessionManager.setVolumeMax(config.maxVolume) }
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
@@ -220,16 +231,19 @@ class PlayerStoreFactory(
             log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
+
             mediaSessionManager.checkCreateMediaSession(mediaSessionListener)
+            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+
             playerSessionManager.checkCreateMediaSession(playerSessionListener)
+            playerSessionManager.setVolumeMax(config.maxVolume)
+            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
                     Load(intent.item.media.platformId, intent.item.media.startPosition())
                 )
             )
-            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
-            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
         }
 
         private fun updatePosition(

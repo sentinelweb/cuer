@@ -21,4 +21,6 @@ class PlayerSession(
     var playlist: PlaylistDomain? = null
     var playbackState: PlayerStateDomain? = null
     var liveOffset: Long? = null
+    var volume: Float = 0f
+    var volumeMax: Float = 0f
 }

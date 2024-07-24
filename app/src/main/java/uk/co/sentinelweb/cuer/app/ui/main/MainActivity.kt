@@ -125,11 +125,9 @@ class MainActivity :
                 bottom = padding.bottom + insets.systemWindowInsetBottom
             )
         }
-        navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, bundle: Bundle? ->
+        navController.addOnDestinationChangedListener { _: NavController, navDestination: NavDestination, _: Bundle? ->
             log.d("navigation change: dest: $navDestination|")
         }
-
-        volumeControl.controlView = binding.castPlayerVolume
 
         if (isOnboarding) {
             navController.navigate(
@@ -141,6 +139,8 @@ class MainActivity :
         } else {
             restoreBottomNavTab(savedInstanceState != null)
         }
+
+        volumeControl.controlView = binding.castPlayerVolume
         presenter.initialise()
     }
 

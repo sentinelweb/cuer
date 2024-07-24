@@ -132,7 +132,8 @@ class RemotesUiCoordinator :
                         floatingManager = get(),
                         playerControls = get(),
                         castDialogLauncher = EmptyCastDialogLauncher(),
-                        ytServiceManager = get()
+                        ytServiceManager = get(),
+                        log = get()
                     )
                 }
             }
