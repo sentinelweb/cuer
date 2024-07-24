@@ -47,7 +47,7 @@ class VlcPlayerKeyMap {
 
     val volDownAction: Action = object : AbstractAction() {
         override fun actionPerformed(e: ActionEvent) {
-            println("Vol up")
+            println("Vol down")
             val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
             val newVolume = (currentVolume - 4).coerceIn(0, 200)
             coordinator.dispatch(VolumeChanged(newVolume.toFloat()))
@@ -65,9 +65,8 @@ class VlcPlayerKeyMap {
 
         // associate the Actions with the Left, Right, and Space keys
 
-        attachKeymap(
-            component = mediaPlayerComponent.videoSurfaceComponent(),
-        )
+        attachKeymap(component = mediaPlayerComponent.videoSurfaceComponent())
+        attachKeymap(component = frame.rootPane)
     }
 
     private fun attachKeymap(
