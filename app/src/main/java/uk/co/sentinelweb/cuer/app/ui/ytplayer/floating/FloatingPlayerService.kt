@@ -132,6 +132,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         playerSessionManager = get(),
                         playerSessionListener = get(),
                         config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { FloatingWindowMviView(get(), get(), get(), get(), get()) }

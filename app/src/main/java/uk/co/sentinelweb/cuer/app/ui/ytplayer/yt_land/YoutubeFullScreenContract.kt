@@ -55,6 +55,7 @@ interface YoutubeFullScreenContract {
                         playerSessionManager = get(),
                         playerSessionListener = get(),
                         config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { navigationRouter(false, get<YoutubeFullScreenActivity>(), withNavHost = false) }

@@ -57,7 +57,8 @@ interface AytLandContract {
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
-                        config = PlayerContract.PlayerConfig(100f)
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { ShowHideUi(get<AytLandActivity>()) }

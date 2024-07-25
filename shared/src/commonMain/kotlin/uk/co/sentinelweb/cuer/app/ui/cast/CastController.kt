@@ -138,7 +138,7 @@ class CastController(
                     remoteNode?.name(),
                     isPlaying(),
                     if (isWatching()) {
-                        (volume / volumeMax * 100).toString() + " %"
+                        (volume / volumeMax * 100).toInt().toString() + " %"
                     } else {
                         "--"
                     },

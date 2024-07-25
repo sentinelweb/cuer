@@ -66,6 +66,7 @@ interface AytPortraitContract {
                         playerSessionManager = get(),
                         playerSessionListener = get(),
                         config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<AytPortraitActivity>(), get()) }

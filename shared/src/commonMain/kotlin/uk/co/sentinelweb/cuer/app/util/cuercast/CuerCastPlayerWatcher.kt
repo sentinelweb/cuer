@@ -95,8 +95,10 @@ class CuerCastPlayerWatcher(
                     // error handling
                     when (result) {
                         is NetResult.HttpError -> if (result.code == "503") {
-                            log.e("remote player not available: cleaning up ${remoteNode?.locator()}", result.t)
-                            cleanup()
+                            // fixme maybe cleanup after a few request - auto disconnect at launch
+                            // while player is starting
+                            log.e("remote player not available: ${remoteNode?.locator()}")
+                            //cleanup()
                         }
 
                         is NetResult.Error -> log.e("cast update error: ${remoteNode?.locator()}", result.t)

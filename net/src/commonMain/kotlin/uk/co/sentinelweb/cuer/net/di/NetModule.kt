@@ -69,23 +69,27 @@ object NetModule {
             RemoteStatusKtorInteractor(
                 availableService = get(),
                 availableMessageMapper = get(),
-                localRepository = get()
+                localRepository = get(),
+                coroutines = get(),
             )
         }
         factory<RemotePlaylistsInteractor> {
             RemotePlaylistsKtorInteractor(
-                remotePlaylistsService = get()
+                remotePlaylistsService = get(),
+                coroutines = get(),
             )
         }
         factory<RemotePlayerInteractor> {
             RemotePlayerKtorInteractor(
                 service = get(),
-                log = get()
+                log = get(),
+                coroutines = get(),
             )
         }
         factory<RemoteFilesInteractor> {
             RemoteFilesKtorInteractor(
                 remoteFilesService = get(),
+                coroutines = get(),
             )
         }
     }
