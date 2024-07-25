@@ -33,6 +33,7 @@ class FileBrowserViewModel(
 
     sealed class Label {
         object Init : Label()
+        object Up : Label()
     }
 
     val labels = MutableStateFlow<Label>(Label.Init)
@@ -47,12 +48,23 @@ class FileBrowserViewModel(
         loadCurrentPath()
     }
 
-    override fun clickFolder(folder: PlaylistDomain) {
+    fun onBackClick() {
+        state.currentFolder
+            ?.takeIf { it.children.size > 0 && state.path != null }
+            ?.also { onClickFolder(it.children[0]) }
+            ?: run { labels.value = Label.Up }
+    }
+
+    fun onUpClick() {
+        labels.value = Label.Up
+    }
+
+    override fun onClickFolder(folder: PlaylistDomain) {
         state.path = folder.platformId
         loadCurrentPath()
     }
 
-    override fun clickFile(file: PlaylistItemDomain) {
+    override fun onClickFile(file: PlaylistItemDomain) {
         if (listOf(VIDEO, AUDIO).contains(file.media.mediaType))
             playMedia(file)
         else if (FILE.equals(file.media.mediaType))
@@ -82,7 +94,7 @@ class FileBrowserViewModel(
     }
 
     private fun selectScreenDialog() {
-        // show screen selection dialog
+        // show screen selection dialog - build into remotesSelector
     }
 
     private fun launchRemotePlayer(screen: PlayerNodeDomain.Screen) {

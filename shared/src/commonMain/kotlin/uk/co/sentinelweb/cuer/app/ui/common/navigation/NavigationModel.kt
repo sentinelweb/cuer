@@ -86,6 +86,7 @@ data class NavigationModel constructor(
         DO_AUTO_BACKUP(Boolean::class),
         ONBOARD_CONFIG(OnboardingContract.Config::class),
         ONBOARD_KEY(String::class),
+        BACK_PARAMS(Int::class)
         ;
     }
 

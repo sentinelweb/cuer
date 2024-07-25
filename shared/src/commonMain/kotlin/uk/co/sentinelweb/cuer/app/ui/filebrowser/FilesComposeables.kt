@@ -35,7 +35,7 @@ object FilesComposeables {
                 .fillMaxHeight()
         ) {
             model.list.children.forEach {
-                Row(modifier = Modifier.clickable { view.clickFolder(it) }) {
+                Row(modifier = Modifier.clickable { view.onClickFolder(it) }) {
                     val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
                     Image(
                         painter = painterResource(icon),
@@ -48,7 +48,7 @@ object FilesComposeables {
             }
             model.list.playlist.items.forEach {
                 Row(modifier = Modifier.clickable {
-                    view.clickFile(it)
+                    view.onClickFile(it)
                 }) {
                     val icon = when (it.media.mediaType) {
                         VIDEO -> Res.drawable.ic_video

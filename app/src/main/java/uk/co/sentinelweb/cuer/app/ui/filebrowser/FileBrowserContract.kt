@@ -12,7 +12,7 @@ interface FileBrowserContract {
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
         var remotePlayerConfig: PlayerNodeDomain? = null,
-        var selectedFile: PlaylistItemDomain? = null
+        var selectedFile: PlaylistItemDomain? = null,
     )
 
     data class AppFilesUiModel(
