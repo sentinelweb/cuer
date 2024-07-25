@@ -1,5 +1,9 @@
 package uk.co.sentinelweb.cuer.app.ui.common.dialog.play
 
+import android.app.Activity
+import android.app.Application
+import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
@@ -44,9 +48,11 @@ class PlayDialog constructor(
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
 
-    override lateinit var playUseCase: PlayUseCase
+    override var playUseCase: PlayUseCase? = null
 
-    private lateinit var dialog: AlertDialog
+    private var _dialog: AlertDialog? = null
+    private val dialog: AlertDialog
+        get() = _dialog ?: throw Exception("AlertDialog not bound")
 
     override fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain) {//item: PlaylistItemDomain?, playlistTitle: String?
         _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
@@ -57,7 +63,7 @@ class PlayDialog constructor(
         binding.dpChromecast.setOnClickListener {
 //            f.childFragmentManager
             castDialogWrapper.showRouteSelector()
-            playlistAndItem.apply { playUseCase.setQueueItem(this) }
+            playlistAndItem.apply { playUseCase?.setQueueItem(this) }
             (f.requireActivity() as? MainActivity)?.showPlayer()
             dialog.dismiss()
         }
@@ -82,10 +88,10 @@ class PlayDialog constructor(
         binding.dpFloating.setOnClickListener {
             val hasPermission = floatingService.hasPermission(f.requireActivity())
             if (hasPermission) {
-                playlistAndItem.apply { playUseCase.setQueueItem(this) }
+                playlistAndItem.apply { playUseCase?.setQueueItem(this) }
                 // fixme the item is not received by the player mvi binding not made yet?
                 floatingService.start(f.requireActivity(), playlistAndItem)
-                playUseCase.attachControls(
+                playUseCase?.attachControls(
                     (f.requireActivity() as? MainContract.View)?.playerControls
                 )
                 (f.requireActivity() as? MainActivity)?.showPlayer()
@@ -114,16 +120,34 @@ class PlayDialog constructor(
                     false
                 )
         }
-        dialog = MaterialAlertDialogBuilder(f.requireContext())
+        _dialog = MaterialAlertDialogBuilder(f.requireContext())
             .setTitle(f.getString(R.string.play_dialog_title))
             .setIcon(R.drawable.ic_play)
             .setView(binding.root)
+            .setOnDismissListener { playUseCase = null }
             .create()
         dialog.show()
     }
 
     override fun showDialog(model: AlertDialogModel) {
         alertDialogCreator.create(model).show()
+    }
+
+    private fun registerCleanupOnDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            f.activity?.registerActivityLifecycleCallbacks(object : Application.ActivityLifecycleCallbacks {
+                override fun onActivityDestroyed(p0: Activity) {
+                    _dialog?.dismiss();_dialog = null;
+                }
+
+                override fun onActivityCreated(p0: Activity, p1: Bundle?) = Unit
+                override fun onActivityStarted(p0: Activity) = Unit
+                override fun onActivityResumed(p0: Activity) = Unit
+                override fun onActivityPaused(p0: Activity) = Unit
+                override fun onActivityStopped(p0: Activity) = Unit
+                override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) = Unit
+            })
+        }
     }
 
     private val emptyInteractions = object : ItemContract.Interactions {

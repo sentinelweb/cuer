@@ -26,7 +26,7 @@ class PlayUseCase constructor(
 ) {
 
     interface Dialog {
-        var playUseCase: PlayUseCase
+        var playUseCase: PlayUseCase?
         fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain)
         fun showDialog(model: AlertDialogModel)
     }

@@ -120,6 +120,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
     override fun onDestroyView() {
         _binding = null
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = null
         super.onDestroyView()
     }
 
