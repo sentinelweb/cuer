@@ -82,9 +82,8 @@ class CuerCastPlayerWatcher(
 
     private suspend fun updatePlayerState(result: NetResult<PlayerSessionContract.PlayerStatusMessage>) =
         withContext(coroutines.Main) {
-            // todo process errors
-            // if 503 - either disconnect or set unavailable flag in state
-            result.takeIf { it.isSuccessful }?.data
+            result.takeIf { it.isSuccessful }
+                ?.data
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
@@ -92,6 +91,18 @@ class CuerCastPlayerWatcher(
                 ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
                 ?.apply { state.lastMessage = this }
                 ?.apply { log.d("from host: volume:${state.lastMessage?.volume} max:${state.lastMessage?.volumeMax}") }
+                ?: run {
+                    // error handling
+                    when (result) {
+                        is NetResult.HttpError -> if (result.code == "503") {
+                            log.e("remote player not available: cleaning up ${remoteNode?.locator()}", result.t)
+                            cleanup()
+                        }
+
+                        is NetResult.Error -> log.e("cast update error: ${remoteNode?.locator()}", result.t)
+                        is NetResult.Data -> Unit
+                    }
+                }
         }
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
