@@ -53,7 +53,7 @@ class CuerCastPlayerWatcher(
             } else if (value != null) {
                 value.addListener(controlsListener)
                 value.setCastDetails(CastDetails(CuerCast, Connected, remoteNode?.name()))
-                initPolling()
+                startPolling()
             }
             field = value
             //currentButtons?.let { value?.setButtons(it) }
@@ -63,7 +63,7 @@ class CuerCastPlayerWatcher(
 
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
 
-    private fun initPolling() {
+    private fun startPolling() {
         pollingJob = coroutines.mainScope.launch {
             while (isActive && remoteNode != null) {
                 val watcherLocator1 = remoteNode

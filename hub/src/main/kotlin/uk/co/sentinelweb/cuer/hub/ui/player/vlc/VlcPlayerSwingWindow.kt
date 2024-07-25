@@ -128,6 +128,7 @@ class VlcPlayerSwingWindow(
                 "--disable-screensaver",
                 "--video-title-show",
                 "--video-title-timeout", "3000",
+                "--quiet",
             )
         this.contentPane.add(mediaPlayerComponent, CENTER)
 

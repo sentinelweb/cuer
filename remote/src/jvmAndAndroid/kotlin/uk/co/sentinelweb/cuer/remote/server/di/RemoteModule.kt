@@ -18,7 +18,14 @@ object RemoteModule {
             val buildConfigDomain: BuildConfigDomain = get()
             val multiPort = if (buildConfigDomain.isDebug) MULTICAST_PORT_DEBUG_DEF else MULTICAST_PORT_DEF
             val config = MultiCastSocketContract.Config(multicastPort = multiPort)
-            JvmMultiCastSocket(config, get(), get(), get(), get())
+            JvmMultiCastSocket(
+                config = config,
+                log = get(),
+                localRepository = get(),
+                availableMessageMapper = get(),
+                availableMessageHandler = get(),
+                coroutines = get()
+            )
         }
         factory { AvailableMessageMapper(get()) }
     }
