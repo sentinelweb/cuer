@@ -29,6 +29,17 @@ internal class MultiPlatformPreferencesWrapperImpl(private val settings: Setting
         prefs.putInt(field.fname, value)
     }
 
+    override fun getFloat(field: MultiPlatformPreferences): Float? =
+        if (prefs.hasKey(field.fname)) prefs.getFloat(field.fname, 0f)
+        else null
+
+    override fun getFloat(field: MultiPlatformPreferences, def: Float): Float =
+        prefs.getFloat(field.fname, def)
+
+    override fun putFloat(field: MultiPlatformPreferences, value: Float) {
+        prefs.putFloat(field.fname, value)
+    }
+
     override fun getString(field: MultiPlatformPreferences, def: String?): String? =
         prefs.getStringOrNull(field.fname) ?: def
 

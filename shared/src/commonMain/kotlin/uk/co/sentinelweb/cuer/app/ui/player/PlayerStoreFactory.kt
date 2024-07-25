@@ -20,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -46,6 +47,7 @@ class PlayerStoreFactory(
     private val playerSessionManager: PlayerSessionManager,
     private val playerSessionListener: PlayerSessionListener,
     private val config: PlayerContract.PlayerConfig,
+    private val prefs: MultiPlatformPreferencesWrapper,
 ) {
 
     private sealed class Result {
@@ -149,6 +151,7 @@ class PlayerStoreFactory(
 
         private fun volumeChanged(intent: Intent.VolumeChanged) {
             //log.d("volumeChanged: ${intent.vol}")
+            prefs.volume = intent.vol
             playerSessionManager.setVolume(intent.vol)
             dispatch(Result.Volume(intent.vol))
         }
@@ -199,6 +202,7 @@ class PlayerStoreFactory(
             // fixme there seem to be some race condition when binding the store to the UI so the initial load command
             // label doesnt make it to the view.processLabel() - this delay gets around it
             delay(1)
+            dispatch(Result.Volume(prefs.volume))
             itemLoader.load()?.also { playlistAndItem ->
                 log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
                 loadItem(playlistAndItem)

@@ -200,6 +200,7 @@ class VlcPlayerUiCoordinator(
                         playerSessionManager = get(),
                         playerSessionListener = get(),
                         config = PlayerContract.PlayerConfig(maxVolume = 200f),
+                        prefs = get()
                     ).create()
                 }
                 scoped<SkipContract.External> {

@@ -42,6 +42,7 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     FOLDER_ROOTS("folder.roots"),
     SKIP_FWD_TIME("skipFwdTime"),
     SKIP_BACK_TIME("skipBackTime"),
+    VOLUME("volume"),
     ;
 
     companion object {
@@ -159,6 +160,11 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
         get() = getInt(LAST_BOTTOM_TAB) ?: 0
         set(value) = value
             .let { putInt(LAST_BOTTOM_TAB, it) }
+
+    var volume: Float
+        get() = getFloat(VOLUME) ?: 0f
+        set(value) = value
+            .let { putFloat(VOLUME, it) }
 
     fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
     fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)
