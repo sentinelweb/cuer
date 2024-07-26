@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes.selector
 
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 // fixme memory leak somewhere - see leak canary
@@ -10,8 +11,8 @@ class RemotesDialogLauncher(
 ) : RemotesDialogContract.Launcher {
 
     private var dialogFragment: DialogFragment? = null
-    override fun launchRemotesDialog(selected: (RemoteNodeDomain) -> Unit) {
-        dialogFragment = RemotesDialogFragment.newInstance(selected)
+    override fun launchRemotesDialog(callback: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit) {
+        dialogFragment = RemotesDialogFragment.newInstance(callback)
         dialogFragment?.show(activity.supportFragmentManager, CAST_DIALOG_FRAGMENT_TAG)
     }
 

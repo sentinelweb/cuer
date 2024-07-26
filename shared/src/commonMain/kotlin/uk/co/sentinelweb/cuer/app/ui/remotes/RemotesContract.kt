@@ -6,11 +6,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.ServerState.INITIAL
 
@@ -120,6 +117,16 @@ class RemotesContract {
             val deviceType: NodeDomain.DeviceType,
             val authType: String,
             val domain: RemoteNodeDomain,
+            val screens: List<Screen>,
+        )
+
+        data class Screen(
+            val index: Int,
+            val width: Int,
+            val height: Int,
+            val refreshRate: Int,
+            val name: String,
+            val domain: PlayerNodeDomain.Screen
         )
 
         sealed class Event {

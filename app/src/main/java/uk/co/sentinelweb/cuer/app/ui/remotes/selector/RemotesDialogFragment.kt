@@ -17,10 +17,11 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class RemotesDialogFragment(
-    private val selectedListener: (RemoteNodeDomain) -> Unit
+    private val selectedListener: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit
 ) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
@@ -85,7 +86,7 @@ class RemotesDialogFragment(
     }
 
     companion object {
-        fun newInstance(selected: (RemoteNodeDomain) -> Unit): RemotesDialogFragment {
+        fun newInstance(selected: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit): RemotesDialogFragment {
             return RemotesDialogFragment(selected)
         }
 
@@ -96,7 +97,9 @@ class RemotesDialogFragment(
                     RemotesDialogViewModel(
                         repo = get(),
                         mapper = get(),
-                        coroutines = get()
+                        coroutines = get(),
+                        playerInteractor = get(),
+                        state = RemotesDialogContract.State()
                     )
                 }
             }

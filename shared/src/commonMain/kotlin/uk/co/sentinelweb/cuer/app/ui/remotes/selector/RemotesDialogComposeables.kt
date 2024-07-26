@@ -17,6 +17,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
+import uk.co.sentinelweb.cuer.shared.generated.resources.ic_tv
 import uk.co.sentinelweb.cuer.shared.generated.resources.remotes_dialog_title
 
 object RemotesDialogComposeables {
@@ -69,25 +70,25 @@ object RemotesDialogComposeables {
         remote: RemotesContract.View.RemoteNodeModel,
         viewModel: RemotesDialogViewModel
     ) {
-        // fixme why isAvailable false
-        val contentColor = remote.domain.isAvailable
-            .takeIf { it }
-            ?.let { MaterialTheme.colors.onSurface }
-            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-        Box(
+        // fixme why isAvailable false?
+//        val contentColor = remote.domain.isAvailable
+//            .takeIf { it }
+//            ?.let { MaterialTheme.colors.onSurface }
+//            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+        val contentColor = MaterialTheme.colors.onSurface
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { viewModel.onSelected(remote.domain) },
-            contentAlignment = Alignment.CenterEnd,
+
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .background(MaterialTheme.colors.surface),
+                    .background(MaterialTheme.colors.surface)
+                    .clickable { viewModel.onNodeSelected(remote.domain) },
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-
                 Image(
                     painter = painterResource(RemotesIconMapper.map(remote.deviceType)),
                     contentDescription = "Remote Icon",
@@ -101,7 +102,7 @@ object RemotesDialogComposeables {
                     Text(
                         text = remote.title,
                         color = contentColor,
-                        style = MaterialTheme.typography.h5,
+                        style = MaterialTheme.typography.h4,
                         modifier = Modifier
                             .padding(start = 8.dp),
                     )
@@ -117,6 +118,40 @@ object RemotesDialogComposeables {
                         style = MaterialTheme.typography.body2,
                         modifier = Modifier.padding(start = 8.dp)
                     )
+                }
+            }
+            remote.screens.forEach { screen ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp)
+                        .background(MaterialTheme.colors.surface)
+                        .clickable { viewModel.onScreenSelected(remote.domain, screen.domain) },
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Image(
+                        painter = painterResource(Res.drawable.ic_tv),
+                        contentDescription = "Remote Icon",
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(8.dp)
+                            .align(Alignment.CenterVertically)
+                    )
+                    Column { // todo use textview
+                        Text(
+                            text = "${screen.index}. ${screen.name}",
+                            color = contentColor,
+                            style = MaterialTheme.typography.h6,
+                            modifier = Modifier
+                                .padding(start = 8.dp),
+                        )
+                        Text(
+                            text = "${screen.width} x ${screen.height} @ ${screen.refreshRate} ",
+                            color = contentColor,
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
                 }
             }
         }

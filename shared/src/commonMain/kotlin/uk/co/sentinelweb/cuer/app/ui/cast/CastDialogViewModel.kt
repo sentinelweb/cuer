@@ -20,8 +20,7 @@ class CastDialogViewModel(
 
     fun connectCuerCast() {
         if (!_model.value.cuerCastStatus.isConnected) {
-            remotesLauncher.launchRemotesDialog { remoteNode ->
-                // todo screen selection
+            remotesLauncher.launchRemotesDialog { remoteNode, selectedScreen ->
                 remotesLauncher.hideRemotesDialog()
                 castController.connectCuerCast(remoteNode)
             }

@@ -7,12 +7,10 @@ import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.AppFilesUiModel
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.net.remote.RemoteFilesInteractor
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
@@ -26,6 +24,7 @@ class FileBrowserViewModel(
     private val playerInteractor: RemotePlayerInteractor,
     private val log: LogWrapper,
     private val castController: CastController,
+    private val remoteDialogLauncher: RemotesDialogContract.Launcher,
 ) : FilesContract.Interactions, ViewModel() {
 
     override val modelObservable = MutableStateFlow(blankModel())
@@ -76,36 +75,26 @@ class FileBrowserViewModel(
         viewModelScope.launch {
             appModelObservable.value = AppFilesUiModel(loading = true)
             state.node?.apply {
-                state.remotePlayerConfig = playerInteractor.getPlayerConfig(this.locator()).data
-                state.remotePlayerConfig?.apply {
-                    // modelObservable.value = mapper.map(this)
-                    log.d("remotePlayerConfig: $this")
-                    if (this.screens.size == 1) {
-                        launchRemotePlayer(this.screens[0])
-                    } else {
-                        // fixme implement this later
-                        //selectScreenDialog()
-                        launchRemotePlayer(this.screens[this.screens.size - 1])
-                    }
-                }
+                // show remotes dialog and wait for selection
+                // todo check if connected and just launch video directly - need scren ref in castController
+                remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
+                    launchRemotePlayer(remoteNode, screen)
+                })
                 appModelObservable.value = AppFilesUiModel(loading = false)
             }
         }
     }
 
-    private fun selectScreenDialog() {
-        // show screen selection dialog - build into remotesSelector
-    }
-
-    private fun launchRemotePlayer(screen: PlayerNodeDomain.Screen) {
+    private fun launchRemotePlayer(remoteNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
         viewModelScope.launch {
             appModelObservable.value = AppFilesUiModel(loading = true)
             playerInteractor.launchPlayerVideo(
-                state.node?.locator()!!,
-                state.selectedFile!!,
+                remoteNode.locator(),
+                state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
             castController.connectCuerCast(state.node)
+            remoteDialogLauncher.hideRemotesDialog()
             appModelObservable.value = AppFilesUiModel(loading = false)
         }
     }
