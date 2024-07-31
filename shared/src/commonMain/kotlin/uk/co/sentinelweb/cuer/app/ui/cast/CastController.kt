@@ -1,14 +1,21 @@
 package uk.co.sentinelweb.cuer.app.ui.cast
 
+import kotlinx.coroutines.withContext
+import org.jetbrains.compose.resources.getString
 import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogModel.CuerCastStatus
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
+import uk.co.sentinelweb.cuer.shared.generated.resources.Res
+import uk.co.sentinelweb.cuer.shared.generated.resources.cast_control_floating_window
+import uk.co.sentinelweb.cuer.shared.generated.resources.cast_control_not_connected
+import uk.co.sentinelweb.cuer.shared.generated.resources.cast_control_unknown
 
 class CastController(
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
@@ -19,6 +26,7 @@ class CastController(
     private val playerControls: PlayerContract.PlayerControls,
     private val castDialogLauncher: CastContract.CastDialogLauncher,
     private val ytServiceManager: YoutubeCastServiceContract.Manager,
+    private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
 ) {
 
@@ -122,15 +130,20 @@ class CastController(
         }
     }
 
-    fun map(): CastDialogModel {
+
+    suspend fun map(): CastDialogModel = withContext(coroutines.Main) {
 //        chromeCastWrapper.logCastDevice()
 //        chromeCastWrapper.logRoutes()
+        // goes into the dialog header - player data is mapped lower down
         val connectedStatus = if (cuerCastPlayerWatcher.isWatching()) {
-            "CuerCast: " + cuerCastPlayerWatcher.remoteNode?.name()
+            cuerCastPlayerWatcher.remoteNode?.name() ?: getString(Res.string.cast_control_unknown)
         } else if (chromeCastHolder.isConnected()) {
-            "ChromeCast: " + chromeCastWrapper.getCastDeviceName()
-        } else "Not Connected"
-        return CastDialogModel(
+            chromeCastWrapper.getCastDeviceName() ?: getString(Res.string.cast_control_unknown)
+        } else if (floatingManager.isRunning()) {
+            getString(Res.string.cast_control_floating_window)
+        } else getString(Res.string.cast_control_not_connected)
+
+        CastDialogModel(
             connectedStatus,
             cuerCastPlayerWatcher.run {
                 CuerCastStatus(

@@ -9,4 +9,9 @@
     <!-- remotes -->
     <string name="remotes_dialog_title">Select Remote</string>
 
+    <!-- cast controller -->
+    <string name="cast_control_unknown">Unknown</string>
+    <string name="cast_control_floating_window">Floating window</string>
+    <string name="cast_control_not_connected">Not Connected</string>
+
 </resources>

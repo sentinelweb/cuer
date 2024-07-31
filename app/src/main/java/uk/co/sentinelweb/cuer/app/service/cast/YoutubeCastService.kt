@@ -132,6 +132,7 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
                         playerControls = get(),
                         castDialogLauncher = EmptyCastDialogLauncher(),
                         ytServiceManager = get(),
+                        coroutines = get(),
                         log = get(),
                     )
                 }

@@ -133,6 +133,7 @@ class RemotesUiCoordinator :
                         playerControls = get(),
                         castDialogLauncher = EmptyCastDialogLauncher(),
                         ytServiceManager = get(),
+                        coroutines = get(),
                         log = get()
                     )
                 }

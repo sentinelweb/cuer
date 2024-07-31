@@ -139,7 +139,9 @@ interface MainContract {
                         floatingManager = get(),
                         playerControls = get(),
                         castDialogLauncher = get(),
-                        ytServiceManager = get(), log = get(),
+                        ytServiceManager = get(),
+                        coroutines = get(),
+                        log = get(),
                     )
                 }
                 scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(activity = get<MainActivity>()) }

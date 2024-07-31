@@ -142,6 +142,7 @@ class CastPlayerFragment() :
             Connected, Disconnected -> hideBuffering()
             Connecting -> showBuffering()
         }
+        binding.castConnectionSummary.text = details.name
     }
 
     override fun onAttach(context: Context) {

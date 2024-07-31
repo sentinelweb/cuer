@@ -15,7 +15,9 @@ class CastDialogViewModel(
     val model: Flow<CastDialogModel> = _model
 
     init {
-        _model.value = castController.map()
+        coroutines.mainScope.launch {
+            _model.value = castController.map()
+        }
     }
 
     fun connectCuerCast() {
@@ -29,7 +31,9 @@ class CastDialogViewModel(
 
     fun disconnectCuerCast() {
         castController.connectCuerCast(null)
-        _model.value = castController.map()
+        coroutines.mainScope.launch {
+            _model.value = castController.map()
+        }
     }
 
     fun stopCuerCast() {
@@ -42,12 +46,16 @@ class CastDialogViewModel(
     fun connectChromeCast() {
         if (!_model.value.chromeCastStatus.isConnected) {
             castController.connectChromeCast()
-            _model.value = castController.map()
+            coroutines.mainScope.launch {
+                _model.value = castController.map()
+            }
         }
     }
 
     fun disconnectChromeCast() {
         castController.disonnectChromeCast()
-        _model.value = castController.map()
+        coroutines.mainScope.launch {
+            _model.value = castController.map()
+        }
     }
 }

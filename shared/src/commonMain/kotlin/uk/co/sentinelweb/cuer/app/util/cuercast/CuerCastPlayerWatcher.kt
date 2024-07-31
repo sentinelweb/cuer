@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.cuercast
 
 import kotlinx.coroutines.*
+import org.jetbrains.compose.resources.getString
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
@@ -17,6 +18,8 @@ import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
+import uk.co.sentinelweb.cuer.shared.generated.resources.Res
+import uk.co.sentinelweb.cuer.shared.generated.resources.cast_control_unknown
 
 // using FloatingWindowMviView as a template
 class CuerCastPlayerWatcher(
@@ -49,10 +52,20 @@ class CuerCastPlayerWatcher(
             pollingJob?.cancel()
             if (field != null && value == null) {
                 field?.removeListener(controlsListener)
-                field?.setCastDetails(CastDetails(CuerCast, Disconnected))
+                coroutines.mainScope.launch {
+                    field?.setCastDetails(CastDetails(CuerCast, Disconnected))
+                }
             } else if (value != null) {
                 value.addListener(controlsListener)
-                value.setCastDetails(CastDetails(CuerCast, Connected, remoteNode?.name()))
+                coroutines.mainScope.launch {
+                    value.setCastDetails(
+                        CastDetails(
+                            CuerCast,
+                            Connected,
+                            remoteNode?.name() ?: getString(Res.string.cast_control_unknown)
+                        )
+                    )
+                }
                 startPolling()
             }
             field = value
