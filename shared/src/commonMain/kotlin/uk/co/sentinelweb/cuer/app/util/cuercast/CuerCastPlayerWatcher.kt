@@ -79,10 +79,10 @@ class CuerCastPlayerWatcher(
     private fun startPolling() {
         pollingJob = coroutines.mainScope.launch {
             while (isActive && remoteNode != null) {
-                val watcherLocator1 = remoteNode
-                if (watcherLocator1 != null) {
+                val watcherNode = remoteNode
+                if (watcherNode != null) {
                     remotePlayerInteractor
-                        .playerSessionStatus(watcherLocator1.locator())
+                        .playerSessionStatus(watcherNode.locator())
                         .also { updatePlayerState(it) }
                     delay(1000)
                 } else {
