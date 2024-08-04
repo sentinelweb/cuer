@@ -12,12 +12,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
-import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.usecase.GetPlaylistsFromDeviceUseCase
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -31,9 +29,7 @@ import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Pin
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
-    private val strings: StringDecoder,
     private val log: LogWrapper,
-    private val prefs: MultiPlatformPreferencesWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
@@ -109,11 +105,17 @@ class RemotesStoreFactory constructor(
                 is Intent.RemoteFolders -> getRemoteFolders(intent)
                 is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
                 is Intent.CuerConnect -> cuerConnect(intent)
+                is Intent.CuerConnectScreen -> cuerConnectScreen(intent)
             }
 
         private fun cuerConnect(intent: Intent.CuerConnect) {
-            castController.connectCuerCast(intent.remote)
-            publish(Label.CuerConnected(intent.remote))
+            // fixme check screens
+            publish(Label.CuerSelectScreen(intent.remote))
+        }
+
+        private fun cuerConnectScreen(intent: Intent.CuerConnectScreen) {
+            castController.connectCuerCast(intent.remote, intent.screen)
+            publish(Label.CuerConnected(intent.remote, intent.screen))
         }
 
         private fun deleteRemote(intent: Intent.RemoteDelete) {

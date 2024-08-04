@@ -134,7 +134,8 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         playerInteractor = get(),
                         log = get(),
                         castController = get(),
-                        remoteDialogLauncher = get()
+                        remoteDialogLauncher = get(),
+                        cuerCastPlayerWatcher = get(),
                     )
                 }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }

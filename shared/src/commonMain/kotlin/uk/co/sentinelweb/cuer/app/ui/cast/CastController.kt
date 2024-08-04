@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
@@ -33,6 +34,7 @@ class CastController(
     init {
         log.tag(this)
     }
+
     fun showCastDialog() {
         castDialogLauncher.launchCastDialog()
     }
@@ -86,8 +88,9 @@ class CastController(
         cuerCastPlayerWatcher.cleanup()
     }
 
-    fun connectCuerCast(node: RemoteNodeDomain?) {
+    fun connectCuerCast(node: RemoteNodeDomain?, screen: PlayerNodeDomain.Screen?) {
         cuerCastPlayerWatcher.remoteNode = node
+        cuerCastPlayerWatcher.screen = screen
         cuerCastPlayerWatcher.mainPlayerControls = node?.let { playerControls }
         castDialogLauncher.hideCastDialog()
     }

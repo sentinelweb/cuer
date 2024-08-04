@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.util.cuercast
 
 import kotlinx.coroutines.*
-import org.jetbrains.compose.resources.getString
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
@@ -10,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCas
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
@@ -18,8 +18,6 @@ import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
-import uk.co.sentinelweb.cuer.shared.generated.resources.Res
-import uk.co.sentinelweb.cuer.shared.generated.resources.cast_control_unknown
 
 // using FloatingWindowMviView as a template
 class CuerCastPlayerWatcher(
@@ -37,6 +35,7 @@ class CuerCastPlayerWatcher(
     }
 
     var remoteNode: RemoteNodeDomain? = null
+    var screen: PlayerNodeDomain.Screen? = null
 
     private var pollingJob: Job? = null
 
@@ -62,7 +61,7 @@ class CuerCastPlayerWatcher(
                         CastDetails(
                             CuerCast,
                             Connected,
-                            remoteNode?.name() ?: getString(Res.string.cast_control_unknown)
+                            getConnectionDescription()
                         )
                     )
                 }
@@ -71,6 +70,11 @@ class CuerCastPlayerWatcher(
             field = value
             //currentButtons?.let { value?.setButtons(it) }
         }
+
+    fun getConnectionDescription() =
+        (remoteNode?.name()
+            ?.let { it + "[" + (screen?.index ?: 0) + "]" })
+            ?: "Not connected"
 
     fun isWatching(): Boolean = remoteNode != null
 

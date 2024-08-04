@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.AppFilesUiModel
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
@@ -25,6 +26,7 @@ class FileBrowserViewModel(
     private val log: LogWrapper,
     private val castController: CastController,
     private val remoteDialogLauncher: RemotesDialogContract.Launcher,
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
 ) : FilesContract.Interactions, ViewModel() {
 
     override val modelObservable = MutableStateFlow(blankModel())
@@ -42,8 +44,8 @@ class FileBrowserViewModel(
     }
 
     fun init(id: GUID) {
-        state.remoteId = id
-        state.node = remotesRepository.getById(id)
+        state.sourceRemoteId = id
+        state.sourceNode = remotesRepository.getById(id)
         loadCurrentPath()
     }
 
@@ -74,12 +76,17 @@ class FileBrowserViewModel(
         state.selectedFile = file
         viewModelScope.launch {
             appModelObservable.value = AppFilesUiModel(loading = true)
-            state.node?.apply {
-                // show remotes dialog and wait for selection
-                // todo check if connected and just launch video directly - need scren ref in castController
-                remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
-                    launchRemotePlayer(remoteNode, screen)
-                })
+            state.sourceNode?.apply {
+                if (cuerCastPlayerWatcher.isWatching()) {
+                    launchRemotePlayer(
+                        cuerCastPlayerWatcher.remoteNode ?: throw IllegalStateException("No remote"),
+                        cuerCastPlayerWatcher.screen ?: throw IllegalStateException("No remote screen")
+                    )
+                } else {
+                    remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
+                        launchRemotePlayer(remoteNode, screen)
+                    })
+                }
                 appModelObservable.value = AppFilesUiModel(loading = false)
             }
         }
@@ -93,7 +100,7 @@ class FileBrowserViewModel(
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
-            castController.connectCuerCast(state.node)
+            castController.connectCuerCast(state.sourceNode, screen)
             remoteDialogLauncher.hideRemotesDialog()
             appModelObservable.value = AppFilesUiModel(loading = false)
         }
@@ -106,7 +113,7 @@ class FileBrowserViewModel(
     private fun loadCurrentPath() {
         viewModelScope.launch {
             appModelObservable.value = AppFilesUiModel(loading = true)
-            state.node?.apply {
+            state.sourceNode?.apply {
                 state.currentFolder = filesInteractor.getFolderList(this.locator(), state.path).data
                 state.currentFolder?.apply {
                     modelObservable.value = mapper.map(this)

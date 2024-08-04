@@ -21,7 +21,8 @@ import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class RemotesDialogFragment(
-    private val selectedListener: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit
+    private val selectedListener: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
+    private val selectedNode: RemoteNodeDomain?
 ) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
@@ -60,6 +61,7 @@ class RemotesDialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.listener = selectedListener
+        selectedNode?.apply { viewModel.onNodeSelected(this) }
         binding.composeView.setContent {
             RemotesDialogComposeables.RemotesDialogUi(viewModel)
         }
@@ -86,8 +88,11 @@ class RemotesDialogFragment(
     }
 
     companion object {
-        fun newInstance(selected: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit): RemotesDialogFragment {
-            return RemotesDialogFragment(selected)
+        fun newInstance(
+            selected: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
+            selectedNode: RemoteNodeDomain?
+        ): RemotesDialogFragment {
+            return RemotesDialogFragment(selected, selectedNode)
         }
 
         @JvmStatic

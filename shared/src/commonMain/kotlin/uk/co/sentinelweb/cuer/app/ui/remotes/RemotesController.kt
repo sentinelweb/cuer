@@ -69,6 +69,7 @@ class RemotesController(
             is Event.OnActionPlaylists -> Intent.RemotePlaylists(remote)
             is Event.OnActionFolders -> Intent.RemoteFolders(remote)
             is Event.OnActionCuerConnect -> Intent.CuerConnect(remote)
+            is Event.OnActionCuerConnectScreen -> Intent.CuerConnectScreen(remote, screen)
         }
     }
 

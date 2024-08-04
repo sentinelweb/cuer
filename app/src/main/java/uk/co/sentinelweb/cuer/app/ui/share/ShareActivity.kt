@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.net.Uri
 import android.os.Bundle
-import android.view.KeyEvent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
@@ -34,7 +33,6 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditFragment
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanFragmentDirections
-import uk.co.sentinelweb.cuer.app.util.chromecast.CuerSimpleVolumeController
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
@@ -60,7 +58,9 @@ class ShareActivity : AppCompatActivity(),
     private val presenter: ShareContract.Presenter by inject()
     private val shareWrapper: AndroidShareWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val volumeControl: CuerSimpleVolumeController by inject()
+
+    // todo reenable would have to inject player controls from notif (if available else empty)
+    //private val volumeControl: CuerSimpleVolumeController by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
@@ -122,19 +122,19 @@ class ShareActivity : AppCompatActivity(),
         navController.addOnDestinationChangedListener { _: NavController, _: NavDestination, _: Bundle? ->
             presenter.onDestinationChange()
         }
-        volumeControl.controlView = binding.castPlayerVolume
+        //volumeControl.controlView = binding.castPlayerVolume
         scanFragment.listener = this
     }
 
     override fun onDestroy() {
-        volumeControl.controlView = null
+        //volumeControl.controlView = null
         _binding = null
         snackbar = null
         super.onDestroy()
     }
 
-    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
-        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
+//    override fun dispatchKeyEvent(event: KeyEvent): Boolean =
+//        if (volumeControl.handleVolumeKey(event)) true else super.dispatchKeyEvent(event)
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         if (hasFocus && intent.getBooleanExtra(PASTE.toString(), false)) {

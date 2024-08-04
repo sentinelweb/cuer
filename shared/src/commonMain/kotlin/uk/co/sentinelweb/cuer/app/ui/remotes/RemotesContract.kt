@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain.Screen
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.ServerState.INITIAL
 
@@ -35,6 +36,7 @@ class RemotesContract {
             data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
             data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
             data class CuerConnect(val remote: RemoteNodeDomain) : Intent()
+            data class CuerConnectScreen(val remote: RemoteNodeDomain, val screen: Screen?) : Intent()
         }
 
         sealed class Label {
@@ -46,7 +48,8 @@ class RemotesContract {
             object ActionConfig : Label()
             data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
             data class Message(val msg: String) : Label()
-            data class CuerConnected(val node: RemoteNodeDomain) : Label()
+            data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
+            data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()
 
         }
 
@@ -147,6 +150,8 @@ class RemotesContract {
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
             data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
             data class OnActionCuerConnect(val remote: RemoteNodeDomain) : Event()
+            data class OnActionCuerConnectScreen(val remote: RemoteNodeDomain, val screen: PlayerNodeDomain.Screen?) :
+                Event()
         }
     }
 }

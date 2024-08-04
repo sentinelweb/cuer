@@ -22,15 +22,15 @@ class CastDialogViewModel(
 
     fun connectCuerCast() {
         if (!_model.value.cuerCastStatus.isConnected) {
-            remotesLauncher.launchRemotesDialog { remoteNode, selectedScreen ->
+            remotesLauncher.launchRemotesDialog({ remoteNode, selectedScreen ->
                 remotesLauncher.hideRemotesDialog()
-                castController.connectCuerCast(remoteNode)
-            }
+                castController.connectCuerCast(remoteNode, selectedScreen)
+            }, null)
         }
     }
 
     fun disconnectCuerCast() {
-        castController.connectCuerCast(null)
+        castController.connectCuerCast(null, null)
         coroutines.mainScope.launch {
             _model.value = castController.map()
         }

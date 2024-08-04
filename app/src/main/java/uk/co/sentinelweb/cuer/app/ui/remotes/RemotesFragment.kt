@@ -30,6 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -53,6 +54,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val remotesHelpConfig: RemotesHelpConfig by inject()
+    private val remotesDialogLauncher: RemotesDialogContract.Launcher by inject()
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
 
     private var _binding: FragmentComposeBinding? = null
@@ -129,8 +131,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         remotesMviView.labelObservable().observe(
             this.viewLifecycleOwner,
             object : Observer<RemotesContract.MviStore.Label> {
-                override fun onChanged(label: RemotesContract.MviStore.Label) {
-                    when (label) {
+                override fun onChanged(value: RemotesContract.MviStore.Label) {
+                    when (value) {
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
                         ActionSearch -> {
                             SearchBottomSheetFragment()
@@ -140,20 +142,36 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         ActionPasteAdd -> (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
                         ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, remotesHelpConfig)
                         Up -> log.d("Up")
-                        is Message -> snackbarWrapper.make(label.msg)
+                        is Message -> snackbarWrapper.make(value.msg)
                         ActionConfig -> showConfigFragment()
                         is ActionFolders -> navigationProvider.navigate(
-                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to label.remoteId.id.value))
+                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to value.remoteId.id.value))
                         )
 
                         is CuerConnected ->
-                            snackbarWrapper.make(getString(R.string.remotes_cuer_connected, label.node.name()))
+                            snackbarWrapper.make(
+                                getString(
+                                    R.string.remotes_cuer_connected_screen,
+                                    value.remote.name(),
+                                    value.screen?.index ?: 0
+                                )
+                            ).show()
+
+                        is CuerSelectScreen ->
+                            remotesDialogLauncher.launchRemotesDialog(
+                                { remoteNodeDomain, screen ->
+                                    remotesMviView.dispatch(Event.OnActionCuerConnectScreen(remoteNodeDomain, screen))
+                                    remotesDialogLauncher.hideRemotesDialog()
+                                },
+                                value.node
+                            )
                     }
                 }
             })
     }
 
     private fun showConfigFragment() {
+        dialogFragment?.dismissAllowingStateLoss()
         dialogFragment = LocalFragment.newInstance()
         (dialogFragment as LocalFragment).onDismissListener = { remotesMviView.dispatch(Event.OnRefresh) }
         dialogFragment?.show(childFragmentManager, CONFIG_FRAGMENT_TAG)
@@ -181,9 +199,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                     RemotesStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         storeFactory = DefaultStoreFactory(),
-                        strings = get(),
                         log = get(),
-                        prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),

@@ -107,9 +107,7 @@ class RemotesUiCoordinator :
                     RemotesStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         storeFactory = DefaultStoreFactory(),
-                        strings = get(),
                         log = get(),
-                        prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),

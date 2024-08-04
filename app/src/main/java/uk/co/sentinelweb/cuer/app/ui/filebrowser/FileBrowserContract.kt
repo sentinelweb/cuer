@@ -10,8 +10,8 @@ interface FileBrowserContract {
 
     @Serializable
     data class State(
-        var remoteId: GUID? = null,
-        var node: RemoteNodeDomain? = null,
+        var sourceRemoteId: GUID? = null,
+        var sourceNode: RemoteNodeDomain? = null,
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
         // var remotePlayerConfig: PlayerNodeDomain? = null,
