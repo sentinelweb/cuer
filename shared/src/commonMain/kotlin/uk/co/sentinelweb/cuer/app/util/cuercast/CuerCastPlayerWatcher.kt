@@ -73,7 +73,7 @@ class CuerCastPlayerWatcher(
 
     fun getConnectionDescription() =
         (remoteNode?.name()
-            ?.let { it + "[" + (screen?.index ?: 0) + "]" })
+            ?.let { it + "-[" + (screen?.index ?: 0) + "]" })
             ?: "Not connected"
 
     fun isWatching(): Boolean = remoteNode != null

@@ -22,6 +22,7 @@ class CuerSimpleVolumeController(
         get() = field
         set(value) {
             value?.castController = castController
+            value?.updateValue()
             field = value
         }
 
@@ -33,8 +34,8 @@ class CuerSimpleVolumeController(
             KeyEvent.KEYCODE_VOLUME_UP -> {
                 if (action == KeyEvent.ACTION_DOWN) {
                     val newVolume = castController.getVolume() + VOL_INCREMENT
-                    log.d("newVolume; $newVolume")
                     castController.setVolume(newVolume)
+                    //log.d("newVolume; $newVolume")
                     controlView?.updateValue()
                 }
                 true
@@ -44,7 +45,7 @@ class CuerSimpleVolumeController(
                 if (action == KeyEvent.ACTION_DOWN) {
                     val newVolume = castController.getVolume() - VOL_INCREMENT
                     castController.setVolume(newVolume)
-                    log.d("newVolume; $newVolume")
+                    // log.d("newVolume; $newVolume")
                     controlView?.updateValue()
                 }
                 true

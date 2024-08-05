@@ -99,6 +99,7 @@ class CastVolumeControlView @JvmOverloads constructor(
     fun show() {
         if (!isVisible) {
             fadeIn()
+
         }
         triggerHide()
     }
