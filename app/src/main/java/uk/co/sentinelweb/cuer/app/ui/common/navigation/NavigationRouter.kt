@@ -144,13 +144,9 @@ class NavigationRouter constructor(
             FOLDER_LIST -> navController?.navigate(
                 R.id.navigation_folders,
                 bundleOf(
-                    REMOTE_ID.name to nav.params[REMOTE_ID].toString()
+                    REMOTE_ID.name to nav.params[REMOTE_ID].toString(),
+                    FILE_PATH.name to nav.params[FILE_PATH]?.toString()
                 ),
-                /*nav.navOpts ?: */
-//                navOptions(optionsBuilder = {
-////                    launchSingleTop = true
-//                    popUpTo(R.id.navigation_remotes, { inclusive = false })
-//                }),
             )
 
             SHARE -> nav.getParam<String>(LINK)

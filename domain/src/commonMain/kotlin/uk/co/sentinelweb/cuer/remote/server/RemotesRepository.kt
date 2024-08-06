@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
@@ -38,6 +39,8 @@ class RemotesRepository constructor(
 
     fun getById(guid: GUID): RemoteNodeDomain? =
         _remoteNodes.find { it.id?.id == guid }
+    fun getByLocator(locator: OrchestratorContract.Identifier.Locator): RemoteNodeDomain? =
+        _remoteNodes.find { it.locator() == locator }
 
     suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()

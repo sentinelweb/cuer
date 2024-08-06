@@ -1,6 +1,8 @@
 package uk.co.sentinelweb.cuer.app.util.cuercast
 
 import kotlinx.coroutines.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
@@ -10,9 +12,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
@@ -105,6 +105,26 @@ class CuerCastPlayerWatcher(
         withContext(coroutines.Main) {
             result.takeIf { it.isSuccessful }
                 ?.data
+                ?.let {
+                    if (it.item.id == null) {
+                        it.copy(
+                            item = it.item.copy(
+                                id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
+                            )
+                        )
+                    } else it
+                }
+                ?.let {
+                    if (it.item.media.thumbNail == null) {
+                        it.copy(
+                            item = it.item.copy(
+                                media = it.item.media.copy(
+                                    thumbNail = ImageDomain(url = "https://cuer-275020.firebaseapp.com/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg")
+                                )
+                            )
+                        )
+                    } else it
+                }
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }

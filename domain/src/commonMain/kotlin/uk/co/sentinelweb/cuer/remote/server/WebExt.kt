@@ -10,6 +10,7 @@ fun LocalNodeDomain.ipport() = "$ipAddress:$port"
 fun RemoteNodeDomain.ipport() = "$ipAddress:$port"
 fun Locator.ipport() = "$address:$port"
 fun RemoteNodeDomain.locator() = Locator(ipAddress, port)
+fun LocalNodeDomain.locator() = Locator(ipAddress, port)
 
 fun Pair<String, Int>.http() = "http://$first:$second"
 fun LocalNodeDomain.http() = "http://$ipAddress:$port"

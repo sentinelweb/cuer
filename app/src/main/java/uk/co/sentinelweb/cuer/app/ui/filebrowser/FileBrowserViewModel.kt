@@ -43,9 +43,10 @@ class FileBrowserViewModel(
         log.tag(this)
     }
 
-    fun init(id: GUID) {
+    fun init(id: GUID, path: String?) {
         state.sourceRemoteId = id
         state.sourceNode = remotesRepository.getById(id)
+        state.path = path
         loadCurrentPath()
     }
 

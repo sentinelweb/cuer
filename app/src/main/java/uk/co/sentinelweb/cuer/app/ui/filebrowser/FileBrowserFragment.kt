@@ -53,6 +53,10 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         NavigationModel.Param.REMOTE_ID.getString(arguments)?.toGUID()
     }
 
+    private val filePathArg: String? by lazy {
+        NavigationModel.Param.FILE_PATH.getString(arguments)
+    }
+
     init {
         log.tag(this)
     }
@@ -102,7 +106,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onStart()
         //OnboardingFragment.showIntro(this@FileBrowserFragment, remotesHelpConfig)
         compactPlayerScroll.raisePlayer(this)
-        remoteIdArg?.apply { viewModel.init(this) }
+        remoteIdArg?.apply { viewModel.init(this, filePathArg) }
     }
 
     override fun onResume() {

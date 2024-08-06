@@ -303,6 +303,7 @@ class CastPlayerFragment() :
                         skipControl = get(),
                         playUseCase = get(),
                         playlistAndItemMapper = get(),
+                        remotesRepository = get(),
                     )
                 }
                 scoped<SkipContract.External> {

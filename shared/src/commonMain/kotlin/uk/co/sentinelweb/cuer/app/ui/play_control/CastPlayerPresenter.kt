@@ -8,9 +8,11 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 
 class CastPlayerPresenter(
     private val view: CastPlayerContract.View,
@@ -20,6 +22,7 @@ class CastPlayerPresenter(
     private val skipControl: SkipContract.External,
     private val playUseCase: PlayUseCase,
     private val playlistAndItemMapper: PlaylistAndItemMapper,
+    private val remotesRepository: RemotesRepository,
 ) : CastPlayerContract.Presenter, PlayerContract.PlayerControls, SkipContract.Listener {
 
     private lateinit var castController: CastController
@@ -265,17 +268,30 @@ class CastPlayerPresenter(
     }
 
     override fun onPlaylistItemClick() {
-        state.playlistItem?.let {
-            view.navigate(
-                NavigationModel(
+        state.playlistItem?.let { item ->
+            when (item.media.platform) {
+                PlatformDomain.FILESYSTEM -> (item.id?.locator
+                    ?.let { remotesRepository.getByLocator(it) })
+                    ?.let { foundNode ->
+                        NavigationModel(
+                            NavigationModel.Target.FOLDER_LIST,
+                            mapOf(
+                                NavigationModel.Param.REMOTE_ID to foundNode.id?.id?.value,
+                                NavigationModel.Param.FILE_PATH to item.media.platformId.substringBeforeLast("/")
+                            )
+                        )
+                    }
+
+                else -> NavigationModel(
                     NavigationModel.Target.PLAYLIST_ITEM,
                     mapOf(
-                        NavigationModel.Param.PLAYLIST_ITEM to it,
-                        //FRAGMENT_NAV_EXTRAS to view.makeItemTransitionExtras(),
-                        NavigationModel.Param.SOURCE to it.id!!.source
+                        NavigationModel.Param.PLAYLIST_ITEM to item,
+                        //FRAGMENT_NAV_EXTRAS to view.makeItemTransitemionExtras(),
+                        NavigationModel.Param.SOURCE to item.id!!.source
                     )
                 )
-            )
+            }?.also { view.navigate(it) }
+
         }
     }
 
