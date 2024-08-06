@@ -7,6 +7,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.C
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Disconnected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -24,6 +25,7 @@ class CuerCastPlayerWatcher(
     private val state: State,
     private val remotePlayerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
+    private val mediaSessionManager: MediaSessionContract.Manager,
     private val log: LogWrapper,
 ) {
     data class State(
@@ -51,11 +53,13 @@ class CuerCastPlayerWatcher(
             pollingJob?.cancel()
             if (field != null && value == null) {
                 field?.removeListener(controlsListener)
+                mediaSessionManager.destroyMediaSession()
                 coroutines.mainScope.launch {
                     field?.setCastDetails(CastDetails(CuerCast, Disconnected))
                 }
             } else if (value != null) {
                 value.addListener(controlsListener)
+                mediaSessionManager.checkCreateMediaSession(controlsListener)
                 coroutines.mainScope.launch {
                     value.setCastDetails(
                         CastDetails(
@@ -105,7 +109,13 @@ class CuerCastPlayerWatcher(
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
                 ?.apply { item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) } }
-                ?.apply { mainPlayerControls?.setButtons(Buttons(false, false, true)) }
+                ?.apply {// fixme enable when we have playlist
+                    mainPlayerControls?.setButtons(Buttons(false, false, true))
+                }
+                ?.apply { mediaSessionManager.setMedia(this.item.media, null) } // fixme get playlist
+                ?.apply {// fixme get liveOffset, playlist
+                    mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
+                }
                 ?.apply { state.lastMessage = this }
                 ?.apply { log.d("from host: volume:${state.lastMessage?.volume} max:${state.lastMessage?.volumeMax}") }
                 ?: run {

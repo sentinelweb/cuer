@@ -25,7 +25,6 @@ class PlaybackStateMapper {
                         actionsBase = actionsBase or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
                     }
                 }
-
         }
         return if (domain.isLiveBroadcast) {
             PlaybackStateCompat.Builder()

@@ -180,7 +180,7 @@ object SharedAppModule {
         single { PlayerEventToIntentMapper }
         single { PlayerSessionMessageMapper() }
         factory { PlayerMessageToIntentMapper(get(), get()) }
-        single { CuerCastPlayerWatcher(CuerCastPlayerWatcher.State(), get(), get(), get()) }
+        single { CuerCastPlayerWatcher(CuerCastPlayerWatcher.State(), get(), get(), get(), get()) }
     }
 
     private val utilModule = module {

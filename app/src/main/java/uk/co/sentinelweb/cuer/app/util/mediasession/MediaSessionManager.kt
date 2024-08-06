@@ -44,6 +44,7 @@ class MediaSessionManager(
     }
 
     override fun destroyMediaSession() {
+        appState.mediaSession?.isActive = false
         appState.mediaSession?.release()
         appState.mediaSession = null
         state.bitmap = null
@@ -74,9 +75,38 @@ class MediaSessionManager(
         override fun onLoadCleared(placeholder: Drawable?) {}
     }
 
-    override fun updatePlaybackState(media: MediaDomain, state: PlayerStateDomain, liveOffset: Long?, playlist: PlaylistDomain?) {
+    override fun updatePlaybackState(
+        media: MediaDomain,
+        state: PlayerStateDomain,
+        liveOffset: Long?,
+        playlist: PlaylistDomain?
+    ) {
         appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state, liveOffset, playlist))
     }
+
+//    override fun setRemotePlaybackType() {
+//        // todo make a volume provider for cuercast and chrome cast
+//        // or maybe from cast controller
+//        val myVolumeProvider = object : VolumeProviderCompat(
+//            VolumeProviderCompat.VOLUME_CONTROL_ABSOLUTE, /* max volume */
+//            100, /* current volume */
+//            50
+//        ) {
+//            override fun onAdjustVolume(direction: Int) {
+//                if (direction > 0) {
+//                    // volume was increased
+//                } else {
+//                    // volume was decreased
+//                }
+//            }
+//
+//            override fun onSetVolumeTo(volume: Int) {
+//                // volume was set to a specific value
+//            }
+//        }
+//
+//        appState.mediaSession?.setPlaybackToRemote(myVolumeProvider)
+//    }
 
     inner class CuerMediaSessionCallback(private val controls: PlayerContract.PlayerControls.Listener) :
         MediaSessionCompat.Callback() {

@@ -99,7 +99,7 @@ class PlayerControlsNotificationMedia constructor(
                     }
             )
             .setContentTitle(buildTitle(state))
-            .setContentText(state.media?.description ?: "No description")
+            .setContentText(state.media?.description)
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
@@ -107,7 +107,7 @@ class PlayerControlsNotificationMedia constructor(
 
         //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
         builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0
-        builder.addAction(R.drawable.ic_notif_fast_rewind_black, "-30s", skipbPendingIntent) // #1
+        builder.addAction(R.drawable.ic_notif_fast_rewind_black, "<<", skipbPendingIntent) // #1
         if (state.blocked) {
             builder.addAction(R.drawable.ic_lock_24, "Locked", contentPendingIntent)
         } else {
@@ -130,7 +130,7 @@ class PlayerControlsNotificationMedia constructor(
                 }
             }
         }
-        builder.addAction(R.drawable.ic_notif_fast_forward_black, "+30s", skipfPendingIntent) // #3
+        builder.addAction(R.drawable.ic_notif_fast_forward_black, ">>", skipfPendingIntent) // #3
         if (state.nextEnabled) {
             builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
         }
