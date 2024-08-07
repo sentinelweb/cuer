@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.common.compose
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
@@ -51,22 +52,26 @@ fun HeaderButton(
     Button(
         onClick = { action() },
         modifier = modifier
-            .padding(end = 16.dp),
+            .padding(end = 8.dp),
+
         border = border(enabled),
         colors = colors,
         enabled = enabled,
         elevation = ButtonDefaults.elevation(0.dp),
+        contentPadding = PaddingValues(horizontal = 2.dp, vertical = 0.dp)
     ) {
         Icon(
             painter = painterResource(icon),
             tint = colors.contentColor(enabled).value,
             contentDescription = null,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier
+                .size(24.dp)
+                .padding(4.dp, end = 0.dp)
         )
         Text(
             text = text.uppercase(),
             style = MaterialTheme.typography.button,
-            modifier = Modifier.padding(start = 4.dp),
+            modifier = Modifier.padding(end = 8.dp),
             color = colors.contentColor(enabled).value,
         )
     }

@@ -70,7 +70,7 @@ val CuerTypography = Typography(
     button = TextStyle(
         fontFamily = Montserrat,
         fontWeight = FontWeight.Bold,
-        fontSize = 14.sp
+        fontSize = 12.sp
     ),
     caption = TextStyle(
         fontFamily = Montserrat,
