@@ -189,7 +189,7 @@ class CuerCastPlayerWatcher(
                         is NetResult.Error -> {
                             log.e("cast update error: ${remoteNode?.locator()}", result.t)
                             result.t
-                                ?.takeIf { it::class.qualifiedName == "java.net.ConnectException" }
+                                //?.takeIf { it::class.qualifiedName == "java.net.ConnectException" }
                                 ?.also { cleanup() }
                         }
 
