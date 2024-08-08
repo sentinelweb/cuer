@@ -65,6 +65,7 @@ class HomeUiCoordinator :
     }
 
     fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
+        killPlayer()
         playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
         playerUiCoordinator?.setupPlaylistAndItem(item, playlist, PREFERRED_SCREEN_DEFAULT)
     }

@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
+import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -67,6 +68,7 @@ class VlcPlayerUiCoordinator(
     private val playerItemLoader: FolderMemoryPlaylistItemLoader by inject()
     private val playlistOrchestrator: PlaylistOrchestrator by inject()
     private val coroutines: CoroutineContextProvider by inject()
+    private val queueProducer: QueueMediatorContract.Producer by inject()
 
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
@@ -97,6 +99,7 @@ class VlcPlayerUiCoordinator(
             lifecycle.onStop()
             controller.onViewDestroyed()
             controller.onDestroy(endSession = true)
+            queueProducer.resetCurrentItem()
             lifecycle.onDestroy()
             scope.close()
             coroutines.cancel()

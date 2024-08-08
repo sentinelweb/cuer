@@ -194,7 +194,6 @@ class VlcPlayerSwingWindow(
                     coordinator.dispatch(PlayerStateChanged(PlayerStateDomain.ERROR))
                 }
 
-
                 override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
                     val current = timeProvider.currentTimeMillis()
                     if (current - lastVolumeUpdateTime > 1000) {
@@ -225,6 +224,10 @@ class VlcPlayerSwingWindow(
 
     fun playItem(path: String) {
         durationMs = null
+        log.d("playItem: $path")
+        mediaPlayerComponent.mediaPlayer().media().info()
+            ?.apply { log.d("playItem: current ${this.mrl()}") }
+            ?: log.d("playItem: current is null")
         mediaPlayerComponent.mediaPlayer().media().prepare(path)
         mediaPlayerComponent.mediaPlayer().media().parsing().parse()
         // play after parse is complete
@@ -232,7 +235,10 @@ class VlcPlayerSwingWindow(
     }
 
     fun destroy() {
+//        mediaPlayerComponent.mediaPlayer().media().newMedia()
+        //mediaPlayerComponent.mediaPlayer().media().prepare(null as String?)
         mediaPlayerComponent.mediaPlayer().release()
+        mediaPlayerComponent.mediaPlayer().media()
         this@VlcPlayerSwingWindow.dispose()
     }
 
@@ -353,7 +359,7 @@ class VlcPlayerSwingWindow(
     }
 
     fun updateUiPlayState(state: PlayerStateDomain) {
-        log.d("state:${state::class.java.simpleName}")
+        log.d("state:${state}")
         return when (state) {
             UNKNOWN -> Unit
             UNSTARTED -> Unit
@@ -383,6 +389,7 @@ class VlcPlayerSwingWindow(
     fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
         is Load -> {
             command.platformId
+                .also { log.d("") }
                 .let { folderListUseCase.truncatedToFullFolderPath(it) }
                 ?.also { playItem(it) }
                 ?: log.d("Cannot get full path ${command.platformId}")
