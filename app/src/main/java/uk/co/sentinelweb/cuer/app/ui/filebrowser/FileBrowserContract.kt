@@ -21,4 +21,10 @@ interface FileBrowserContract {
     data class AppFilesUiModel(
         val loading: Boolean
     )
+
+    sealed class Label {
+        object Init : Label()
+        object Up : Label()
+    }
+
 }

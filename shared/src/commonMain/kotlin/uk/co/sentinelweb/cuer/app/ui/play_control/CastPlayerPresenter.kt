@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import summarise
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
@@ -139,7 +138,6 @@ class CastPlayerPresenter(
 
     override fun setPlayerState(playState: PlayerStateDomain) {
         state.playState = playState
-        log.d("playState = $playState")
         skipControl.stateChange(playState)
         when (playState) {
             PlayerStateDomain.PLAYING -> view.setPlaying()
@@ -228,7 +226,6 @@ class CastPlayerPresenter(
     }
 
     override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
-        log.d("setPlaylistItem: ${playlistItem?.summarise()}")
         state.playlistItem = playlistItem
         playlistItem
             ?.apply {
@@ -246,14 +243,12 @@ class CastPlayerPresenter(
                         view.setDurationStyle(Live)
                     }
                     view.updateSeekPosition(1f)
-
                 } else {
                     view.setDuration(mapper.formatTime(state.durationMs))
                     view.setDurationStyle(Normal)
                 }
             }
             ?: run {
-                log.d("player reset media")
                 view.setPosition("--:--")
                 view.setDuration("--:--")
                 view.setDurationStyle(Normal)

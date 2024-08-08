@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserViewModel.Label
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.Label
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity

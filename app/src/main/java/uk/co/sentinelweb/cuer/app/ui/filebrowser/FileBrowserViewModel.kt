@@ -2,10 +2,12 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.AppFilesUiModel
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.Label
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
@@ -32,12 +34,9 @@ class FileBrowserViewModel(
     override val modelObservable = MutableStateFlow(blankModel())
     val appModelObservable = MutableStateFlow(AppFilesUiModel(loading = false))
 
-    sealed class Label {
-        object Init : Label()
-        object Up : Label()
-    }
-
-    val labels = MutableStateFlow<Label>(Label.Init)
+    val _labels = MutableStateFlow<Label>(Label.Init)
+    val labels: Flow<Label>
+        get() = _labels
 
     init {
         log.tag(this)
@@ -54,11 +53,11 @@ class FileBrowserViewModel(
         state.currentFolder
             ?.takeIf { it.children.size > 0 && state.path != null }
             ?.also { onClickFolder(it.children[0]) }
-            ?: run { labels.value = Label.Up }
+            ?: run { _labels.value = Label.Up }
     }
 
     fun onUpClick() {
-        labels.value = Label.Up
+        _labels.value = Label.Up
     }
 
     override fun onClickFolder(folder: PlaylistDomain) {

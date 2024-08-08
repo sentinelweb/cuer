@@ -97,15 +97,19 @@ class CastController(
     }
 
     fun connectCuerCast(node: RemoteNodeDomain?, screen: PlayerNodeDomain.Screen?) {
+        if (node == null) {
+            cuerCastPlayerWatcher.cleanup()
+        }
         cuerCastPlayerWatcher.remoteNode = node
         cuerCastPlayerWatcher.screen = screen
         cuerCastPlayerWatcher.mainPlayerControls = node?.let { playerControls }
+
         castDialogLauncher.hideCastDialog()
     }
 
     suspend fun stopCuerCast() {
         cuerCastPlayerWatcher.sendStop()
-
+        castDialogLauncher.hideCastDialog()
     }
 
     fun connectChromeCast() {
