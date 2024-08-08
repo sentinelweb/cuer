@@ -34,13 +34,18 @@ class RemotesRepository constructor(
     private val updateRemotesMutex = Mutex()
 
     init {
-        coroutines.mainScope.launch { loadAll() }
+        coroutines.computationScope.launch { loadAll() }
     }
 
     fun getById(guid: GUID): RemoteNodeDomain? =
         _remoteNodes.find { it.id?.id == guid }
     fun getByLocator(locator: OrchestratorContract.Identifier.Locator): RemoteNodeDomain? =
         _remoteNodes.find { it.locator() == locator }
+
+    suspend fun getByName(name: String): RemoteNodeDomain? = updateRemotesMutex.withLock {
+        _remoteNodes
+            .find { it.hostname == name }
+    }
 
     suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()

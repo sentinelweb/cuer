@@ -10,12 +10,14 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.D
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
@@ -26,6 +28,8 @@ class CuerCastPlayerWatcher(
     private val remotePlayerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
     private val mediaSessionManager: MediaSessionContract.Manager,
+    private val prefs: MultiPlatformPreferencesWrapper,
+    private val remotesRepository: RemotesRepository,
     private val log: LogWrapper,
 ) {
     data class State(
@@ -37,7 +41,18 @@ class CuerCastPlayerWatcher(
     }
 
     var remoteNode: RemoteNodeDomain? = null
+        get() = field
+        set(value) {
+            prefs.curecastRemoteNodeName = value?.hostname
+            field = value
+        }
+
     var screen: PlayerNodeDomain.Screen? = null
+        get() = field
+        set(value) {
+            prefs.cuerCastScreen = value?.index
+            field = value
+        }
 
     private var pollingJob: Job? = null
 
@@ -83,6 +98,26 @@ class CuerCastPlayerWatcher(
     fun isWatching(): Boolean = remoteNode != null
 
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
+
+    fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls) {
+        prefs.curecastRemoteNodeName
+            ?.also { name ->
+                coroutines.mainScope.launch {
+                    remotesRepository.getByName(name)
+                        ?.also { foundNode ->
+                            prefs.cuerCastScreen?.also { screenIndex ->
+                                screen =
+                                    remotePlayerInteractor.getPlayerConfig(foundNode.locator())
+                                        .data
+                                        ?.screens
+                                        ?.getOrNull(screenIndex)
+                                        ?.also { remoteNode = foundNode }
+                                        ?.also { mainPlayerControls = playerControls }
+                            }
+                        }
+                }
+            }
+    }
 
     private fun startPolling() {
         pollingJob = coroutines.mainScope.launch {
@@ -142,17 +177,27 @@ class CuerCastPlayerWatcher(
                     // error handling
                     when (result) {
                         is NetResult.HttpError -> if (result.code == "503") {
-                            // fixme maybe cleanup after a few request - auto disconnect at launch
-                            // while player is starting
-                            log.e("remote player not available: ${remoteNode?.locator()}")
+                            // fixme maybe cleanup after a few request - auto disconnect at launch while player is
+                            // starting
+                            log.e("remote player service not available: ${remoteNode?.locator()}")
                             //cleanup()
+                        } else {
+                            log.e("remote error (${result.code}): ${remoteNode?.locator()}")
+                        }
+                        // remote down : java.net.ConnectException: Connection refused
+                        // no network: java.net.ConnectException: Network is unreachable
+                        is NetResult.Error -> {
+                            log.e("cast update error: ${remoteNode?.locator()}", result.t)
+                            result.t
+                                ?.takeIf { it::class.qualifiedName == "java.net.ConnectException" }
+                                ?.also { cleanup() }
                         }
 
-                        is NetResult.Error -> log.e("cast update error: ${remoteNode?.locator()}", result.t)
                         is NetResult.Data -> Unit
                     }
                 }
         }
+
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {
         override fun play() {
@@ -215,6 +260,7 @@ class CuerCastPlayerWatcher(
         mainPlayerControls?.reset()
         mainPlayerControls = null
         remoteNode = null
+        screen = null
     }
 
     fun sendVolume(volume: Float) = coroutines.ioScope.launch {

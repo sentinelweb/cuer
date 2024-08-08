@@ -32,7 +32,7 @@ class ChromecastYouTubePlayerContextHolder(
 
     override fun isCreated() = context != null
 
-    override fun isConnected() = listener?.isConnected() ?: false
+    override fun isConnected() = isCreated() && listener?.isConnected() ?: false
 
     override fun destroy() {
         listener?.destroy()

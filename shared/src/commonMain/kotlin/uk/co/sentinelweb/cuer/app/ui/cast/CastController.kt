@@ -43,18 +43,26 @@ class CastController(
         ytServiceManager.stop()
         if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.mainPlayerControls = playerControls
-        } else if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
+        } else if (chromeCastHolder.isConnected()) {
             chromeCastHolder.mainPlayerControls = playerControls
         } else if (floatingManager.isRunning()) {
             floatingManager.get()?.external?.mainPlayerControls = playerControls
+        } else {
+            attemptRestoreConnection()
         }
     }
 
     fun initialiseForService() {
         if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.mainPlayerControls = playerControls
-        } else if (chromeCastHolder.isCreated() && chromeCastHolder.isConnected()) {
+        } else if (chromeCastHolder.isConnected()) {
             chromeCastHolder.mainPlayerControls = playerControls
+        }
+    }
+
+    fun attemptRestoreConnection() {
+        if (!cuerCastPlayerWatcher.isWatching() || !chromeCastHolder.isConnected()) {
+            cuerCastPlayerWatcher.attemptRestoreConnection(playerControls)
         }
     }
 
