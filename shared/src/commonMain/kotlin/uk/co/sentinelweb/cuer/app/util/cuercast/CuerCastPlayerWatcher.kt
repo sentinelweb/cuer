@@ -34,6 +34,7 @@ class CuerCastPlayerWatcher(
 ) {
     data class State(
         var lastMessage: PlayerSessionContract.PlayerStatusMessage? = null,
+        var isCommunicating: Boolean = false
     )
 
     init {
@@ -140,26 +141,8 @@ class CuerCastPlayerWatcher(
         withContext(coroutines.Main) {
             result.takeIf { it.isSuccessful }
                 ?.data
-                ?.let {
-                    if (it.item.id == null) {
-                        it.copy(
-                            item = it.item.copy(
-                                id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
-                            )
-                        )
-                    } else it
-                }
-                ?.let {
-                    if (it.item.media.thumbNail == null) {
-                        it.copy(
-                            item = it.item.copy(
-                                media = it.item.media.copy(
-                                    thumbNail = ImageDomain(url = "https://cuer-275020.firebaseapp.com/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg")
-                                )
-                            )
-                        )
-                    } else it
-                }
+                ?.let { addBlankRemoteIdToItem(it) }
+                ?.let { addThumbnailToMedia(it) }
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
@@ -172,17 +155,26 @@ class CuerCastPlayerWatcher(
                     mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
                 }
                 ?.apply { state.lastMessage = this }
+                ?.apply { state.isCommunicating = true }
                 ?.apply { log.d("from host: volume:${state.lastMessage?.volume} max:${state.lastMessage?.volumeMax}") }
                 ?: run {
-                    // error handling
+                    state.isCommunicating = false
                     when (result) {
-                        is NetResult.HttpError -> if (result.code == "503") {
-                            // fixme maybe cleanup after a few request - auto disconnect at launch while player is
-                            // starting
-                            log.e("remote player service not available: ${remoteNode?.locator()}")
-                            //cleanup()
-                        } else {
-                            log.e("remote error (${result.code}): ${remoteNode?.locator()}")
+                        is NetResult.HttpError -> {
+                            if (result.code == "503") {
+                                // fixme maybe cleanup after a few request - auto disconnect at launch while player is
+                                // starting
+                                log.e("remote player service not available: ${remoteNode?.locator()}")
+                            } else {
+                                log.e("remote error (${result.code}): ${remoteNode?.locator()}")
+                            }
+                            mainPlayerControls?.setPlayerState(PlayerStateDomain.UNKNOWN)
+                            log.d("reset media")
+                            mainPlayerControls?.setPlaylistItem(null)
+                            mainPlayerControls?.setButtons(Buttons(false, false, false))
+                            state.lastMessage?.item?.media?.also {
+                                mediaSessionManager.updatePlaybackState(it, PlayerStateDomain.UNKNOWN, null, null)
+                            }
                         }
                         // remote down : java.net.ConnectException: Connection refused
                         // no network: java.net.ConnectException: Network is unreachable
@@ -197,6 +189,26 @@ class CuerCastPlayerWatcher(
                     }
                 }
         }
+
+    private fun addThumbnailToMedia(it: PlayerSessionContract.PlayerStatusMessage) =
+        if (it.item.media.thumbNail == null) {
+            it.copy(
+                item = it.item.copy(
+                    media = it.item.media.copy(
+                        thumbNail = ImageDomain(url = "https://cuer-275020.firebaseapp.com/images/headers/pixabay-star-640-wallpaper-ga4c7c7acf_640.jpg")
+                    )
+                )
+            )
+        } else it
+
+    private fun addBlankRemoteIdToItem(it: PlayerSessionContract.PlayerStatusMessage) =
+        if (it.item.id == null) {
+            it.copy(
+                item = it.item.copy(
+                    id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
+                )
+            )
+        } else it
 
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {

@@ -54,6 +54,6 @@ class RemotesDialogViewModel(
     }
 
     private suspend fun map() {
-        _model.value = Model(repo.loadAll().map { mapper.mapRemoteNode(it) })
+        _model.value = Model(repo.remoteNodes.map { mapper.mapRemoteNode(it) })
     }
 }

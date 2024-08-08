@@ -25,6 +25,8 @@ class RemotesRepository constructor(
     }
 
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
+    val remoteNodes: List<RemoteNodeDomain>
+        get() = _remoteNodes
 
     private val _updatesFlow: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(emptyList())
 

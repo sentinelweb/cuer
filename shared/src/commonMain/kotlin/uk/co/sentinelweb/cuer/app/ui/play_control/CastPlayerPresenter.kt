@@ -144,7 +144,7 @@ class CastPlayerPresenter(
             PlayerStateDomain.PLAYING -> view.setPlaying()
             PlayerStateDomain.ENDED -> view.setPaused()
             PlayerStateDomain.PAUSED -> view.setPaused()
-            PlayerStateDomain.UNKNOWN,
+            PlayerStateDomain.UNKNOWN -> view.setPaused()
             PlayerStateDomain.UNSTARTED,
             PlayerStateDomain.BUFFERING -> view.showBuffering()
 
@@ -227,28 +227,40 @@ class CastPlayerPresenter(
     }
 
     override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
-        state.playlistItem = playlistItem?.apply {
-            media.thumbNail?.url?.apply { view.setImage(this) }
-            media.title?.apply { state.title = this }
-            media.title?.let { view.setTitle(it) }
-            state.durationMs = media.duration ?: 0L
-            state.isLiveStream = media.isLiveBroadcast
-            state.isUpcoming = media.isLiveBroadcastUpcoming
-            if (state.isLiveStream) {
-                view.setPosition("-")
-                if (state.isUpcoming) {
-                    view.setDurationStyle(Upcoming)
-                } else {
-                    view.setDurationStyle(Live)
-                }
-                view.updateSeekPosition(1f)
+        state.playlistItem = playlistItem
+        playlistItem
+            ?.apply {
+                media.thumbNail?.url?.apply { view.setImage(this) }
+                media.title?.apply { state.title = this }
+                media.title?.let { view.setTitle(it) }
+                state.durationMs = media.duration ?: 0L
+                state.isLiveStream = media.isLiveBroadcast
+                state.isUpcoming = media.isLiveBroadcastUpcoming
+                if (state.isLiveStream) {
+                    view.setPosition("-")
+                    if (state.isUpcoming) {
+                        view.setDurationStyle(Upcoming)
+                    } else {
+                        view.setDurationStyle(Live)
+                    }
+                    view.updateSeekPosition(1f)
 
-            } else {
-                view.setDuration(mapper.formatTime(state.durationMs))
-                view.setDurationStyle(Normal)
+                } else {
+                    view.setDuration(mapper.formatTime(state.durationMs))
+                    view.setDurationStyle(Normal)
+                }
             }
-//            view.setSeekEnabled(!state.isLiveStream)
-        }
+            ?: {
+                log.d("reset media")
+                view.setPosition("--:--")
+                view.setDuration("--:--")
+                view.setDurationStyle(Normal)
+                view.setTitle("No media")
+                state.durationMs = 0L
+                state.isLiveStream = false
+                state.isUpcoming = false
+                view.clearImage()
+            }
     }
 
     override fun setPlaylistImage(image: ImageDomain?) {

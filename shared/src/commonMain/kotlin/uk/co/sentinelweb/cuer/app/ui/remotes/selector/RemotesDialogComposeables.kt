@@ -71,15 +71,14 @@ object RemotesDialogComposeables {
         viewModel: RemotesDialogViewModel
     ) {
         // fixme why isAvailable false?
-//        val contentColor = remote.domain.isAvailable
-//            .takeIf { it }
-//            ?.let { MaterialTheme.colors.onSurface }
-//            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-        val contentColor = MaterialTheme.colors.onSurface
+        val contentColor = remote.domain.isAvailable
+            .takeIf { it }
+            ?.let { MaterialTheme.colors.onSurface }
+            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+//        val contentColor = MaterialTheme.colors.onSurface
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-
         ) {
             Row(
                 modifier = Modifier
