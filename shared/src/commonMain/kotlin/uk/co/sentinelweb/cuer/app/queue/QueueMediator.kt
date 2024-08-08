@@ -141,7 +141,7 @@ class QueueMediator constructor(
         refreshQueue(identifier)
     }
 
-    override suspend fun resetCurrentItem() {
+    override suspend fun resetQueue() {
         _currentItemFlow.emit(null)
         state.currentItem = null
         state.playlist = null

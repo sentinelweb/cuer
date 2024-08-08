@@ -99,7 +99,7 @@ class VlcPlayerUiCoordinator(
             lifecycle.onStop()
             controller.onViewDestroyed()
             controller.onDestroy(endSession = true)
-            queueProducer.resetCurrentItem()
+            queueProducer.resetQueue()
             lifecycle.onDestroy()
             scope.close()
             coroutines.cancel()

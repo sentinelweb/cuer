@@ -22,7 +22,7 @@ interface QueueMediatorContract {
         suspend fun playNow(identifier: OrchestratorContract.Identifier<GUID>, playlistItemId: OrchestratorContract.Identifier<GUID>?)
         suspend fun switchToPlaylist(identifier: OrchestratorContract.Identifier<GUID>)
 
-        suspend fun resetCurrentItem()
+        suspend fun resetQueue()
     }
 
     interface Consumer : Shared {
