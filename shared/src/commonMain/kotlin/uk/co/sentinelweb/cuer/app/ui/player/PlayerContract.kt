@@ -52,6 +52,7 @@ interface PlayerContract {
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
+            data class ScreenAcquired(val screen: PlayerNodeDomain.Screen) : Intent()
         }
 
         sealed class Label {
@@ -78,6 +79,7 @@ interface PlayerContract {
             val content: Content = Content.DESCRIPTION,
             val position: Long = -1,
             val volume: Float = 0f,
+            val screen: PlayerNodeDomain.Screen? = null
         ) {
             fun playlistAndItem(): PlaylistAndItemDomain? = item?.let {
                 PlaylistAndItemDomain(
@@ -211,6 +213,7 @@ interface PlayerContract {
             data class OnInitFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
             data class OnPlayItemFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
             data class OnSeekToPosition(val ms: Long) : Event()
+            data class OnScreenAcquired(val screen: PlayerNodeDomain.Screen) : Event()
         }
     }
 

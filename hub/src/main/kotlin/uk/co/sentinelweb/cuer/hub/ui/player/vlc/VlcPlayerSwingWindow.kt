@@ -20,11 +20,12 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
-import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
@@ -47,6 +48,8 @@ class VlcPlayerSwingWindow(
     private val log: LogWrapper by inject()
     private val timeProvider: TimeProvider by inject()
     private val timeFormatter: TimeFormatter by inject()
+    private val playerConfigProvider: PlayerConfigProvider by inject()
+    private lateinit var screenUsed: PlayerNodeDomain.Screen
 
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
@@ -80,22 +83,23 @@ class VlcPlayerSwingWindow(
         log.tag(this)
     }
 
-    fun assemble(screenIndex: Int = PREFERRED_SCREEN_DEFAULT) {
-        createWindow(screenIndex)
+    fun assemble(screen: PlayerNodeDomain.Screen) {
+        val screenIndexUsed = createWindow(screen)
         createMediaPlayer()
         createControls()
         showHideControls.setupInactivityTimer(this, mediaPlayerComponent, controlsPane)
         keyMap.initialiseKeyMap(mediaPlayerComponent, this, coordinator)
+        screenUsed = playerConfigProvider.invoke().screens[screenIndexUsed]
     }
 
-    private fun createWindow(preferredScreen: Int) {
+    private fun createWindow(preferredScreen: PlayerNodeDomain.Screen): Int {
         this.defaultCloseOperation = DO_NOTHING_ON_CLOSE
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        val preferredExists = screenDevices.size > preferredScreen
+        val preferredExists = screenDevices.size > preferredScreen.index
         val selectedScreenIndex = if (preferredExists) {
-            preferredScreen
+            preferredScreen.index
         } else 0
         log.d("selectedScreenIndex: $selectedScreenIndex, preferredScreen: $preferredScreen")
         val selectedScreen = screenDevices[selectedScreenIndex]
@@ -118,6 +122,7 @@ class VlcPlayerSwingWindow(
             }
         })
         this.isVisible = true
+        return selectedScreenIndex
     }
 
     // https://wiki.videolan.org/VLC_command-line_help/
@@ -187,6 +192,7 @@ class VlcPlayerSwingWindow(
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     log.d("event ready")
+                    coordinator.dispatch(OnScreenAcquired(screenUsed))
                     coordinator.dispatch(PlayerStateChanged(PLAYING))
                 }
 

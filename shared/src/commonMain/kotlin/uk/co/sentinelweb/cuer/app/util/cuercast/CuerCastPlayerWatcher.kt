@@ -75,8 +75,8 @@ class CuerCastPlayerWatcher(
                 }
             } else if (value != null) {
                 value.addListener(controlsListener)
-                mediaSessionManager.checkCreateMediaSession(controlsListener)
                 coroutines.mainScope.launch {
+                    mediaSessionManager.checkCreateMediaSession(controlsListener)
                     value.setCastDetails(
                         CastDetails(
                             CuerCast,

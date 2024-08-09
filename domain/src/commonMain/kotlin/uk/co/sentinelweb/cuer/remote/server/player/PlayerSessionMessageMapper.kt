@@ -32,6 +32,7 @@ class PlayerSessionMessageMapper(
             liveOffset = session.liveOffset ?: 0,
             playbackState = session.playbackState ?: PlayerStateDomain.UNKNOWN,
             volume = session.volume,
-            volumeMax = session.volumeMax
+            volumeMax = session.volumeMax,
+            screen = session.screen
         )
 }

@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
@@ -61,5 +62,9 @@ class PlayerSessionManager(
     override fun setVolumeMax(volumeMax: Float) {
         //log.d("session volumeMax: $volumeMax")
         playerSessionHolder.playerSession?.volumeMax = volumeMax
+    }
+
+    override fun setScreen(screen: PlayerNodeDomain.Screen) {
+        playerSessionHolder.playerSession?.screen = screen
     }
 }

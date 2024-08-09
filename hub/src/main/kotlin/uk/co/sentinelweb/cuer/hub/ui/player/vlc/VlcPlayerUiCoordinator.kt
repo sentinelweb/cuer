@@ -37,10 +37,7 @@ import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContra
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -73,7 +70,7 @@ class VlcPlayerUiCoordinator(
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
-    private var screenIndex: Int = 0
+    private lateinit var screen: PlayerNodeDomain.Screen
 
     override fun create() {
         log.tag(this)
@@ -83,7 +80,7 @@ class VlcPlayerUiCoordinator(
         lifecycle.onResume()
         playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
-                .apply { assemble(screenIndex) }
+                .apply { assemble(screen) }
                 .also { SleepPreventer.preventSleep() }
         } else throw IllegalStateException("Can't find VLC")
     }
@@ -139,7 +136,7 @@ class VlcPlayerUiCoordinator(
     fun setupPlaylistAndItem(
         item: PlaylistItemDomain,
         playlist: PlaylistDomain,
-        screenIndex: Int?
+        screen: PlayerNodeDomain.Screen
     ) {
         coroutines.mainScope.launch {
             playlistId = playlist.id
@@ -154,13 +151,14 @@ class VlcPlayerUiCoordinator(
                     item = item
                 )
             )
-            this@VlcPlayerUiCoordinator.screenIndex = screenIndex ?: PREFERRED_SCREEN_DEFAULT
+            this@VlcPlayerUiCoordinator.screen = screen
             create() // initialises the player controller
         }
     }
 
     companion object {
         const val PREFERRED_SCREEN_DEFAULT = 1
+
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> VlcPlayerUiCoordinator(parent) }
             factory<AppPlaylistInteractor.CustomisationResources>(named(NewItems)) { EmptyCustomisationResources() }

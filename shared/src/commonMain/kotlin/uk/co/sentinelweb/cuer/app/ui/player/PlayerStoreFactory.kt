@@ -24,11 +24,8 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
-import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.startPosition
 
 class PlayerStoreFactory(
@@ -56,9 +53,10 @@ class PlayerStoreFactory(
         data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        data class Screen(val content: Content) : Result()
+        data class SelectedTab(val content: Content) : Result()
         data class Position(val pos: Long) : Result()
         data class Volume(val vol: Float) : Result()
+        data class Screen(val screen: PlayerNodeDomain.Screen) : Result()
     }
 
     private sealed class Action {
@@ -78,7 +76,7 @@ class PlayerStoreFactory(
 
                 is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(content = msg.content)
+                is Result.SelectedTab -> copy(content = msg.content)
                 is Result.SkipTimes -> copy(
                     skipFwdText = msg.fwd ?: skipFwdText,
                     skipBackText = msg.back ?: skipBackText
@@ -86,6 +84,7 @@ class PlayerStoreFactory(
 
                 is Result.Position -> copy(position = msg.pos)
                 is Result.Volume -> copy(volume = msg.vol)
+                is Result.Screen -> copy(screen = screen)
             }
     }
 
@@ -128,8 +127,8 @@ class PlayerStoreFactory(
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
                 is Intent.SeekToFraction -> seekTo(intent.fraction, getState().item)
-                is Intent.PlaylistView -> dispatch(Result.Screen(Content.PLAYLIST))
-                is Intent.PlaylistItemView -> dispatch(Result.Screen(Content.DESCRIPTION))
+                is Intent.PlaylistView -> dispatch(Result.SelectedTab(Content.PLAYLIST))
+                is Intent.PlaylistItemView -> dispatch(Result.SelectedTab(Content.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
@@ -147,10 +146,15 @@ class PlayerStoreFactory(
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
                 Intent.Stop -> publish(Label.Stop)
                 is Intent.VolumeChanged -> volumeChanged(intent)
+                is Intent.ScreenAcquired -> screenAcquired(intent)
             }
 
+        private fun screenAcquired(intent: Intent.ScreenAcquired) {
+            playerSessionManager.setScreen(intent.screen)
+            dispatch(Result.Screen(intent.screen))
+        }
+
         private fun volumeChanged(intent: Intent.VolumeChanged) {
-            //log.d("volumeChanged: ${intent.vol}")
             prefs.volume = intent.vol
             playerSessionManager.setVolume(intent.vol)
             dispatch(Result.Volume(intent.vol))

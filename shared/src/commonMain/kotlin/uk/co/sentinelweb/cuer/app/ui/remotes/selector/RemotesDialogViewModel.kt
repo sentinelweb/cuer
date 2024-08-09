@@ -43,14 +43,20 @@ class RemotesDialogViewModel(
     }
 
     private suspend fun remoteSelected(node: RemoteNodeDomain) = withContext(coroutines.IO) {
-        state.selectedNodeConfig = playerInteractor.getPlayerConfig(node.locator()).data
-        state.selectedNodeConfig?.apply {
-            if (this.screens.size == 1) {
-                listener(node, screens[0])
-            } else {
-                _model.value = Model(listOf(mapper.mapNodeAndScreen(node, this)))
+        playerInteractor.playerSessionStatus(node.locator())
+            .data
+            ?.screen
+            ?.also { listener(node, it) }
+            ?: run {
+                state.selectedNodeConfig = playerInteractor.getPlayerConfig(node.locator()).data
+                state.selectedNodeConfig?.apply {
+                    if (this.screens.size == 1) {
+                        listener(node, screens[0])
+                    } else {
+                        _model.value = Model(listOf(mapper.mapNodeAndScreen(node, this)))
+                    }
+                }
             }
-        }
     }
 
     private suspend fun map() {

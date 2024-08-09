@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -39,6 +40,7 @@ class HomeUiCoordinator :
     val filesUiCoordinator: FilesUiCoordinator by inject { parametersOf(this) }
     private val remoteServiceManager: RemoteServerContract.Manager by inject()
     private val log: LogWrapper by inject()
+    private val playerConfigProvider: PlayerConfigProvider by inject()
 
     private var playerUiCoordinator: VlcPlayerUiCoordinator? = null
 
@@ -67,7 +69,10 @@ class HomeUiCoordinator :
     fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
         killPlayer()
         playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
-        playerUiCoordinator?.setupPlaylistAndItem(item, playlist, PREFERRED_SCREEN_DEFAULT)
+        val selectedScreen = playerConfigProvider.invoke()
+            .screens
+            .let { if (it.size > PREFERRED_SCREEN_DEFAULT) it.get(PREFERRED_SCREEN_DEFAULT) else it.get(0) }
+        playerUiCoordinator?.setupPlaylistAndItem(item, playlist, selectedScreen)
     }
 
     fun killPlayer() {
@@ -84,7 +89,11 @@ class HomeUiCoordinator :
             title = "Queue",
             items = listOf(item)
         )
-        playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, screenIndex)
+        val index = screenIndex ?: PREFERRED_SCREEN_DEFAULT
+        val selectedScreen = playerConfigProvider.invoke()
+            .screens
+            .let { if (it.size > index) it.get(index) else it.get(0) }
+        playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, selectedScreen)
     }
 
     companion object {

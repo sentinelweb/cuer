@@ -46,6 +46,7 @@ object PlayerEventToIntentMapper {
                 is Event.OpenClick -> Intent.OpenInApp
                 is Event.ShareClick -> Intent.Share
                 is Event.VolumeChanged -> Intent.VolumeChanged(vol)
+                is Event.OnScreenAcquired -> Intent.ScreenAcquired(screen)
             }
         }
 }

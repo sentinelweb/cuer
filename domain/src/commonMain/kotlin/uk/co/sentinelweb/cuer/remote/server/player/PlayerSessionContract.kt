@@ -26,6 +26,7 @@ interface PlayerSessionContract {
         )
         fun setVolume(volume: Float)
         fun setVolumeMax(volumeMax: Float)
+        fun setScreen(screen: PlayerNodeDomain.Screen)
     }
 
     @Serializable
@@ -50,6 +51,7 @@ interface PlayerSessionContract {
         val liveOffset: Long,
         val volume: Float,
         val volumeMax: Float,
+        val screen: PlayerNodeDomain.Screen?
     ) : Message
 
     interface Listener {
