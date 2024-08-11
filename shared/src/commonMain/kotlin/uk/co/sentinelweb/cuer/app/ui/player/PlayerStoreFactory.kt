@@ -220,6 +220,7 @@ class PlayerStoreFactory(
                 .apply { playerSessionManager.setMedia(item.media, null) }
                 //.apply { log.d("config.maxVolume: ${config.maxVolume}") }
                 .apply { playerSessionManager.setVolumeMax(config.maxVolume) }
+                .apply { playerSessionManager.setVolume(prefs.volume) }
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
         }

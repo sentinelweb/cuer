@@ -205,7 +205,7 @@ class VlcPlayerSwingWindow(
                     if (current - lastVolumeUpdateTime > 1000) {
                         super.volumeChanged(mediaPlayer, volume)
                         val sendVolume = volume * 100 //* 200 // todo getMax
-                        //log.d("mediaPlayer.volumeChanged: $volume $sendVolume")
+                        log.d("mediaPlayer.volumeChanged: $volume $sendVolume")
                         coordinator.dispatch(VolumeChanged(sendVolume))
                         lastVolumeUpdateTime = current
                     }
@@ -351,13 +351,12 @@ class VlcPlayerSwingWindow(
         // Add a mouse wheel listener to adjust the volume
         val volumeWheelListener = object : MouseWheelListener {
             override fun mouseWheelMoved(e: MouseWheelEvent) {
-                val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
-                val newVolume = (currentVolume + e.wheelRotation * 4).coerceIn(0, 200)
-
-                //mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume)
-                coordinator.dispatch(VolumeChanged(newVolume.toFloat()))
-                showHideControls.showControls()
-                // updateVolumeText()
+                if (e.wheelRotation != 0) {
+                    val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
+                    val newVolume = (currentVolume + e.wheelRotation * 4).coerceIn(0, 200)
+                    coordinator.dispatch(VolumeChanged(newVolume.toFloat()))
+                    showHideControls.showControls()
+                }
             }
         }
         mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
@@ -420,6 +419,7 @@ class VlcPlayerSwingWindow(
     }
 
     private fun updateVolumeText(text: String?) {
+        log.d("updateVolumeText: (${text})")
         volumeText.text = "Volume: $text"
     }
 
@@ -430,7 +430,7 @@ class VlcPlayerSwingWindow(
     }
 
     fun updateVolume(newVolume: Float) {
-        //log.d("updateVolume: (${newVolume})")
+        log.d("updateVolume: (${newVolume})")
         lastVolumeUpdateTime = timeProvider.currentTimeMillis()
         mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume.toInt())
     }
