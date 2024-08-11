@@ -122,17 +122,21 @@ class CuerCastPlayerWatcher(
 
     private fun startPolling() {
         pollingJob = coroutines.mainScope.launch {
-            while (isActive && remoteNode != null) {
-                val watcherNode = remoteNode
-                if (watcherNode != null) {
-                    remotePlayerInteractor
-                        .playerSessionStatus(watcherNode.locator())
-                        .also { updatePlayerState(it) }
-                    delay(1000)
-                } else {
-                    mainPlayerControls?.setCastDetails(CastDetails(CuerCast, Disconnected))
-                    cancel()
+            try {
+                while (isActive && remoteNode != null) {
+                    val watcherNode = remoteNode
+                    if (watcherNode != null) {
+                        remotePlayerInteractor
+                            .playerSessionStatus(watcherNode.locator())
+                            .also { updatePlayerState(it) }
+                        delay(1000)
+                    } else {
+                        mainPlayerControls?.setCastDetails(CastDetails(CuerCast, Disconnected))
+                        cancel()
+                    }
                 }
+            } catch (e: CancellationException) {
+                log.d("polling job cancelled")
             }
         }
     }
