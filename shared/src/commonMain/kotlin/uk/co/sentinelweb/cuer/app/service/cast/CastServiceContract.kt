@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
-interface YoutubeCastServiceContract {
+interface CastServiceContract {
 
     interface Service {
         fun stopSelf()

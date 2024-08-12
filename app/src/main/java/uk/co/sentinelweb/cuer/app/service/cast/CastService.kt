@@ -26,10 +26,10 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialog
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
-class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, AndroidScopeComponent {
+class CastService : Service(), CastServiceContract.Service, AndroidScopeComponent {
 
     override val scope: Scope by serviceScopeWithSource()
-    private val controller: YoutubeCastServiceContract.Controller by scope.inject()
+    private val controller: CastServiceContract.Controller by scope.inject()
     private val appState: CuerAppState by inject()
     private val log: LogWrapper by inject()
     private val notification: PlayerControlsNotificationContract.External by inject()
@@ -70,15 +70,15 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
         const val CHANNEL_ID: String = "cuer_yt_service"
         const val CHANNEL_NAME: String = "Cuer Youtube Service"
 
-        private var _instance: YoutubeCastService? = null
-        fun instance(): YoutubeCastService? = _instance
+        private var _instance: CastService? = null
+        fun instance(): CastService? = _instance
 
         val serviceModule = module {
-            factory<YoutubeCastServiceContract.Manager> { YoutubeCastServiceManager(androidApplication()) }
-            scope(named<YoutubeCastService>()) {
-                scoped<YoutubeCastServiceContract.Controller> {
-                    YoutubeCastServiceController(
-                        service = get<YoutubeCastService>(),
+            factory<CastServiceContract.Manager> { CastServiceManager(androidApplication()) }
+            scope(named<CastService>()) {
+                scoped<CastServiceContract.Controller> {
+                    CastServiceController(
+                        service = get<CastService>(),
 //                        ytContextHolder = get(),
                         notification = get(),
 //                        chromeCastWrapper = get(),
@@ -114,7 +114,7 @@ class YoutubeCastService : Service(), YoutubeCastServiceContract.Service, Androi
                 }
                 scoped<PlayerControlsNotificationContract.View> {
                     PlayerControlsNotificationMedia(
-                        service = get<YoutubeCastService>(),
+                        service = get<CastService>(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),

@@ -2,7 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.cast
 
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogModel.CuerCastStatus
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
@@ -26,7 +26,7 @@ class CastController(
     private val floatingManager: FloatingPlayerContract.Manager,
     private val playerControls: PlayerContract.PlayerControls,
     private val castDialogLauncher: CastContract.CastDialogLauncher,
-    private val ytServiceManager: YoutubeCastServiceContract.Manager,
+    private val ytServiceManager: CastServiceContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,
 ) {

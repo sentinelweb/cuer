@@ -11,7 +11,7 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
@@ -182,7 +182,7 @@ object Modules {
         factory<ChromecastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
         factory<FloatingPlayerContract.Manager> { EmptyFloatingPlayerManager() }
         factory<ChromecastContract.Wrapper> { EmptyChromeCastWrapper() }
-        factory<YoutubeCastServiceContract.Manager> { EmptyYoutubeCastServiceManager() }
+        factory<CastServiceContract.Manager> { EmptyYoutubeCastServiceManager() }
     }
 
     val allModules = listOf(resourcesModule)

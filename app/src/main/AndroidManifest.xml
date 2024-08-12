@@ -152,7 +152,7 @@
             tools:ignore="LockedOrientationActivity" />
 
         <service
-            android:name="uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService"
+                android:name="uk.co.sentinelweb.cuer.app.service.cast.CastService"
             android:exported="false">
 
             <!--            android:foregroundServiceType="mediaPlayback"-->

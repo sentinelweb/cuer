@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.app.util.permission
 
 import uk.co.sentinelweb.cuer.app.CuerAppState
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastService
+import uk.co.sentinelweb.cuer.app.service.cast.CastService
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingNotification
@@ -13,8 +13,8 @@ class NotificationChannelCreator(
 ) {
     fun create() {
         appState.castNotificationChannelId = notificationWrapper.createChannelId(
-            YoutubeCastService.CHANNEL_ID,
-            YoutubeCastService.CHANNEL_NAME
+            CastService.CHANNEL_ID,
+            CastService.CHANNEL_NAME
         )
 
         appState.remoteNotificationChannelId = notificationWrapper.createChannelId(

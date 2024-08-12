@@ -3,9 +3,9 @@ package uk.co.sentinelweb.cuer.app.service.cast
 import android.app.Application
 import android.content.Intent
 
-class YoutubeCastServiceManager constructor(
+class CastServiceManager constructor(
     private val app: Application
-) : YoutubeCastServiceContract.Manager {
+) : CastServiceContract.Manager {
 
     override fun start() {
         if (!isRunning()) {
@@ -19,10 +19,10 @@ class YoutubeCastServiceManager constructor(
         }
     }
 
-    override fun get(): YoutubeCastService? = YoutubeCastService.instance()
+    override fun get(): CastService? = CastService.instance()
 
-    override fun isRunning(): Boolean = YoutubeCastService.instance() != null
+    override fun isRunning(): Boolean = CastService.instance() != null
 
-    private fun intent() = Intent(app, YoutubeCastService::class.java)
+    private fun intent() = Intent(app, CastService::class.java)
 
 }

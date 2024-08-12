@@ -9,12 +9,19 @@ import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -129,6 +136,29 @@ interface ShareContract {
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<DoneNavigation> { get<ShareActivity>() }
                 scoped { ShareNavigationHack() }
+                // dependencies for player controls
+                scoped {
+                    CastController(
+                        cuerCastPlayerWatcher = get(),
+                        chromeCastHolder = get(),
+                        chromeCastDialogWrapper = get(),
+                        chromeCastWrapper = get(),
+                        floatingManager = get(),
+                        playerControls = get(),
+                        castDialogLauncher = get(),
+                        ytServiceManager = get(),
+                        coroutines = get(),
+                        log = get(),
+                    )
+                }
+                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(activity = get<ShareActivity>()) }
+                scoped<ChromecastContract.DialogWrapper> {
+                    CastDialogWrapper(
+                        activity = get<ShareActivity>(),
+                        chromeCastWrapper = get()
+                    )
+                }
+                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<ShareActivity>()) }
             }
         }
     }
