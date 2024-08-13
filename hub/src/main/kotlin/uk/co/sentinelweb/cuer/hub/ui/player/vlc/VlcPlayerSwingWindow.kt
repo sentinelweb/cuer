@@ -435,6 +435,13 @@ class VlcPlayerSwingWindow(
         mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume.toInt())
     }
 
+    fun doFocus() {
+        toFront()
+        repaint()
+        requestFocus()
+        showHideControls.hideControls()
+    }
+
     companion object {
         fun checkShowWindow(): Boolean {
             if (!NativeDiscovery().discover()) {

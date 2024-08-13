@@ -55,7 +55,7 @@ class VlcPlayerShowHideControls {
     private val hideControlsTimer = Timer(3000, { hideControls() })
         .apply { isRepeats = false }
 
-    private val hideControls = {
+    fun hideControls() {
         controlsPane.isVisible = false
         this.frame.cursor = transparentCursor
     }

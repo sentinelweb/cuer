@@ -145,6 +145,7 @@ class PlayerStoreFactory(
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
                 Intent.Stop -> publish(Label.Stop)
+                Intent.FocusWindow -> publish(Label.FocusWindow)
                 is Intent.VolumeChanged -> volumeChanged(intent)
                 is Intent.ScreenAcquired -> screenAcquired(intent)
             }

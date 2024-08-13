@@ -112,6 +112,10 @@ class CastController(
         castDialogLauncher.hideCastDialog()
     }
 
+    suspend fun focusCuerCast() {
+        cuerCastPlayerWatcher.sendFocus()
+    }
+
     fun connectChromeCast() {
         castDialogLauncher.hideCastDialog()
         if (!chromeCastHolder.isConnected()) {

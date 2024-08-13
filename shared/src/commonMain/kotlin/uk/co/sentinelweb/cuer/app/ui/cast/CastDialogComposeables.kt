@@ -122,8 +122,17 @@ object CastDialogComposeables {
                 ) {
                     if (model.isPlaying) {
                         Image(
+                            painter = painterResource(Res.drawable.ic_focus),
+                            contentDescription = "Cuer cast focus",
+                            modifier = Modifier
+                                .size(48.dp)
+                                .padding(8.dp)
+                                .align(Alignment.CenterVertically)
+                                .clickable { viewModel.focusCuerCast() }
+                        )
+                        Image(
                             painter = painterResource(Res.drawable.ic_stop),
-                            contentDescription = "Cuer cast Icon",
+                            contentDescription = "Cuer cast stop",
                             modifier = Modifier
                                 .size(48.dp)
                                 .padding(8.dp)
@@ -140,7 +149,6 @@ object CastDialogComposeables {
                             .align(Alignment.CenterVertically)
                             .clickable { viewModel.disconnectCuerCast() }
                     )
-
                 }
             }
         }

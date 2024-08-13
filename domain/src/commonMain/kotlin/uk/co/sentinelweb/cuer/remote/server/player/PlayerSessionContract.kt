@@ -36,9 +36,9 @@ interface PlayerSessionContract {
         object TrackFwd : PlayerCommandMessage()
         object TrackBack : PlayerCommandMessage()
         object Stop : PlayerCommandMessage()
+        object FocusWindow : PlayerCommandMessage()
         data class PlayPause(val isPlaying: Boolean?) : PlayerCommandMessage()
         data class TrackSelected(val itemId: Identifier<GUID>, val resetPosition: Boolean) : PlayerCommandMessage()
-
         data class SeekToFraction(val fraction: Float) : PlayerCommandMessage()
         data class Volume(val volume: Float) : PlayerCommandMessage()
     }

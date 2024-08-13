@@ -43,6 +43,13 @@ class CastDialogViewModel(
         }
     }
 
+    fun focusCuerCast() {
+        coroutines.mainScope.launch {
+            castController.focusCuerCast()
+            _model.value = castController.map()
+        }
+    }
+
     fun connectChromeCast() {
         if (!_model.value.chromeCastStatus.isConnected) {
             castController.connectChromeCast()

@@ -270,6 +270,10 @@ class CuerCastPlayerWatcher(
         withContext(coroutines.Main) { cleanup() }
     }
 
+    suspend fun sendFocus() = withContext(coroutines.IO) {
+        sendCommand(FocusWindow)
+    }
+
     fun cleanup() {
         pollingJob?.cancel()
         pollingJob = null

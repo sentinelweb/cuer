@@ -302,6 +302,7 @@ class AytPortraitActivity : AppCompatActivity(),
                 is Share -> shareWrapper.share(label.item.media)
 
                 is Stop -> finish()
+                is FocusWindow -> Unit
             }
         }
     }

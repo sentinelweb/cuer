@@ -27,8 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Stop
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
@@ -107,6 +106,7 @@ class VlcPlayerUiCoordinator(
         when (label) {
             is Command -> playerWindow.playStateChanged(label.command)
             Stop -> destroyPlayerWindow()
+            FocusWindow -> focusPlayerWindow()
             else -> log.d("Unprocessed label: $label")
         }
     }
@@ -127,6 +127,10 @@ class VlcPlayerUiCoordinator(
         diff(get = Model::buttons, set = {
             playerWindow.updateButtons(it)
         })
+    }
+
+    fun focusPlayerWindow() {
+        playerWindow.doFocus()
     }
 
     fun destroyPlayerWindow() {

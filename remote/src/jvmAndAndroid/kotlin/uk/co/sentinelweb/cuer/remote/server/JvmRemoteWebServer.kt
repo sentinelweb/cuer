@@ -247,6 +247,7 @@ class JvmRemoteWebServer(
                             SkipBack::class.java.simpleName -> SkipBack
                             TrackFwd::class.java.simpleName -> TrackFwd
                             TrackBack::class.java.simpleName -> TrackBack
+                            FocusWindow::class.java.simpleName -> FocusWindow
                             Stop::class.java.simpleName -> Stop
                             PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
                             SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)

@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerC
 internal class RemotePlayerService(
     private val executor: ServiceExecutor
 ) {
+    // fixme find better way to send serializdd object
     internal suspend fun executeCommand(locator: Locator, message: PlayerCommandMessage): ResponseMessage {
         val command = when (message) {
             is PlayPause -> PLAYER_COMMAND_API.PATH
@@ -47,6 +48,8 @@ internal class RemotePlayerService(
 
             Stop -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "Stop")
+            FocusWindow -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "FocusWindow")
 
             is Volume -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "Volume")

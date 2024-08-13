@@ -1,5 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+// ./gradlew packageDmg
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -44,15 +46,15 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinxCoroutinesTest)
 }
-
+// lots on configuration info here
+// https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
 compose.desktop {
     application {
         mainClass = "uk.co.sentinelweb.cuer.hub.main.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "CuerHub"
-            packageVersion = "1.0.0"// fixme shoudl use app_versionName but there are a lot of platform dependent rules
+            packageName = "Cuer Hub"
+            packageVersion = "1.0.0"// fixme should use app_versionName but there are a lot of platform dependent rules
         }
     }
 }

@@ -36,5 +36,12 @@ fun main() {
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
 
+//    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
+//        //Application.getApplication().dockIconImage = loadSVG(resourcePath ="drawable/ic_bitcoin.svg", color= Color.Red, 64)
+//        System.setProperty("apple.awt.application.name", "My Custom App Name");
+//        System.setProperty("apple.laf.useScreenMenuBar", "true"); // Use the screen menu bar
+//        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "My Custom App Name");
+//    }
+
     home(homeUiCoordinator)
 }
