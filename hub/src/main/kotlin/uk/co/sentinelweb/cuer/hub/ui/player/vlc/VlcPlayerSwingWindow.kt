@@ -310,14 +310,16 @@ class VlcPlayerSwingWindow(
         }
         seekBar.addMouseMotionListener(object : MouseAdapter() {
             override fun mouseMoved(e: MouseEvent) {
-                val slider = e.source as JSlider
-                val mouseX = e.x
-                val value = slider.minimum + (slider.maximum - slider.minimum) * mouseX / slider.width
-                val duration = mediaPlayerComponent.mediaPlayer().media().info().duration()
-                val position = value.toDouble() / slider.maximum
-                val timeInMillis = (duration * position).toLong()
-                val timeFormatted = timeFormatter.formatTime(timeInMillis / 1000f)
-                slider.toolTipText = timeFormatted
+                if (mediaPlayerComponent.mediaPlayer().media().info() != null) {
+                    val slider = e.source as JSlider
+                    val mouseX = e.x
+                    val value = slider.minimum + (slider.maximum - slider.minimum) * mouseX / slider.width
+                    val duration = mediaPlayerComponent.mediaPlayer().media().info().duration()
+                    val position = value.toDouble() / slider.maximum
+                    val timeInMillis = (duration * position).toLong()
+                    val timeFormatted = timeFormatter.formatTime(timeInMillis / 1000f)
+                    slider.toolTipText = timeFormatted
+                }
             }
         })
         posText = JLabel("00:00:00").apply {

@@ -53,7 +53,7 @@ compose.desktop {
         mainClass = "uk.co.sentinelweb.cuer.hub.main.MainKt"
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "Cuer Hub"
+            packageName = "Cuer"
             packageVersion = "1.0.0"// fixme should use app_versionName but there are a lot of platform dependent rules
         }
     }

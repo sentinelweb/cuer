@@ -99,6 +99,7 @@ class CuerCastPlayerWatcher(
     fun isWatching(): Boolean = remoteNode != null
 
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
+    fun isCommunicating(): Boolean = state.isCommunicating
 
     fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls) {
         prefs.curecastRemoteNodeName
