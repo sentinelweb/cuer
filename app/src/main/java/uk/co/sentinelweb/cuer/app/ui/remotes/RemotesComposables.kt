@@ -79,7 +79,8 @@ object RemotesComposables {
                     ) {
                         Header(model, view)
                         LazyColumn(
-                            modifier = Modifier.height(300.dp),
+                            modifier = Modifier
+                                .height(400.dp), // fixme need to calc height for device (or make scrollable)
                             contentPadding = PaddingValues(top = 4.dp)
                         ) {
                             items(model.remoteNodes) { remote ->
@@ -178,16 +179,19 @@ object RemotesComposables {
             .takeIf { it }
             ?.let { MaterialTheme.colors.onSurface }
             ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-        Column {
+        Column(
+            Modifier
+                .background(MaterialTheme.colors.surface)
+        ) {
             Box(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd,
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp)
-                        .background(MaterialTheme.colors.surface),
+                        .padding(8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
