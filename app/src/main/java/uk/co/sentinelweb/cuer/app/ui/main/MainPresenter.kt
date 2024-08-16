@@ -34,24 +34,24 @@ class MainPresenter(
     override fun onPlayServicesOk() {
         log.d("onPlayServicesOk()")
         state.playServicesAvailable = true
-        if (!ytContextHolder.isCreated()) {
-            initialiseCastContext()
-        }
+//        if (!ytContextHolder.isCreated()) {
+//            initialiseCastContext()
+//        }
     }
 
     override fun onDestroy() {
 
     }
 
-    private fun initialiseCastContext() {
-        ytContextHolder.create()
-    }
+//    private fun initialiseCastContext() {
+//        ytContextHolder.create(view.playerControls)
+//    }
 
     override fun onStart() {
         log.d("onStart()")
-        if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
-            initialiseCastContext()
-        }
+//        if (!ytContextHolder.isCreated() && state.playServicesAvailable) {
+//            initialiseCastContext()
+//        }
         if (!state.playControlsInit) {
             // view.playerControls.initMediaRouteButton()
             view.playerControls.reset()

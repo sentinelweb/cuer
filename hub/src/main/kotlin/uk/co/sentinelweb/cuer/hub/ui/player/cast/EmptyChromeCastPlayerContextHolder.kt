@@ -8,7 +8,7 @@ class EmptyChromeCastPlayerContextHolder : ChromecastContract.PlayerContextHolde
         get() = null
         set(value) {}
 
-    override fun create() = Unit
+    override fun create(playerControls: PlayerContract.PlayerControls) = Unit
 
     override fun isCreated(): Boolean = false
 

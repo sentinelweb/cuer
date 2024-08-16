@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 
 class ChromecastYouTubePlayerContextHolder(
     private val creator: YoutubePlayerContextCreator,
-    private val chromeCastWrapper: ChromeCastWrapper
+    private val chromeCastWrapper: ChromeCastWrapper,
 ) : ChromecastContract.PlayerContextHolder {
 
     private var context: ChromecastYouTubePlayerContext? = null
@@ -20,9 +20,10 @@ class ChromecastYouTubePlayerContextHolder(
             listener?.playerUi = field
         }
 
-    override fun create() {
-        listener = creator.createConnectionListener().also { listener ->
-            this.mainPlayerControls = mainPlayerControls
+    override fun create(playerControls: PlayerContract.PlayerControls) {
+        creator.createConnectionListener().also { listener ->
+            this.listener = listener
+            mainPlayerControls = playerControls
             creator.createContext(chromeCastWrapper.getCastContext(), listener).also { context ->
                 this@ChromecastYouTubePlayerContextHolder.context = context
                 listener.setContext(context)

@@ -122,6 +122,9 @@ class CastController(
     fun connectChromeCast() {
         castDialogLauncher.hideCastDialog()
         if (!chromeCastHolder.isConnected()) {
+            if (!chromeCastHolder.isCreated()) {
+                chromeCastHolder.create(playerControls)
+            }
             chromeCastDialogWrapper.showRouteSelector()
         }
     }
@@ -129,7 +132,9 @@ class CastController(
     fun disonnectChromeCast() {
         if (chromeCastHolder.isConnected()) {
             chromeCastWrapper.killCurrentSession()
+            chromeCastHolder.destroy()
         }
+        castDialogLauncher.hideCastDialog()
     }
 
     fun getVolume(): Float = // 0..1

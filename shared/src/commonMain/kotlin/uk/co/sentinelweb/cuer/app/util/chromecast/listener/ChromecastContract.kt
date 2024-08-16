@@ -7,7 +7,7 @@ interface ChromecastContract {
 
         var mainPlayerControls: PlayerContract.PlayerControls?
 
-        fun create()
+        fun create(playerControls: PlayerContract.PlayerControls)
 
         fun isCreated(): Boolean
 
