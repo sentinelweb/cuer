@@ -22,7 +22,6 @@ class CuerSimpleVolumeController(
         get() = field
         set(value) {
             value?.castController = castController
-            value?.updateValue()
             field = value
         }
 
@@ -35,7 +34,6 @@ class CuerSimpleVolumeController(
                 if (action == KeyEvent.ACTION_DOWN) {
                     val newVolume = castController.getVolume() + VOL_INCREMENT
                     castController.setVolume(newVolume)
-                    //log.d("newVolume; $newVolume")
                     controlView?.updateValue()
                 }
                 true
@@ -45,7 +43,6 @@ class CuerSimpleVolumeController(
                 if (action == KeyEvent.ACTION_DOWN) {
                     val newVolume = castController.getVolume() - VOL_INCREMENT
                     castController.setVolume(newVolume)
-                    // log.d("newVolume; $newVolume")
                     controlView?.updateValue()
                 }
                 true
@@ -56,6 +53,6 @@ class CuerSimpleVolumeController(
     }
 
     companion object {
-        private val VOL_INCREMENT = 0.03f
+        private val VOL_INCREMENT = 0.05f // chrome cast doesnt adjust if less than 0.05
     }
 }

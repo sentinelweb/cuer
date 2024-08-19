@@ -49,5 +49,4 @@ class ChromecastYouTubePlayerContextHolder(
     fun removeConnectionListener(listener: ChromecastConnectionListener) {
         context?.removeChromecastConnectionListener(listener)
     }
-
 }

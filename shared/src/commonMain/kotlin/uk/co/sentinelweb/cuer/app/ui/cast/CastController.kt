@@ -141,19 +141,16 @@ class CastController(
         if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.volume / cuerCastPlayerWatcher.volumeMax
         } else if (chromeCastHolder.isConnected()) {
-            (chromeCastWrapper.getVolume() / chromeCastWrapper.getMaxVolume()).toFloat()
+            val vol = chromeCastWrapper.getVolume() / chromeCastWrapper.getMaxVolume()
+            vol.toFloat()
         } else 0f
 
     fun setVolume(volume: Float) { // 0 .. 1
-        if (cuerCastPlayerWatcher.isWatching() && volume < 1) {
+        if (cuerCastPlayerWatcher.isWatching() && volume <= 1) {
             val newVolume = volume * cuerCastPlayerWatcher.volumeMax
-            log.d("cuercast newVolume:$newVolume max=${cuerCastPlayerWatcher.volumeMax}")
             cuerCastPlayerWatcher.sendVolume(newVolume)
-        } else if (chromeCastHolder.isConnected() && volume < 1) {
-            val maxVolume = chromeCastWrapper.getMaxVolume().toFloat()
-            val newVolume = volume * maxVolume
-            log.d("chromecast newVolume:$newVolume max=${maxVolume}")
-            chromeCastWrapper.setVolume(newVolume)
+        } else if (chromeCastHolder.isConnected() && volume <= 1) {
+            chromeCastWrapper.setVolume(volume)
         }
     }
 
