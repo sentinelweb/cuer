@@ -301,9 +301,7 @@ class MainActivity :
     var isRaised = true
     override fun lowerPlayer() {
         if (isRaised) {
-//            log.d("lowerPlayer()")
-//            val baseTranslation = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
-            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()//+baseTranslation
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =
                 ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", 0f, lowerY)
             transAnimation.setDuration(200)
@@ -314,9 +312,7 @@ class MainActivity :
 
     override fun raisePlayer() {
         if (!isRaised) {
-//            log.d("raisePlayer()")
-//            val baseTranslation = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
-            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()//+baseTranslation
+            val lowerY = res.getDimensionPixelSize(R.dimen.player_lower_y).toFloat()
             val transAnimation =
                 ObjectAnimator.ofFloat(binding.castPlayerFragment, "translationY", lowerY, 0f)
             transAnimation.setDuration(200)
@@ -326,7 +322,6 @@ class MainActivity :
     }
 
     private fun setupBottomNav() {
-//        binding.bottomNavView.setupWithNavController(navController)
         NavigationUI.setupWithNavController(binding.bottomNavView, navController, false)
         binding.bottomNavView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
