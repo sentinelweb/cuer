@@ -80,6 +80,12 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
     override fun setVolume(volume: Float) {
         getCastSession()?.volume = volume.toDouble()
     }
+
+    override fun getMediaRouteIdForCurrentSession(): String? = getCastSession()
+        ?.castDevice
+        ?.let { getRoute(it) }
+        ?.id
+
     /*
         description:Cuer
         name:Living Room TV

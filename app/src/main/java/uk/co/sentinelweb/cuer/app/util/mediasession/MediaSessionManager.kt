@@ -41,6 +41,7 @@ class MediaSessionManager(
         } else {
             appState.mediaSession?.setCallback(CuerMediaSessionCallback(controls))
         }
+        appState.mediaSession?.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS)
     }
 
     override fun destroyMediaSession() {

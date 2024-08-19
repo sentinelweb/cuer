@@ -12,7 +12,6 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastD
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
-import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -21,7 +20,7 @@ class YoutubeCastConnectionListener constructor(
     private val state: State,
     private val creator: YoutubePlayerContextCreator,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val castWrapper: ChromeCastWrapper,
+    private val castWrapper: ChromecastContract.Wrapper,
     private val queue: QueueMediatorContract.Consumer,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,

@@ -28,5 +28,6 @@ interface ChromecastContract {
         fun getMaxVolume(): Double
         fun logCastDevice()
         fun setVolume(volume: Float)
+        fun getMediaRouteIdForCurrentSession(): String?
     }
 }
