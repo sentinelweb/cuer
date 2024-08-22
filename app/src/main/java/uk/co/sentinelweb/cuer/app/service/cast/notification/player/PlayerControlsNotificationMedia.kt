@@ -104,7 +104,7 @@ class PlayerControlsNotificationMedia constructor(
                     }
             )
             .setContentTitle(buildTitle(state))
-            .setContentText(state.media?.description)
+            .setContentText(state.item?.media?.description)
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
             .setChannelId(channelIdToUse)
@@ -131,7 +131,7 @@ class PlayerControlsNotificationMedia constructor(
                     builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
 
                 else -> {
-                    log.e("state: ${state.playState} title: ${state.media?.title}")
+                    log.e("state: ${state.playState} title: ${state.item?.media?.title}")
                     builder.addAction(R.drawable.ic_error, "Unknown", contentPendingIntent)
                 }
             }
@@ -145,7 +145,7 @@ class PlayerControlsNotificationMedia constructor(
         return builder.build()
     }
 
-    private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.media?.title ?: "No title")
+    private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.item?.media?.title ?: "No title")
 
     private fun pendingIntent(action: String): PendingIntent {
         val intent = Intent(service, service::class.java).apply {

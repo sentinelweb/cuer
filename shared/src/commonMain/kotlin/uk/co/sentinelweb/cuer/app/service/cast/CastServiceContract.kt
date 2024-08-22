@@ -8,7 +8,7 @@ interface CastServiceContract {
 
     interface Controller {
         fun initialise()
-        fun handleAction(action: String?)
+        fun handleAction(action: String?, extras: Map<String, Any>?)
         fun destroy()
     }
 
@@ -20,13 +20,17 @@ interface CastServiceContract {
     }
 
     companion object {
-        const val ACTION_PAUSE = "pause"
-        const val ACTION_PLAY = "play"
-        const val ACTION_SKIPF = "skipf"
-        const val ACTION_SKIPB = "skipb"
-        const val ACTION_TRACKF = "trackf"
-        const val ACTION_TRACKB = "trackb"
-        const val ACTION_DISCONNECT = "disconnect"
-        const val ACTION_STAR = "star"
+        const val ACTION_PAUSE = "cuer:pause"
+        const val ACTION_PLAY = "cuer:play"
+        const val ACTION_SKIPF = "cuer:skipf"
+        const val ACTION_SKIPB = "cuer:skipb"
+        const val ACTION_TRACKF = "cuer:trackf"
+        const val ACTION_TRACKB = "cuer:trackb"
+        const val ACTION_DISCONNECT = "cuer:disconnect"
+        const val ACTION_STAR = "cuer:star"
+        const val ACTION_VOL_UP = "cuer:volUp"
+        const val ACTION_VOL_DOWN = "cuer:volDown"
+        const val ACTION_VOL_MUTE = "cuer:volMute"
+        const val ACTION_STOP = "cuer:stop"
     }
 }

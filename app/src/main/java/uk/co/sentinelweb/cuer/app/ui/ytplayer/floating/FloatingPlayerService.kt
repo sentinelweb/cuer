@@ -182,6 +182,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         launchClass = MainActivity::class.java,
                         playerUiMapper = get(),
                         channelId = get<CuerAppState>().floatingNotificationChannelId,
+                        showVolumeControls = false,
                     )
 
                 }

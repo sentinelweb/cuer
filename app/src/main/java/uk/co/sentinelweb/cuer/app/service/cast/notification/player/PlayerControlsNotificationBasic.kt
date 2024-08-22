@@ -83,8 +83,8 @@ class PlayerControlsNotificationBasic constructor(
         val builder = NotificationCompat.Builder(service, channelIdToUse)
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)
-            .setContentTitle(state.media?.title ?: "No title")
-            .setContentText(state.media?.description ?: "No description")
+            .setContentTitle(state.item?.media?.title ?: "No title")
+            .setContentText(state.item?.media?.description ?: "No description")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
@@ -114,7 +114,7 @@ class PlayerControlsNotificationBasic constructor(
                     builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
 
                 else -> {
-                    log.e("state: ${state.playState} title: ${state.media?.title}")
+                    log.e("state: ${state.playState} title: ${state.item?.media?.title}")
                     builder.addAction(R.drawable.ic_error, "Unknown", contentPendingIntent)
                 }
             }

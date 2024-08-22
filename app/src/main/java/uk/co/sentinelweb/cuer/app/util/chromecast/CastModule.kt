@@ -26,7 +26,8 @@ object CastModule {
                 castWrapper = get(),
                 timeProvider = get(),
                 livePlayback = get(named(CAST_PLAYER)),
-                coroutines = get()
+                coroutines = get(),
+                chromeCastWrapper = get(),
             )
         }
         factory<LivePlaybackContract.Controller>(named(CAST_PLAYER)) {

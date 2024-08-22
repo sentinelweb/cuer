@@ -32,6 +32,7 @@ class YouTubePlayerListener(
     private val timeProvider: TimeProvider,
     private val coroutines: CoroutineContextProvider,
     private val livePlaybackController: LivePlaybackContract.Controller,
+    private val chromeCastWrapper: ChromecastContract.Wrapper,
 ) : AbstractYouTubePlayerListener(),
     PlayerContract.PlayerControls.Listener {
 
@@ -118,6 +119,7 @@ class YouTubePlayerListener(
         }
         if (shouldUpdateUi()) {
             playerUi?.setCurrentSecond(second)
+            playerUi?.setVolume((chromeCastWrapper.getVolume() / chromeCastWrapper.getMaxVolume()).toFloat())
             setTimeUpdateUi()
             updateMediaSessionManagerPlaybackState()
         }

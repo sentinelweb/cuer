@@ -103,10 +103,10 @@ class PlayerControlsNotificationController(
     private fun updateNotification() {
         //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
-        state.media?.apply {
+        state.item?.apply {
             state.bitmap
                 ?.let { showNotification() }
-                ?: (state.media?.run { image ?: thumbNail })?.let { image ->
+                ?: (state.item?.media?.run { image ?: thumbNail })?.let { image ->
                     Glide.with(context).asBitmap()
                         .load(image.url)
                         .into(BitmapLoadTarget())
@@ -173,17 +173,16 @@ class PlayerControlsNotificationController(
     override fun setPlaylistImage(image: ImageDomain?) = Unit
 
     override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
-        if (state.media?.id != playlistItem?.media?.id) {
+        if (state.item?.id != playlistItem?.media?.id) {
             state.bitmap = null
         }
-        state.media = playlistItem?.media
+        state.item = playlistItem
         updateNotification()
     }
 
     override fun reset() {
-        //log.e("reset: state.media=${state.media?.stringMedia()}", Exception())
         state.bitmap = null
-        state.media = null
+        state.item = null
         updateNotification()
     }
 
@@ -201,6 +200,10 @@ class PlayerControlsNotificationController(
         state.prevEnabled = buttons.prevTrackEnabled
         state.seekEnabled = buttons.seekEnabled
         updateNotification()
+    }
+
+    override fun setVolume(fraction: Float) {
+        state.volumeFraction = fraction
     }
 
     override fun setCastDetails(details: TargetDetails) {

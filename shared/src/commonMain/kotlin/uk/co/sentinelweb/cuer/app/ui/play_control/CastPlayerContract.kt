@@ -81,7 +81,8 @@ interface CastPlayerContract {
         var isUpcoming: Boolean = false,
         var playlistName: String? = null,
         var buttons: PlayerContract.View.Model.Buttons? = null,
-        var targetDetails: TargetDetails = TargetDetails()
+        var targetDetails: TargetDetails = TargetDetails(),
+        var volumeFraction: Float = 0f,
     ) {
         data class TargetDetails(
             val target: PlayerContract.ControlTarget = Local,

@@ -159,6 +159,13 @@ class CastController(
         }
     }
 
+    fun decrementVolume() {
+        setVolume((getVolume() - VOLUME_CREMENT).coerceIn(0f..1f))
+    }
+
+    fun incrementVolume() {
+        setVolume((getVolume() + VOLUME_CREMENT).coerceIn(0f..1f))
+    }
 
     suspend fun map(): CastDialogModel = withContext(coroutines.Main) {
 //        chromeCastWrapper.logCastDevice()
@@ -197,5 +204,9 @@ class CastController(
             ),
             floatingManager.isRunning()
         )
+    }
+
+    companion object {
+        const val VOLUME_CREMENT = 0.05F
     }
 }

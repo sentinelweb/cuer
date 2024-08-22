@@ -317,6 +317,10 @@ class CastPlayerPresenter(
         updateButtons()
     }
 
+    override fun setVolume(fraction: Float) {
+        state.volumeFraction = fraction
+    }
+
     private fun updateButtons() {
         view.setSeekEnabled(state.buttons?.seekEnabled ?: false)
         view.setNextTrackEnabled(state.buttons?.nextTrackEnabled ?: false)

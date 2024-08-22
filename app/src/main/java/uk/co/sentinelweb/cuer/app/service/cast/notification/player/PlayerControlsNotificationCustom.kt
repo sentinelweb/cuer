@@ -7,26 +7,26 @@ import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.RemoteViews
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DISCONNECT
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPF
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STAR
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKB
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKF
+import uk.co.sentinelweb.cuer.app.service.EXTRA_ITEM_ID
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_DOWN
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_MUTE
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_UP
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerUiMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class PlayerControlsNotificationCustom constructor(
     private val service: Service,
@@ -35,7 +35,8 @@ class PlayerControlsNotificationCustom constructor(
     private val log: LogWrapper,
     private val launchClass: Class<out Activity>,
     private val playerUiMapper: CastPlayerUiMapper,
-    private val channelId: String?
+    private val channelId: String?,
+    private val showVolumeControls: Boolean,
 ) : PlayerControlsNotificationContract.View {
 
     init {
@@ -75,23 +76,17 @@ class PlayerControlsNotificationCustom constructor(
         val channelIdToUse = channelId
             ?: appState.castNotificationChannelId
             ?: throw IllegalStateException("No media notification channel")
-        val remoteViews = RemoteViews(service.packageName, R.layout.notif_custom_media)
 
-        val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
-        val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
-        val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
-        val skipbPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPB)
-        val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
-        val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
-        val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
-        val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
+        val remoteView = RemoteViews(service.packageName, R.layout.notif_custom_media)
 
         val contentIntent = Intent(service, launchClass)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
-        val title = state.media?.title ?: "No title"
-        val description = state.media?.description ?: "No description"
+        val title = state.item?.media?.title ?: "No title"
+        val description = state.targetDetails.name
+            ?: state.item?.media?.description
+            ?: "No description"
 
         val builder = NotificationCompat.Builder(service, channelIdToUse)
             .setDefaults(Notification.DEFAULT_ALL)
@@ -102,114 +97,158 @@ class PlayerControlsNotificationCustom constructor(
             .setWhen(timeProvider.currentTimeMillis())
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
-            .setCustomBigContentView(remoteViews)
+            .setCustomBigContentView(remoteView)
             .setSound(null)
-//            .setSilent(true)
+            .setSilent(true)
             .setChannelId(channelIdToUse)
 
         (state.bitmap as Bitmap?)?.apply {
             builder.setLargeIcon(this)
-            remoteViews.setImageViewBitmap(R.id.notif_album_art, this)
+            remoteView.setImageViewBitmap(R.id.notif_album_art, this)
         }
 
-        remoteViews.setTextViewText(R.id.notif_track_title, title)
-        remoteViews.setTextViewText(R.id.notif_track_description, description)
+        remoteView.setTextViewText(R.id.notif_track_title, title)
+        remoteView.setTextViewText(R.id.notif_track_description, description)
 
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_disconnect, disconnectPendingIntent)
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_previous_track, trackbPendingIntent)
-        remoteViews.setBoolean(R.id.notif_button_previous_track, "setEnabled", state.prevEnabled)
+        // previous track
+        val trackbPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_TRACKB)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_previous_track, trackbPendingIntent)
+        remoteView.setBoolean(R.id.notif_button_previous_track, "setEnabled", state.prevEnabled)
 
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_rewind, skipbPendingIntent)
+        // skip back
+        val skipbPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_SKIPB)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_rewind, skipbPendingIntent)
+        remoteView.setBoolean(R.id.notif_button_play_pause, "setEnabled", true)
 
-        remoteViews.setBoolean(R.id.notif_button_play_pause, "setEnabled", true)
+        // play/pause button
+        val playPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_PLAY)
         if (state.blocked) {
-            remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
-            remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_lock_24)
+            remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
+            remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_lock_24)
         } else {
             when (state.playState) {
                 PLAYING -> {
-                    remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, pausePendingIntent)
-                    remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_pause)
+                    val pausePendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_PAUSE)
+                    remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, pausePendingIntent)
+                    remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_pause)
                 }
 
                 PAUSED -> {
-                    remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, playPendingIntent)
-                    remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_play)
+                    remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, playPendingIntent)
+                    remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_play)
                 }
 
                 BUFFERING, VIDEO_CUED -> {
-                    remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, playPendingIntent)
-                    remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_buffer)
+                    remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, playPendingIntent)
+                    remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_buffer)
                 }
 
                 ERROR -> {
-                    remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
-                    remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_error)
-                    remoteViews.setBoolean(R.id.notif_button_play_pause, "setEnabled", false)
+                    remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
+                    remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_error)
+                    remoteView.setBoolean(R.id.notif_button_play_pause, "setEnabled", false)
                 }
 
                 else -> {
-                    remoteViews.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
-                    remoteViews.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_buffer)
+                    remoteView.setOnClickPendingIntent(R.id.notif_button_play_pause, contentPendingIntent)
+                    remoteView.setImageViewResource(R.id.notif_button_play_pause, R.drawable.ic_notif_buffer)
                 }
             }
         }
 
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_forward, skipfPendingIntent)
+        // skip forward
+        val skipfPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_SKIPF)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_forward, skipfPendingIntent)
 
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_next_track, trackfPendingIntent)
-        remoteViews.setBoolean(R.id.notif_button_next_track, "setEnabled", state.nextEnabled)
+        // next track
+        val trackfPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_TRACKF)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_next_track, trackfPendingIntent)
+        remoteView.setBoolean(R.id.notif_button_next_track, "setEnabled", state.nextEnabled)
 
-        val starred = state.media?.starred ?: false
-        remoteViews.setOnClickPendingIntent(R.id.notif_button_star, starPendingIntent)
+        // star button
+        val starred = state.item?.media?.starred == true
+        val xtras = state.item?.id?.let { mapOf(EXTRA_ITEM_ID to it.serialise()) }
+        val starPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_STAR, xtras)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_star, starPendingIntent)
         if (starred) {
-            remoteViews.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_starred)
+            remoteView.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_starred)
         } else {
-            remoteViews.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_unstarred_black)
+            remoteView.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_unstarred_black)
         }
-        val progress = state.media
+
+        //progress bar
+        val progress = state.item
             ?.let {
-                val duration = it.duration
-                val positon = it.positon
-                //log.d("duration: $duration, positon: $positon")
+                val duration = it.media.duration
+                val positon = it.media.positon
                 if (duration != null && positon != null) {
                     (positon * 1000f / duration).toInt()
                 } else 0
-            }//?.also{log.d("progress: $it")}
+            }
             ?: 0
-        remoteViews.setProgressBar(R.id.notif_progress, 1000, progress, false)
+        remoteView.setProgressBar(R.id.notif_progress, 1000, progress, false)
 
-        remoteViews.setTextViewText(R.id.notif_position, playerUiMapper.formatTime(state.positionMs))
-        remoteViews.setTextViewText(R.id.notif_duration, playerUiMapper.formatTime(state.durationMs))
+        // position / duration
+        remoteView.setTextViewText(R.id.notif_position, playerUiMapper.formatTime(state.positionMs))
+        remoteView.setTextViewText(R.id.notif_duration, playerUiMapper.formatTime(state.durationMs))
+
+        // target item
         state.targetDetails
             .takeIf { it.target != ControlTarget.Local && it.connectionState == Connected }
             ?.let { "${it.target.toString()} - ${it.name}" }
             ?: "Local"
         when (state.targetDetails.target) {
-            ControlTarget.Local -> remoteViews.setImageViewResource(R.id.notif_target_icon, R.drawable.ic_notif_iphone)
-            ControlTarget.ChromeCast -> remoteViews.setImageViewResource(
+            ControlTarget.Local -> remoteView.setImageViewResource(R.id.notif_target_icon, R.drawable.ic_notif_iphone)
+            ControlTarget.ChromeCast -> remoteView.setImageViewResource(
                 R.id.notif_target_icon,
                 R.drawable.ic_notif_chromecast_connected
             )
 
-            ControlTarget.CuerCast -> remoteViews.setImageViewResource(
+            ControlTarget.CuerCast -> remoteView.setImageViewResource(
                 R.id.notif_target_icon,
                 R.drawable.ic_notif_cuer_cast_connected
             )
 
-            ControlTarget.FloatingWindow -> remoteViews.setImageViewResource(
+            ControlTarget.FloatingWindow -> remoteView.setImageViewResource(
                 R.id.notif_target_icon,
                 R.drawable.ic_notif_floating
             )
         }
-        remoteViews.setTextViewText(R.id.notif_target, state.targetDetails.name)
+        remoteView.setTextViewText(R.id.notif_target, state.targetDetails.name)
+
+        // disconnect
+        val disconnectPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_DISCONNECT)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_disconnect, disconnectPendingIntent)
+
+        // stop
+        val stopPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_STOP)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_stop, stopPendingIntent)
+        when (state.targetDetails.target) {
+            ControlTarget.CuerCast -> remoteView.setViewVisibility(R.id.notif_button_stop, VISIBLE)
+            else -> remoteView.setViewVisibility(R.id.notif_button_stop, GONE)
+        }
+        // volume control
+        remoteView.setViewVisibility(R.id.notif_group_vol, if (!showVolumeControls) GONE else VISIBLE)
+
+        val mutePendingIntent: PendingIntent = pendingIntent(ACTION_VOL_MUTE)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_vol_mute, mutePendingIntent)
+
+        val volUpPendingIntent: PendingIntent = pendingIntent(ACTION_VOL_UP)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_vol_up, volUpPendingIntent)
+
+        val volDownPendingIntent: PendingIntent = pendingIntent(ACTION_VOL_DOWN)
+        remoteView.setOnClickPendingIntent(R.id.notif_button_vol_down, volDownPendingIntent)
+
+        remoteView.setTextViewText(R.id.notif_text_vol, "${(state.volumeFraction * 100f).toInt()}%")
+
         return builder.build()
     }
 
-    private fun pendingIntent(action: String): PendingIntent {
+    private fun pendingIntent(action: String, extras: Map<String, String>? = null): PendingIntent {
         val intent = Intent(service, service::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
+            extras?.forEach { (k, v) -> putExtra(k, v) }
         }
         return PendingIntent.getService(service, 0, intent, FLAG_IMMUTABLE)
     }

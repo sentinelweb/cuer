@@ -260,6 +260,7 @@ interface PlayerContract {
         fun seekTo(ms: Long)
         fun getPlaylistItem(): PlaylistItemDomain?
         fun setButtons(buttons: View.Model.Buttons)
+        fun setVolume(fraction: Float)
 
         interface Listener {
             fun play()

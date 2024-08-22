@@ -192,6 +192,7 @@ object SharedAppModule {
                 log = get()
             )
         }
+        factory { StarMediaUseCase() }
     }
 
     private val remoteModule = module {

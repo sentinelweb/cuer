@@ -18,6 +18,7 @@ class YoutubePlayerContextCreator constructor(
     private val timeProvider: TimeProvider,
     private val livePlayback: LivePlaybackContract.Controller,
     private val coroutines: CoroutineContextProvider,
+    private val chromeCastWrapper: ChromecastContract.Wrapper,
 ) {
 
     fun createContext(
@@ -43,7 +44,8 @@ class YoutubePlayerContextCreator constructor(
             log,
             timeProvider,
             coroutines,
-            livePlayback
+            livePlayback,
+            chromeCastWrapper
         )
 
 }

@@ -1,8 +1,8 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 interface PlayerControlsNotificationContract {
 
@@ -32,7 +32,7 @@ interface PlayerControlsNotificationContract {
         var seekPositionMs: Long = 0,
         var durationMs: Long = 0,
         var title: String = "",
-        var media: MediaDomain? = null,
+        var item: PlaylistItemDomain? = null,
         var bitmap: Any? = null,
         var playlistName: String = "none",
         var blocked: Boolean = false,
@@ -41,5 +41,6 @@ interface PlayerControlsNotificationContract {
         var prevEnabled: Boolean = true,
         var targetDetails: TargetDetails = TargetDetails(),
         var lastNotificationShowTime: Long = 0,
+        var volumeFraction: Float = 0f, // 0f .. 2f
     )
 }

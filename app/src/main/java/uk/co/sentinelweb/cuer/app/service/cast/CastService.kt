@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationCustom
+import uk.co.sentinelweb.cuer.app.service.extrasToMap
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
@@ -59,7 +60,7 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
         if (intent?.action == Intent.ACTION_MEDIA_BUTTON) {
             MediaButtonReceiver.handleIntent(appState.mediaSession, intent)
         } else {
-            controller.handleAction(intent?.action)
+            controller.handleAction(intent?.action, intent?.extrasToMap())
         }
         return START_NOT_STICKY
     }
@@ -84,6 +85,8 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
 //                        chromeCastWrapper = get(),
                         castController = get(),
                         log = get(),
+                        coroutines = get(),
+                        starMediaUseCase = get(),
                     )
                 }
                 scoped {
@@ -128,7 +131,8 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                         log = get(),
                         launchClass = MainActivity::class.java,
                         playerUiMapper = get(),
-                        channelId = get<CuerAppState>().castNotificationChannelId
+                        channelId = get<CuerAppState>().castNotificationChannelId,
+                        showVolumeControls = true,
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }

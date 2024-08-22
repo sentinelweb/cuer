@@ -159,6 +159,7 @@ class CuerCastPlayerWatcher(
                 ?.apply {// fixme get liveOffset, playlist
                     mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
                 }
+                ?.apply { mainPlayerControls?.setVolume(volume / volumeMax) }
                 ?.apply { state.lastMessage = this }
                 ?.apply { state.isCommunicating = true }
                 ?.apply { log.d("from host: volume:${state.lastMessage?.volume} max:${state.lastMessage?.volumeMax}") }
@@ -239,7 +240,6 @@ class CuerCastPlayerWatcher(
                     dispatchCommand(SeekToFraction(positionMs / it.toFloat()))
                 }
             }
-
         }
 
         override fun getLiveOffsetMs(): Long = 0
