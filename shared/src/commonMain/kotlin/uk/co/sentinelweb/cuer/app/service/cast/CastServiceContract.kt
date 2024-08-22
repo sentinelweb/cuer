@@ -32,5 +32,6 @@ interface CastServiceContract {
         const val ACTION_VOL_DOWN = "cuer:volDown"
         const val ACTION_VOL_MUTE = "cuer:volMute"
         const val ACTION_STOP = "cuer:stop"
+        const val ACTION_NONE = "cuer:none"
     }
 }

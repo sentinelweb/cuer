@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.EXTRA_ITEM_ID
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_NONE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_DOWN
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_MUTE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_UP
@@ -82,7 +83,6 @@ class PlayerControlsNotificationCustom constructor(
         val contentIntent = Intent(service, launchClass)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
-
         val title = state.item?.media?.title ?: "No title"
         val description = state.targetDetails.name
             ?: state.item?.media?.description
@@ -106,6 +106,14 @@ class PlayerControlsNotificationCustom constructor(
             builder.setLargeIcon(this)
             remoteView.setImageViewBitmap(R.id.notif_album_art, this)
         }
+
+        val blankPendingIntent = pendingIntent(ACTION_NONE)
+        remoteView.setOnClickPendingIntent(R.id.notif_root, blankPendingIntent)
+
+        remoteView.setOnClickPendingIntent(R.id.notif_album_art, contentPendingIntent)
+        remoteView.setOnClickPendingIntent(R.id.notif_track_title, contentPendingIntent)
+        remoteView.setOnClickPendingIntent(R.id.notif_target_continer, contentPendingIntent)
+        remoteView.setOnClickPendingIntent(R.id.notif_progress, contentPendingIntent)
 
         remoteView.setTextViewText(R.id.notif_track_title, title)
         remoteView.setTextViewText(R.id.notif_track_description, description)

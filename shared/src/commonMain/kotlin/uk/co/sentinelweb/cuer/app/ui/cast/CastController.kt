@@ -42,6 +42,7 @@ class CastController(
 
     fun checkCastConnectionToActivity() {
         ytServiceManager.stop()
+        playerControls.reset()
         if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.mainPlayerControls = playerControls
         } else if (chromeCastHolder.isConnected()) {
@@ -79,7 +80,7 @@ class CastController(
         if (cuerCastPlayerWatcher.isWatching()) {
             cuerCastPlayerWatcher.mainPlayerControls = null
             if (cuerCastPlayerWatcher.isCommunicating()) {
-                // don't start service is player isn't running
+                // don't start service if player isn't running
                 ytServiceManager.start()
             }
             chromeCastHolder.destroy() // kills any existing chromecast session
