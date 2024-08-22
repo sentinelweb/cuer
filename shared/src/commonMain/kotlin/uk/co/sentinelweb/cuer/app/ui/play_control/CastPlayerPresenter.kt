@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.None
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.Local
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
@@ -205,7 +205,7 @@ class CastPlayerPresenter(
             view.setDurationStyle(Normal)
             view.updateSeekPosition(0f)
             view.setLiveTime(null)
-            view.setCastDetails(CastDetails(None))
+            view.setCastDetails(CastDetails(Local))
             updateButtons()
         }
     }

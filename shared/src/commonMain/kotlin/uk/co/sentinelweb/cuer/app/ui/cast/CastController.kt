@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.cast
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.getString
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
@@ -61,8 +62,12 @@ class CastController(
     }
 
     fun attemptRestoreConnection() {
-        if (!cuerCastPlayerWatcher.isWatching() || !chromeCastHolder.isConnected()) {
-            cuerCastPlayerWatcher.attemptRestoreConnection(playerControls)
+        if (!cuerCastPlayerWatcher.isWatching() || !chromeCastHolder.isConnected()) {//
+            coroutines.mainScope.launch {
+                if (!cuerCastPlayerWatcher.attemptRestoreConnection(playerControls)) {
+                    chromeCastHolder.create(playerControls)
+                }
+            }
         }
     }
 

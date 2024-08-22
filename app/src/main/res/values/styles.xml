@@ -491,6 +491,21 @@
     </style>
     <!-- end CompactPlayer =========================== -->
 
+    <!-- PlayerNotif =========================== -->
+    <style name="PlayerNotif"/>
+
+    <style name="PlayerNotif.Button">
+        <item name="android:layout_width">128dp</item>
+        <item name="android:layout_height">128dp</item>
+        <item name="android:padding">4dp</item>
+        <item name="android:tint">@color/notif_button_csl</item>
+    </style>
+
+    <style name="PlayerNotif.Text">
+        <item name="android:textColor">@color/color_on_surface</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
     <!-- YoutubePlayer =========================== -->
     <style name="YoutubePlayer" />
 

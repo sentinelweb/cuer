@@ -658,7 +658,7 @@ class PlaylistMviFragment : Fragment(),
             }
 
             QueueCastConnectionListener.CastState.CONNECTING -> {
-                binding.playlistFabPlay.setIconResource(R.drawable.ic_notif_buffer_black)
+                binding.playlistFabPlay.setIconResource(R.drawable.ic_notif_buffer)
                 binding.playlistFabPlay.text = getString(R.string.buffering)
             }
         }

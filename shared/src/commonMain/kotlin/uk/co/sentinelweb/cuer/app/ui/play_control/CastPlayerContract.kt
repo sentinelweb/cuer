@@ -5,7 +5,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Disconnected
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.None
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.Local
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -84,7 +84,7 @@ interface CastPlayerContract {
         var castDetails: CastDetails = CastDetails()
     ) {
         data class CastDetails(
-            val target: PlayerContract.ControlTarget = None,
+            val target: PlayerContract.ControlTarget = Local,
             val connectionState: CastConnectionState = Disconnected,
             val name: String? = null
         )

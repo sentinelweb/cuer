@@ -36,6 +36,7 @@ class PlayerControlsNotificationMedia constructor(
     init {
         log.tag(this)
     }
+
     @DrawableRes
     private var icon: Int = -1
 
@@ -59,6 +60,8 @@ class PlayerControlsNotificationMedia constructor(
         if (icon == -1) {
             throw IllegalStateException("Dont forget to set the icon")
         }
+
+        // try using the mediacompat actions here
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
@@ -106,20 +109,20 @@ class PlayerControlsNotificationMedia constructor(
         (state.bitmap as? Bitmap?)?.apply { builder.setLargeIcon(this) }
 
         //builder.addAction(R.drawable.ic_notif_track_b_black, "Prev", trackbPendingIntent) // #0
-        builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent) // #0
-        builder.addAction(R.drawable.ic_notif_fast_rewind_black, "<<", skipbPendingIntent) // #1
+        builder.addAction(R.drawable.ic_notif_close, "Close", disconnectPendingIntent) // #0
+        builder.addAction(R.drawable.ic_notif_fast_rewind, "<<", skipbPendingIntent) // #1
         if (state.blocked) {
             builder.addAction(R.drawable.ic_lock_24, "Locked", contentPendingIntent)
         } else {
             when (state.playState) {
                 PLAYING ->
-                    builder.addAction(R.drawable.ic_notif_pause_black, "Pause", pausePendingIntent)
+                    builder.addAction(R.drawable.ic_notif_pause, "Pause", pausePendingIntent)
 
                 PAUSED ->
-                    builder.addAction(R.drawable.ic_notif_play_black, "Play", playPendingIntent)
+                    builder.addAction(R.drawable.ic_notif_play, "Play", playPendingIntent)
 
                 BUFFERING ->
-                    builder.addAction(R.drawable.ic_notif_buffer_black, "Buffering", pausePendingIntent)
+                    builder.addAction(R.drawable.ic_notif_buffer, "Buffering", pausePendingIntent)
 
                 ERROR ->
                     builder.addAction(R.drawable.ic_error, "Error", contentPendingIntent)
@@ -130,9 +133,9 @@ class PlayerControlsNotificationMedia constructor(
                 }
             }
         }
-        builder.addAction(R.drawable.ic_notif_fast_forward_black, ">>", skipfPendingIntent) // #3
+        builder.addAction(R.drawable.ic_notif_fast_forward, ">>", skipfPendingIntent) // #3
         if (state.nextEnabled) {
-            builder.addAction(R.drawable.ic_notif_track_f_black, "Next", trackfPendingIntent) // #4
+            builder.addAction(R.drawable.ic_notif_track_next, "Next", trackfPendingIntent) // #4
         }
         // #6 star - disabled
         // builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5

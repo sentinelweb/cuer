@@ -233,7 +233,7 @@ interface PlayerContract {
     }
 
     enum class ControlTarget {
-        None, ChromeCast, CuerCast, FloatingWindow
+        Local, ChromeCast, CuerCast, FloatingWindow
     }
 
     enum class CastConnectionState {

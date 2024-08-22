@@ -101,10 +101,9 @@ class CuerCastPlayerWatcher(
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
     fun isCommunicating(): Boolean = state.isCommunicating
 
-    fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls) {
+    suspend fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls): Boolean {
         prefs.curecastRemoteNodeName
             ?.also { name ->
-                coroutines.mainScope.launch {
                     remotesRepository.getByName(name)
                         ?.also { foundNode ->
                             prefs.cuerCastScreen?.also { screenIndex ->
@@ -115,10 +114,11 @@ class CuerCastPlayerWatcher(
                                         ?.getOrNull(screenIndex)
                                         ?.also { remoteNode = foundNode }
                                         ?.also { mainPlayerControls = playerControls }
+                                return true
                             }
                         }
-                }
             }
+        return false
     }
 
     private fun startPolling() {

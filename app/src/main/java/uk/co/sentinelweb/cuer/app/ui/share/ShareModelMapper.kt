@@ -23,14 +23,14 @@ class ShareModelMapper constructor(
                 topRight = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ true, /*forward = */ true) },
                     text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
-                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
+                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn
                     else R.drawable.ic_button_play_black,
                     enabled = state.ready && canCommit
                 ),
                 topLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */true, /*play = */ true, /*forward = */ false) },
                     text = if (isConnected) res.getString(R.string.share_button_play_return) else null,
-                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
+                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn
                     else R.drawable.ic_button_play_black,
                     enabled = state.ready && canCommit
                 ),
@@ -54,14 +54,14 @@ class ShareModelMapper constructor(
                 topRight = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ true, /*forward = */ true) },
                     text = if (isConnected) res.getString(R.string.share_button_play_now) else null,
-                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
+                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn
                     else R.drawable.ic_button_play_black,
                     enabled = state.ready
                 ),
                 topLeft = ShareContract.Model.Button(
                     action = { finish(/*add = */false, /*play = */ true, /*forward = */ false) },
                     text = if (isConnected) res.getString(R.string.share_button_play_return) else null,
-                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn_white
+                    icon = if (isConnected) R.drawable.ic_notif_status_cast_conn
                     else R.drawable.ic_button_play_black,
                     enabled = state.ready
                 ),

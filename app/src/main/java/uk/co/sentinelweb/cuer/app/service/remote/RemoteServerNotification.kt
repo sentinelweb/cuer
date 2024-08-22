@@ -58,7 +58,7 @@ class RemoteServerNotification constructor(
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
 
-        builder.addAction(R.drawable.ic_notif_close_white, "Close", disconnectPendingIntent)
+        builder.addAction(R.drawable.ic_notif_close, "Close", disconnectPendingIntent)
 
         return builder.build()
     }

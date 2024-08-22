@@ -155,7 +155,7 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         toastWrapper = get(),
                         skipControl = EmptySkipPresenter(),
                         mediaSessionManager = get(),
-//                        res = get()
+                        timeProvider = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {

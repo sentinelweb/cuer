@@ -40,7 +40,7 @@ class ItemPresenter(
         }
         view.setPlayIcon(
             if (ytContext.isConnected()) {
-                R.drawable.ic_notif_status_cast_conn_white
+                R.drawable.ic_notif_status_cast_conn
             } else {
                 R.drawable.ic_play
             }

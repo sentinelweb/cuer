@@ -125,7 +125,7 @@ class CastPlayerFragment() :
 
     override fun setCastDetails(details: CastPlayerContract.State.CastDetails) {
         when (details.target) {
-            None -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
+            Local -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
             ChromeCast -> when (details.connectionState) {
                 Connected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_connected)
                 Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
@@ -320,7 +320,6 @@ class CastPlayerFragment() :
                         selectDialogCreator = SelectDialogCreator(context = this.getFragmentActivity())
                     )
                 }
-                scoped { CastPlayerUiMapper(get(), get(), get()) }
 
                 // todo play usecase - extract
                 scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }

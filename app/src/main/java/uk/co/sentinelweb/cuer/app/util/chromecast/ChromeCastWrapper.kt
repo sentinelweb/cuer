@@ -12,10 +12,14 @@ import androidx.mediarouter.media.MediaRouter
 import com.google.android.gms.cast.CastDevice
 import com.google.android.gms.cast.MediaInfo
 import com.google.android.gms.cast.MediaMetadata
-import com.google.android.gms.cast.framework.*
+import com.google.android.gms.cast.framework.CastButtonFactory
+import com.google.android.gms.cast.framework.CastContext
+import com.google.android.gms.cast.framework.CastSession
+import com.google.android.gms.cast.framework.SessionManagerListener
 import com.google.android.gms.common.images.WebImage
 import com.pierfrancescosoffritti.androidyoutubeplayer.chromecast.chromecastsender.utils.PlayServicesUtils
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract.Route
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 
 
@@ -64,7 +68,7 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
             .build()
     }
 
-    fun isCastConnected() = getCastContext().castState == CastState.CONNECTED
+    override fun isCastConnected(): Boolean = getCastSession()?.isConnected ?: false
 
     fun getCastSession() = getCastContext().sessionManager.currentCastSession
     override fun getVolume(): Double = getCastSession()
@@ -85,6 +89,21 @@ class ChromeCastWrapper(private val application: Application) : ChromecastContra
         ?.castDevice
         ?.let { getRoute(it) }
         ?.id
+
+    override fun getMediaRouteForCurrentSession(): Route? = getCastSession()
+        ?.castDevice
+        ?.let { getRoute(it) }
+        ?.run {
+            Route(
+                id = id,
+                description = description,
+                deviceName = name,
+                connectionState = connectionState,
+                volumeMax = volumeMax,
+                volume = volumeMax
+            )
+        }
+
 
     /*
         description:Cuer

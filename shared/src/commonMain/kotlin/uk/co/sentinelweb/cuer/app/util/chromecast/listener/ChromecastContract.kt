@@ -29,5 +29,16 @@ interface ChromecastContract {
         fun logCastDevice()
         fun setVolume(volume: Float)
         fun getMediaRouteIdForCurrentSession(): String?
+        fun getMediaRouteForCurrentSession(): Route?
+        fun isCastConnected(): Boolean
     }
+
+    data class Route(
+        val id: String?,
+        val description: String?,
+        val deviceName: String,
+        val connectionState: Int, // todo map connection ints
+        val volume: Int,
+        val volumeMax: Int,
+    )
 }

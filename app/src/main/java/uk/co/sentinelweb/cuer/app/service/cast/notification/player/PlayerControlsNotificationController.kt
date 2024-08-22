@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCas
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -37,6 +38,7 @@ class PlayerControlsNotificationController(
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionContract.Manager,
+    private val timeProvider: TimeProvider,
 ) : External, Controller, SkipContract.Listener, PlayerContract.PlayerControls {
 
     private var listener: Listener? = null
@@ -80,7 +82,7 @@ class PlayerControlsNotificationController(
 
     override fun setBlocked(blocked: Boolean) {
         state.blocked = blocked
-        view.showNotification(state)
+        showNotification()
     }
 
     override fun setPlayerState(playState: PlayerStateDomain) {
@@ -103,13 +105,13 @@ class PlayerControlsNotificationController(
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.media?.apply {
             state.bitmap
-                ?.let { view.showNotification(state) }
-                ?: state.media?.image?.let { image ->
+                ?.let { showNotification() }
+                ?: (state.media?.run { image ?: thumbNail })?.let { image ->
                     Glide.with(context).asBitmap()
                         .load(image.url)
                         .into(BitmapLoadTarget())
                 }
-                ?: view.showNotification(state)
+                ?: showNotification()
         } ?: run {
             state.bitmap = null
             view.showNotification(state)
@@ -121,10 +123,18 @@ class PlayerControlsNotificationController(
             if (bitmap.width > 0) {
                 state.bitmap = bitmap
             }
-            view.showNotification(state)
+            showNotification()
         }
 
         override fun onLoadCleared(placeholder: Drawable?) {}
+    }
+
+    private fun showNotification() {
+        if (timeProvider.currentTimeMillis() - state.lastNotificationShowTime > 1000) {
+            view.showNotification(state)
+            state.lastNotificationShowTime = timeProvider.currentTimeMillis()
+        }
+
     }
 
     override fun addListener(l: Listener) {
@@ -140,6 +150,7 @@ class PlayerControlsNotificationController(
     override fun setCurrentSecond(secondsFloat: Float) {
         state.positionMs = secondsFloat.toLong() * 1000
         skipControl.updatePosition(state.positionMs)
+        updateNotification()
     }
 
     override fun setDuration(durationFloat: Float) {
@@ -192,14 +203,8 @@ class PlayerControlsNotificationController(
         updateNotification()
     }
 
-//    override fun initMediaRouteButton() = Unit
-
-    //    override fun setConnectionState(connState: PlayerContract.CastConnectionState) {
-//        if (connState == Connected) {
-//            view.stopSelf()
-//        }
-//    }
     override fun setCastDetails(details: CastDetails) {
+        state.castDetails = details
         if (listOf(ChromeCast, CuerCast).contains(details.target) && details.connectionState == Connected) {
             // fixme check if this should uncomment
             //view.stopSelf()

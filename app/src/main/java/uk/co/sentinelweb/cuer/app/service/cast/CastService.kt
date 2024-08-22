@@ -14,7 +14,7 @@ import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationCustom
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
@@ -95,6 +95,7 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                         toastWrapper = get(),
                         skipControl = get(),
                         mediaSessionManager = get(),
+                        timeProvider = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {
@@ -113,12 +114,20 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                     )
                 }
                 scoped<PlayerControlsNotificationContract.View> {
-                    PlayerControlsNotificationMedia(
+//                    PlayerControlsNotificationMedia(
+//                        service = get<CastService>(),
+//                        appState = get(),
+//                        timeProvider = get(),
+//                        log = get(),
+//                        launchClass = MainActivity::class.java
+//                    )
+                    PlayerControlsNotificationCustom(
                         service = get<CastService>(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),
-                        launchClass = MainActivity::class.java
+                        launchClass = MainActivity::class.java,
+                        playerUiMapper = get()
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }
