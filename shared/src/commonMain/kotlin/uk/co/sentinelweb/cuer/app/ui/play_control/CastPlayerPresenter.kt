@@ -4,7 +4,7 @@ import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.Local
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
@@ -94,9 +94,9 @@ class CastPlayerPresenter(
         }
     }
 
-    override fun setCastDetails(details: CastDetails) {
-        state.castDetails = details
-        view.setCastDetails(details)
+    override fun setCastDetails(details: TargetDetails) {
+        state.targetDetails = details
+        view.setTargetDetails(details)
     }
 
     override fun onCastClick() {
@@ -205,7 +205,7 @@ class CastPlayerPresenter(
             view.setDurationStyle(Normal)
             view.updateSeekPosition(0f)
             view.setLiveTime(null)
-            view.setCastDetails(CastDetails(Local))
+            view.setTargetDetails(TargetDetails(Local))
             updateButtons()
         }
     }

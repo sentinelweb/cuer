@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.play_control
 
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model.Buttons
@@ -10,7 +10,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class EmptyPlayerControls : PlayerContract.PlayerControls {
     //    override fun initMediaRouteButton() = Unit
-    override fun setCastDetails(details: CastDetails) = Unit
+    override fun setCastDetails(details: TargetDetails) = Unit
 
     override fun setPlayerState(playState: PlayerStateDomain) = Unit
 

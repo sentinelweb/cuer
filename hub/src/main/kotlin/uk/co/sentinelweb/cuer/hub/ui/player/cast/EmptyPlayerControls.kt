@@ -8,7 +8,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 // empty instance for building, eventually use with VlcPlayer
 class EmptyPlayerControls : PlayerContract.PlayerControls {
-    override fun setCastDetails(details: CastPlayerContract.State.CastDetails) = Unit
+    override fun setCastDetails(details: CastPlayerContract.State.TargetDetails) = Unit
 
     override fun setPlayerState(playState: PlayerStateDomain) = Unit
 

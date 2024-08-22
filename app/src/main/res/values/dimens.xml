@@ -12,7 +12,10 @@
     <dimen name="controls_button_margin">20dp</dimen>
     <dimen name="player_fab_button_icon_size">64dp</dimen>
 
-    <dimen name="notif_button_icon_size">36dp</dimen>
+    <dimen name="notif_button_size">24dp</dimen>
+    <dimen name="notif_button_icon_padding">12dp</dimen>
+    <dimen name="notif_icon_size">16dp</dimen>
+
     <dimen name="chip_icon_size">16dp</dimen>
 
     <dimen name="list_item_padding">4dp</dimen>

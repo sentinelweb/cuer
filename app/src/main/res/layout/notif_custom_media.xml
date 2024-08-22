@@ -6,47 +6,34 @@
               android:gravity="center_vertical"
               android:padding="8dp">
 
-    <LinearLayout
+
+    <ImageView
+            android:id="@+id/notif_album_art"
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/notif_description_album_art"
+    />
+
+    <TextView
+            android:id="@+id/notif_track_title"
+            style="@style/PlayerNotif.Text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:textStyle="bold"
+            android:maxLines="1"
+            android:paddingVertical="8dp"
+    />
 
-        <ImageView
-                android:id="@+id/notif_album_art"
-                android:layout_width="96dp"
-                android:layout_height="64dp"
-                android:scaleType="centerCrop"
-                android:contentDescription="@string/notif_description_album_art"
-        />
+    <TextView
+            android:id="@+id/notif_track_description"
+            style="@style/PlayerNotif.Text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:visibility="gone"
+    />
 
-        <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="8dp"
-                android:orientation="vertical"
-                android:gravity="center_vertical">
-
-            <TextView
-                    android:id="@+id/notif_track_title"
-                    style="@style/PlayerNotif.Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textStyle="bold"
-                    android:maxLines="2"
-            />
-
-            <TextView
-                    android:id="@+id/notif_track_description"
-                    style="@style/PlayerNotif.Text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxLines="2"
-            />
-
-        </LinearLayout>
-    </LinearLayout>
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -89,6 +76,16 @@
                 android:paddingHorizontal="4dp"
         />
 
+        <ImageView
+                android:id="@+id/notif_target_icon"
+                style="@style/PlayerNotif.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_notif_track_previous"
+                android:paddingHorizontal="2dp"
+                android:layout_gravity="center_vertical"
+        />
+
         <TextView
                 android:id="@+id/notif_target"
                 style="@style/PlayerNotif.Text"
@@ -97,20 +94,25 @@
                 android:maxLines="1"
         />
     </LinearLayout>
-    <!--    <ProgressBar-->
-    <!--            android:id="@+id/notif_progress"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:max="1000"-->
-    <!--            android:indeterminate="false"-->
-    <!--            android:progressTint="@color/primary"-->
-    <!--    />-->
+
+    <ProgressBar
+            android:id="@+id/notif_progress"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="1000"
+            android:indeterminate="false"
+            android:progressTint="@color/primary"
+    />
 
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-        <ImageView
+            android:orientation="horizontal"
+            android:gravity="end"
+    >
+
+    <ImageView
                 android:id="@+id/notif_button_previous_track"
                 style="@style/PlayerNotif.Button"
                 android:layout_width="wrap_content"
@@ -154,7 +156,9 @@
     <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:gravity="end"
+    >
 
         <ImageView
                 android:id="@+id/notif_button_star"
@@ -167,6 +171,15 @@
         />
 
         <ImageView
+                android:id="@+id/notif_button_stop"
+                style="@style/PlayerNotif.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_notif_stop"
+                android:contentDescription="@string/notif_description_stop"
+        />
+
+        <ImageView
                 android:id="@+id/notif_button_disconnect"
                 style="@style/PlayerNotif.Button"
                 android:layout_width="wrap_content"
@@ -174,6 +187,53 @@
                 android:src="@drawable/ic_notif_close"
                 android:contentDescription="@string/notif_description_disconnect"
         />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="end"
+    >
+
+        <ImageView
+                android:id="@+id/notif_button_vol_mute"
+                style="@style/PlayerNotif.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_notif_volume_off"
+                android:contentDescription="@string/notif_description_vol_down"
+        />
+
+        <ImageView
+                android:id="@+id/notif_button_vol_down"
+                style="@style/PlayerNotif.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_notif_volume_mute"
+                android:contentDescription="@string/notif_description_vol_down"
+        />
+
+        <TextView
+                android:id="@+id/notif_text_vol"
+                style="@style/PlayerNotif.Text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="100%"
+                android:maxLines="1"
+                android:layout_gravity="center_vertical"
+        />
+
+        <ImageView
+                android:id="@+id/notif_button_vol_up"
+                style="@style/PlayerNotif.Button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_notif_volume_up"
+                android:contentDescription="@string/notif_description_vol_up"
+        />
+
     </LinearLayout>
 
 </LinearLayout>

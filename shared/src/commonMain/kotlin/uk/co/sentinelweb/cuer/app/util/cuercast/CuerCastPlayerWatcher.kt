@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.util.cuercast
 import kotlinx.coroutines.*
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Disconnected
@@ -71,14 +71,14 @@ class CuerCastPlayerWatcher(
                 field?.removeListener(controlsListener)
                 mediaSessionManager.destroyMediaSession()
                 coroutines.mainScope.launch {
-                    field?.setCastDetails(CastDetails(CuerCast, Disconnected))
+                    field?.setCastDetails(TargetDetails(CuerCast, Disconnected))
                 }
             } else if (value != null) {
                 value.addListener(controlsListener)
                 coroutines.mainScope.launch {
                     mediaSessionManager.checkCreateMediaSession(controlsListener)
                     value.setCastDetails(
-                        CastDetails(
+                        TargetDetails(
                             CuerCast,
                             Connected,
                             getConnectionDescription()
@@ -132,7 +132,7 @@ class CuerCastPlayerWatcher(
                             .also { updatePlayerState(it) }
                         delay(1000)
                     } else {
-                        mainPlayerControls?.setCastDetails(CastDetails(CuerCast, Disconnected))
+                        mainPlayerControls?.setCastDetails(TargetDetails(CuerCast, Disconnected))
                         cancel()
                     }
                 }

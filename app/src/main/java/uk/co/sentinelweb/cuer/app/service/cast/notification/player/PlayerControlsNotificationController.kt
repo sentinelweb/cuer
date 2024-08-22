@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACT
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
@@ -203,8 +203,8 @@ class PlayerControlsNotificationController(
         updateNotification()
     }
 
-    override fun setCastDetails(details: CastDetails) {
-        state.castDetails = details
+    override fun setCastDetails(details: TargetDetails) {
+        state.targetDetails = details
         if (listOf(ChromeCast, CuerCast).contains(details.target) && details.connectionState == Connected) {
             // fixme check if this should uncomment
             //view.stopSelf()

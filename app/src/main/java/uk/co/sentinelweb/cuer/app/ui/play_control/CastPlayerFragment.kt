@@ -123,7 +123,7 @@ class CastPlayerFragment() :
         binding.castPlayerTrackLast.isEnabled = prevTrackEnabled
     }
 
-    override fun setCastDetails(details: CastPlayerContract.State.CastDetails) {
+    override fun setTargetDetails(details: CastPlayerContract.State.TargetDetails) {
         when (details.target) {
             Local -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
             ChromeCast -> when (details.connectionState) {

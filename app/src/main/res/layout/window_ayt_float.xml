@@ -61,6 +61,7 @@
                 android:paddingBottom="@dimen/floating_player_button_outer_padding"
                 android:src="@drawable/ic_notif_close"
                 app:tint="@color/white"
+                android:tint="@color/white"
                 tools:ignore="HardcodedText"
         />
 
@@ -77,6 +78,7 @@
                 android:paddingTop="@dimen/floating_player_button_outer_padding"
                 android:src="@drawable/ic_portrait"
                 app:tint="@color/white"
+                android:tint="@color/white"
                 tools:ignore="HardcodedText"
         />
 

@@ -66,7 +66,7 @@ interface CastPlayerContract {
         fun showSupport(media: MediaDomain)
         fun setNextTrackEnabled(nextTrackEnabled: Boolean)
         fun setPrevTrackEnabled(prevTrackEnabled: Boolean)
-        fun setCastDetails(details: State.CastDetails)
+        fun setTargetDetails(details: State.TargetDetails)
     }
 
     data class State(
@@ -81,9 +81,9 @@ interface CastPlayerContract {
         var isUpcoming: Boolean = false,
         var playlistName: String? = null,
         var buttons: PlayerContract.View.Model.Buttons? = null,
-        var castDetails: CastDetails = CastDetails()
+        var targetDetails: TargetDetails = TargetDetails()
     ) {
-        data class CastDetails(
+        data class TargetDetails(
             val target: PlayerContract.ControlTarget = Local,
             val connectionState: CastConnectionState = Disconnected,
             val name: String? = null

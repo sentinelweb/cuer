@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
@@ -59,12 +59,12 @@ class YoutubeCastConnectionListener constructor(
 
     override fun onChromecastConnecting() {
         state.connectionState = Connecting
-        playerUi?.setCastDetails(CastDetails(ChromeCast, Connecting))
+        playerUi?.setCastDetails(TargetDetails(ChromeCast, Connecting))
     }
 
     override fun onChromecastConnected(chromecastYouTubePlayerContext: ChromecastYouTubePlayerContext) {
         state.connectionState = Connected
-        playerUi?.setCastDetails(CastDetails(ChromeCast, Connected, castWrapper.getCastDeviceName()))
+        playerUi?.setCastDetails(TargetDetails(ChromeCast, Connected, castWrapper.getCastDeviceName()))
 
         youTubePlayerListener?.let {
             it.playerUi = playerUi
@@ -86,7 +86,7 @@ class YoutubeCastConnectionListener constructor(
 
     override fun onChromecastDisconnected() {
         state.connectionState = Disconnected
-        playerUi?.setCastDetails(CastDetails(ChromeCast, Disconnected))
+        playerUi?.setCastDetails(TargetDetails(ChromeCast, Disconnected))
 
         youTubePlayerListener?.onDisconnected()
         youTubePlayerListener = null
@@ -96,7 +96,7 @@ class YoutubeCastConnectionListener constructor(
     private fun restoreState() {
         state.connectionState?.apply {
             playerUi?.setCastDetails(
-                CastDetails(
+                TargetDetails(
                     ChromeCast,
                     this,
                     castWrapper.getCastDeviceName()

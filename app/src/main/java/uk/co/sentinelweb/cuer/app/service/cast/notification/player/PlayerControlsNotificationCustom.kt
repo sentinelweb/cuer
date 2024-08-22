@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
 import android.widget.RemoteViews
@@ -12,7 +13,6 @@ import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.CastService
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
@@ -29,12 +29,13 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 
 class PlayerControlsNotificationCustom constructor(
-    private val service: CastService,
+    private val service: Service,
     private val appState: CuerAppState,
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
     private val launchClass: Class<out Activity>,
-    private val playerUiMapper: CastPlayerUiMapper
+    private val playerUiMapper: CastPlayerUiMapper,
+    private val channelId: String?
 ) : PlayerControlsNotificationContract.View {
 
     init {
@@ -71,7 +72,9 @@ class PlayerControlsNotificationCustom constructor(
         if (icon == -1) {
             throw IllegalStateException("Dont forget to set the icon")
         }
-
+        val channelIdToUse = channelId
+            ?: appState.castNotificationChannelId
+            ?: throw IllegalStateException("No media notification channel")
         val remoteViews = RemoteViews(service.packageName, R.layout.notif_custom_media)
 
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
@@ -90,20 +93,19 @@ class PlayerControlsNotificationCustom constructor(
         val title = state.media?.title ?: "No title"
         val description = state.media?.description ?: "No description"
 
-        val builder = NotificationCompat.Builder(
-            service,
-            appState.castNotificationChannelId ?: throw IllegalStateException("No media session")
-        )
+        val builder = NotificationCompat.Builder(service, channelIdToUse)
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)
             .setContentTitle(title)
             .setContentText(description)
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
             .setCustomBigContentView(remoteViews)
+            .setSound(null)
+//            .setSilent(true)
+            .setChannelId(channelIdToUse)
 
         (state.bitmap as Bitmap?)?.apply {
             builder.setLargeIcon(this)
@@ -165,23 +167,42 @@ class PlayerControlsNotificationCustom constructor(
         } else {
             remoteViews.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_unstarred_black)
         }
-//        val progress = state.media
-//            ?.let {
-//                val duration = it.duration
-//                val positon = it.positon
-//                if (duration != null && positon != null) {
-//                    (positon / duration* 1000).toInt()
-//                } else 0
-//            } ?: 0
-//        remoteViews.setProgressBar(R.id.notif_progress, 1000, progress, true)
+        val progress = state.media
+            ?.let {
+                val duration = it.duration
+                val positon = it.positon
+                //log.d("duration: $duration, positon: $positon")
+                if (duration != null && positon != null) {
+                    (positon * 1000f / duration).toInt()
+                } else 0
+            }//?.also{log.d("progress: $it")}
+            ?: 0
+        remoteViews.setProgressBar(R.id.notif_progress, 1000, progress, false)
 
         remoteViews.setTextViewText(R.id.notif_position, playerUiMapper.formatTime(state.positionMs))
         remoteViews.setTextViewText(R.id.notif_duration, playerUiMapper.formatTime(state.durationMs))
-        state.castDetails
+        state.targetDetails
             .takeIf { it.target != ControlTarget.Local && it.connectionState == Connected }
             ?.let { "${it.target.toString()} - ${it.name}" }
             ?: "Local"
-        remoteViews.setTextViewText(R.id.notif_target, state.castDetails.name)
+        when (state.targetDetails.target) {
+            ControlTarget.Local -> remoteViews.setImageViewResource(R.id.notif_target_icon, R.drawable.ic_notif_iphone)
+            ControlTarget.ChromeCast -> remoteViews.setImageViewResource(
+                R.id.notif_target_icon,
+                R.drawable.ic_notif_chromecast_connected
+            )
+
+            ControlTarget.CuerCast -> remoteViews.setImageViewResource(
+                R.id.notif_target_icon,
+                R.drawable.ic_notif_cuer_cast_connected
+            )
+
+            ControlTarget.FloatingWindow -> remoteViews.setImageViewResource(
+                R.id.notif_target_icon,
+                R.drawable.ic_notif_floating
+            )
+        }
+        remoteViews.setTextViewText(R.id.notif_target, state.targetDetails.name)
         return builder.build()
     }
 

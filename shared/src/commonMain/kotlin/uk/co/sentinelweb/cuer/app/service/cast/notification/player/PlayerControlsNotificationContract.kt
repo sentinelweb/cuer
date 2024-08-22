@@ -1,6 +1,6 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 
@@ -39,7 +39,7 @@ interface PlayerControlsNotificationContract {
         var seekEnabled: Boolean = true,
         var nextEnabled: Boolean = true,
         var prevEnabled: Boolean = true,
-        var castDetails: CastDetails = CastDetails(),
+        var targetDetails: TargetDetails = TargetDetails(),
         var lastNotificationShowTime: Long = 0,
     )
 }

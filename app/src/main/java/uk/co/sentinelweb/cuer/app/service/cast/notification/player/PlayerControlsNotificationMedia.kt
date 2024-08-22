@@ -31,6 +31,7 @@ class PlayerControlsNotificationMedia constructor(
     private val timeProvider: TimeProvider,
     private val log: LogWrapper,
     private val launchClass: Class<out Activity>,
+    private val channelId: String?,
 ) : PlayerControlsNotificationContract.View {
 
     init {
@@ -61,6 +62,10 @@ class PlayerControlsNotificationMedia constructor(
             throw IllegalStateException("Dont forget to set the icon")
         }
 
+        val channelIdToUse = channelId
+            ?: appState.castNotificationChannelId
+            ?: throw IllegalStateException("No media notification channel")
+
         // try using the mediacompat actions here
         val pausePendingIntent: PendingIntent = pendingIntent(ACTION_PAUSE)
         val playPendingIntent: PendingIntent = pendingIntent(ACTION_PLAY)
@@ -79,10 +84,7 @@ class PlayerControlsNotificationMedia constructor(
             (appState.mediaSession?.sessionToken
                 ?: throw IllegalArgumentException("No media session ID allocated"))
         } else null
-        val builder = NotificationCompat.Builder(
-            service,
-            appState.castNotificationChannelId ?: throw IllegalStateException("No media session")
-        )
+        val builder = NotificationCompat.Builder(service, channelIdToUse)
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -105,6 +107,7 @@ class PlayerControlsNotificationMedia constructor(
             .setContentText(state.media?.description)
             .setOngoing(true)
             .setContentIntent(contentPendingIntent)
+            .setChannelId(channelIdToUse)
 
         (state.bitmap as? Bitmap?)?.apply { builder.setLargeIcon(this) }
 

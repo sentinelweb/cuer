@@ -122,12 +122,13 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
 //                        launchClass = MainActivity::class.java
 //                    )
                     PlayerControlsNotificationCustom(
-                        service = get<CastService>(),
+                        service = get(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),
                         launchClass = MainActivity::class.java,
-                        playerUiMapper = get()
+                        playerUiMapper = get(),
+                        channelId = get<CuerAppState>().castNotificationChannelId
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }

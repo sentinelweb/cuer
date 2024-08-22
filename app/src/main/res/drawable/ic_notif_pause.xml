@@ -1,7 +1,7 @@
 <vector
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="@dimen/notif_button_icon_size"
-    android:height="@dimen/notif_button_icon_size"
+    android:width="@dimen/notif_button_size"
+    android:height="@dimen/notif_button_size"
     android:viewportWidth="24.0"
     android:viewportHeight="24.0"
     >

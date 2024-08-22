@@ -6,7 +6,9 @@ import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.FloatingWindow
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Stop
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -37,6 +39,7 @@ class FloatingWindowMviView(
             }
             field = value
             currentButtons?.let { value?.setButtons(it) }
+            field?.setCastDetails(TargetDetails(FloatingWindow))
         }
 
     fun init() {

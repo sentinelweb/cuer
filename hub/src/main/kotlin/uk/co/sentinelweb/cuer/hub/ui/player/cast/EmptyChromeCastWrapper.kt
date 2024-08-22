@@ -16,4 +16,10 @@ class EmptyChromeCastWrapper : ChromecastContract.Wrapper {
     override fun logCastDevice() = Unit
 
     override fun setVolume(volume: Float) = Unit
+
+    override fun getMediaRouteIdForCurrentSession(): String? = null
+
+    override fun getMediaRouteForCurrentSession(): ChromecastContract.Route? = null
+
+    override fun isCastConnected(): Boolean = false
 }

@@ -4,7 +4,7 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import kotlinx.datetime.Clock
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.CastDetails
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
@@ -243,7 +243,7 @@ interface PlayerContract {
     interface PlayerControls {
         //        fun initMediaRouteButton()
         //fun setConnectionState(connState: CastConnectionState)
-        fun setCastDetails(details: CastDetails)
+        fun setCastDetails(details: TargetDetails)
         fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)
