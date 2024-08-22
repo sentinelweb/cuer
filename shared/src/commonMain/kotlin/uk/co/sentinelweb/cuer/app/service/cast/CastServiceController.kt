@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.service.cast
 
 import kotlinx.coroutines.launch
+import uk.co.sentinelweb.cuer.app.service.EXTRA_ITEM_ID
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STOP
@@ -12,6 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.usecase.StarMediaUseCase
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.deserialiseGuidIdentifier
 
 class CastServiceController(
     private val service: CastServiceContract.Service,
@@ -30,7 +32,7 @@ class CastServiceController(
         castController.initialiseForService()
     }
 
-    override fun handleAction(action: String?, extrasToMap: Map<String, Any>?) {
+    override fun handleAction(action: String?, extras: Map<String, Any>?) {
         when (action) {
             ACTION_DISCONNECT -> {
                 castController.killCurrentSession()
@@ -44,8 +46,14 @@ class CastServiceController(
                 }
 
             ACTION_STAR -> {
-                //log.d("star: ${service.toString()}")
-                starMediaUseCase.starMedia()
+                (extras
+                    ?.get(EXTRA_ITEM_ID) as String?)
+                    ?.let { deserialiseGuidIdentifier(it) }
+                    ?.also { itemId ->
+                        coroutines.mainScope.launch {
+                            starMediaUseCase.starMedia(itemId = itemId)
+                        }
+                    }
             }
 
             ACTION_VOL_DOWN ->

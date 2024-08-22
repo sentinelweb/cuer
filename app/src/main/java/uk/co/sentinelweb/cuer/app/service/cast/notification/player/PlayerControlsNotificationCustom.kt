@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Service
 import android.content.Intent
 import android.graphics.Bitmap
@@ -18,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.EXTRA_ITEM_ID
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_NONE
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STAR
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_DOWN
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_MUTE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_VOL_UP
@@ -176,7 +178,7 @@ class PlayerControlsNotificationCustom constructor(
         // star button
         val starred = state.item?.media?.starred == true
         val xtras = state.item?.id?.let { mapOf(EXTRA_ITEM_ID to it.serialise()) }
-        val starPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_STAR, xtras)
+        val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR, xtras)
         remoteView.setOnClickPendingIntent(R.id.notif_button_star, starPendingIntent)
         if (starred) {
             remoteView.setImageViewResource(R.id.notif_button_star, R.drawable.ic_notif_starred)
@@ -235,6 +237,7 @@ class PlayerControlsNotificationCustom constructor(
             ControlTarget.CuerCast -> remoteView.setViewVisibility(R.id.notif_button_stop, VISIBLE)
             else -> remoteView.setViewVisibility(R.id.notif_button_stop, GONE)
         }
+
         // volume control
         remoteView.setViewVisibility(R.id.notif_group_vol, if (!showVolumeControls) GONE else VISIBLE)
 
@@ -252,13 +255,18 @@ class PlayerControlsNotificationCustom constructor(
         return builder.build()
     }
 
-    private fun pendingIntent(action: String, extras: Map<String, String>? = null): PendingIntent {
+    private fun pendingIntent(action: String, extraMap: Map<String, String>? = null): PendingIntent {
         val intent = Intent(service, service::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
-            extras?.forEach { (k, v) -> putExtra(k, v) }
+            extraMap?.keys?.forEach { key ->
+                putExtra(key, extraMap[key])
+            }
         }
-        return PendingIntent.getService(service, 0, intent, FLAG_IMMUTABLE)
+
+        var flags = FLAG_IMMUTABLE
+        if ((extraMap?.size ?: 0) > 0) flags = flags or FLAG_UPDATE_CURRENT
+        return PendingIntent.getService(service, 0, intent, flags)
     }
 
     companion object {

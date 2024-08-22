@@ -192,7 +192,7 @@ object SharedAppModule {
                 log = get()
             )
         }
-        factory { StarMediaUseCase() }
+        factory { StarMediaUseCase(playlistItemOrchestrator = get(), log = get()) }
     }
 
     private val remoteModule = module {

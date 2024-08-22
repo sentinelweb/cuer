@@ -177,6 +177,7 @@ class PlayerControlsNotificationController(
             state.bitmap = null
         }
         state.item = playlistItem
+
         updateNotification()
     }
 

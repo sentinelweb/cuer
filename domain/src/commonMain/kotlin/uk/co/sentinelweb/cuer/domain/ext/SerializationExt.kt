@@ -134,8 +134,6 @@ fun deserialiseRemoteNodeList(input: String) =
 fun deserialisePlaylistAndSubs(input: String) =
     domainJsonSerializer.decodeFromString(ListSerializer(PlaylistAndChildrenDomain.serializer()), input)
 
-
-
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
     mapOf(
