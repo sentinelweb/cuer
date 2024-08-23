@@ -46,6 +46,7 @@ class PlayerControlsNotificationController(
     init {
         log.tag(this)
         skipControl.listener = this
+        skipControl.updateTexts()
     }
 
     override fun handleAction(action: String?) {
@@ -101,7 +102,6 @@ class PlayerControlsNotificationController(
     }
 
     private fun updateNotification() {
-        //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
         state.item?.apply {
             state.bitmap
@@ -114,7 +114,7 @@ class PlayerControlsNotificationController(
                 ?: showNotification()
         } ?: run {
             state.bitmap = null
-            view.showNotification(state)
+            showNotification()
         }
     }
 
@@ -130,11 +130,10 @@ class PlayerControlsNotificationController(
     }
 
     private fun showNotification() {
-        if (timeProvider.currentTimeMillis() - state.lastNotificationShowTime > 1000) {
+        if (timeProvider.currentTimeMillis() - state.lastNotificationShowTime > 300) {
             view.showNotification(state)
             state.lastNotificationShowTime = timeProvider.currentTimeMillis()
         }
-
     }
 
     override fun addListener(l: Listener) {
@@ -150,6 +149,9 @@ class PlayerControlsNotificationController(
     override fun setCurrentSecond(secondsFloat: Float) {
         state.positionMs = secondsFloat.toLong() * 1000
         skipControl.updatePosition(state.positionMs)
+        if (state.item?.media?.isLiveBroadcast ?: false) {
+            state.liveOffsetMs = listener?.getLiveOffsetMs() ?: 0
+        }
         updateNotification()
     }
 
@@ -217,8 +219,12 @@ class PlayerControlsNotificationController(
 
     override fun restoreState() = Unit
 
-    override fun skipSetBackText(text: String) = Unit
+    override fun skipSetBackText(text: String) {
+        state.skipBackText = text
+    }
 
-    override fun skipSetFwdText(text: String) = Unit
+    override fun skipSetFwdText(text: String) {
+        state.skipFwdText = text
+    }
 
 }

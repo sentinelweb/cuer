@@ -41,4 +41,5 @@ class EmptyPlayerControls : PlayerContract.PlayerControls {
     override fun getPlaylistItem(): PlaylistItemDomain? = null
 
     override fun setButtons(buttons: PlayerContract.View.Model.Buttons) = Unit
+    override fun setVolume(fraction: Float) = Unit
 }

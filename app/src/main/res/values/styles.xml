@@ -496,9 +496,11 @@
 
     <style name="PlayerNotif.Button">
         <item name="android:background">@color/notif_button_background_csl</item>
+        <!--        <item name="android:background">@color/red_500</item>-->
         <item name="android:layout_width">@dimen/notif_button_size</item>
         <item name="android:layout_height">@dimen/notif_button_size</item>
-        <item name="android:padding">@dimen/notif_button_icon_padding</item>
+        <item name="android:paddingHorizontal">@dimen/notif_button_icon_padding_h</item>
+        <item name="android:paddingVertical">@dimen/notif_button_icon_padding_v</item>
         <item name="android:tint">@color/notif_button_csl</item>
     </style>
 
@@ -509,7 +511,15 @@
         <item name="android:tint">@color/color_on_surface</item>
     </style>
 
-    <style name="PlayerNotif.Text">
+    <style name="PlayerNotif.HeaderText" parent="@style/TextAppearance.App.Body2">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="PlayerNotif.Text" parent="@style/TextAppearance.App.Body2">
+        <item name="android:textColor">@color/color_on_surface</item>
+    </style>
+
+    <style name="PlayerNotif.SmallText" parent="@style/TextAppearance.App.Caption">
         <item name="android:textColor">@color/color_on_surface</item>
     </style>
     <!-- end CompactPlayer =========================== -->

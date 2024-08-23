@@ -415,6 +415,7 @@
     <string name="notif_description_vol_up">Vol +</string>
     <string name="notif_description_vol_down">Vol -</string>
     <string name="notif_description_vol_mute">Mute</string>
+    <string name="notif_target_arrow">&#x2192;</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -441,5 +442,7 @@
     <string name="done">Done</string>
     <string name="finish">Finish</string>
     <string name="move">Move</string>
+    <string name="local">Local</string>
+    <string name="slash">/</string>
 
 </resources>

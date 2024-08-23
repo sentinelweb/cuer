@@ -1,11 +1,9 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
-import android.app.Activity
-import android.app.Notification
-import android.app.PendingIntent
+import android.app.*
 import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
-import android.app.Service
+import android.content.Context.NOTIFICATION_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.view.View.GONE
@@ -26,9 +24,11 @@ import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACT
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerUiMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.Local
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.ext.isLiveOrUpcoming
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class PlayerControlsNotificationCustom constructor(
@@ -42,12 +42,15 @@ class PlayerControlsNotificationCustom constructor(
     private val showVolumeControls: Boolean,
 ) : PlayerControlsNotificationContract.View {
 
-    init {
-        log.tag(this)
-    }
-
     @DrawableRes
     private var icon: Int = -1
+    private var startedForeground = false
+    private val notificationManager: NotificationManager
+
+    init {
+        log.tag(this)
+        notificationManager = service.getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+    }
 
     override fun setIcon(@DrawableRes icon: Int) {
         this.icon = icon
@@ -56,12 +59,13 @@ class PlayerControlsNotificationCustom constructor(
     override fun showNotification(
         state: PlayerControlsNotificationContract.State
     ) {
-        //log.d("show Notification start")
-        service.startForeground(
-            PlayerControlsNotificationMedia.FOREGROUND_ID,
-            buildNotification(state)
-        )
-        //log.d("show Notification end")
+        val builtNotification = buildNotification(state)
+        if (!startedForeground) {
+            service.startForeground(PlayerControlsNotificationMedia.FOREGROUND_ID, builtNotification)
+            startedForeground = true
+        } else {
+            notificationManager.notify(PlayerControlsNotificationMedia.FOREGROUND_ID, builtNotification)
+        }
     }
 
     override fun stopSelf() {
@@ -129,6 +133,7 @@ class PlayerControlsNotificationCustom constructor(
         val skipbPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_SKIPB)
         remoteView.setOnClickPendingIntent(R.id.notif_button_rewind, skipbPendingIntent)
         remoteView.setBoolean(R.id.notif_button_play_pause, "setEnabled", true)
+        remoteView.setTextViewText(R.id.notif_text_rewind, state.skipBackText)
 
         // play/pause button
         val playPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_PLAY)
@@ -169,6 +174,7 @@ class PlayerControlsNotificationCustom constructor(
         // skip forward
         val skipfPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_SKIPF)
         remoteView.setOnClickPendingIntent(R.id.notif_button_forward, skipfPendingIntent)
+        remoteView.setTextViewText(R.id.notif_text_forward, state.skipFwdText)
 
         // next track
         val trackfPendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_TRACKF)
@@ -187,7 +193,9 @@ class PlayerControlsNotificationCustom constructor(
         }
 
         //progress bar
-        val progress = state.item
+        val progress = state
+            .item
+            ?.takeIf { !it.media.isLiveOrUpcoming() }
             ?.let {
                 val duration = it.media.duration
                 val positon = it.media.positon
@@ -195,20 +203,38 @@ class PlayerControlsNotificationCustom constructor(
                     (positon * 1000f / duration).toInt()
                 } else 0
             }
-            ?: 0
+            ?: 1000
         remoteView.setProgressBar(R.id.notif_progress, 1000, progress, false)
 
         // position / duration
-        remoteView.setTextViewText(R.id.notif_position, playerUiMapper.formatTime(state.positionMs))
-        remoteView.setTextViewText(R.id.notif_duration, playerUiMapper.formatTime(state.durationMs))
+        when {
+            state.item == null -> {
+                remoteView.setTextViewText(R.id.notif_position, "--")
+                remoteView.setTextViewText(R.id.notif_duration, "--")
+                remoteView.setTextColor(R.id.notif_duration, service.getColor(R.color.white))
+            }
+
+            state.item?.media.isLiveOrUpcoming() -> {
+                remoteView.setTextViewText(R.id.notif_position, "-${playerUiMapper.formatTime(state.liveOffsetMs)}")
+                remoteView.setTextViewText(R.id.notif_duration, service.getString(R.string.live))
+                remoteView.setTextColor(R.id.notif_duration, service.getColor(R.color.live_background))
+            }
+
+            else -> {
+                remoteView.setTextViewText(R.id.notif_position, playerUiMapper.formatTime(state.positionMs))
+                remoteView.setTextViewText(R.id.notif_duration, playerUiMapper.formatTime(state.durationMs))
+                remoteView.setTextColor(R.id.notif_duration, service.getColor(R.color.white))
+            }
+        }
 
         // target item
         state.targetDetails
-            .takeIf { it.target != ControlTarget.Local && it.connectionState == Connected }
-            ?.let { "${it.target.toString()} - ${it.name}" }
-            ?: "Local"
+            .takeIf { it.target != Local && it.connectionState == Connected }
+            ?.let { "${it.target} - ${it.name}" }
+            ?: service.getString(R.string.local)
+
         when (state.targetDetails.target) {
-            ControlTarget.Local -> remoteView.setImageViewResource(R.id.notif_target_icon, R.drawable.ic_notif_iphone)
+            Local -> remoteView.setImageViewResource(R.id.notif_target_icon, R.drawable.ic_notif_iphone)
             ControlTarget.ChromeCast -> remoteView.setImageViewResource(
                 R.id.notif_target_icon,
                 R.drawable.ic_notif_chromecast_connected

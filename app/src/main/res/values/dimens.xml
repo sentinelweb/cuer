@@ -13,7 +13,8 @@
     <dimen name="player_fab_button_icon_size">64dp</dimen>
 
     <dimen name="notif_button_size">24dp</dimen>
-    <dimen name="notif_button_icon_padding">12dp</dimen>
+    <dimen name="notif_button_icon_padding_h">12dp</dimen>
+    <dimen name="notif_button_icon_padding_v">8dp</dimen>
     <dimen name="notif_icon_size">16dp</dimen>
 
     <dimen name="chip_icon_size">16dp</dimen>

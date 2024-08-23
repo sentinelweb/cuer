@@ -42,5 +42,8 @@ interface PlayerControlsNotificationContract {
         var targetDetails: TargetDetails = TargetDetails(),
         var lastNotificationShowTime: Long = 0,
         var volumeFraction: Float = 0f, // 0f .. 2f
+        var liveOffsetMs: Long = 0,
+        var skipBackText: String = "",
+        var skipFwdText: String = "",
     )
 }

@@ -23,6 +23,7 @@ interface SkipContract {
         fun stateChange(playState: PlayerStateDomain)
         fun onSelectSkipTime(fwd: Boolean)
         fun updateSkipTimes()
+        fun updateTexts()
     }
 
     interface View {
