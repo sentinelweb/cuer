@@ -6,6 +6,7 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DELETE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPB
@@ -30,6 +31,7 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
+// todo move bitmap loading to view and move this to common
 class PlayerControlsNotificationController(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationContract.State,
@@ -68,6 +70,9 @@ class PlayerControlsNotificationController(
 
             ACTION_TRACKF ->
                 listener?.trackFwd()
+
+            ACTION_DELETE ->
+                view.onDeleteAction()
 
             else -> Unit
         }

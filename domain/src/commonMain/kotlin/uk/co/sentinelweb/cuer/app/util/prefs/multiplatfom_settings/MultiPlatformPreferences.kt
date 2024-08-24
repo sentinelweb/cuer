@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.Field
 import uk.co.sentinelweb.cuer.app.util.prefs.PrefWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PlayerNotificationType
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.RESTART_AFTER_UNLOCK_DEFAULT
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
@@ -45,14 +46,16 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     VOLUME("volume"),
     CUERCAST_HOSTNAME("cuercastId"),
     CUERCAST_SCREEN("cuercastScreen"),
+    PLAYER_NOTIFICATION_TYPE("playerNotificationType"),
     ;
 
     companion object {
         const val PLAYER_AUTO_FLOAT_DEFAULT = true
         const val RESTART_AFTER_UNLOCK_DEFAULT = true
+
+        enum class PlayerNotificationType { Media, Custom }
     }
 }
-
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences> {
     var dbVersion: Int
@@ -192,6 +195,13 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
         set(value) = value
             ?.let { putInt(CUERCAST_SCREEN, it) }
             ?: remove(CUERCAST_SCREEN)
+
+    var playerNotificationType: PlayerNotificationType
+        get() = PlayerNotificationType.valueOf(
+            getString(PLAYER_NOTIFICATION_TYPE, null)
+                ?: PlayerNotificationType.Media.toString()
+        )
+        set(value) = value.let { putString(PLAYER_NOTIFICATION_TYPE, it.toString()) }
 
     fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
     fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)

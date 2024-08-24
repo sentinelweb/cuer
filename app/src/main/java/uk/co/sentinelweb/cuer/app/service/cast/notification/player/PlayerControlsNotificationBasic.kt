@@ -126,6 +126,8 @@ class PlayerControlsNotificationBasic constructor(
         return builder.build()
     }
 
+    override fun onDeleteAction() = Unit
+
     private fun pendingIntent(action: String): PendingIntent {
         val intent = Intent(service, service::class.java).apply {
             this.action = action

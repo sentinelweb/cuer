@@ -12,9 +12,7 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationCustom
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.*
 import uk.co.sentinelweb.cuer.app.service.extrasToMap
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
@@ -80,9 +78,7 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                 scoped<CastServiceContract.Controller> {
                     CastServiceController(
                         service = get<CastService>(),
-//                        ytContextHolder = get(),
                         notification = get(),
-//                        chromeCastWrapper = get(),
                         castController = get(),
                         log = get(),
                         coroutines = get(),
@@ -117,13 +113,13 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                     )
                 }
                 scoped<PlayerControlsNotificationContract.View> {
-//                    PlayerControlsNotificationMedia(
-//                        service = get<CastService>(),
-//                        appState = get(),
-//                        timeProvider = get(),
-//                        log = get(),
-//                        launchClass = MainActivity::class.java
-//                    )
+                    PlayerControlsNotificationViewProxy(
+                        service = get(),
+                        serviceScopeComponent = get(),
+                        preferences = get()
+                    )
+                }
+                scoped {
                     PlayerControlsNotificationCustom(
                         service = get(),
                         appState = get(),
@@ -133,6 +129,16 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                         playerUiMapper = get(),
                         channelId = get<CuerAppState>().castNotificationChannelId,
                         showVolumeControls = true,
+                    )
+                }
+                scoped {
+                    PlayerControlsNotificationMedia(
+                        service = get<CastService>(),
+                        appState = get(),
+                        timeProvider = get(),
+                        log = get(),
+                        launchClass = MainActivity::class.java,
+                        channelId = get<CuerAppState>().castNotificationChannelId,
                     )
                 }
                 scoped { PlayerControlsNotificationContract.State() }

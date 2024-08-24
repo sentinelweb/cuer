@@ -72,8 +72,6 @@ class PlayerControlsNotificationCustom constructor(
         service.stopSelf()
     }
 
-    // todo try this (media notif) https://developer.android.com/training/notify-user/expanded#media-style
-    // or this (custom layout) https://stackoverflow.com/questions/41888161/how-to-create-a-custom-notification-layout-in-android
     private fun buildNotification(
         state: PlayerControlsNotificationContract.State
     ): Notification {
@@ -89,6 +87,9 @@ class PlayerControlsNotificationCustom constructor(
         val contentIntent = Intent(service, launchClass)
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
+
+        val deletePendingIntent: PendingIntent = pendingIntent(CastServiceContract.ACTION_DELETE)
+
         val title = state.item?.media?.title ?: "No title"
         val description = state.targetDetails.name
             ?: state.item?.media?.description
@@ -101,12 +102,13 @@ class PlayerControlsNotificationCustom constructor(
             .setContentText(description)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
-            .setOngoing(true)
+            .setOngoing(false)
             .setContentIntent(contentPendingIntent)
             .setCustomBigContentView(remoteView)
             .setSound(null)
             .setSilent(true)
             .setChannelId(channelIdToUse)
+            .setDeleteIntent(deletePendingIntent)
 
         (state.bitmap as Bitmap?)?.apply {
             builder.setLargeIcon(this)
@@ -280,6 +282,8 @@ class PlayerControlsNotificationCustom constructor(
 
         return builder.build()
     }
+
+    override fun onDeleteAction() = Unit
 
     private fun pendingIntent(action: String, extraMap: Map<String, String>? = null): PendingIntent {
         val intent = Intent(service, service::class.java).apply {

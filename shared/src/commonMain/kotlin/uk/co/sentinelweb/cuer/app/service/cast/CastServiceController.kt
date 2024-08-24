@@ -65,7 +65,6 @@ class CastServiceController(
             ACTION_VOL_MUTE ->
                 castController.setVolume(0f)
 
-
             else ->
                 notification.handleAction(action)
         }

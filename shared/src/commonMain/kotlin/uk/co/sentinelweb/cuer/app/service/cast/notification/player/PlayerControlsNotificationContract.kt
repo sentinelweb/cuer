@@ -24,6 +24,7 @@ interface PlayerControlsNotificationContract {
 
         fun stopSelf()
         fun setIcon(icon: Int)
+        fun onDeleteAction()
     }
 
     data class State(

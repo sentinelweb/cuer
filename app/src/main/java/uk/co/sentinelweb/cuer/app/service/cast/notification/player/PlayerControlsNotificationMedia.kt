@@ -1,10 +1,8 @@
 package uk.co.sentinelweb.cuer.app.service.cast.notification.player
 
-import android.app.Activity
-import android.app.Notification
-import android.app.PendingIntent
+import android.app.*
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.annotation.DrawableRes
@@ -12,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DELETE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DISCONNECT
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
@@ -34,12 +33,16 @@ class PlayerControlsNotificationMedia constructor(
     private val channelId: String?,
 ) : PlayerControlsNotificationContract.View {
 
-    init {
-        log.tag(this)
-    }
 
     @DrawableRes
     private var icon: Int = -1
+    private var startedForeground = false
+    private val notificationManager: NotificationManager
+
+    init {
+        log.tag(this)
+        notificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    }
 
     override fun setIcon(@DrawableRes icon: Int) {
         this.icon = icon
@@ -48,7 +51,13 @@ class PlayerControlsNotificationMedia constructor(
     override fun showNotification(
         state: PlayerControlsNotificationContract.State
     ) {
-        service.startForeground(FOREGROUND_ID, buildNotification(state))
+        val builtNotification = buildNotification(state)
+        if (!startedForeground) {
+            service.startForeground(FOREGROUND_ID, builtNotification)
+            startedForeground = true
+        } else {
+            notificationManager.notify(FOREGROUND_ID, builtNotification)
+        }
     }
 
     override fun stopSelf() {
@@ -75,6 +84,7 @@ class PlayerControlsNotificationMedia constructor(
         val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
         val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
         val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
+        val deletePendingIntent: PendingIntent = pendingIntent(ACTION_DELETE)
 
         val contentIntent = Intent(service, launchClass)
         val contentPendingIntent: PendingIntent =
@@ -105,9 +115,10 @@ class PlayerControlsNotificationMedia constructor(
             )
             .setContentTitle(buildTitle(state))
             .setContentText(state.item?.media?.description)
-            .setOngoing(true)
+            .setOngoing(false)
             .setContentIntent(contentPendingIntent)
             .setChannelId(channelIdToUse)
+            .setDeleteIntent(deletePendingIntent)
 
         (state.bitmap as? Bitmap?)?.apply { builder.setLargeIcon(this) }
 
@@ -144,6 +155,8 @@ class PlayerControlsNotificationMedia constructor(
         // builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
         return builder.build()
     }
+
+    override fun onDeleteAction() = Unit
 
     private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.item?.media?.title ?: "No title")
 
