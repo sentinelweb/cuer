@@ -116,7 +116,7 @@ class CastService : Service(), CastServiceContract.Service, AndroidScopeComponen
                     PlayerControlsNotificationViewProxy(
                         service = get(),
                         serviceScopeComponent = get(),
-                        preferences = get()
+//                        preferences = get()
                     )
                 }
                 scoped {

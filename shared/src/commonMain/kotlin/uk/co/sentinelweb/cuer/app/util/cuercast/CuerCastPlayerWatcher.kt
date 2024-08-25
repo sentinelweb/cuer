@@ -22,7 +22,6 @@ import uk.co.sentinelweb.cuer.remote.server.locator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
-// using FloatingWindowMviView as a template
 class CuerCastPlayerWatcher(
     private val state: State,
     private val remotePlayerInteractor: RemotePlayerInteractor,

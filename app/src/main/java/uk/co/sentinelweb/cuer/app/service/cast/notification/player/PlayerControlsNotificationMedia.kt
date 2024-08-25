@@ -16,8 +16,6 @@ import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACT
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPB
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPF
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STAR
-import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKB
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -81,9 +79,9 @@ class PlayerControlsNotificationMedia constructor(
         val skipfPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPF)
         val skipbPendingIntent: PendingIntent = pendingIntent(ACTION_SKIPB)
         val trackfPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKF)
-        val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
+        // val trackbPendingIntent: PendingIntent = pendingIntent(ACTION_TRACKB)
         val disconnectPendingIntent: PendingIntent = pendingIntent(ACTION_DISCONNECT)
-        val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
+        // val starPendingIntent: PendingIntent = pendingIntent(ACTION_STAR)
         val deletePendingIntent: PendingIntent = pendingIntent(ACTION_DELETE)
 
         val contentIntent = Intent(service, launchClass)
@@ -100,19 +98,6 @@ class PlayerControlsNotificationMedia constructor(
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
-            .setStyle(
-                MediaNotificationCompat.MediaStyle()
-                    .setMediaSession(mediaSessionToken)
-                    .setShowCancelButton(true)
-                    .setCancelButtonIntent(disconnectPendingIntent)
-                    .run {
-                        val actionIndexes = mutableListOf(2) // #2: pause or play button
-                        if (state.nextEnabled) {
-                            actionIndexes.add(4) // #4: next button
-                        }
-                        setShowActionsInCompactView(*actionIndexes.toIntArray())
-                    }
-            )
             .setContentTitle(buildTitle(state))
             .setContentText(state.item?.media?.description)
             .setOngoing(false)
@@ -153,10 +138,27 @@ class PlayerControlsNotificationMedia constructor(
         }
         // #6 star - disabled
         // builder.addAction(R.drawable.ic_notif_unstarred_black, "Star", starPendingIntent)// #5
+
+        builder.setStyle(
+            MediaNotificationCompat.MediaStyle()
+                .setMediaSession(mediaSessionToken)
+                .setShowCancelButton(true)
+                .setCancelButtonIntent(disconnectPendingIntent)
+                .run {
+                    val actionIndexes = mutableListOf(2) // #2: pause or play button
+                    if (state.nextEnabled) {
+                        actionIndexes.add(4) // #4: next button
+                    }
+                    setShowActionsInCompactView(*actionIndexes.toIntArray())
+                }
+        )
         return builder.build()
     }
 
-    override fun onDeleteAction() = Unit
+    override fun onDeleteAction() {
+        notificationManager.cancel(FOREGROUND_ID)
+        startedForeground = false
+    }
 
     private fun buildTitle(state: PlayerControlsNotificationContract.State) = (state.item?.media?.title ?: "No title")
 
@@ -169,6 +171,6 @@ class PlayerControlsNotificationMedia constructor(
     }
 
     companion object {
-        val FOREGROUND_ID = if (BuildConfig.DEBUG) 34563 else 34564
+        val FOREGROUND_ID = if (BuildConfig.DEBUG) 34565 else 34566
     }
 }

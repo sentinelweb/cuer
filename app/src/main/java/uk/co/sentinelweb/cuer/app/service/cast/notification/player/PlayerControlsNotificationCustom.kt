@@ -61,10 +61,10 @@ class PlayerControlsNotificationCustom constructor(
     ) {
         val builtNotification = buildNotification(state)
         if (!startedForeground) {
-            service.startForeground(PlayerControlsNotificationMedia.FOREGROUND_ID, builtNotification)
+            service.startForeground(FOREGROUND_ID, builtNotification)
             startedForeground = true
         } else {
-            notificationManager.notify(PlayerControlsNotificationMedia.FOREGROUND_ID, builtNotification)
+            notificationManager.notify(FOREGROUND_ID, builtNotification)
         }
     }
 
@@ -102,7 +102,7 @@ class PlayerControlsNotificationCustom constructor(
             .setContentText(description)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setWhen(timeProvider.currentTimeMillis())
-            .setOngoing(false)
+//            .setOngoing(false)
             .setContentIntent(contentPendingIntent)
             .setCustomBigContentView(remoteView)
             .setSound(null)
@@ -283,7 +283,10 @@ class PlayerControlsNotificationCustom constructor(
         return builder.build()
     }
 
-    override fun onDeleteAction() = Unit
+    override fun onDeleteAction() {
+        notificationManager.cancel(PlayerControlsNotificationMedia.FOREGROUND_ID)
+        startedForeground = false
+    }
 
     private fun pendingIntent(action: String, extraMap: Map<String, String>? = null): PendingIntent {
         val intent = Intent(service, service::class.java).apply {

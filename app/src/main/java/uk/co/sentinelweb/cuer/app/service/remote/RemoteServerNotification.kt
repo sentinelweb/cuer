@@ -25,10 +25,7 @@ class RemoteServerNotification constructor(
     }
 
     override fun showNotification(content: String) {
-        service.startForeground(
-            FOREGROUND_ID,
-            buildNotification(content)
-        )
+        service.startForeground(FOREGROUND_ID, buildNotification(content))
     }
 
     override fun stopSelf() {
@@ -63,7 +60,7 @@ class RemoteServerNotification constructor(
         return builder.build()
     }
 
-    private fun pendingIntent(action: String): PendingIntent {
+    private fun pendingIntent(@Suppress("SameParameterValue") action: String): PendingIntent {
         val intent = Intent(service, RemoteServerService::class.java).apply {
             this.action = action
             putExtra(Notification.EXTRA_NOTIFICATION_ID, FOREGROUND_ID)
@@ -74,7 +71,7 @@ class RemoteServerNotification constructor(
     }
 
     companion object {
-        const val FOREGROUND_ID = 34564
+        const val FOREGROUND_ID = 34562
     }
 
 }
