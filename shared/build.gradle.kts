@@ -73,13 +73,15 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                implementation(compose.material3)
+                implementation(compose.materialIconsExtended)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
-                println("---------------" + compose.runtime)
-                println("---------------" + compose.compiler.auto)
-                println("---------------" + compose.components.uiToolingPreview)
-
+//                println("---------------" + compose.runtime)
+//                println("---------------" + compose.material)
+////                println("---------------" + compose.compiler.auto)
+//                println("---------------" + compose.components.uiToolingPreview)
             }
         }
         val commonTest by getting {

@@ -4,19 +4,21 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object CastDialogComposeables {
@@ -24,7 +26,9 @@ object CastDialogComposeables {
     @Composable
     fun CastDialogUi(viewModel: CastDialogViewModel) {
         val state = viewModel.model.collectAsState(initial = CastDialogModel.blank)
-        CastDialogView(state.value, viewModel)
+        CuerSharedTheme {
+            CastDialogView(state.value, viewModel)
+        }
     }
 
     @Composable
@@ -39,7 +43,7 @@ object CastDialogComposeables {
     @Composable
     private fun Header(model: CastDialogModel) {
         Box(
-            modifier = Modifier.height(80.dp)
+            modifier = Modifier.height(100.dp)
                 .fillMaxWidth()
                 .background(Color.Blue)
         ) {
@@ -55,7 +59,7 @@ object CastDialogComposeables {
             Text(
                 text = stringResource(Res.string.cast_dialog_title),
                 color = Color.White,
-                fontSize = 20.sp,
+                style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp),
@@ -63,6 +67,7 @@ object CastDialogComposeables {
             Text(
                 text = model.connectionSummary,
                 color = Color.White,
+                style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .padding(16.dp),
@@ -73,7 +78,8 @@ object CastDialogComposeables {
     @Composable
     private fun CuerCastRow(model: CastDialogModel.CuerCastStatus, viewModel: CastDialogViewModel) {
         Box(
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .height(64.dp)
         ) {
@@ -86,6 +92,7 @@ object CastDialogComposeables {
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Cuer cast Icon",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(8.dp)
@@ -99,14 +106,15 @@ object CastDialogComposeables {
                 ) {
                     Text(
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
+
                         modifier = Modifier
                             .padding(2.dp),
                     )
                     if (model.isConnected) {
                         Text(
                             text = stringResource(Res.string.cast_dialog_volume, model.volumePercent),
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .padding(2.dp),
                         )
@@ -124,6 +132,7 @@ object CastDialogComposeables {
                         Image(
                             painter = painterResource(Res.drawable.ic_focus),
                             contentDescription = "Cuer cast focus",
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                             modifier = Modifier
                                 .size(48.dp)
                                 .padding(8.dp)
@@ -133,6 +142,7 @@ object CastDialogComposeables {
                         Image(
                             painter = painterResource(Res.drawable.ic_stop),
                             contentDescription = "Cuer cast stop",
+                            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                             modifier = Modifier
                                 .size(48.dp)
                                 .padding(8.dp)
@@ -143,11 +153,13 @@ object CastDialogComposeables {
                     Icon(
                         Icons.Default.Clear,
                         contentDescription = "Cuer cast disconnect",
+                        tint = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .height(48.dp)
                             .padding(8.dp)
                             .align(Alignment.CenterVertically)
                             .clickable { viewModel.disconnectCuerCast() }
+
                     )
                 }
             }
@@ -157,7 +169,7 @@ object CastDialogComposeables {
     @Composable
     private fun ChromeCastRow(model: CastDialogModel.ChromeCastStatus, viewModel: CastDialogViewModel) {
         Box(
-            modifier = Modifier.background(Color.White)
+            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                 .fillMaxWidth()
                 .height(64.dp)
         ) {
@@ -170,6 +182,7 @@ object CastDialogComposeables {
                 Image(
                     painter = painterResource(icon),
                     contentDescription = "Chrome cast Icon",
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(8.dp)
@@ -182,14 +195,14 @@ object CastDialogComposeables {
                 ) {
                     Text(
                         text = model.connectedHost ?: stringResource(Res.string.cast_dialog_not_connected),
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier
                             .padding(2.dp),
                     )
                     if (model.isConnected) {
                         Text(
                             text = stringResource(Res.string.cast_dialog_volume, model.volumePercent),
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSurface,
                             modifier = Modifier
                                 .padding(2.dp),
                         )
@@ -200,6 +213,7 @@ object CastDialogComposeables {
                 Icon(
                     Icons.Default.Clear,
                     contentDescription = "Cuer cast disconnect",
+                    tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier
                         .height(48.dp)
                         .padding(8.dp)
