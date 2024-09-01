@@ -17,6 +17,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, AndroidScopeComponent {
@@ -24,6 +25,7 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
     override val scope: Scope by fragmentScopeWithSource<PrefPlayerFragment>()
     private val presenter: PrefPlayerContract.Presenter by inject()
     private val log: LogWrapper by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     init {
         log.tag(this)
@@ -40,6 +42,7 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
         return view
     }
 

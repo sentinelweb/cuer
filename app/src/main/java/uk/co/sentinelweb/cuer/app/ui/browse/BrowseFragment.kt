@@ -41,6 +41,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -59,6 +60,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
     private val res: ResourceWrapper by inject()
     private val browseHelpConfig: BrowseHelpConfig by inject()
     private val addBrowsePlaylistUsecase: AddBrowsePlaylistUsecase by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -99,6 +101,7 @@ class BrowseFragment : Fragment(), AndroidScopeComponent {
             delay(300)
             browseMviView.dispatch(OnResume)
         }
+        statusBarColor.setStatusBarColorResource(R.color.secondary_variant)
         observeLabels()
     }
 

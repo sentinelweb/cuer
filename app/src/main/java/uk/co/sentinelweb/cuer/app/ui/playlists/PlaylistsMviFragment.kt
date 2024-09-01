@@ -18,7 +18,6 @@ import com.arkivanov.essenty.lifecycle.essentyLifecycle
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.get
@@ -56,6 +55,7 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment.Companion.
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.glide.GlideStatusColorLoadListener
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
@@ -77,6 +77,7 @@ class PlaylistsMviFragment :
     private val navRouter: NavigationRouter by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val playlistsHelpConfig: PlaylistsHelpConfig by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _binding: FragmentPlaylistsBinding? = null
     private val binding get() = _binding!!
@@ -254,7 +255,8 @@ class PlaylistsMviFragment :
         log.d("Playlists set list:items: ${model.items.size}")
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(model.imageUrl, imageProvider)
-            .transition(DrawableTransitionOptions.withCrossFade())
+//            .transition(DrawableTransitionOptions.withCrossFade())
+            .addListener(GlideStatusColorLoadListener(statusBarColorWrapper = statusBarColor))
             .into(binding.playlistsHeaderImage)
         binding.playlistsSwipe.isRefreshing = false
         binding.playlistsItems.text = "${model.items.size}"

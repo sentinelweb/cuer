@@ -29,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.toGUID
@@ -42,6 +43,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val navRouter: NavigationRouter by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
     //private val remotesHelpConfig: RemotesHelpConfig by inject()
 
     private var _binding: FragmentComposeBinding? = null
@@ -86,6 +88,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 viewModel = viewModel
             )
         }
+        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
         bindFlow(viewModel.labels, ::observeLabels)
     }
 

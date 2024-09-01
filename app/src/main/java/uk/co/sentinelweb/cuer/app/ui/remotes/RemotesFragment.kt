@@ -40,6 +40,7 @@ import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionOpener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.name
 
@@ -56,6 +57,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val remotesHelpConfig: RemotesHelpConfig by inject()
     private val remotesDialogLauncher: RemotesDialogContract.Launcher by inject()
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -94,6 +96,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         binding.composeView.setContent {
             RemotesComposables.RemotesUi(remotesMviView)
         }
+        statusBarColor.setStatusBarColorResource(R.color.blue_grey_900)
         observeLabels()
     }
 

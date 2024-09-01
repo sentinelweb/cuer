@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTI
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 @Suppress("TooManyFunctions")
@@ -40,6 +41,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     private val log: LogWrapper by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var progress: ProgressBar
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     init {
         log.tag(this)
@@ -65,6 +67,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
         return view
     }
 

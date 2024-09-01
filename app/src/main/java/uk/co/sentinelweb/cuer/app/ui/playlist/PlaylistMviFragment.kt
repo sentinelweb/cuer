@@ -67,6 +67,7 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.glide.GlideStatusColorLoadListener
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
@@ -106,6 +107,7 @@ class PlaylistMviFragment : Fragment(),
     private val prefsWrapper: MultiPlatformPreferencesWrapper by inject()
     private val queueCastConnectionListener: QueueCastConnectionListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -563,8 +565,10 @@ class PlaylistMviFragment : Fragment(),
     private fun setImage(url: String) {
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(url, imageProvider)
-            //.transition(DrawableTransitionOptions.withCrossFade())
+//            .transition(DrawableTransitionOptions.withCrossFade())
+            .addListener(GlideStatusColorLoadListener(statusBarColorWrapper = statusBarColor))
             .into(binding.playlistHeaderImage)
+
     }
 
     private fun showUndo(msg: String, undoFunction: () -> Unit) {

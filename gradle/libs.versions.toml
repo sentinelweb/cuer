@@ -84,6 +84,7 @@ batik = "1.17"
 vlcj = "4.8.2"
 logback = "1.2.3"
 jna = "5.14.0"
+paletteKtx = "1.0.0"
 
 [libraries]
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
@@ -133,6 +134,7 @@ accompanistGlide = { module = "com.google.accompanist:accompanist-glide", versio
 accompanistDrawablepainter = { module = "com.google.accompanist:accompanist-drawablepainter", version.ref = "accompanist" }
 coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coreSplashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splash" }
+androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 
 # testing
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

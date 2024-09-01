@@ -26,6 +26,7 @@ import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.domain.CategoryDomain
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.ObjectTypeDomain
@@ -159,6 +160,7 @@ interface ShareContract {
                     )
                 }
                 scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<ShareActivity>()) }
+                scoped { StatusBarColorWrapper(activity = get<ShareActivity>()) }
             }
         }
     }

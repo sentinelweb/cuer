@@ -1,33 +1,29 @@
 package uk.co.sentinelweb.cuer.app.util.glide
 
+import android.graphics.drawable.BitmapDrawable
 import android.graphics.drawable.Drawable
-import android.widget.ImageView
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import org.koin.core.component.KoinComponent
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 
 /**
  * Dont know why this is needed but sometime images don't load properly this manual listner seem to work when just .into doesn't
  */
-class GlideFallbackLoadListener constructor(
-    private val imageView: ImageView,
-    private val url: String,
-    private val errDrawable: Drawable,
-    log: LogWrapper? = null
+class GlideStatusColorLoadListener constructor(
+    private val statusBarColorWrapper: StatusBarColorWrapper,
 ) : RequestListener<Drawable?>, KoinComponent {
 
-    private val _log = log ?: getKoin().get()
     override fun onLoadFailed(
         e: GlideException?,
         model: Any?,
         target: Target<Drawable?>?,
         isFirstResource: Boolean
     ): Boolean {
-        imageView.setImageDrawable(errDrawable)
-        _log.e("glide load failure url = $url", e)
+        statusBarColorWrapper.setStatusBarColorResource(R.color.primary_variant)
         return true
     }
 
@@ -38,8 +34,9 @@ class GlideFallbackLoadListener constructor(
         dataSource: DataSource?,
         isFirstResource: Boolean
     ): Boolean {
-        //_log.d("glide loading suceess url = $url")
-        imageView.setImageDrawable(resource)
+        if (resource is BitmapDrawable) {
+            statusBarColorWrapper.changeStatusBarColor(resource.bitmap)
+        }
         return false
     }
 }
