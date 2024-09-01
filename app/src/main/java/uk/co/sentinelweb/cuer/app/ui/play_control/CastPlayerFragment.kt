@@ -332,12 +332,12 @@ class CastPlayerFragment() :
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        playDialog = get(),
                         strings = get(),
-                        cuerCastPlayerWatcher = get()
+                        cuerCastPlayerWatcher = get(),
+                        alertDialogCreator = get(),
                     )
                 }
-                scoped<PlayUseCase.Dialog> {
+                factory<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<CastPlayerFragment>(),
                         itemFactory = get(),
@@ -346,7 +346,6 @@ class CastPlayerFragment() :
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),
-                        alertDialogCreator = get(),
                         youtubeApi = get(),
                     )
                 }

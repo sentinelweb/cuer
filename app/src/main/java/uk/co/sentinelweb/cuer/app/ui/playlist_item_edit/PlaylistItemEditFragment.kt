@@ -61,7 +61,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
     private val castDialogWrapper: ChromecastContract.DialogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -357,7 +357,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
             }
 
             DialogModel.Type.CONFIRM -> {
-                alertDialogCreator.create(model as AlertDialogModel).show()
+                alertDialogCreator.createAndShowDialog(model as AlertDialogModel)
             }
 
             DialogModel.Type.PLAYLIST -> {

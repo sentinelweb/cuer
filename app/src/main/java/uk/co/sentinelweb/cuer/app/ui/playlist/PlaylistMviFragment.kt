@@ -35,7 +35,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -94,7 +94,7 @@ class PlaylistMviFragment : Fragment(),
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val log: LogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val imageProvider: ImageProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
@@ -638,7 +638,7 @@ class PlaylistMviFragment : Fragment(),
     }
 
     private fun showAlertDialog(model: AlertDialogModel) {
-        alertDialogCreator.create(model).show()
+        alertDialogCreator.createAndShowDialog(model)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -831,12 +831,12 @@ class PlaylistMviFragment : Fragment(),
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        playDialog = get(),
                         strings = get(),
-                        cuerCastPlayerWatcher = get()
+                        cuerCastPlayerWatcher = get(),
+                        alertDialogCreator = get()
                     )
                 }
-                scoped<PlayUseCase.Dialog> {
+                factory<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistMviFragment>(),
                         itemFactory = get(),
@@ -845,7 +845,6 @@ class PlaylistMviFragment : Fragment(),
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),
-                        alertDialogCreator = get(),
                         youtubeApi = get()
                     )
                 }

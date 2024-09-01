@@ -2,7 +2,9 @@ package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
@@ -14,25 +16,24 @@ import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatform
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
-class PlayUseCase constructor(
+class PlayUseCase(
     private val queue: QueueMediatorContract.Producer,
     private val ytCastContextHolder: ChromecastContract.PlayerContextHolder,
     private val prefsWrapper: MultiPlatformPreferencesWrapper,
     private val coroutines: CoroutineContextProvider,
     private val floatingService: FloatingPlayerContract.Manager,
-    private val playDialog: Dialog,
     private val strings: StringDecoder,
+    private val alertDialogCreator: AlertDialogContract.Creator,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
-) {
+) : KoinComponent {
 
     interface Dialog {
         var playUseCase: PlayUseCase?
         fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain)
-        fun showDialog(model: AlertDialogModel)
     }
 
-    init {
-        playDialog.playUseCase = this
+    fun createPlayDialog(): Dialog = getKoin().get<Dialog>().apply {
+        playUseCase = this@PlayUseCase
     }
 
     fun playLogic(
@@ -49,7 +50,7 @@ class PlayUseCase constructor(
 //            playlistAndItem
 //                .let { playItem(it, resetPos) }
         } else {
-            playDialog.showPlayDialog(playlistAndItem)
+            createPlayDialog().showPlayDialog(playlistAndItem)
         }
     }
 
@@ -57,8 +58,7 @@ class PlayUseCase constructor(
         if (queue.playlistId == itemDomain.playlistId) {
             queue.onItemSelected(itemDomain.item, resetPosition = resetPos)
         } else {
-            playDialog.showDialog(mapChangePlaylistAlert({
-
+            alertDialogCreator.createAndShowDialog(mapChangePlaylistAlert({
                 prefsWrapper.currentPlayingPlaylistId = itemDomain.playlistId!!
                 coroutines.computationScope.launch {
                     queue.switchToPlaylist(itemDomain.playlistId!!)
@@ -74,7 +74,7 @@ class PlayUseCase constructor(
             title = strings.get(StringResource.playlist_change_dialog_title),
             message = strings.get(StringResource.playlist_change_dialog_message),
             confirm = AlertDialogModel.Button(StringResource.ok, confirm),
-            neutral = AlertDialogModel.Button(StringResource.dialog_button_view_info, info)
+            neutral = AlertDialogModel.Button(StringResource.cancel, info)
         )
 
     fun setQueueItem(playlistAndItem: PlaylistAndItemDomain) {

@@ -21,7 +21,7 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
@@ -37,7 +37,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     override val scope: Scope by fragmentScopeWithSource<PrefBackupFragment>()
     private val presenter: PrefBackupContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val log: LogWrapper by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var progress: ProgressBar
@@ -158,7 +158,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             message = message,
             confirm = AlertDialogModel.Button(StringResource.ok)
         ).apply {
-            alertDialogCreator.create(this).show()
+            alertDialogCreator.createAndShowDialog(this)
         }
     }
 
@@ -193,7 +193,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             ),
             cancel = AlertDialogModel.Button(label = StringResource.cancel, action = {})
         ).apply {
-            alertDialogCreator.create(this).show()
+            alertDialogCreator.createAndShowDialog(this)
         }
     }
 

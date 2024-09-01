@@ -111,12 +111,12 @@ interface PlaylistItemEditContract {
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        playDialog = get(),
                         strings = get(),
                         cuerCastPlayerWatcher = get(),
+                        alertDialogCreator = get(),
                     )
                 }
-                scoped<PlayUseCase.Dialog> {
+                factory<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistItemEditFragment>(),
                         itemFactory = get(),
@@ -125,7 +125,6 @@ interface PlaylistItemEditContract {
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),
-                        alertDialogCreator = get(),
                         youtubeApi = get(),
                     )
                 }

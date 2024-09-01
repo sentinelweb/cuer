@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -77,7 +78,7 @@ interface YoutubeFullScreenContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get<YoutubeFullScreenActivity>(), get()) }
+                factory<AlertDialogContract.Creator> { AlertDialogCreator(get<YoutubeFullScreenActivity>(), get()) }
             }
         }
     }

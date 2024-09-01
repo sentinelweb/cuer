@@ -9,6 +9,7 @@ import uk.co.sentinelweb.cuer.app.backup.AutoBackupFileExporter
 import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogLauncher
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.EmptyCommitHost
@@ -97,7 +98,12 @@ interface MainContract {
                         floatingPlayerServiceManager = get()
                     )
                 }
-                scoped { AlertDialogCreator(context = get<MainActivity>(), strings = get()) }
+                factory<AlertDialogContract.Creator> {
+                    AlertDialogCreator(
+                        context = get<MainActivity>(),
+                        strings = get()
+                    )
+                }
                 scoped {
                     LinkNavigator(
                         navRouter = get(),

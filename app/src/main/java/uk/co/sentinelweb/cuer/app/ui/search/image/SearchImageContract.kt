@@ -3,7 +3,6 @@ package uk.co.sentinelweb.cuer.app.ui.search.image
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -67,7 +66,7 @@ interface SearchImageContract {
                         a = this.getFragmentActivity(), res = get(), bitmapSizer = get()
                     )
                 }
-                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
+                //scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
             }
             factory { Mapper() }
         }
