@@ -131,8 +131,8 @@ class PlayDialog(
             .setOnDismissListener {
                 playUseCase = null
                 _dialog = null
-                _f = null
                 unregisterCleanupOnDestroy()
+                _f = null
             }
             .create()
         dialog.show()

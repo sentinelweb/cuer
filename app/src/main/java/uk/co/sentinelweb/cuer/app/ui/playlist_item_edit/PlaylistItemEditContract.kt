@@ -114,6 +114,7 @@ interface PlaylistItemEditContract {
                         strings = get(),
                         cuerCastPlayerWatcher = get(),
                         alertDialogCreator = get(),
+                        parentScope = get<PlaylistItemEditFragment>().scope
                     )
                 }
                 factory<PlayUseCase.Dialog> {

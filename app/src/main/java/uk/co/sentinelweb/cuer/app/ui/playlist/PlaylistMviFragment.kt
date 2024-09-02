@@ -833,7 +833,8 @@ class PlaylistMviFragment : Fragment(),
                         floatingService = get(),
                         strings = get(),
                         cuerCastPlayerWatcher = get(),
-                        alertDialogCreator = get()
+                        alertDialogCreator = get(),
+                        parentScope = get<PlaylistMviFragment>().scope
                     )
                 }
                 factory<PlayUseCase.Dialog> {

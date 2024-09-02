@@ -2,7 +2,8 @@ package uk.co.sentinelweb.cuer.app.usecase
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
+import org.koin.core.component.KoinScopeComponent
+import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
@@ -25,14 +26,17 @@ class PlayUseCase(
     private val strings: StringDecoder,
     private val alertDialogCreator: AlertDialogContract.Creator,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
-) : KoinComponent {
+    parentScope: Scope
+) : KoinScopeComponent {
+
+    override val scope: Scope = parentScope
 
     interface Dialog {
         var playUseCase: PlayUseCase?
         fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain)
     }
 
-    fun createPlayDialog(): Dialog = getKoin().get<Dialog>().apply {
+    fun createPlayDialog(): Dialog = scope.get<Dialog>().apply {
         playUseCase = this@PlayUseCase
     }
 
@@ -93,4 +97,5 @@ class PlayUseCase(
             floatingService.get()?.external?.mainPlayerControls = playerControls
         }
     }
+
 }

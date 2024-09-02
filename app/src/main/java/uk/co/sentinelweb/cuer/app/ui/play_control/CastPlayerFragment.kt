@@ -335,6 +335,7 @@ class CastPlayerFragment() :
                         strings = get(),
                         cuerCastPlayerWatcher = get(),
                         alertDialogCreator = get(),
+                        parentScope = get<CastPlayerFragment>().scope
                     )
                 }
                 factory<PlayUseCase.Dialog> {
