@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.settings
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +18,7 @@ import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
@@ -48,6 +50,11 @@ class PrefPlayerFragment : PreferenceFragmentCompat(), PrefPlayerContract.View, 
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_player, rootKey)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
     }
 
     override fun onStart() {

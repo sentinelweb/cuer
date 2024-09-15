@@ -10,10 +10,7 @@ import org.koin.core.component.KoinComponent
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 
-/**
- * Dont know why this is needed but sometime images don't load properly this manual listner seem to work when just .into doesn't
- */
-class GlideStatusColorLoadListener constructor(
+class GlideStatusColorLoadListener(
     private val statusBarColorWrapper: StatusBarColorWrapper,
 ) : RequestListener<Drawable?>, KoinComponent {
 

@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
@@ -436,6 +437,8 @@ class PlaylistMviFragment : Fragment(),
                 controller.onRefresh()
             }
         queueCastConnectionListener.listenForState()
+        (binding.playlistHeaderImage.drawable as? BitmapDrawable)
+            ?.apply { statusBarColor.changeStatusBarColor(bitmap) }
     }
 
     override fun onPause() {

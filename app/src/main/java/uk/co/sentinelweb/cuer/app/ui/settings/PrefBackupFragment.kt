@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -26,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
@@ -74,6 +76,11 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_backup, rootKey)
         presenter.updateSummaryForAutoBackup()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
     }
 
     override fun onStart() {
