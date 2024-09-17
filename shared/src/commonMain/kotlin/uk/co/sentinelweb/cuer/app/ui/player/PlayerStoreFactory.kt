@@ -46,6 +46,9 @@ class PlayerStoreFactory(
     private val config: PlayerContract.PlayerConfig,
     private val prefs: MultiPlatformPreferencesWrapper,
 ) {
+    init {
+        log.tag(this)
+    }
 
     private sealed class Result {
         object NoVideo : Result()
@@ -85,7 +88,7 @@ class PlayerStoreFactory(
                 is Result.Position -> copy(position = msg.pos)
                 is Result.Volume -> copy(volume = msg.vol)
                 is Result.Screen -> copy(screen = screen)
-            }
+            }//.also { println("PlayerStoreFactory: volume=${it.volume} msg=$msg") }
     }
 
     private class BootstrapperImpl(private val queueConsumer: QueueMediatorContract.Consumer) :
@@ -156,6 +159,7 @@ class PlayerStoreFactory(
         }
 
         private fun volumeChanged(intent: Intent.VolumeChanged) {
+            log.d("volumeChanged: ${intent.vol}")
             prefs.volume = intent.vol
             playerSessionManager.setVolume(intent.vol)
             dispatch(Result.Volume(intent.vol))
@@ -207,6 +211,7 @@ class PlayerStoreFactory(
             // fixme there seem to be some race condition when binding the store to the UI so the initial load command
             // label doesnt make it to the view.processLabel() - this delay gets around it
             delay(1)
+            log.d("init(): prefs.volume:${prefs.volume}")
             dispatch(Result.Volume(prefs.volume))
             itemLoader.load()?.also { playlistAndItem ->
                 log.d("itemLoader.load(${playlistAndItem.item.media.title}))")

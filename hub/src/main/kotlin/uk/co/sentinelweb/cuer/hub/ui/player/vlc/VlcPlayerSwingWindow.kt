@@ -202,9 +202,9 @@ class VlcPlayerSwingWindow(
 
                 override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
                     val current = timeProvider.currentTimeMillis()
-                    if (current - lastVolumeUpdateTime > 1000) {
+                    if (current - lastVolumeUpdateTime > 1000 && volume >= 0) {
                         super.volumeChanged(mediaPlayer, volume)
-                        val sendVolume = volume * 100 //* 200 // todo getMax
+                        val sendVolume = volume * 100
                         log.d("mediaPlayer.volumeChanged: $volume $sendVolume")
                         coordinator.dispatch(VolumeChanged(sendVolume))
                         lastVolumeUpdateTime = current
