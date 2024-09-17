@@ -45,7 +45,7 @@ object CastDialogComposeables {
         Box(
             modifier = Modifier.height(100.dp)
                 .fillMaxWidth()
-                .background(Color.Blue)
+                .background(MaterialTheme.colorScheme.primary)
         ) {
 //            Image(
 //                painter = painterResource(Res.drawable.cast_header_640_T9rKvI3N0NM_unsplash),

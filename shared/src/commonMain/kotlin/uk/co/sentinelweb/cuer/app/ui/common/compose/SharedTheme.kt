@@ -22,8 +22,12 @@ private val AppShapes = Shapes(
     extraLarge = CutCornerShape(topStart = 32.dp, bottomEnd = 32.dp)
 )
 
-private val lightColors = lightColorScheme()
-private val darkColors = darkColorScheme()
+private val lightColors = lightColorScheme(
+    primary = "#e53935".toColor(),
+)
+private val darkColors = darkColorScheme(
+    primary = "#e53935".toColor(),
+)
 
 @Composable
 internal fun CuerSharedTheme(
