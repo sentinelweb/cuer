@@ -88,10 +88,10 @@ class PlayerControlsNotificationMedia constructor(
         val contentPendingIntent: PendingIntent =
             PendingIntent.getActivity(service, 0, contentIntent, FLAG_IMMUTABLE)
 
-        val mediaSessionToken = if (state.seekEnabled) {
+        val mediaSessionToken = //if (state.seekEnabled) {
             (appState.mediaSession?.sessionToken
                 ?: throw IllegalArgumentException("No media session ID allocated"))
-        } else null
+        //} else null
         val builder = NotificationCompat.Builder(service, channelIdToUse)
             .setDefaults(Notification.DEFAULT_ALL)
             .setSmallIcon(icon)

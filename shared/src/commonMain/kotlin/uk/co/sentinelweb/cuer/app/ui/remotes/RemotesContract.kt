@@ -40,6 +40,7 @@ class RemotesContract {
         }
 
         sealed class Label {
+            object None : Label()
             object Up : Label()
             object ActionSettings : Label()
             object ActionSearch : Label()

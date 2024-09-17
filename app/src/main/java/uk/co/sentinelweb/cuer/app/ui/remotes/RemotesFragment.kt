@@ -168,6 +168,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                                 },
                                 value.node
                             )
+
+                        None -> Unit
                     }
                 }
             })

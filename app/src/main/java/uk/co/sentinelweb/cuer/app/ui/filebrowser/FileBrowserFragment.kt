@@ -95,7 +95,9 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private fun observeLabels(label: Label) {
         when (label) {
             Label.Init -> {}
-            Label.Up -> navRouter.navigate(NavigationModel(NAV_BACK, mapOf(BACK_PARAMS to R.id.navigation_remotes)))
+            Label.Up -> {
+                navRouter.navigate(NavigationModel(NAV_BACK, mapOf(BACK_PARAMS to R.id.navigation_remotes)))
+            }
         }
     }
 
