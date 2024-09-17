@@ -57,7 +57,7 @@ object RemotesComposables {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
                     CuerTopAppBarComposables.CuerAppBar(
-                        text = model.title,
+                        title = model.title,
                         backgroundColor = Color.Transparent,
                         onUp = { view.dispatch(OnUpClicked) },
                         actions = listOf(

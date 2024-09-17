@@ -19,8 +19,13 @@ interface FileBrowserContract {
     )
 
     data class AppFilesUiModel(
-        val loading: Boolean
-    )
+        val loading: Boolean,
+        val subTitle: String?
+    ) {
+        companion object {
+            val BLANK = AppFilesUiModel(loading = false, subTitle = null)
+        }
+    }
 
     sealed class Label {
         object Init : Label()

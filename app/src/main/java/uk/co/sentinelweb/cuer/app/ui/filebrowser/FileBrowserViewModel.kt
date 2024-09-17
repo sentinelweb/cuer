@@ -29,10 +29,11 @@ class FileBrowserViewModel(
     private val castController: CastController,
     private val remoteDialogLauncher: RemotesDialogContract.Launcher,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
+    private val appModelMapper: FileBrowserAppModelMapper,
 ) : FilesContract.Interactions, ViewModel() {
 
     override val modelObservable = MutableStateFlow(blankModel())
-    val appModelObservable = MutableStateFlow(AppFilesUiModel(loading = false))
+    val appModelObservable = MutableStateFlow(AppFilesUiModel.BLANK)
 
     val _labels = MutableStateFlow<Label>(Label.Init)
     val labels: Flow<Label>
@@ -75,7 +76,7 @@ class FileBrowserViewModel(
     private fun playMedia(file: PlaylistItemDomain) {
         state.selectedFile = file
         viewModelScope.launch {
-            appModelObservable.value = AppFilesUiModel(loading = true)
+            appModelObservable.value = appModelMapper.map(state = state, loading = true)
             state.sourceNode?.apply {
                 if (cuerCastPlayerWatcher.isWatching()) {
                     launchRemotePlayer(
@@ -87,14 +88,14 @@ class FileBrowserViewModel(
                         launchRemotePlayer(remoteNode, screen)
                     })
                 }
-                appModelObservable.value = AppFilesUiModel(loading = false)
+                appModelObservable.value = appModelMapper.map(state = state, loading = false)
             }
         }
     }
 
     private fun launchRemotePlayer(remoteNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
         viewModelScope.launch {
-            appModelObservable.value = AppFilesUiModel(loading = true)
+            appModelObservable.value = appModelMapper.map(state = state, loading = true)
             playerInteractor.launchPlayerVideo(
                 remoteNode.locator(),
                 state.selectedFile ?: throw IllegalStateException(),
@@ -102,7 +103,7 @@ class FileBrowserViewModel(
             )
             castController.connectCuerCast(state.sourceNode, screen)
             remoteDialogLauncher.hideRemotesDialog()
-            appModelObservable.value = AppFilesUiModel(loading = false)
+            appModelObservable.value = appModelMapper.map(state = state, loading = false)
         }
     }
 
@@ -112,13 +113,13 @@ class FileBrowserViewModel(
 
     private fun loadCurrentPath() {
         viewModelScope.launch {
-            appModelObservable.value = AppFilesUiModel(loading = true)
+            appModelObservable.value = appModelMapper.map(state = state, loading = true)
             state.sourceNode?.apply {
                 state.currentFolder = filesInteractor.getFolderList(this.locator(), state.path).data
                 state.currentFolder?.apply {
                     modelObservable.value = mapper.map(this)
                 }
-                appModelObservable.value = AppFilesUiModel(loading = false)
+                appModelObservable.value = appModelMapper.map(state = state, loading = false)
             }
         }
     }

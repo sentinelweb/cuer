@@ -143,9 +143,11 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         castController = get(),
                         remoteDialogLauncher = get(),
                         cuerCastPlayerWatcher = get(),
+                        appModelMapper = get()
                     )
                 }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped { FileBrowserAppModelMapper() }
             }
         }
     }

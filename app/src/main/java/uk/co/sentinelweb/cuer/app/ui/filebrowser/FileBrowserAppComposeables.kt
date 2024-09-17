@@ -23,7 +23,7 @@ object FileBrowserAppComposeables {
     // todo use scaffold
     @Composable
     fun FileBrowserAppWrapperUi(appModelObservable: Flow<AppFilesUiModel>, viewModel: FileBrowserViewModel) {
-        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel(loading = false))
+        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel.BLANK)
         CuerTheme {
             Surface {
                 Box(contentAlignment = Alignment.Center) {
@@ -34,7 +34,8 @@ object FileBrowserAppComposeables {
                     ) {
                         Box(contentAlignment = Alignment.TopStart) {
                             CuerTopAppBarComposables.CuerAppBar(
-                                text = "Files",
+                                title = "Files",
+                                subTitle = appFileUiState.value.subTitle,
                                 backgroundColor = MaterialTheme.colors.primary,
                                 onUp = { viewModel.onUpClick() },
                                 actions = listOf(

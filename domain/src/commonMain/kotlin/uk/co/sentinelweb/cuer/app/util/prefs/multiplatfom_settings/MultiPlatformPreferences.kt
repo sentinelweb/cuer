@@ -165,7 +165,6 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
                 ?: remove(LAST_SEARCH_TYPE)
         }
 
-
     var recentIds: String?
         get() = getString(RECENT_PLAYLISTS, null)
         set(value) {
