@@ -15,12 +15,6 @@
     />
 
     <fragment
-        android:id="@+id/navigation_onboard"
-        android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
-        android:label="@string/nav_title_onboard"
-    />
-
-    <fragment
         android:id="@+id/navigation_playlists"
         android:name="uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment"
         android:label="@string/bottomnav_title_playlists"
@@ -269,10 +263,33 @@
         android:label="@string/prefs_root_player_title"
     />
 
+    <!-- fixme delete one? -->
+    <fragment
+            android:id="@+id/navigation_onboard"
+            android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
+            android:label="@string/nav_title_onboard"
+    />
+
     <fragment
         android:id="@+id/navigation_onboarding"
         android:name="uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment"
         android:label="@string/onboarding_title"
     />
 
+    <fragment
+            android:id="@+id/navigation_folders"
+            android:name="uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserFragment"
+            android:label="@string/folders">
+        <argument
+                android:name="REMOTE_ID"
+                app:argType="string"
+                app:nullable="false"
+        />
+
+        <argument
+                android:name="FILE_PATH"
+                app:argType="string"
+                app:nullable="true"
+        />
+    </fragment>
 </navigation>

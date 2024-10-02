@@ -49,64 +49,62 @@ internal class YoutubeKtorInteractor constructor(
     suspend override fun videos(
         ids: List<String>,
         parts: List<YoutubePart>
-    ): NetResult<List<MediaDomain>> =
-        withContext(coContext.IO) {
-            try {
-                if (connectivity.isConnected()) {
-                    if (!parts.contains(SNIPPET)) {
-                        throw InvalidPartsException(SNIPPET)
-                    }
-                    service.getVideoInfos(
-                        ids = ids.joinToString(separator = ","),
-                        parts = parts.map { it.part }.joinToString(separator = ","),
-                        key = keyProvider.key
-                    )
-                        .let { videoMapper.map(it) }
-                        .takeIf { it.size > 0 }
-                        ?.let { medias ->
-                            updateChannelData(medias)
-                                .takeIf { it.isSuccessful }
-                                .let { it?.data }
-                                ?: medias
-                        }
-                        .let { NetResult.Data(it) }
-                } else {
-                    errorMapper.notConnected<List<MediaDomain>>()
+    ): NetResult<List<MediaDomain>> = withContext(coContext.IO) {
+        try {
+            if (connectivity.isConnected()) {
+                if (!parts.contains(SNIPPET)) {
+                    throw InvalidPartsException(SNIPPET)
                 }
-            } catch (ex: Throwable) {
-                errorMapper.map<List<MediaDomain>>(ex, "videos: error: $ids")
+                service.getVideoInfos(
+                    ids = ids.joinToString(separator = ","),
+                    parts = parts.map { it.part }.joinToString(separator = ","),
+                    key = keyProvider.key
+                )
+                    .let { videoMapper.map(it) }
+                    .takeIf { it.size > 0 }
+                    ?.let { medias ->
+                        updateChannelData(medias)
+                            .takeIf { it.isSuccessful }
+                            .let { it?.data }
+                            ?: medias
+                    }
+                    .let { NetResult.Data(it) }
+            } else {
+                errorMapper.notConnected<List<MediaDomain>>()
             }
+        } catch (ex: Throwable) {
+            errorMapper.map<List<MediaDomain>>(ex, "videos: error: $ids")
         }
+    }
 
     // todo add existing channel provider to see if channel is already in db
     suspend fun updateChannelData(
         medias: List<MediaDomain>
-    ): NetResult<List<MediaDomain>> =
-        withContext(coContext.IO) {
-            val idList = medias.map { it.channelData.platformId!! }.distinct()
-            try {
-                if (connectivity.isConnected()) {
-                    // note the items come out of order
-                    channels(ids = idList)
-                        .takeIf { it.isSuccessful }
-                        ?.data
-                        ?.let { channels ->
-                            medias.map { media ->
-                                channels
-                                    .find { channel -> channel.id == media.channelData.id }
-                                    ?.let { media.copy(channelData = it) }
-                                    ?: media
-                            }
-                        }?.let { NetResult.Data(it) }
-                        ?: medias
-                            .let { NetResult.Data(it) }
-                } else {
-                    errorMapper.notConnected<List<MediaDomain>>()
-                }
-            } catch (ex: Throwable) {
-                errorMapper.map<List<MediaDomain>>(ex, "updateChannelData: error: $idList")
+    ): NetResult<List<MediaDomain>> = withContext(coContext.IO) {
+        val idList = medias.map { it.channelData.platformId!! }.distinct()
+        try {
+            if (connectivity.isConnected()) {
+                // note the items come out of order
+                channels(ids = idList)
+                    .takeIf { it.isSuccessful }
+                    ?.data
+                    ?.let { channels ->
+                        medias.map { media ->
+                            channels
+                                .find { channel -> channel.id == media.channelData.id }
+                                ?.let { media.copy(channelData = it) }
+                                ?: media
+                        }
+                    }?.let { NetResult.Data(it) }
+                    ?: medias
+                        .let { NetResult.Data(it) }
+            } else {
+                errorMapper.notConnected<List<MediaDomain>>()
             }
+        } catch (ex: Throwable) {
+            errorMapper.map<List<MediaDomain>>(ex, "updateChannelData: error: $idList")
         }
+    }
 
     /**
      * todo add existing channel provider to see if channel is already in db
@@ -115,137 +113,133 @@ internal class YoutubeKtorInteractor constructor(
     override suspend fun channels(
         ids: List<String>,
         parts: List<YoutubePart>
-    ): NetResult<List<ChannelDomain>> =
-        withContext(coContext.IO) {
-            try {
-                if (connectivity.isConnected()) {
-                    if (!parts.contains(SNIPPET)) {
-                        throw InvalidPartsException(SNIPPET)
-                    }
-                    service.getChannelInfos(
-                        ids = ids.joinToString(separator = ","),
-                        parts = parts.map { it.part }.joinToString(separator = ","),
-                        key = keyProvider.key
-                    )
-                        .let { channelMapper.map(it) }
-                        .let { NetResult.Data(it) }
-                } else {
-                    errorMapper.notConnected<List<ChannelDomain>>()
+    ): NetResult<List<ChannelDomain>> = withContext(coContext.IO) {
+        try {
+            if (connectivity.isConnected()) {
+                if (!parts.contains(SNIPPET)) {
+                    throw InvalidPartsException(SNIPPET)
                 }
-            } catch (ex: Throwable) {
-                errorMapper.map<List<ChannelDomain>>(ex, "channels: error: $ids")
+                service.getChannelInfos(
+                    ids = ids.joinToString(separator = ","),
+                    parts = parts.map { it.part }.joinToString(separator = ","),
+                    key = keyProvider.key
+                )
+                    .let { channelMapper.map(it) }
+                    .let { NetResult.Data(it) }
+            } else {
+                errorMapper.notConnected<List<ChannelDomain>>()
             }
+        } catch (ex: Throwable) {
+            errorMapper.map<List<ChannelDomain>>(ex, "channels: error: $ids")
         }
+    }
 
-    override suspend fun playlist(id: String): NetResult<PlaylistDomain> =
-        withContext(coContext.IO) {
-            try {
-                if (connectivity.isConnected()) {
-                    service.getPlaylistInfos(
-                        ids = id,
-                        parts = listOf(SNIPPET, CONTENT_DETAILS).map { it.part }.joinToString(separator = ","),
-                        key = keyProvider.key
-                    ).let { playlistDto ->
-                        // get items
-                        val itemsDtoList = mutableListOf<YoutubePlaylistItemDto.PlaylistItemDto>()
-                        var hasMorePages = true
-                        var nextToken: String? = null
-                        while (hasMorePages) {
-                            service.getPlaylistItemInfos(
-                                playlistId = id,
-                                parts = listOf(SNIPPET)
+    override suspend fun playlist(id: String): NetResult<PlaylistDomain> = withContext(coContext.IO) {
+        try {
+            if (connectivity.isConnected()) {
+                service.getPlaylistInfos(
+                    ids = id,
+                    parts = listOf(SNIPPET, CONTENT_DETAILS).map { it.part }.joinToString(separator = ","),
+                    key = keyProvider.key
+                ).let { playlistDto ->
+                    // get items
+                    val itemsDtoList = mutableListOf<YoutubePlaylistItemDto.PlaylistItemDto>()
+                    var hasMorePages = true
+                    var nextToken: String? = null
+                    while (hasMorePages) {
+                        service.getPlaylistItemInfos(
+                            playlistId = id,
+                            parts = listOf(SNIPPET)
+                                .map { it.part }
+                                .joinToString(separator = ","),
+                            key = keyProvider.key,
+                            pageToken = nextToken,
+                            maxResults = MAX_RESULTS
+                        ).apply {
+                            itemsDtoList.addAll(items)
+                            hasMorePages = nextPageToken != null && itemsDtoList.size < MAX_PLAYLIST_ITEMS
+                            nextToken = this.nextPageToken
+                        }
+                    }
+                    // get videos
+                    val videosDtoList = mutableListOf<YoutubeVideosDto.VideoDto>()
+                    itemsDtoList.map { it.snippet.resourceId.videoId }
+                        .chunked(MAX_RESULTS)
+                        .forEach {
+                            service.getVideoInfos(
+                                ids = it.joinToString(separator = ","),
+                                parts = listOf(SNIPPET, CONTENT_DETAILS)
                                     .map { it.part }
                                     .joinToString(separator = ","),
-                                key = keyProvider.key,
-                                pageToken = nextToken,
-                                maxResults = MAX_RESULTS
+                                key = keyProvider.key
                             ).apply {
-                                itemsDtoList.addAll(items)
-                                hasMorePages = nextPageToken != null && itemsDtoList.size < MAX_PLAYLIST_ITEMS
-                                nextToken = this.nextPageToken
+                                videosDtoList.addAll(items)
                             }
                         }
-                        // get videos
-                        val videosDtoList = mutableListOf<YoutubeVideosDto.VideoDto>()
-                        itemsDtoList.map { it.snippet.resourceId.videoId }
-                            .chunked(MAX_RESULTS)
-                            .forEach {
-                                service.getVideoInfos(
-                                    ids = it.joinToString(separator = ","),
-                                    parts = listOf(SNIPPET, CONTENT_DETAILS)
-                                        .map { it.part }
-                                        .joinToString(separator = ","),
-                                    key = keyProvider.key
-                                ).apply {
-                                    videosDtoList.addAll(items)
-                                }
+                    val channelsDtoList = mutableListOf<YoutubeChannelsDto.ItemDto>()
+                    listOf(playlistDto.items[0].snippet.channelId)
+                        .plus(videosDtoList.map { it.snippet.channelId })
+                        .distinct()
+                        .chunked(MAX_RESULTS)
+                        .forEach {
+                            service.getChannelInfos(
+                                ids = it.joinToString(separator = ","),
+                                parts = listOf(SNIPPET).map { it.part }
+                                    .joinToString(separator = ","),
+                                key = keyProvider.key
+                            ).apply {
+                                channelsDtoList.addAll(items)
                             }
-                        val channelsDtoList = mutableListOf<YoutubeChannelsDto.ItemDto>()
-                        listOf(playlistDto.items[0].snippet.channelId)
-                            .plus(videosDtoList.map { it.snippet.channelId })
+                        }
+                    playlistDto to itemsDtoList then videosDtoList then channelsDtoList
+                    // todo filter out existing media ids - provide db accessor - then do media fetch
+                    // can just exec videos with contentDetails,liveStreamingDetails as all other info is in item
+                    // https://www.googleapis.com/youtube/v3/videos?id=8nhPVOM97Jg%2CfY7M3pzXdUo%2CGXfsI-zZO7s&part=contentDetails%2CliveStreamingDetails&key=
+                }
+                    .let { playlistMapper.map(it.first, it.second, it.third, it.fourth) }
+                    .let { NetResult.Data(it) }
+            } else {
+                errorMapper.notConnected<PlaylistDomain>()
+            }
+        } catch (ex: Throwable) {
+            errorMapper.map<PlaylistDomain>(ex, "playlist: error: $id")
+        }
+    }
+
+    override suspend fun search(search: SearchRemoteDomain): NetResult<PlaylistDomain> = withContext(coContext.IO) {
+        try {
+            if (connectivity.isConnected()) {
+                searchMapper.mapRequest(search)
+                    .let {
+                        service.search(
+                            request = it,
+                            key = keyProvider.key
+                        )
+                    }
+                    // filter out null snippets (deleted videos) in results
+                    .let { it.copy(items = it.items.filter { it.snippet != null }) }
+                    .let { searchResult ->
+                        val channels = searchResult.items.mapNotNull { it.snippet?.channelId }
                             .distinct()
-                            .chunked(MAX_RESULTS)
-                            .forEach {
+                            .takeIf { it.size > 0 }
+                            ?.let {
                                 service.getChannelInfos(
                                     ids = it.joinToString(separator = ","),
                                     parts = listOf(SNIPPET).map { it.part }
                                         .joinToString(separator = ","),
                                     key = keyProvider.key
-                                ).apply {
-                                    channelsDtoList.addAll(items)
-                                }
-                            }
-                        playlistDto to itemsDtoList then videosDtoList then channelsDtoList
-                        // todo filter out existing media ids - provide db accessor - then do media fetch
-                        // can just exec videos with contentDetails,liveStreamingDetails as all other info is in item
-                        // https://www.googleapis.com/youtube/v3/videos?id=8nhPVOM97Jg%2CfY7M3pzXdUo%2CGXfsI-zZO7s&part=contentDetails%2CliveStreamingDetails&key=
+                                )
+                            }?.items
+                            ?: listOf()
+                        searchResult to channels
                     }
-                        .let { playlistMapper.map(it.first, it.second, it.third, it.fourth) }
-                        .let { NetResult.Data(it) }
-                } else {
-                    errorMapper.notConnected<PlaylistDomain>()
-                }
-            } catch (ex: Throwable) {
-                errorMapper.map<PlaylistDomain>(ex, "playlist: error: $id")
+                    .let { searchMapper.map(it.first, it.second) }
+                    .let { NetResult.Data(it) }
+            } else {
+                errorMapper.notConnected<PlaylistDomain>()
             }
+        } catch (ex: Throwable) {
+            errorMapper.map<PlaylistDomain>(ex, "search: error: ${search.text}")
         }
-
-    override suspend fun search(search: SearchRemoteDomain): NetResult<PlaylistDomain> =
-        withContext(coContext.IO) {
-            try {
-                if (connectivity.isConnected()) {
-                    searchMapper.mapRequest(search)
-                        .let {
-                            service.search(
-                                request = it,
-                                key = keyProvider.key
-                            )
-                        }
-                        // filter out null snippets (deleted videos) in results
-                        .let { it.copy(items = it.items.filter { it.snippet != null }) }
-                        .let { searchResult ->
-                            val channels = searchResult.items.mapNotNull { it.snippet?.channelId }
-                                .distinct()
-                                .takeIf { it.size > 0 }
-                                ?.let {
-                                    service.getChannelInfos(
-                                        ids = it.joinToString(separator = ","),
-                                        parts = listOf(SNIPPET).map { it.part }
-                                            .joinToString(separator = ","),
-                                        key = keyProvider.key
-                                    )
-                                }?.items
-                                ?: listOf()
-                            searchResult to channels
-                        }
-                        .let { searchMapper.map(it.first, it.second) }
-                        .let { NetResult.Data(it) }
-                } else {
-                    errorMapper.notConnected<PlaylistDomain>()
-                }
-            } catch (ex: Throwable) {
-                errorMapper.map<PlaylistDomain>(ex, "search: error: ${search.text}")
-            }
-        }
-
+    }
 }

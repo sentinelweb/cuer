@@ -10,7 +10,7 @@ class PlaybackStateMapper {
 
     @Suppress("RemoveRedundantQualifierName")
     fun map(domain: MediaDomain, state: PlayerStateDomain, liveOffset: Long?, playlist: PlaylistDomain?): PlaybackStateCompat {
-        var actionsBase = PlaybackStateCompat.ACTION_REWIND or
+        var actions = PlaybackStateCompat.ACTION_REWIND or
                 PlaybackStateCompat.ACTION_FAST_FORWARD or
                 PlaybackStateCompat.ACTION_PLAY or
                 PlaybackStateCompat.ACTION_PAUSE
@@ -19,23 +19,22 @@ class PlaybackStateMapper {
                 .takeIf { it != -1 }
                 ?.also {
                     if (it < items.size - 1) {
-                        actionsBase = actionsBase or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
                     }
                     if (it > 0) {
-                        actionsBase = actionsBase or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                        actions = actions or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
                     }
                 }
-
         }
         return if (domain.isLiveBroadcast) {
             PlaybackStateCompat.Builder()
                 .setState(mapState(state), liveOffset ?: 0, 1f)
-                .setActions(actionsBase)
+                .setActions(actions)
                 .build()
         } else {
             PlaybackStateCompat.Builder()
                 .setState(mapState(state), domain.positon ?: 0, 1f)
-                .setActions(actionsBase or PlaybackStateCompat.ACTION_SEEK_TO)
+                .setActions(actions or PlaybackStateCompat.ACTION_SEEK_TO)
                 .build()
         }
     }

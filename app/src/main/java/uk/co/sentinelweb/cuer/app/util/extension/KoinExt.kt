@@ -12,6 +12,7 @@ import org.koin.android.scope.createScope
 import org.koin.android.scope.getScopeOrNull
 import org.koin.androidx.scope.LifecycleScopeDelegate
 import org.koin.core.Koin
+import org.koin.core.component.KoinScopeComponent
 import org.koin.core.component.getScopeId
 import org.koin.core.component.getScopeName
 import org.koin.core.context.GlobalContext
@@ -31,6 +32,10 @@ fun <T> Fragment.fragmentScopeWithSource() = LifecycleScopeDelegate<T>(this, get
 /** links the fragment scope to the activity scope */
 fun Fragment.linkScopeToActivity() {
     (this as AndroidScopeComponent).scope.linkTo((requireActivity() as AndroidScopeComponent).scope)
+}
+
+fun KoinScopeComponent.linkScopeToAndroidScope(target: AndroidScopeComponent) {
+    this.scope.linkTo(target.scope)
 }
 
 /** copied from org.koin.android.scope.ServiceExtKt  */

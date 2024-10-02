@@ -5,7 +5,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.common.chip.ChipModel
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.EnumValuesDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -68,7 +67,7 @@ interface SearchContract {
                 scoped { State() }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { EnumValuesDialogCreator(this.getFragmentActivity()) }
-                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
+                // scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
             }
             factory { SearchMapper(get(), get()) }
 

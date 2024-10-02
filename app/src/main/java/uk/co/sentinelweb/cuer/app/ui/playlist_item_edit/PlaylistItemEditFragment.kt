@@ -40,12 +40,14 @@ import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsMviDialogContract
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
-import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.glide.GlideStatusColorLoadListener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
@@ -58,8 +60,8 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private val navRouter: NavigationRouter by inject()
     private val selectDialogCreator: SelectDialogCreator by inject()
     private val res: ResourceWrapper by inject()
-    private val castDialogWrapper: CastDialogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val castDialogWrapper: ChromecastContract.DialogWrapper by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val doneNavigation: DoneNavigation by inject()// from activity (see onAttach)
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -68,6 +70,7 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private val playerControls: PlayerContract.PlayerControls by inject()
     private val shareNavigationHack: ShareNavigationHack by inject()
     private val playlistItemEditHelpConfig: PlaylistItemEditHelpConfig by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private val binding: FragmentPlaylistItemEditBinding
         get() = _binding ?: throw IllegalStateException("FragmentPlaylistItemEditBinding not bound")
@@ -311,7 +314,8 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
     private fun setImage(imageUrl: String?) {
         Glide.with(requireContext())
             .load(imageUrl)
-            //.transition(DrawableTransitionOptions.withCrossFade()) // messes up transition
+//            .transition(DrawableTransitionOptions.withCrossFade()) // messes up transition
+            .addListener(GlideStatusColorLoadListener(statusBarColorWrapper = statusBarColor))
             .into(binding.plieImage)
     }
 
@@ -348,11 +352,12 @@ class PlaylistItemEditFragment : Fragment(), ShareCommitter, AndroidScopeCompone
             }
 
             DialogModel.Type.SELECT_ROUTE -> {
-                castDialogWrapper.showRouteSelector(childFragmentManager)
+//                childFragmentManager
+                castDialogWrapper.showRouteSelector()
             }
 
             DialogModel.Type.CONFIRM -> {
-                alertDialogCreator.create(model as AlertDialogModel).show()
+                alertDialogCreator.createAndShowDialog(model as AlertDialogModel)
             }
 
             DialogModel.Type.PLAYLIST -> {

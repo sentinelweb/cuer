@@ -12,20 +12,20 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistItemOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionManager
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory.Action.*
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
-import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.startPosition
 
 class PlayerStoreFactory(
@@ -38,20 +38,28 @@ class PlayerStoreFactory(
     private val log: LogWrapper,
     private val livePlaybackController: LivePlaybackContract.Controller,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val playerControls: PlayerListener,
+    private val mediaSessionListener: MediaSessionListener,
     private val mediaOrchestrator: MediaOrchestrator,
     private val playlistItemOrchestrator: PlaylistItemOrchestrator,
+    private val playerSessionManager: PlayerSessionManager,
+    private val playerSessionListener: PlayerSessionListener,
+    private val config: PlayerContract.PlayerConfig,
+    private val prefs: MultiPlatformPreferencesWrapper,
 ) {
+    init {
+        log.tag(this)
+    }
 
     private sealed class Result {
         object NoVideo : Result()
         data class State(val state: PlayerStateDomain) : Result()
         data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
-
         data class Playlist(val playlist: PlaylistDomain) : Result()
         data class SkipTimes(val fwd: String? = null, val back: String? = null) : Result()
-        data class Screen(val content: Content) : Result()
+        data class SelectedTab(val content: Content) : Result()
         data class Position(val pos: Long) : Result()
+        data class Volume(val vol: Float) : Result()
+        data class Screen(val screen: PlayerNodeDomain.Screen) : Result()
     }
 
     private sealed class Action {
@@ -71,14 +79,16 @@ class PlayerStoreFactory(
 
                 is Result.Playlist -> copy(playlist = msg.playlist)
                 is Result.NoVideo -> copy(item = null)
-                is Result.Screen -> copy(content = msg.content)
+                is Result.SelectedTab -> copy(content = msg.content)
                 is Result.SkipTimes -> copy(
                     skipFwdText = msg.fwd ?: skipFwdText,
                     skipBackText = msg.back ?: skipBackText
                 )
 
                 is Result.Position -> copy(position = msg.pos)
-            }
+                is Result.Volume -> copy(volume = msg.vol)
+                is Result.Screen -> copy(screen = screen)
+            }//.also { println("PlayerStoreFactory: volume=${it.volume} msg=$msg") }
     }
 
     private class BootstrapperImpl(private val queueConsumer: QueueMediatorContract.Consumer) :
@@ -119,9 +129,9 @@ class PlayerStoreFactory(
                 is Intent.SkipFwdSelect -> skip.onSelectSkipTime(true)
                 is Intent.SkipBackSelect -> skip.onSelectSkipTime(false)
                 is Intent.PlayPause -> playPause(intent, getState().playerState)
-                is Intent.SeekTo -> seekTo(intent.fraction, getState().item)
-                is Intent.PlaylistView -> dispatch(Result.Screen(Content.PLAYLIST))
-                is Intent.PlaylistItemView -> dispatch(Result.Screen(Content.DESCRIPTION))
+                is Intent.SeekToFraction -> seekTo(intent.fraction, getState().item)
+                is Intent.PlaylistView -> dispatch(Result.SelectedTab(Content.PLAYLIST))
+                is Intent.PlaylistItemView -> dispatch(Result.SelectedTab(Content.DESCRIPTION))
                 is Intent.LinkOpen -> publish(Label.LinkOpen(intent.link))
                 is Intent.ChannelOpen -> openChannel(getState())
                 is Intent.TrackSelected -> trackSelected(intent.item, intent.resetPosition)
@@ -137,7 +147,23 @@ class PlayerStoreFactory(
                 Intent.StarClick -> toggleStar(getState().item).let { Unit }
                 is Intent.OpenInApp -> getState().item?.let { publish(Label.ItemOpen(it)) } ?: Unit
                 is Intent.Share -> getState().item?.let { publish(Label.Share(it)) } ?: Unit
+                Intent.Stop -> publish(Label.Stop)
+                Intent.FocusWindow -> publish(Label.FocusWindow)
+                is Intent.VolumeChanged -> volumeChanged(intent)
+                is Intent.ScreenAcquired -> screenAcquired(intent)
             }
+
+        private fun screenAcquired(intent: Intent.ScreenAcquired) {
+            playerSessionManager.setScreen(intent.screen)
+            dispatch(Result.Screen(intent.screen))
+        }
+
+        private fun volumeChanged(intent: Intent.VolumeChanged) {
+            log.d("volumeChanged: ${intent.vol}")
+            prefs.volume = intent.vol
+            playerSessionManager.setVolume(intent.vol)
+            dispatch(Result.Volume(intent.vol))
+        }
 
         private fun receiveDuration(intent: Intent.Duration) {
             livePlaybackController.gotDuration(intent.ms)
@@ -185,6 +211,8 @@ class PlayerStoreFactory(
             // fixme there seem to be some race condition when binding the store to the UI so the initial load command
             // label doesnt make it to the view.processLabel() - this delay gets around it
             delay(1)
+            log.d("init(): prefs.volume:${prefs.volume}")
+            dispatch(Result.Volume(prefs.volume))
             itemLoader.load()?.also { playlistAndItem ->
                 log.d("itemLoader.load(${playlistAndItem.item.media.title}))")
                 loadItem(playlistAndItem)
@@ -193,7 +221,12 @@ class PlayerStoreFactory(
 
         private fun loadItem(playlistAndItem: PlaylistAndItemDomain) = coroutines.mainScope.launch {
             playlistAndItem
-                .apply { mediaSessionManager.checkCreateMediaSession(playerControls) }
+                .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
+                .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
+                .apply { playerSessionManager.setMedia(item.media, null) }
+                //.apply { log.d("config.maxVolume: ${config.maxVolume}") }
+                .apply { playerSessionManager.setVolumeMax(config.maxVolume) }
+                .apply { playerSessionManager.setVolume(prefs.volume) }
                 .apply { livePlaybackController.clear(item.media.platformId) }
                 .apply { queueProducer.playNow(playlistId!!, item.id) }
         }
@@ -213,14 +246,19 @@ class PlayerStoreFactory(
             log.d("trackchange: ${intent.item.media.platformId}")
             intent.item.media.duration?.apply { skip.duration = this }
             livePlaybackController.clear(intent.item.media.platformId)
-            mediaSessionManager.checkCreateMediaSession(playerControls)
+
+            mediaSessionManager.checkCreateMediaSession(mediaSessionListener)
+            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+
+            playerSessionManager.checkCreateMediaSession(playerSessionListener)
+            playerSessionManager.setVolumeMax(config.maxVolume)
+            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
                     Load(intent.item.media.platformId, intent.item.media.startPosition())
                 )
             )
-            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
         }
 
         private fun updatePosition(
@@ -273,7 +311,13 @@ class PlayerStoreFactory(
 
         private fun PlaylistItemDomain.updatePlaybackState(playState: PlayerStateDomain) {
             mediaSessionManager.updatePlaybackState(
-                media,
+                this.media,
+                playState,
+                if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
+                queueConsumer.playlist
+            )
+            playerSessionManager.updatePlaybackState(
+                this.media,// todo item(this)
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist
@@ -310,6 +354,7 @@ class PlayerStoreFactory(
         ) {
             override fun endSession() {
                 mediaSessionManager.destroyMediaSession()
+                playerSessionManager.destroyMediaSession()
             }
         }
 }

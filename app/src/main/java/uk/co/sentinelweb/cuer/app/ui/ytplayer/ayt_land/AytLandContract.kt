@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
@@ -35,8 +36,9 @@ interface AytLandContract {
                         coroutines = get(),
                         lifecycle = get<AytLandActivity>().lifecycle.asEssentyLifecycle(),
                         log = get(),
-                        playControls = get(),
-                        store = get()
+                        mediaSessionListener = get(),
+                        store = get(),
+                        playSessionListener = get()
                     )
                 }
                 scoped {
@@ -51,9 +53,13 @@ interface AytLandContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        playerControls = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get()
+                        playlistItemOrchestrator = get(),
+                        playerSessionManager = get(),
+                        playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { ShowHideUi(get<AytLandActivity>()) }
@@ -75,7 +81,7 @@ interface AytLandContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get(), get()) }
+                factory<AlertDialogContract.Creator> { AlertDialogCreator(get(), get()) }
                 scoped { LocalPlayerCastListener(get(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }

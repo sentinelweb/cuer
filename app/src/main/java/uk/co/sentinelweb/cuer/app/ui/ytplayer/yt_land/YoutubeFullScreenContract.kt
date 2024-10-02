@@ -4,6 +4,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
@@ -32,8 +33,9 @@ interface YoutubeFullScreenContract {
                         coroutines = get(),
                         lifecycle = null,
                         log = get(),
-                        playControls = get(),
-                        store = get()
+                        mediaSessionListener = get(),
+                        store = get(),
+                        playSessionListener = get()
                     )
                 }
                 scoped {
@@ -48,9 +50,13 @@ interface YoutubeFullScreenContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        playerControls = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get()
+                        playlistItemOrchestrator = get(),
+                        playerSessionManager = get(),
+                        playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { navigationRouter(false, get<YoutubeFullScreenActivity>(), withNavHost = false) }
@@ -72,7 +78,7 @@ interface YoutubeFullScreenContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get<YoutubeFullScreenActivity>(), get()) }
+                factory<AlertDialogContract.Creator> { AlertDialogCreator(get<YoutubeFullScreenActivity>(), get()) }
             }
         }
     }

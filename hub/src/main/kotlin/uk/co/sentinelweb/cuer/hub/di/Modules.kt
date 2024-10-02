@@ -11,21 +11,25 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
-import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.JvmDatabaseModule
+import uk.co.sentinelweb.cuer.di.DomainModule
+import uk.co.sentinelweb.cuer.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
@@ -33,6 +37,7 @@ import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.player.cast.*
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
@@ -64,7 +69,6 @@ import uk.co.sentinelweb.cuer.remote.server.di.RemoteModule
 import java.io.File
 import java.util.prefs.Preferences
 
-
 object Modules {
 
     private val scopedModules = listOf(
@@ -95,12 +99,25 @@ object Modules {
     }
 
     private val connectivityModule = module {
-        single<ConnectivityWrapper> { DesktopConnectivityWrapper(get(), get(), get(), get()) }
+        single<ConnectivityWrapper> {
+            DesktopConnectivityWrapper(
+                coroutines = get(),
+                monitor = get(),
+                timeProvider = get(),
+                log = get()
+            )
+        }
 //        single<WifiStateProvider> { DesktopWifiStateProvider(get(), get(), get(), get()) }
-        single<WifiStateProvider> { PlatformWifiStateProvider(get(), get(), get()) }
+        single<WifiStateProvider> {
+            PlatformWifiStateProvider(
+                wifiStartChecker = get(),
+                platformWifiInfo = get(),
+                log = get()
+            )
+        }
         single { PlatformWifiInfo() }
-        single { ConnectivityCheckManager(get(), get(), get()) }
-        single { ConnectivityMonitor(get(), get(), get()) }
+        single { ConnectivityCheckManager(coroutines = get(), monitor = get(), log = get()) }
+        single { ConnectivityMonitor(connectivityCheckTimer = get(), checker = get(), coroutines = get()) }
         single { ConnectivityCheckTimer() }
         single { ConnectivityChecker() }
     }
@@ -133,33 +150,52 @@ object Modules {
             "localNode.json"
                 .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { LocalRepository(it, get(), get(), get(), get()) }
+                .let {
+                    LocalRepository(
+                        it,
+                        coroutineContext = get(),
+                        guidCreator = get(),
+                        buildConfigDomain = get(),
+                        log = get()
+                    )
+                }
         }
         single {
             "remoteNodes.json"
                 .let { AFile(File(ConfigDirectory.Path, it).absolutePath) }
                 .let { JsonFileInteractor(it, get()) }
-                .let { RemotesRepository(it, get(), get(), get()) }
+                .let {
+                    RemotesRepository(
+                        jsonFileInteractor = it,
+                        localNodeRepo = get(),
+                        coroutines = get(),
+                        log = get()
+                    )
+                }
         }
         factory<WakeLockManager> { EmptyWakeLockManager() }
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
+
+        factory<PlayerContract.PlayerControls> { EmptyPlayerControls() }
+        factory<ChromecastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
+        factory<FloatingPlayerContract.Manager> { EmptyFloatingPlayerManager() }
+        factory<ChromecastContract.Wrapper> { EmptyChromeCastWrapper() }
+        factory<CastServiceContract.Manager> { EmptyYoutubeCastServiceManager() }
     }
 
-    val allModules = listOf(
-        resourcesModule,
-        utilModule,
-        remoteModule,
-        configModule,
-        connectivityModule,
-        DomainModule.objectModule,
-        RemoteModule.objectModule,
-        SharedDomainModule.objectModule,
-    )
+    val allModules = listOf(resourcesModule)
+        .plus(utilModule)
+        .plus(remoteModule)
+        .plus(configModule)
+        .plus(connectivityModule)
+        .plus(scopedModules)
+        .plus(DomainModule.allModules)
+        .plus(JvmDomainModule.allModules)
+        .plus(RemoteModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(NetModule.modules)
         .plus(JvmDatabaseModule.modules)
         .plus(DatabaseCommonModule.modules)
-        .plus(scopedModules)
 }

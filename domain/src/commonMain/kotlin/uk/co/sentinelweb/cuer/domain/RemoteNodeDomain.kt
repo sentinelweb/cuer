@@ -2,11 +2,11 @@ package uk.co.sentinelweb.cuer.domain
 
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 
 @Serializable
 data class RemoteNodeDomain(
-    val id: OrchestratorContract.Identifier<GUID>?,
+    val id: Identifier<GUID>?,
     val ipAddress: String,
     val port: Int,
     val ssid: String? = null,

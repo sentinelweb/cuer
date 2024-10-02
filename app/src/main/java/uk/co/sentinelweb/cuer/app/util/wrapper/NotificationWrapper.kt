@@ -9,15 +9,15 @@ import android.graphics.Color
 
 class NotificationWrapper constructor(private val app: Application) {
 
-    fun createChannelId(channelId: String, channelName: String) =
-        createNotificationChannel(channelId, channelName)
+    fun createChannelId(channelId: String, channelName: String, importance: Int = NotificationManager.IMPORTANCE_LOW) =
+        createNotificationChannel(channelId, channelName, importance)
 
     @Suppress("SameParameterValue")
-    private fun createNotificationChannel(channelId: String, channelName: String): String {
+    private fun createNotificationChannel(channelId: String, channelName: String, importance: Int): String {
         val chan = NotificationChannel(
             channelId,
             channelName,
-            NotificationManager.IMPORTANCE_LOW
+            importance
         )
         chan.lightColor = Color.BLUE
         chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE

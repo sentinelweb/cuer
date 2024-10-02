@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.settings
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
 import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
@@ -21,13 +22,15 @@ import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.scope.Scope
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity.Companion.TOP_LEVEL_DESTINATIONS
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 
 @Suppress("TooManyFunctions")
@@ -36,10 +39,11 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
     override val scope: Scope by fragmentScopeWithSource<PrefBackupFragment>()
     private val presenter: PrefBackupContract.Presenter by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val log: LogWrapper by inject()
     private val res: ResourceWrapper by inject()
     private lateinit var progress: ProgressBar
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     init {
         log.tag(this)
@@ -65,12 +69,18 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             it.setupWithNavController(findNavController(), AppBarConfiguration(TOP_LEVEL_DESTINATIONS))
         }
         view.findViewById<FrameLayout>(android.R.id.list_container).setPadding(0, 0, 0, resources.getDimensionPixelSize(R.dimen.prefs_bottom_padding))
+        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
         return view
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         setPreferencesFromResource(R.xml.pref_backup, rootKey)
         presenter.updateSummaryForAutoBackup()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        linkScopeToActivity()
     }
 
     override fun onStart() {
@@ -155,7 +165,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             message = message,
             confirm = AlertDialogModel.Button(StringResource.ok)
         ).apply {
-            alertDialogCreator.create(this).show()
+            alertDialogCreator.createAndShowDialog(this)
         }
     }
 
@@ -190,7 +200,7 @@ class PrefBackupFragment : PreferenceFragmentCompat(), PrefBackupContract.View, 
             ),
             cancel = AlertDialogModel.Button(label = StringResource.cancel, action = {})
         ).apply {
-            alertDialogCreator.create(this).show()
+            alertDialogCreator.createAndShowDialog(this)
         }
     }
 

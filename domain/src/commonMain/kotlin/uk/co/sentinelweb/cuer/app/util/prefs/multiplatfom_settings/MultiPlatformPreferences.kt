@@ -10,6 +10,7 @@ import uk.co.sentinelweb.cuer.app.util.prefs.Field
 import uk.co.sentinelweb.cuer.app.util.prefs.PrefWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.*
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PLAYER_AUTO_FLOAT_DEFAULT
+import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.PlayerNotificationType
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.Companion.RESTART_AFTER_UNLOCK_DEFAULT
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialiseSearchLocal
@@ -42,14 +43,19 @@ enum class MultiPlatformPreferences constructor(override val fname: String) : Fi
     FOLDER_ROOTS("folder.roots"),
     SKIP_FWD_TIME("skipFwdTime"),
     SKIP_BACK_TIME("skipBackTime"),
+    VOLUME("volume"),
+    CUERCAST_HOSTNAME("cuercastId"),
+    CUERCAST_SCREEN("cuercastScreen"),
+    PLAYER_NOTIFICATION_TYPE("playerNotificationType"),
     ;
 
     companion object {
         const val PLAYER_AUTO_FLOAT_DEFAULT = true
         const val RESTART_AFTER_UNLOCK_DEFAULT = true
+
+        enum class PlayerNotificationType { Media, Custom }
     }
 }
-
 
 interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences> {
     var dbVersion: Int
@@ -82,9 +88,11 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
 
     var lastBackupLocation: String?
         get() = getString(BACKUP_LAST_LOCATION, null)
-        set(value) = value
-            ?.let { putString(BACKUP_LAST_LOCATION, it) }
-            ?: let { remove(BACKUP_LAST_LOCATION) }
+        set(value) {
+            value
+                ?.let { putString(BACKUP_LAST_LOCATION, it) }
+                ?: remove(BACKUP_LAST_LOCATION)
+        }
 
     var currentPlayingPlaylistId: OrchestratorContract.Identifier<GUID>
         get() = if (has(CURRENT_PLAYING_PLAYLIST_ID) && has(CURRENT_PLAYING_PLAYLIST_ID)) {
@@ -115,50 +123,84 @@ interface MultiPlatformPreferencesWrapper : PrefWrapper<MultiPlatformPreferences
 
     var lastAddedPlaylistId: GUID?
         get() = getString(LAST_PLAYLIST_ADDED_TO, null)?.toGUID()
-        set(value) = value
-            ?.let { putString(LAST_PLAYLIST_ADDED_TO, it.value) }
-            ?: let { remove(LAST_PLAYLIST_ADDED_TO) }
-
+        set(value) {
+            value
+                ?.let { putString(LAST_PLAYLIST_ADDED_TO, it.value) }
+                ?: remove(LAST_PLAYLIST_ADDED_TO)
+        }
     var pinnedPlaylistId: GUID?
         get() = getString(PINNED_PLAYLIST, null)?.toGUID()
-        set(value) = value
-            ?.let { putString(PINNED_PLAYLIST, it.value) }
-            ?: let { remove(PINNED_PLAYLIST) }
+        set(value) {
+            value
+                ?.let { putString(PINNED_PLAYLIST, it.value) }
+                ?: remove(PINNED_PLAYLIST)
+        }
 
     var lastLocalSearch: SearchLocalDomain?
         get() = getString(LAST_LOCAL_SEARCH, null)
             ?.let { deserialiseSearchLocal(it) }
-        set(value) = value
-            ?.let { putString(LAST_LOCAL_SEARCH, it.serialise()) }
-            ?: let { remove(LAST_LOCAL_SEARCH) }
+        set(value) {
+            value
+                ?.let { putString(LAST_LOCAL_SEARCH, it.serialise()) }
+                ?: remove(LAST_LOCAL_SEARCH)
+        }
 
     val hasLocalSearch: Boolean get() = getString(LAST_LOCAL_SEARCH, null) != null
     var lastRemoteSearch: SearchRemoteDomain?
         get() = getString(LAST_REMOTE_SEARCH, null)
             ?.let { deserialiseSearchRemote(it) }
-        set(value) = value
-            ?.let { putString(LAST_REMOTE_SEARCH, it.serialise()) }
-            ?: let { remove(LAST_REMOTE_SEARCH) }
+        set(value) {
+            value
+                ?.let { putString(LAST_REMOTE_SEARCH, it.serialise()) }
+                ?: remove(LAST_REMOTE_SEARCH)
+        }
     val hasRemoteSearch: Boolean get() = getString(LAST_REMOTE_SEARCH, null) != null
 
     var lastSearchType: SearchTypeDomain?
         get() = getString(LAST_SEARCH_TYPE, null)
             ?.let { SearchTypeDomain.valueOf(it) }
-        set(value) = value
-            ?.let { putString(LAST_SEARCH_TYPE, it.toString()) }
-            ?: let { remove(LAST_SEARCH_TYPE) }
-
+        set(value) {
+            value
+                ?.let { putString(LAST_SEARCH_TYPE, it.toString()) }
+                ?: remove(LAST_SEARCH_TYPE)
+        }
 
     var recentIds: String?
         get() = getString(RECENT_PLAYLISTS, null)
-        set(value) = value
-            ?.let { putString(RECENT_PLAYLISTS, it) }
-            ?: let { remove(RECENT_PLAYLISTS) }
+        set(value) {
+            value
+                ?.let { putString(RECENT_PLAYLISTS, it) }
+                ?: remove(RECENT_PLAYLISTS)
+        }
 
     var lastBottomTab: Int
         get() = getInt(LAST_BOTTOM_TAB) ?: 0
         set(value) = value
             .let { putInt(LAST_BOTTOM_TAB, it) }
+
+    var volume: Float
+        get() = getFloat(VOLUME) ?: 0f
+        set(value) = value
+            .let { putFloat(VOLUME, it) }
+
+    var curecastRemoteNodeName: String?
+        get() = getString(CUERCAST_HOSTNAME, null)
+        set(value) = value
+            ?.let { putString(CUERCAST_HOSTNAME, it) }
+            ?: remove(CUERCAST_HOSTNAME)
+
+    var cuerCastScreen: Int?
+        get() = getInt(CUERCAST_SCREEN)
+        set(value) = value
+            ?.let { putInt(CUERCAST_SCREEN, it) }
+            ?: remove(CUERCAST_SCREEN)
+
+    var playerNotificationType: PlayerNotificationType
+        get() = PlayerNotificationType.valueOf(
+            getString(PLAYER_NOTIFICATION_TYPE, null)
+                ?: PlayerNotificationType.Media.toString()
+        )
+        set(value) = value.let { putString(PLAYER_NOTIFICATION_TYPE, it.toString()) }
 
     fun hasOnboarded(key: String): Boolean = getBoolean(ONBOARDED_PREFIX, key, false)
     fun setOnboarded(key: String, value: Boolean = true) = putBoolean(ONBOARDED_PREFIX, key, value)

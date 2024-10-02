@@ -33,7 +33,8 @@ class PlayerModelMapper constructor(
                     nextTrackText = trackTitle(playlist, 1),
                     lastTrackText = trackTitle(playlist, -1),
                     skipFwdText = skipFwdText,
-                    skipBackText = skipBackText
+                    skipBackText = skipBackText,
+                    volumeText = volume.toInt().toString(),
                 ),
                 description = item?.media
                     ?.let {
@@ -63,7 +64,8 @@ class PlayerModelMapper constructor(
                 ),
                 content = content,
                 playlistItem = state.item,
-                playlistAndItem = state.playlistAndItem()
+                playlistAndItem = state.playlistAndItem(),
+                volume = state.volume
             )
         }
     //.also { log.d("buttons: ${it.buttons} index: ${state.playlist?.currentIndex} dur:${state.item?.media?.duration}") }

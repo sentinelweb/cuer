@@ -46,6 +46,11 @@ class SkipPresenter constructor(
         state.backJumpInterval = prefsWrapper.getInt(MultiPlatformPreferences.SKIP_BACK_TIME, 30000)
     }
 
+    override fun updateTexts() {
+        listener.skipSetBackText(skipBackText)
+        listener.skipSetFwdText(skipForwardText)
+    }
+
     override fun skipFwd() {
         updateSkipTimes()
         state.accumulator += skipForwardInterval

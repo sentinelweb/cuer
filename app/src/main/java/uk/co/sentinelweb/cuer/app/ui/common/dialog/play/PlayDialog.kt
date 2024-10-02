@@ -1,13 +1,16 @@
 package uk.co.sentinelweb.cuer.app.ui.common.dialog.play
 
+import android.app.Activity
+import android.app.Application
+import android.os.Build
+import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.DialogPlayBinding
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
@@ -20,22 +23,24 @@ import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemRowView
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.CastDialogWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 
-class PlayDialog constructor(
-    private val f: Fragment,
+class PlayDialog(
+    f: Fragment,
     private val itemFactory: ItemFactory,
     private val itemModelMapper: ItemModelMapper,
     private val navigationRouter: NavigationRouter,
-    private val castDialogWrapper: CastDialogWrapper,
+    private val castDialogWrapper: ChromecastContract.DialogWrapper,
     private val floatingService: FloatingPlayerServiceManager,
     private val log: LogWrapper,
-    private val alertDialogCreator: AlertDialogCreator,
     private val youtubeApi: PlatformLaunchWrapper,
 ) : PlayUseCase.Dialog {
+
+    private var _f: Fragment? = f
+
     init {
         log.tag(this)
     }
@@ -44,21 +49,26 @@ class PlayDialog constructor(
     private val binding: DialogPlayBinding
         get() = _binding ?: throw Exception("DialogPlayBinding not bound")
 
-    override lateinit var playUseCase: PlayUseCase
+    override var playUseCase: PlayUseCase? = null
 
-    private lateinit var dialog: AlertDialog
+    private var _dialog: AlertDialog? = null
+    private val dialog: AlertDialog
+        get() = _dialog ?: throw Exception("AlertDialog not bound")
+
+    private val fragmentActivity: FragmentActivity
+        get() = _f?.requireActivity() ?: throw IllegalStateException("Fragment has been cleaned")
 
     override fun showPlayDialog(playlistAndItem: PlaylistAndItemDomain) {//item: PlaylistItemDomain?, playlistTitle: String?
-
-        _binding = DialogPlayBinding.inflate(LayoutInflater.from(f.requireContext()))
+        _binding = DialogPlayBinding.inflate(LayoutInflater.from(fragmentActivity))
         binding.dpLaunchYoutube.setOnClickListener {
             playlistAndItem.apply { youtubeApi.launchVideoWithTimeSystem(item.media) }
             dialog.dismiss()
         }
         binding.dpChromecast.setOnClickListener {
-            castDialogWrapper.showRouteSelector(f.childFragmentManager)
-            playlistAndItem.apply { playUseCase.setQueueItem(this) }
-            (f.requireActivity() as? MainActivity)?.showPlayer()
+//            f.childFragmentManager
+            castDialogWrapper.showRouteSelector()
+            playlistAndItem.apply { playUseCase?.setQueueItem(this) }
+            (fragmentActivity as? MainActivity)?.showPlayer()
             dialog.dismiss()
         }
         binding.dpPortrait.setOnClickListener {
@@ -80,18 +90,18 @@ class PlayDialog constructor(
             )
         }
         binding.dpFloating.setOnClickListener {
-            val hasPermission = floatingService.hasPermission(f.requireActivity())
+            val hasPermission = floatingService.hasPermission(fragmentActivity)
             if (hasPermission) {
-                playlistAndItem.apply { playUseCase.setQueueItem(this) }
+                playlistAndItem.apply { playUseCase?.setQueueItem(this) }
                 // fixme the item is not received by the player mvi binding not made yet?
-                floatingService.start(f.requireActivity(), playlistAndItem)
-                playUseCase.attachControls(
-                    (f.requireActivity() as? MainContract.View)?.playerControls
+                floatingService.start(fragmentActivity, playlistAndItem)
+                playUseCase?.attachControls(
+                    (fragmentActivity as? MainContract.View)?.playerControls
                 )
-                (f.requireActivity() as? MainActivity)?.showPlayer()
+                (fragmentActivity as? MainActivity)?.showPlayer()
                 dialog.dismiss()
             } else {
-                floatingService.requestPermission(f.requireActivity())
+                floatingService.requestPermission(fragmentActivity)
             }
         }
         playlistAndItem.apply {
@@ -114,16 +124,45 @@ class PlayDialog constructor(
                     false
                 )
         }
-        dialog = MaterialAlertDialogBuilder(f.requireContext())
-            .setTitle(f.getString(R.string.play_dialog_title))
+        _dialog = MaterialAlertDialogBuilder(fragmentActivity)
+            .setTitle(fragmentActivity.getString(R.string.play_dialog_title))
             .setIcon(R.drawable.ic_play)
             .setView(binding.root)
+            .setOnDismissListener {
+                playUseCase = null
+                _dialog = null
+                unregisterCleanupOnDestroy()
+                _f = null
+            }
             .create()
         dialog.show()
+        registerCleanupOnDestroy()
     }
 
-    override fun showDialog(model: AlertDialogModel) {
-        alertDialogCreator.create(model).show()
+    private fun registerCleanupOnDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            fragmentActivity.registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        }
+    }
+
+    private fun unregisterCleanupOnDestroy() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            fragmentActivity.unregisterActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        }
+    }
+
+    private val activityLifecycleCallbacks = object : Application.ActivityLifecycleCallbacks {
+        override fun onActivityDestroyed(p0: Activity) {
+            _dialog?.dismiss();
+            _dialog = null;
+        }
+
+        override fun onActivityCreated(p0: Activity, p1: Bundle?) = Unit
+        override fun onActivityStarted(p0: Activity) = Unit
+        override fun onActivityResumed(p0: Activity) = Unit
+        override fun onActivityPaused(p0: Activity) = Unit
+        override fun onActivityStopped(p0: Activity) = Unit
+        override fun onActivitySaveInstanceState(p0: Activity, p1: Bundle) = Unit
     }
 
     private val emptyInteractions = object : ItemContract.Interactions {

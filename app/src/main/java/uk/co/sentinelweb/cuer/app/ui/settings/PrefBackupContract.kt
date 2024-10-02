@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.wrapper.AndroidSnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
@@ -65,7 +64,7 @@ interface PrefBackupContract {
                     )
                 }
                 scoped<SnackbarWrapper> { AndroidSnackbarWrapper(this.getFragmentActivity(), get()) }
-                scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
+                // scoped { AlertDialogCreator(this.getFragmentActivity(), get()) }
                 viewModel { State() }
             }
         }

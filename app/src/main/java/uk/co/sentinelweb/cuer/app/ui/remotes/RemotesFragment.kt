@@ -18,6 +18,9 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.REMOTE_ID
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.FOLDER_LIST
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
@@ -27,7 +30,9 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
@@ -35,7 +40,9 @@ import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionOpener
 import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.ext.name
 
 class RemotesFragment : Fragment(), AndroidScopeComponent {
 
@@ -47,7 +54,10 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
-    private val browseHelpConfig: RemotesHelpConfig by inject()
+    private val remotesHelpConfig: RemotesHelpConfig by inject()
+    private val remotesDialogLauncher: RemotesDialogContract.Launcher by inject()
+    private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
@@ -86,6 +96,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         binding.composeView.setContent {
             RemotesComposables.RemotesUi(remotesMviView)
         }
+        statusBarColor.setStatusBarColorResource(R.color.blue_grey_900)
         observeLabels()
     }
 
@@ -97,7 +108,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
     override fun onStart() {
         super.onStart()
-        OnboardingFragment.showIntro(this@RemotesFragment, browseHelpConfig)
+        OnboardingFragment.showIntro(this@RemotesFragment, remotesHelpConfig)
         compactPlayerScroll.raisePlayer(this)
     }
 
@@ -114,6 +125,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
     override fun onDestroyView() {
         _binding = null
+        dialogFragment?.dismissAllowingStateLoss()
+        dialogFragment = null
         super.onDestroyView()
     }
 
@@ -121,8 +134,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
         remotesMviView.labelObservable().observe(
             this.viewLifecycleOwner,
             object : Observer<RemotesContract.MviStore.Label> {
-                override fun onChanged(label: RemotesContract.MviStore.Label) {
-                    when (label) {
+                override fun onChanged(value: RemotesContract.MviStore.Label) {
+                    when (value) {
                         ActionSettings -> navigationProvider.navigate(R.id.navigation_settings_root)
                         ActionSearch -> {
                             SearchBottomSheetFragment()
@@ -130,16 +143,40 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         }
 
                         ActionPasteAdd -> (requireActivity() as? MainActivity)?.checkIntentAndPasteAdd()
-                        ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, browseHelpConfig)
+                        ActionHelp -> OnboardingFragment.showHelp(this@RemotesFragment, remotesHelpConfig)
                         Up -> log.d("Up")
-                        is Message -> snackbarWrapper.make(label.msg)
+                        is Message -> snackbarWrapper.make(value.msg)
                         ActionConfig -> showConfigFragment()
+                        is ActionFolders -> navigationProvider.navigate(
+                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to value.remoteId.id.value))
+                        )
+
+                        is CuerConnected ->
+                            snackbarWrapper.make(
+                                getString(
+                                    R.string.remotes_cuer_connected_screen,
+                                    value.remote.name(),
+                                    value.screen?.index ?: 0
+                                )
+                            ).show()
+
+                        is CuerSelectScreen ->
+                            remotesDialogLauncher.launchRemotesDialog(
+                                { remoteNodeDomain, screen ->
+                                    remotesMviView.dispatch(Event.OnActionCuerConnectScreen(remoteNodeDomain, screen))
+                                    remotesDialogLauncher.hideRemotesDialog()
+                                },
+                                value.node
+                            )
+
+                        None -> Unit
                     }
                 }
             })
     }
 
     private fun showConfigFragment() {
+        dialogFragment?.dismissAllowingStateLoss()
         dialogFragment = LocalFragment.newInstance()
         (dialogFragment as LocalFragment).onDismissListener = { remotesMviView.dispatch(Event.OnRefresh) }
         dialogFragment?.show(childFragmentManager, CONFIG_FRAGMENT_TAG)
@@ -167,9 +204,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                     RemotesStoreFactory(
 //                        storeFactory = LoggingStoreFactory(DefaultStoreFactory),
                         storeFactory = DefaultStoreFactory(),
-                        strings = get(),
                         log = get(),
-                        prefs = get(),
                         remoteServerManager = get(),
                         coroutines = get(),
                         localRepository = get(),
@@ -178,10 +213,9 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         locationPermissionLaunch = get(),
                         wifiStateProvider = get(),
                         getPlaylistsFromDeviceUseCase = get(),
-                        playlistsOrchestrator = get(),
+                        castController = get(),
                     )
                 }
-                scoped { RemotesModelMapper(get(), get()) }
                 scoped { RemotesMviViewProxy(get(), get()) }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped { RemotesHelpConfig(get()) }

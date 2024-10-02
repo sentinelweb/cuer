@@ -18,6 +18,7 @@ class PlaylistItemOrchestrator constructor(
     private val playlistItemDatabaseRepository: PlaylistItemDatabaseRepository,
     private val log: LogWrapper
 ) : OrchestratorContract<PlaylistItemDomain>, KoinComponent {
+
     // to stop a circular reference
     private val playlistItemMemoryRepository: PlaylistMemoryRepository.PlayListItemMemoryRepository by inject()
 

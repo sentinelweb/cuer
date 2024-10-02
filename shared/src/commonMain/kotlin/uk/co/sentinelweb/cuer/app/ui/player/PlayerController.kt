@@ -9,22 +9,22 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
+import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.StarClick
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.Support
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.PlaylistChange
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent.TrackChange
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 @ExperimentalCoroutinesApi
-class PlayerController constructor(
+class PlayerController(
     private val queueConsumer: QueueMediatorContract.Consumer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,
-    private val playControls: PlayerListener,
+    private val mediaSessionListener: MediaSessionListener,
+    private val playSessionListener: PlayerSessionListener,
     private val log: LogWrapper,
     private val store: PlayerContract.MviStore,
     lifecycle: Lifecycle?,
@@ -32,39 +32,6 @@ class PlayerController constructor(
     init {
         log.tag(this)
         lifecycle?.doOnDestroy { store.dispose() }
-    }
-
-    private val eventToIntent: suspend PlayerContract.View.Event.() -> Intent = {
-        when (this) {
-            is PlayerStateChanged -> PlayState(state)
-            is TrackFwdClicked -> TrackFwd
-            is TrackBackClicked -> TrackBack
-            is SkipFwdClicked -> SkipFwd
-            is SkipBackClicked -> SkipBack
-            is PositionReceived -> Position(ms)
-            is SkipFwdSelectClicked -> SkipFwdSelect
-            is SkipBackSelectClicked -> SkipBackSelect
-            is PlayPauseClicked -> PlayPause(isPlaying)
-            is SeekBarChanged -> SeekTo(fraction)
-            is PlaylistClicked -> PlaylistView
-            is ItemClicked -> PlaylistItemView
-            is LinkClick -> LinkOpen(link)
-            is ChannelClick -> ChannelOpen
-            is TrackClick -> TrackSelected(item, resetPosition)
-            is DurationReceived -> Duration(ms)
-            is IdReceived -> Id(videoId)
-            is FullScreenClick -> FullScreenPlayerOpen
-            is PortraitClick -> PortraitPlayerOpen
-            is PipClick -> PipPlayerOpen
-            //is OnDestroy -> {log.d("map destroy");Destroy}
-            is OnInitFromService -> InitFromService(playlistAndItem)
-            is OnPlayItemFromService -> PlayItemFromService(playlistAndItem)
-            is OnSeekToPosition -> SeekToPosition(ms)
-            is Support -> Intent.Support
-            is StarClick -> Intent.StarClick
-            is OpenClick -> OpenInApp
-            is ShareClick -> Share
-        }
     }
 
     private val trackChangeToIntent: suspend PlaylistItemDomain.() -> Intent = {
@@ -101,9 +68,10 @@ class PlayerController constructor(
             store.labels bindTo { label -> view.processLabel(label) }
 
             // view -> store
-            view.events.mapNotNull(eventToIntent) bindTo store
+            view.events.mapNotNull(PlayerEventToIntentMapper.eventToIntent) bindTo store
         }
-        playControls.intentFlow bindTo store
+        mediaSessionListener.intentFlow bindTo store
+        playSessionListener.intentFlow bindTo store
         // queue -> store
         queueConsumer.currentItemFlow
             .filterNotNull()

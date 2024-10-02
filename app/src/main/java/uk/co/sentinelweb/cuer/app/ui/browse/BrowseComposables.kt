@@ -52,7 +52,7 @@ object BrowseComposables {
                 Box(contentAlignment = Alignment.Center) {
                     Column {
                         CuerTopAppBarComposables.CuerAppBar(
-                            text = model.title,
+                            title = model.title,
                             onUp = { view.dispatch(Event.OnUpClicked) },
                             actions = listOf(
                                 Action(CuerMenuItem.Help,
@@ -197,7 +197,8 @@ object BrowseComposables {
             )
         ) {
             Surface(
-                modifier = Modifier.padding(4.dp)
+                modifier = Modifier
+                    .padding(4.dp)
                     .animateEnterExit(
                         enter = fadeIn(animationSpec = tween(durationMillis = 300)),
                         exit = fadeOut(animationSpec = tween(durationMillis = 200))

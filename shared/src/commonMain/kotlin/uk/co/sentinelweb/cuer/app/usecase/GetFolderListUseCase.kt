@@ -8,9 +8,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMOR
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.FILESYSTEM
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 
 class GetFolderListUseCase(
@@ -18,20 +20,34 @@ class GetFolderListUseCase(
     private val fileOperations: PlatformFileOperation,
     private val guidCreator: GuidCreator,
     private val timeProvider: TimeProvider,
+    private val log: LogWrapper
 ) {
-    fun getFolderList(folderPath: String? = null): PlaylistAndSubsDomain? =
+    init {
+        log.tag(this)
+    }
+
+    fun getFolderList(folderPath: String? = null): PlaylistAndChildrenDomain? =
         (if (folderPath == null) {
             prefs.folderRoots.map { AFile(it) }
-        } else if (checkFolderPathIsInAllowedSet(folderPath)) {
-            folderPath
-                .let { AFile(it) }
-                .takeIf { fileOperations.exists(it) }
-                ?.let { fileOperations.list(it) }
         } else {
-            null
-        })?.mapNotNull { fileOperations.properties(it) }
+            folderPath
+                .let { truncatedToFullFolderPath(it) }
+                ?.takeIf { checkFolderPathIsInAllowedSet(it) }
+                ?.let { AFile(it) }
+                ?.takeIf { fileOperations.exists(it) }
+                ?.takeIf { fileOperations.properties(it)?.isDirectory ?: false }
+                ?.let { fileOperations.list(it) }
+        })
+            ?.also { log.d("folderPath: $folderPath") }
+            ?.mapNotNull { fileOperations.properties(it) }
             ?.sortedBy { it.name }
             ?.let {
+                val fullFolderPath = folderPath
+                    ?.let { truncatedToFullFolderPath(it) }
+                if (folderPath != null && fullFolderPath == null) {
+                    throw IllegalArgumentException("folderPath is not configured")
+                }
+                log.d("fullFolderPath: $fullFolderPath")
                 val filesProperties = it.filter { it.isDirectory.not() }
                 val subFoldersProperties = it.filter { it.isDirectory }
                 val rootId = guidCreator.create().toIdentifier(MEMORY)
@@ -39,47 +55,63 @@ class GetFolderListUseCase(
                     PlaylistDomain(
                         id = guidCreator.create().toIdentifier(MEMORY),
                         title = it.name,
-                        platform = PlatformDomain.FILESYSTEM,
-                        platformId = it.file.path,
+                        platform = FILESYSTEM,
+                        platformId = fullToTruncatedFolderPath(it.file.path),
                         parentId = rootId
                     )
                 }.toMutableList()
 
                 // generate parent folder link
                 if (folderPath != null) {
-                    val parent = if (prefs.folderRoots.contains(folderPath)) {
+                    val parent = if (prefs.folderRoots.contains(fullFolderPath)) {
                         null
                     } else {
-                        fileOperations.parent(AFile(folderPath))
+                        fileOperations.parent(
+                            AFile(
+                                fullFolderPath
+                                    ?: throw IllegalStateException("fullFolderPath can't be null here")
+                            )
+                        )
                     }
                     PlaylistDomain(
                         id = guidCreator.create().toIdentifier(MEMORY),
                         title = "..",
-                        platform = PlatformDomain.FILESYSTEM,
-                        platformId = parent?.path,
+                        platform = FILESYSTEM,
+                        platformId = parent?.path?.let { fullToTruncatedFolderPath(it) },
                         parentId = rootId
                     ).apply { subFolders.add(0, this) }
                 }
-
+                val folderProperties = fullFolderPath?.let { fileOperations.properties(AFile(it)) }
                 val playlist = PlaylistDomain(
                     id = rootId,
-                    title = folderPath ?: "Top",
-                    platform = PlatformDomain.FILESYSTEM,
+                    title = folderProperties?.name ?: "Top",
+                    platform = FILESYSTEM,
                     platformId = folderPath,
-                    items = filesProperties.mapIndexed { index, item ->
-                        mapFileToPlaylist(index, rootId, item, folderPath)
-                    },
+                    items = fullFolderPath?.let {
+                        filesProperties.mapIndexed { index, item ->
+                            mapFileToPlaylist(index, rootId, item, it)
+                        }
+                    } ?: listOf()
                 )
 
-                PlaylistAndSubsDomain(
+                PlaylistAndChildrenDomain(
                     playlist = playlist,
-                    subPlaylists = subFolders
+                    children = subFolders
                 )
             }
 
-    private fun checkFolderPathIsInAllowedSet(folderPath: String): Boolean =
+    internal fun checkFolderPathIsInAllowedSet(folderPath: String): Boolean =
         prefs.folderRoots.any { folderPath.startsWith(it) }
 
+    internal fun fullToTruncatedFolderPath(path: String): String? =
+        prefs.folderRoots
+            .find { path.startsWith(it) }
+            ?.let { path.replace(it, it.substringAfterLast("/")) }
+
+    fun truncatedToFullFolderPath(path: String): String? =
+        prefs.folderRoots
+            .find { path.startsWith(it.substringAfterLast("/")) }
+            ?.let { path.replace(it.substringAfterLast("/"), it) }
 
     private fun mapFileToPlaylist(
         index: Int,
@@ -87,6 +119,7 @@ class GetFolderListUseCase(
         item: AFileProperties,
         folderPath: String?
     ): PlaylistItemDomain {
+        val truncatedPath = fullToTruncatedFolderPath(item.file.path)!!
         return PlaylistItemDomain(
             id = guidCreator.create().toIdentifier(MEMORY),
             dateAdded = timeProvider.instant(),
@@ -96,24 +129,24 @@ class GetFolderListUseCase(
                 id = guidCreator.create().toIdentifier(MEMORY),
                 title = item.name,
                 mediaType = checkMediaType(item),
-                platform = PlatformDomain.FILESYSTEM,
-                platformId = item.file.path,
-                url = "file://${item.file.path}",
+                platform = FILESYSTEM,
+                platformId = truncatedPath,
+                url = "file://${truncatedPath}",
                 channelData = ChannelDomain(
                     id = guidCreator.create().toIdentifier(MEMORY),
-                    platform = PlatformDomain.FILESYSTEM,
+                    platform = FILESYSTEM,
                     platformId = folderPath
                 )
             )
         )
     }
 
-    fun checkMediaType(item: AFileProperties):MediaTypeDomain {
+    private fun checkMediaType(item: AFileProperties): MediaTypeDomain {
         val ext = getFileExtension(item.name)
         return mediaTypes[ext]?.type ?: FILE
     }
 
-    fun getFileExtension(fileName: String): String {
+    private fun getFileExtension(fileName: String): String {
         return fileName.substringAfterLast(".", "")
     }
 

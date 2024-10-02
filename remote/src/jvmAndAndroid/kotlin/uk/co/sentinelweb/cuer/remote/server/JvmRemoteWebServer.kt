@@ -20,6 +20,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
@@ -28,7 +30,14 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
+import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.FOLDER_LIST_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API.P_SCREEN_INDEX
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_STATUS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
@@ -36,19 +45,29 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 import java.io.PrintWriter
 import java.io.StringWriter
 
-class JvmRemoteWebServer constructor(
+// todo break this up into use cases
+class JvmRemoteWebServer(
     private val database: RemoteDatabaseAdapter,
     private val logWrapper: LogWrapper,
-    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler
+    private val connectMessageListener: RemoteServerContract.AvailableMessageHandler,
 ) : RemoteWebServerContract, KoinComponent {
     init {
         logWrapper.tag(this)
     }
 
     private val localRepository: LocalRepository by inject()
+    private val playerSessionHolder: PlayerSessionHolder by inject()
+    private val getFolderListUseCase: GetFolderListUseCase by inject()
+    private val playerConfigProvider: PlayerConfigProvider by inject()
+    private val remotePlayerLaunchHost: RemotePlayerLaunchHost by inject()
+    private val playerSessionMessageMapper: PlayerSessionMessageMapper by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -98,8 +117,7 @@ class JvmRemoteWebServer constructor(
                     logWrapper.d("/ : " + call.request.uri)
                 }
                 get(PLAYLISTS_API.PATH) {
-                    database.getPlaylists()
-                        .let { ResponseDomain(it) }
+                    ResponseDomain(database.getPlaylists())
                         .apply {
                             call.respondText(serialise(), ContentType.Application.Json)
                         }
@@ -109,7 +127,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get(PLAYLIST_API.PATH) {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylist(id)
                                 ?.let { ResponseDomain(it) }
@@ -126,7 +144,7 @@ class JvmRemoteWebServer constructor(
                     (call.parameters["src"] to call.parameters["id"])
                         .takeIf { it.checkNull() != null }?.checkNull()
                         ?.let {
-                            it.second.toGuidIdentifier(Source.valueOf(it.first)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                            it.second.toGuidIdentifier(Source.valueOf(it.first)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                                 .let { id ->
                                     database.getPlaylist(id)
                                         ?.let { ResponseDomain(it) }
@@ -144,7 +162,7 @@ class JvmRemoteWebServer constructor(
                     call.error(HttpStatusCode.BadRequest, "No ID")
                 }
                 get("/playlistItem/{id}") {
-                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme jsut deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
+                    (call.parameters["id"]?.toGuidIdentifier(LOCAL)) // fixme just deserialise whole id and replace LOCAL_NETWORK -> LOCAL?
                         ?.let { id ->
                             database.getPlaylistItem(id)
                                 ?.let { ResponseDomain(it) }
@@ -196,6 +214,7 @@ class JvmRemoteWebServer constructor(
                     }
                     logWrapper.d(call.request.uri)
                 }
+
                 post("/addItem") {
                     val post = call.receiveParameters()
                     //logWrapper.d("scan:" + post)
@@ -215,6 +234,98 @@ class JvmRemoteWebServer constructor(
                         call.error(HttpStatusCode.InternalServerError, null, e)
                     }
                     logWrapper.d(call.request.uri)
+                }
+                // http://192.168.1.x:9090/player/PlayPause/true
+                // todo modify arg to be a parameter not a part of the url
+                get(PLAYER_COMMAND_API.PATH) {
+                    try {
+                        val command = call.parameters["command"]
+                        val arg0 = call.parameters["arg0"]
+                        logWrapper.d("${call.request.uri} $command $arg0 ${SkipFwd::class.java.simpleName}")
+                        when (command) {
+                            SkipFwd::class.java.simpleName -> SkipFwd
+                            SkipBack::class.java.simpleName -> SkipBack
+                            TrackFwd::class.java.simpleName -> TrackFwd
+                            TrackBack::class.java.simpleName -> TrackBack
+                            FocusWindow::class.java.simpleName -> FocusWindow
+                            Stop::class.java.simpleName -> Stop
+                            PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
+                            SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
+                            Volume::class.java.simpleName -> Volume(volume = arg0?.toFloat() ?: 0f)
+                            else -> null
+                        }?.also {
+                            // fixme get operation success and return the code
+                            logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
+                            playerSessionHolder.playerSession
+                                ?.apply { controlsListener.messageRecieved(it) }
+                                ?.let { playerSessionMessageMapper.map(it) }
+                                ?.let { ResponseMessage(it) }
+                                ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                                ?: call.error(HttpStatusCode.ServiceUnavailable, "player session not available")
+                        } ?: call.error(HttpStatusCode.BadRequest, "url is required")
+                    } catch (e: NumberFormatException) {
+                        call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                    }
+                }
+
+                get(PLAYER_STATUS_API.PATH) {
+                    try {
+                        playerSessionHolder.playerSession
+                            ?.let { playerSessionMessageMapper.map(it) }
+                            //?.also{logWrapper.d("Mapped player status message: $it")}
+                            ?.let { ResponseMessage(it) }
+                            ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                            ?: call.error(HttpStatusCode.ServiceUnavailable, "player session invalid")
+                    } catch (e: NumberFormatException) {
+                        call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                        logWrapper.e("Exception player status", e)
+                    }
+                }
+
+                get(PLAYER_CONFIG_API.PATH) {
+                    try {
+                        ResponseDomain(playerConfigProvider.invoke())
+                            .apply {
+                                call.respondText(serialise(), ContentType.Application.Json)
+                            }
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                    }
+                }
+
+                post(PLAYER_LAUNCH_VIDEO_API.PATH) {
+                    val postData = call.receiveText()
+                    try {
+                        (postData)
+                            .let { deserialisePlaylistItem(it) }
+                            .let { item ->
+                                remotePlayerLaunchHost.launchVideo(
+                                    item,
+                                    // todo send bad request if no P_SCREEN_INDEX
+                                    call.parameters[P_SCREEN_INDEX]?.toInt()
+                                )
+                            }
+                            .also { call.respond(HttpStatusCode.OK) }
+                            ?: call.error(HttpStatusCode.BadRequest, "item is required")
+                    } catch (e: Throwable) {
+                        call.error(HttpStatusCode.InternalServerError, null, e)
+                    }
+                    logWrapper.d(call.request.uri)
+                }
+
+                get(FOLDER_LIST_API.PATH) {
+                    val path = call.parameters[FOLDER_LIST_API.P_PARAM]
+                    logWrapper.d("Folder: $path")
+                    getFolderListUseCase.getFolderList(path)
+                        ?.let { ResponseDomain(it) }
+                        ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                        ?: apply {
+                            call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
+                        }
                 }
                 static("/") {
                     resources("")

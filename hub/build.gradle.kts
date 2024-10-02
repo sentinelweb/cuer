@@ -1,23 +1,13 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+// ./gradlew packageDmg
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
 }
 
-val ver_jvm: String by project
-val ver_koin: String by project
-val ver_coroutines: String by project
-val ver_ktor: String by project
-val ver_batik: String by project
-val ver_junit: String by project
-val ver_mockk: String by project
-val ver_turbine: String by project
-val ver_multiplatform_settings: String by project
-val ver_vlcj: String by project
 val isProduction: String by project
-val app_versionCode: String by project
-val app_versionName: String by project
 val CUER_BG_PLAY: String by project
 val CUER_REMOTE_ENABLED: String by project
 val CUER_HUB_STORE_KEY: String by project
@@ -38,50 +28,43 @@ dependencies {
     implementation(project(":net"))
     implementation(compose.desktop.currentOs)
 
-    // koin
-    implementation("io.insert-koin:koin-core:$ver_koin")
+    implementation(libs.koinCore)
+    implementation(libs.kotlinxCoroutinesCore)
+    implementation(libs.kotlinxCoroutinesJdk8)
+    implementation(libs.ktorClientCore)
+    implementation(libs.ktorClientCio)
+    implementation(libs.batikTranscoder)
+    implementation(libs.multiplatformSettings)
+    implementation(libs.vlcj)
+    implementation(libs.jna)
+    implementation(libs.jnaPlatform)
 
-    // kotlin coroutines
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlinx/kotlinx-coroutines-jdk8
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$ver_coroutines")
-
-    // todo upgrade ktor - sec vuln
-    implementation("io.ktor:ktor-client-core:$ver_ktor")
-    implementation("io.ktor:ktor-client-cio:$ver_ktor")
-
-    implementation("org.apache.xmlgraphics:batik-transcoder:$ver_batik")
-    implementation("com.russhwolf:multiplatform-settings:$ver_multiplatform_settings")
-
-    testImplementation("junit:junit:$ver_junit")
-    testImplementation("io.insert-koin:koin-test:$ver_koin")
-    testImplementation("io.insert-koin:koin-test-junit4:$ver_koin")
-    testImplementation("io.mockk:mockk:$ver_mockk")
-    testImplementation("app.cash.turbine:turbine:$ver_turbine")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-
-    implementation("uk.co.caprica:vlcj:$ver_vlcj")
-
+    testImplementation(libs.junit)
+    testImplementation(libs.koinTest)
+    testImplementation(libs.koinTestJUnit4)
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinxCoroutinesTest)
 }
-
+// lots on configuration info here
+// https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
 compose.desktop {
     application {
         mainClass = "uk.co.sentinelweb.cuer.hub.main.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
             packageName = "Cuer"
-            packageVersion = "1.0.0"// fixme shoudl use app_versionName but there are a lot of platform dependent rules
+            packageVersion = "1.0.0"// fixme should use app_versionName but there are a lot of platform dependent rules
         }
     }
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = ver_jvm
+        kotlinOptions.jvmTarget = libs.versions.jvm.get()
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = ver_jvm
+        kotlinOptions.jvmTarget = libs.versions.jvm.get()
     }
 }
 
@@ -128,8 +111,8 @@ tasks.register("generateBuildConfigInjectClass") {
                 val isDebug: Boolean = ${isProduction}.not()
                 val cuerRemoteEnabled: Boolean = $CUER_REMOTE_ENABLED
                 val cuerBgPlayEnabled: Boolean = $CUER_BG_PLAY
-                val versionCode: Int = $app_versionCode
-                val version: String = "$app_versionName"
+                val versionCode: Int = ${libs.versions.app.versionCode.get().toInt()}
+                val version: String = "${libs.versions.app.versionName.get()}"
                 val hubStoreKey: String = "$CUER_HUB_STORE_KEY"
                 val hubStorePass: String = "$CUER_HUB_STORE_PASS"
             }

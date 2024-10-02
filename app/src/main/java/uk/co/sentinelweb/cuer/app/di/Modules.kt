@@ -22,10 +22,11 @@ import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.M
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor.CustomisationResources
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
 import uk.co.sentinelweb.cuer.app.receiver.WifiStateReceiver
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceContract
+import uk.co.sentinelweb.cuer.app.service.cast.CastService
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.app.service.update.UpdateService
 import uk.co.sentinelweb.cuer.app.ui.browse.BrowseFragment
+import uk.co.sentinelweb.cuer.app.ui.cast.CastDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.DatePickerCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.playlist.PlaylistSelectDialogModelCreator
@@ -36,10 +37,11 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserFragment
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
 import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingFragment
-import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.play_control.mvi.CastPlayerMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist.PlaylistMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlist_edit.PlaylistEditContract
@@ -47,6 +49,7 @@ import uk.co.sentinelweb.cuer.app.ui.playlist_item_edit.PlaylistItemEditContract
 import uk.co.sentinelweb.cuer.app.ui.playlists.PlaylistsMviFragment
 import uk.co.sentinelweb.cuer.app.ui.playlists.dialog.PlaylistsDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesFragment
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.resources.NewPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
@@ -67,7 +70,7 @@ import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerService
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.yt_land.YoutubeFullScreenContract
 import uk.co.sentinelweb.cuer.app.usecase.EmailUseCase
 import uk.co.sentinelweb.cuer.app.usecase.ShareUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.CastModule
+import uk.co.sentinelweb.cuer.app.util.chromecast.CastModule
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseModule
 import uk.co.sentinelweb.cuer.app.util.image.BitmapSizer
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
@@ -88,15 +91,15 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.AndroidLogWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.log.CompositeLogWrapper
 import uk.co.sentinelweb.cuer.app.work.WorkManagerInteractor
-import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.db.di.AndroidDatabaseModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
+import uk.co.sentinelweb.cuer.di.AndroidDomainModule
+import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
@@ -121,12 +124,12 @@ object Modules {
         PlaylistsMviFragment.fragmentModule,
         PlaylistsDialogFragment.fragmentModule,
         MainContract.activityModule,
-        CastPlayerContract.viewModule,
+        CastPlayerFragment.viewModule,
         ShareContract.activityModule,
         ScanContract.fragmentModule,
         PlaylistItemEditContract.fragmentModule,
         PlaylistEditContract.fragmentModule,
-        YoutubeCastServiceContract.serviceModule,
+        CastService.serviceModule,
         PrefBackupContract.fragmentModule,
         PrefRootContract.fragmentModule,
         PrefPlayerContract.fragmentModule,
@@ -146,6 +149,9 @@ object Modules {
         RemotesFragment.fragmentModule,
         LocalFragment.fragmentModule,
         UpdateService.serviceModule,
+        FileBrowserFragment.fragmentModule,
+        CastDialogFragment.fragmentModule,
+        RemotesDialogFragment.fragmentModule,
     )
 
     private val uiModule = module {
@@ -288,8 +294,8 @@ object Modules {
         .plus(DatabaseCommonModule.modules)
         .plus(AndroidDatabaseModule.modules)
         .plus(NetModule.modules)
-        .plus(DomainModule.objectModule)
-        .plus(SharedDomainModule.objectModule)
+        .plus(DomainModule.allModules)
+        .plus(AndroidDomainModule.allModules)
         .plus(DomainNetModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(CastModule.castModule)

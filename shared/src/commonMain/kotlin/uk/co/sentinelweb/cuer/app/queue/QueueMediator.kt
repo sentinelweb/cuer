@@ -141,6 +141,13 @@ class QueueMediator constructor(
         refreshQueue(identifier)
     }
 
+    override suspend fun resetQueue() {
+        _currentItemFlow.emit(null)
+        state.currentItem = null
+        state.playlist = null
+        state.playlistIdentifier = NO_PLAYLIST
+    }
+
     override fun onItemSelected(
         playlistItem: PlaylistItemDomain,
         forcePlay: Boolean,

@@ -3,14 +3,14 @@ package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 import android.content.Intent
 import uk.co.sentinelweb.cuer.app.BuildConfig
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_DISCONNECT
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PAUSE
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_PLAY
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_SKIPF
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_STAR
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKB
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController.Companion.ACTION_TRACKF
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DISCONNECT
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_STAR
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -50,14 +50,14 @@ class FloatingPlayerController constructor(
 
     private var wasPausedScreenLocked: Boolean = false
 
-    private val lockHandler = {
+    private val screenLockHandler = {
         log.d("Screen off -> ACTION_PAUSE")
         playerMviViw.setBlocked(true)
         handleAction(Intent(ACTION_PAUSE))
         wasPausedScreenLocked = true
     }
 
-    private val unlockHandler = {
+    private val screenUnlockHandler = {
         log.d("Unlock -> ACTION_PLAY")
         playerMviViw.setBlocked(false)
         if (wasPausedScreenLocked && multiPrefs.restartAfterUnlock) {
@@ -80,8 +80,8 @@ class FloatingPlayerController constructor(
             }
         }
         if (!BuildConfig.cuerBackgroundPlay) {
-            screenStateReceiver.screenOffCallbacks.add(lockHandler)
-            screenStateReceiver.unlockCallbacks.add(unlockHandler)
+            screenStateReceiver.screenOffCallbacks.add(screenLockHandler)
+            screenStateReceiver.unlockCallbacks.add(screenUnlockHandler)
         }
         playerMviViw.init()
         playerController.onViewCreated(listOf(playerMviViw))
@@ -90,8 +90,8 @@ class FloatingPlayerController constructor(
 
     override fun destroy() {
         if (!BuildConfig.cuerBackgroundPlay) {
-            screenStateReceiver.screenOffCallbacks.remove(lockHandler)
-            screenStateReceiver.unlockCallbacks.remove(unlockHandler)
+            screenStateReceiver.screenOffCallbacks.remove(screenLockHandler)
+            screenStateReceiver.unlockCallbacks.remove(screenUnlockHandler)
         }
         playerMviViw.cleanup()
         playerController.onStop()

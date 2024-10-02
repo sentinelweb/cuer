@@ -14,7 +14,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.navigation.fragment.findNavController
 import androidx.transition.TransitionInflater
 import com.bumptech.glide.Glide
-import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.google.android.material.appbar.AppBarLayout
 import com.roche.mdas.util.wrapper.SoftKeyboardWrapper
 import org.koin.android.ext.android.inject
@@ -47,12 +46,10 @@ import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageContract
 import uk.co.sentinelweb.cuer.app.ui.search.image.SearchImageDialogFragment
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.glide.GlideStatusColorLoadListener
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -74,6 +71,7 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
     private val commitHost: CommitHost by inject()
     private val res: ResourceWrapper by inject()
     private val playlistEditHelpConfig: PlaylistEditHelpConfig by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     internal var listener: Listener? = null
 
@@ -340,7 +338,8 @@ class PlaylistEditFragment : DialogFragment(), AndroidScopeComponent {
         url?.let {
             Glide.with(binding.peImage.context)
                 .loadFirebaseOrOtherUrl(it, imageProvider)
-                .transition(DrawableTransitionOptions.withCrossFade())
+                //.transition(DrawableTransitionOptions.withCrossFade())
+                .addListener(GlideStatusColorLoadListener(statusBarColorWrapper = statusBarColor))
                 .into(binding.peImage)
         }
     }

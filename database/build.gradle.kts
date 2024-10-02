@@ -10,7 +10,7 @@ plugins {
 group = "uk.co.sentinelweb.cuer"
 version = "1.0"
 
-val ver_jvm: String by project
+//val ver_jvm: String by project
 val ver_coroutines: String by project
 val ver_kotlinx_serialization_core: String by project
 val ver_sqldelight: String by project
@@ -19,10 +19,6 @@ val ver_koin: String by project
 val ver_turbine: String by project
 val ver_kotlin_fixture: String by project
 val ver_mockk: String by project
-val app_compileSdkVersion: String by project
-val app_targetSdkVersion: String by project
-val app_minSdkVersion: String by project
-val app_base: String by project
 
 val ver_swift_tools: String by project
 val ver_ios_deploy_target: String by project
@@ -31,7 +27,7 @@ kotlin {
     jvm()
     androidTarget {
         compilations.all {
-            kotlinOptions.jvmTarget = ver_jvm
+            kotlinOptions.jvmTarget = libs.versions.jvm.get()
         }
     }
     iosX64()
@@ -43,7 +39,7 @@ kotlin {
     cocoapods {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
-        ios.deploymentTarget = ver_ios_deploy_target
+        ios.deploymentTarget = libs.versions.ios.deploy.target.get()
         version = "1"
         framework {
             baseName = "database"
@@ -60,40 +56,36 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(project(":domain"))
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:$ver_kotlinx_datetime")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$ver_coroutines")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-core:$ver_kotlinx_serialization_core")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$ver_kotlinx_serialization_core")
-                implementation("io.insert-koin:koin-core:$ver_koin")
-
+                implementation(libs.kotlinxDatetime)
+                implementation(libs.kotlinxCoroutinesCore)
+                implementation(libs.kotlinxSerializationCore)
+                implementation(libs.kotlinxSerializationJson)
+                implementation(libs.koinCore)
             }
         }
         val commonTest by getting {
             dependencies {
                 implementation(project(":domain"))
                 implementation(kotlin("test"))
-                implementation("io.insert-koin:koin-test:$ver_koin")
-//                implementation("com.flextrade.jfixture:jfixture:$ver_jfixture")
-//                implementation("com.google.truth:truth:$ver_truth")
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$ver_coroutines")
-                implementation("app.cash.turbine:turbine:$ver_turbine")
+                implementation(libs.koinTest)
+                implementation(libs.kotlinxCoroutinesTest)
+                implementation(libs.turbine)
             }
         }
         val androidMain by getting {
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:android-driver:$ver_sqldelight")
-                implementation("io.insert-koin:koin-android:$ver_koin")
+                implementation(libs.sqldelightAndroidDriver)
+                implementation(libs.koinAndroid)
             }
         }
         val androidUnitTest by getting {
             dependencies {
                 implementation(project(":domain"))
-                implementation("io.insert-koin:koin-test-junit4:$ver_koin")
-                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
-                implementation("com.appmattus.fixture:fixture:$ver_kotlin_fixture")
-                implementation("io.mockk:mockk-android:$ver_mockk")
-                implementation("io.mockk:mockk-agent:$ver_mockk")
+                implementation(libs.koinTestJUnit4)
+                implementation(libs.sqldelightSqliteDriver)
+                implementation(libs.kotlinFixture)
+                implementation(libs.mockkAndroid)
+                implementation(libs.mockkAgent)
             }
         }
         val iosX64Main by getting
@@ -105,8 +97,7 @@ kotlin {
             iosArm64Main.dependsOn(this)
             iosSimulatorArm64Main.dependsOn(this)
             dependencies {
-//                implementation(project(":shared"))
-                implementation("com.squareup.sqldelight:native-driver:$ver_sqldelight")
+                implementation(libs.sqldelightNativeDriver)
             }
 
         }
@@ -121,12 +112,12 @@ kotlin {
         }
         val jsMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqljs-driver:$ver_sqldelight")
+                implementation(libs.sqldelightSqlJsDriver)
             }
         }
         val jvmMain by getting {
             dependencies {
-                implementation("com.squareup.sqldelight:sqlite-driver:$ver_sqldelight")
+                implementation(libs.sqldelightSqliteDriver)
             }
         }
         val jsTest by getting
@@ -134,11 +125,11 @@ kotlin {
 }
 
 android {
-    compileSdk = app_compileSdkVersion.toInt()
-    namespace = app_base
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    namespace = libs.versions.app.base.get()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = app_minSdkVersion.toInt()
+        minSdk = libs.versions.android.minSdk.get().toInt()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

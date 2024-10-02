@@ -2,15 +2,13 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
-import uk.co.sentinelweb.cuer.domain.GUID
-import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain.Screen
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.ServerState.INITIAL
 
@@ -36,16 +34,23 @@ class RemotesContract {
             data class RemoteSync(val remote: RemoteNodeDomain) : Intent()
             data class RemoteDelete(val remote: RemoteNodeDomain) : Intent()
             data class RemotePlaylists(val remote: RemoteNodeDomain) : Intent()
+            data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
+            data class CuerConnect(val remote: RemoteNodeDomain) : Intent()
+            data class CuerConnectScreen(val remote: RemoteNodeDomain, val screen: Screen?) : Intent()
         }
 
         sealed class Label {
+            object None : Label()
             object Up : Label()
             object ActionSettings : Label()
             object ActionSearch : Label()
             object ActionHelp : Label()
             object ActionPasteAdd : Label()
             object ActionConfig : Label()
+            data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
             data class Message(val msg: String) : Label()
+            data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
+            data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()
 
         }
 
@@ -84,7 +89,7 @@ class RemotesContract {
         }
 
         data class LocalNodeModel(
-            val id: OrchestratorContract.Identifier<GUID>?,
+            val id: Identifier<GUID>?,
             val title: String,
             val address: String,
             val hostname: String,
@@ -108,7 +113,7 @@ class RemotesContract {
         }
 
         data class RemoteNodeModel(
-            val id: OrchestratorContract.Identifier<GUID>?,
+            val id: Identifier<GUID>?,
             val title: String,
             val address: String,
             val hostname: String,
@@ -116,6 +121,16 @@ class RemotesContract {
             val deviceType: NodeDomain.DeviceType,
             val authType: String,
             val domain: RemoteNodeDomain,
+            val screens: List<Screen>,
+        )
+
+        data class Screen(
+            val index: Int,
+            val width: Int,
+            val height: Int,
+            val refreshRate: Int,
+            val name: String,
+            val domain: PlayerNodeDomain.Screen
         )
 
         sealed class Event {
@@ -134,6 +149,10 @@ class RemotesContract {
             data class OnActionDelete(val remote: RemoteNodeDomain) : Event()
             data class OnActionSync(val remote: RemoteNodeDomain) : Event()
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
+            data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
+            data class OnActionCuerConnect(val remote: RemoteNodeDomain) : Event()
+            data class OnActionCuerConnectScreen(val remote: RemoteNodeDomain, val screen: PlayerNodeDomain.Screen?) :
+                Event()
         }
     }
 }

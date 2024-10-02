@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.RequestDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import uk.co.sentinelweb.cuer.remote.server.message.messageSerializersModule
+import uk.co.sentinelweb.cuer.remote.server.messageSerializersModule
 
 // channel
 fun ChannelDomain.serialise() = domainJsonSerializer.encodeToString(ChannelDomain.serializer(), this)
@@ -121,12 +121,18 @@ fun RemoteNodeDomain.serialise() = domainJsonSerializer.encodeToString(RemoteNod
 
 fun deserialiseRemoteNode(input: String) = domainJsonSerializer.decodeFromString(RemoteNodeDomain.serializer(), input)
 
+fun PlayerNodeDomain.serialise() = domainJsonSerializer.encodeToString(PlayerNodeDomain.serializer(), this)
+
+fun deserialisePlayerNode(input: String) = domainJsonSerializer.decodeFromString(PlayerNodeDomain.serializer(), input)
+
 fun List<RemoteNodeDomain>.serialise() =
     domainJsonSerializer.encodeToString(ListSerializer(RemoteNodeDomain.serializer()), this)
 
 fun deserialiseRemoteNodeList(input: String) =
     domainJsonSerializer.decodeFromString(ListSerializer(RemoteNodeDomain.serializer()), input)
 
+fun deserialisePlaylistAndSubs(input: String) =
+    domainJsonSerializer.decodeFromString(ListSerializer(PlaylistAndChildrenDomain.serializer()), input)
 
 val domainClassDiscriminator = "domainType"
 val domainSerializersModule = SerializersModule {
@@ -145,7 +151,10 @@ val domainSerializersModule = SerializersModule {
         AppDetailsDomain::class to AppDetailsDomain.serializer(),
         LocalNodeDomain::class to LocalNodeDomain.serializer(),
         RemoteNodeDomain::class to RemoteNodeDomain.serializer(),
+        PlayerNodeDomain::class to PlayerNodeDomain.serializer(),
+        PlayerNodeDomain.Screen::class to PlayerNodeDomain.Screen.serializer(),
         PlaylistAndItemDomain::class to PlaylistAndItemDomain.serializer(),
+        PlaylistAndChildrenDomain::class to PlaylistAndChildrenDomain.serializer(),
 
         AuthConfig.Username::class to AuthConfig.Username.serializer(),
         AuthType.Username::class to AuthType.Username.serializer(),
@@ -161,7 +170,9 @@ val domainSerializersModule = SerializersModule {
     polymorphic(Domain::class, SearchRemoteDomain::class, SearchRemoteDomain.serializer())
     polymorphic(Domain::class, LocalNodeDomain::class, LocalNodeDomain.serializer())
     polymorphic(Domain::class, RemoteNodeDomain::class, RemoteNodeDomain.serializer())
+    polymorphic(Domain::class, PlayerNodeDomain::class, PlayerNodeDomain.serializer())
     polymorphic(Domain::class, PlaylistAndItemDomain::class, PlaylistAndItemDomain.serializer())
+    polymorphic(Domain::class, PlaylistAndChildrenDomain::class, PlaylistAndChildrenDomain.serializer())
 
     polymorphic(AuthConfig::class, AuthConfig.Open::class, AuthConfig.Open.serializer())
     polymorphic(AuthConfig::class, AuthConfig.Confirm::class, AuthConfig.Confirm.serializer())

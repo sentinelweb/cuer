@@ -7,11 +7,10 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ShareWrapper
-import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseCommonModule
 import uk.co.sentinelweb.cuer.db.di.DatabaseIosModule
+import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
@@ -38,7 +37,8 @@ private fun initKoinInternal(
 
 
         modules(
-            listOf(DomainModule.objectModule, SharedDomainModule.objectModule, DomainNetModule.objectModule)
+            DomainModule.allModules
+                .plus(DomainNetModule.objectModule)
                 .plus(configModule)
                 .plus(SharedAppModule.modules)
                 .plus(SharedAppIosModule.modules)

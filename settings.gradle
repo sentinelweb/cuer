@@ -5,6 +5,7 @@ pluginManagement {
         maven { url "https://plugins.gradle.org/m2/" }
     }
 }
+
 rootProject.name = 'Cuer'
 
 include ':app'
@@ -16,4 +17,5 @@ include 'domain'
 include 'net'
 include 'hub'
 include 'scripts'
+//include 'sharedUi'
 

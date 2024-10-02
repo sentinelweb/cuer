@@ -23,7 +23,7 @@ class RemoteServerServiceController constructor(
     private val localRepo: LocalRepository,
     private val wakeLockManager: WakeLockManager,
     private val wifiStateProvider: WifiStateProvider,
-    private val service: RemoteServerContract.Service, //todo might need to just extract intf for stopSelf()
+    private var service: RemoteServerContract.Service, //todo might need to just extract intf for stopSelf()
 ) : RemoteServerContract.Controller {
 
     init {
@@ -92,15 +92,16 @@ class RemoteServerServiceController constructor(
         _serverJob?.cancel()
         _serverJob = null
         notification.destroy()
+        multi.close()
+        // waits for close to send before killing socket - possible short mem leak
         coroutines.ioScope.launch {
-            multi.close()
-            delay(50)
+            delay(20)
             _multiJob?.cancel()
             _multiJob = null
         }
         _wifiJob?.cancel()
         _wifiJob = null
-        coroutines.mainScope.launch {
+        coroutines.computationScope.launch {
             remoteRepo.setUnAvailable()
         }
         log.d("Controller destroyed")

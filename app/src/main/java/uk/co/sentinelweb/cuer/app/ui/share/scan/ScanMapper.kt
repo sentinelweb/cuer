@@ -37,7 +37,7 @@ class ScanMapper constructor() {
             uri,
             PlatformDomain.YOUTUBE,
             "none",
-            R.drawable.ic_notif_close_white,
+            R.drawable.ic_notif_close,
             false
         )
 

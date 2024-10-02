@@ -6,22 +6,33 @@ import android.graphics.drawable.Drawable
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_DELETE
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PAUSE
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_PLAY
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPB
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_SKIPF
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKB
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract.Companion.ACTION_TRACKF
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.Controller
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract.External
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ConnectionState.CC_DISCONNECTED
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.Connected
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.ChromeCast
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.CuerCast
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerControls.Listener
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
+import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
-class PlayerControlsNotificationController constructor(
+// todo move bitmap loading to view and move this to common
+class PlayerControlsNotificationController(
     private val view: PlayerControlsNotificationContract.View,
     private val state: PlayerControlsNotificationContract.State,
     private val toastWrapper: ToastWrapper,
@@ -29,30 +40,40 @@ class PlayerControlsNotificationController constructor(
     private val context: Context,
     private val skipControl: SkipContract.External,
     private val mediaSessionManager: MediaSessionContract.Manager,
-    private val res: ResourceWrapper,
-) : External, Controller, SkipContract.Listener {
+    private val timeProvider: TimeProvider,
+) : External, Controller, SkipContract.Listener, PlayerContract.PlayerControls {
 
     private var listener: Listener? = null
 
     init {
         log.tag(this)
         skipControl.listener = this
+        skipControl.updateTexts()
     }
 
     override fun handleAction(action: String?) {
         when (action) {
             ACTION_PAUSE ->
                 listener?.pause()
+
             ACTION_PLAY ->
                 listener?.play()
+
             ACTION_SKIPF ->
                 skipControl.skipFwd()
+
             ACTION_SKIPB ->
                 skipControl.skipBack()
+
             ACTION_TRACKB ->
                 listener?.trackBack()
+
             ACTION_TRACKF ->
                 listener?.trackFwd()
+
+            ACTION_DELETE ->
+                view.onDeleteAction()
+
             else -> Unit
         }
     }
@@ -67,7 +88,7 @@ class PlayerControlsNotificationController constructor(
 
     override fun setBlocked(blocked: Boolean) {
         state.blocked = blocked
-        view.showNotification(state)
+        showNotification()
     }
 
     override fun setPlayerState(playState: PlayerStateDomain) {
@@ -86,20 +107,19 @@ class PlayerControlsNotificationController constructor(
     }
 
     private fun updateNotification() {
-        //log.d("updateNotification: state.media=${state.media?.stringMedia()}")
         listener?.apply { mediaSessionManager.checkCreateMediaSession(this) }
-        state.media?.apply {
+        state.item?.apply {
             state.bitmap
-                ?.let { view.showNotification(state) }
-                ?: state.media?.image?.let { image ->
+                ?.let { showNotification() }
+                ?: (state.item?.media?.run { image ?: thumbNail })?.let { image ->
                     Glide.with(context).asBitmap()
                         .load(image.url)
                         .into(BitmapLoadTarget())
                 }
-                ?: view.showNotification(state)
+                ?: showNotification()
         } ?: run {
             state.bitmap = null
-            view.showNotification(state)
+            showNotification()
         }
     }
 
@@ -108,10 +128,17 @@ class PlayerControlsNotificationController constructor(
             if (bitmap.width > 0) {
                 state.bitmap = bitmap
             }
-            view.showNotification(state)
+            showNotification()
         }
 
         override fun onLoadCleared(placeholder: Drawable?) {}
+    }
+
+    private fun showNotification() {
+        if (timeProvider.currentTimeMillis() - state.lastNotificationShowTime > 300) {
+            view.showNotification(state)
+            state.lastNotificationShowTime = timeProvider.currentTimeMillis()
+        }
     }
 
     override fun addListener(l: Listener) {
@@ -127,6 +154,10 @@ class PlayerControlsNotificationController constructor(
     override fun setCurrentSecond(secondsFloat: Float) {
         state.positionMs = secondsFloat.toLong() * 1000
         skipControl.updatePosition(state.positionMs)
+        if (state.item?.media?.isLiveBroadcast ?: false) {
+            state.liveOffsetMs = listener?.getLiveOffsetMs() ?: 0
+        }
+        updateNotification()
     }
 
     override fun setDuration(durationFloat: Float) {
@@ -142,12 +173,6 @@ class PlayerControlsNotificationController constructor(
         state.title = title
     }
 
-    override fun setConnectionState(connState: PlayerContract.ConnectionState) {
-        if (connState == CC_DISCONNECTED) {
-            view.stopSelf()
-        }
-    }
-
     override fun setPlaylistName(name: String) {
         state.playlistName = name
     }
@@ -155,17 +180,17 @@ class PlayerControlsNotificationController constructor(
     override fun setPlaylistImage(image: ImageDomain?) = Unit
 
     override fun setPlaylistItem(playlistItem: PlaylistItemDomain?) {
-        if (state.media?.id != playlistItem?.media?.id) {
+        if (state.item?.id != playlistItem?.media?.id) {
             state.bitmap = null
         }
-        state.media = playlistItem?.media
+        state.item = playlistItem
+
         updateNotification()
     }
 
     override fun reset() {
-        //log.e("reset: state.media=${state.media?.stringMedia()}", Exception())
         state.bitmap = null
-        state.media = null
+        state.item = null
         updateNotification()
     }
 
@@ -185,22 +210,26 @@ class PlayerControlsNotificationController constructor(
         updateNotification()
     }
 
-    override fun initMediaRouteButton() = Unit
+    override fun setVolume(fraction: Float) {
+        state.volumeFraction = fraction
+    }
+
+    override fun setCastDetails(details: TargetDetails) {
+        state.targetDetails = details
+        if (listOf(ChromeCast, CuerCast).contains(details.target) && details.connectionState == Connected) {
+            // fixme check if this should uncomment
+            //view.stopSelf()
+        }
+    }
 
     override fun restoreState() = Unit
 
-    override fun skipSetBackText(text: String) = Unit
-
-    override fun skipSetFwdText(text: String) = Unit
-
-    companion object {
-        const val ACTION_PAUSE = "pause"
-        const val ACTION_PLAY = "play"
-        const val ACTION_SKIPF = "skipf"
-        const val ACTION_SKIPB = "skipb"
-        const val ACTION_TRACKF = "trackf"
-        const val ACTION_TRACKB = "trackb"
-        const val ACTION_DISCONNECT = "disconnect"
-        const val ACTION_STAR = "star"
+    override fun skipSetBackText(text: String) {
+        state.skipBackText = text
     }
+
+    override fun skipSetFwdText(text: String) {
+        state.skipFwdText = text
+    }
+
 }

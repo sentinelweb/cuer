@@ -7,15 +7,14 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerServiceController
-import uk.co.sentinelweb.cuer.core.di.DomainModule
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
+import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain
-import uk.co.sentinelweb.cuer.domain.di.SharedDomainModule
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerNotification
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerNotificationController
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
@@ -150,16 +149,13 @@ object RemoteServerControllerTestModules {
         }
     }
 
-    val testModules = listOf(
-        connectivityModule,
-        remoteModule,
-        serviceModule,
-        utilModule,
-        configModule,
-        DomainModule.objectModule,
-        RemoteModule.objectModule,
-        SharedDomainModule.objectModule,
-    )
+    val testModules = listOf(connectivityModule)
+        .plus(remoteModule)
+        .plus(serviceModule)
+        .plus(utilModule)
+        .plus(configModule)
+        .plus(DomainModule.allModules)
+        .plus(RemoteModule.objectModule)
         .plus(SharedAppModule.modules)
         .plus(NetModule.modules)
 }

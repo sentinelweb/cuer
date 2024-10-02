@@ -21,4 +21,5 @@ class EmptySkipPresenter : SkipContract.External {
     override fun onSelectSkipTime(fwd: Boolean) = Unit
 
     override fun updateSkipTimes() = Unit
+    override fun updateTexts() = Unit
 }

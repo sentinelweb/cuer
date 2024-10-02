@@ -1,15 +1,15 @@
 package uk.co.sentinelweb.cuer.remote.server.multicast
 
 //import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.providers.ignoreJob
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.remote.server.AvailableMessageMapper
-import uk.co.sentinelweb.cuer.remote.server.LocalRepository
-import uk.co.sentinelweb.cuer.remote.server.MultiCastSocketContract
+import uk.co.sentinelweb.cuer.remote.server.*
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType
-import uk.co.sentinelweb.cuer.remote.server.message.deserialiseMulti
-import uk.co.sentinelweb.cuer.remote.server.message.serialise
 import java.io.IOException
 import java.net.*
 import java.nio.charset.Charset
@@ -20,6 +20,7 @@ class JvmMultiCastSocket(
     private val localRepository: LocalRepository,
     private val availableMessageMapper: AvailableMessageMapper,
     private val availableMessageHandler: RemoteServerContract.AvailableMessageHandler,
+    private val coroutines: CoroutineContextProvider,
 ) : MultiCastSocketContract {
 
     private lateinit var broadcastAddress: InetSocketAddress
@@ -30,7 +31,7 @@ class JvmMultiCastSocket(
         log.tag(this)
     }
 
-    override suspend fun runSocketListener(startListener: (() -> Unit)) {
+    override suspend fun runSocketListener(startListener: (() -> Unit)) = withContext(coroutines.IO) {
         try {
             printInterfaces()
             isKeepGoing = true
@@ -87,31 +88,33 @@ class JvmMultiCastSocket(
         }
     }
 
-    override fun close() {
+    override fun close(): Unit = coroutines.ioScope.launch {
         isKeepGoing = false
-        if (theSocket != null && !theSocket!!.isClosed) {
-            // TODO note we might need to send a local exit message to stop blocking ...
-            try {
-                val closeMsg = AvailableMessage(MsgType.Close, mapLocalNode())
-                sendDatagram(closeMsg)
-                //log.d("multi closing: send lastcall")
-                // todo check if i need this
-                // fixme does this return the right IP for multicast?
-                val local = InetAddress.getLocalHost()
-                val data1 = DatagramPacket("".toByteArray(), 0, local, config.multicastPort)
-                theSocket!!.send(data1)
-                theSocket!!.close()
-                log.d("multi closed")
-            } catch (e: Exception) {
-                log.e("multi close ex: ", e)
+        theSocket?.also { socket ->
+            if (!socket.isClosed) {
+                // TODO note we might need to send a local exit message to stop blocking ...
+                try {
+                    val closeMsg = AvailableMessage(MsgType.Close, mapLocalNode())
+                    sendDatagram(closeMsg)
+                    //log.d("multi closing: send lastcall")
+                    // todo check if i need this
+                    // fixme does this return the right IP for multicast?
+                    val local = InetAddress.getLocalHost()
+                    val data1 = DatagramPacket("".toByteArray(), 0, local, config.multicastPort)
+                    socket.send(data1)
+                    socket.close()
+                    log.d("multi closed")
+                } catch (e: Exception) {
+                    log.e("multi close ex: ", e)
+                }
             }
-        }
-    }
+        } ?: throw IllegalStateException("Socket not available")
+    }.ignoreJob()
 
     private fun sendDatagram(msg: AvailableMessage) {
         val serialise = msg.serialise()
         val data = DatagramPacket(serialise.toByteArray(), serialise.length, broadcastAddress)
-        theSocket!!.send(data)
+        theSocket?.send(data) ?: throw IllegalStateException("Socket not available")
     }
 
     fun printInterfaces() {

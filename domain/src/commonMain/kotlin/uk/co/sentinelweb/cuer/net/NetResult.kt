@@ -1,5 +1,7 @@
 package uk.co.sentinelweb.cuer.net
 
+import uk.co.sentinelweb.cuer.net.client.RequestFailureException
+
 
 sealed class NetResult<R> constructor(
     val isSuccessful: Boolean,
@@ -36,7 +38,10 @@ sealed class NetResult<R> constructor(
         t: Exception,
         msg: String = t.message.toString(),
         code: String
-    ) : Error<R>(t, msg, code)
+    ) : Error<R>(t, msg, code) {
+        constructor(t: RequestFailureException) :
+                this(t, t.description, t.code.toString())
+    }
 
     class NotConnectedError<R>(
     ) : Error<R>(null, "Not connected", "NOT_CONNECTED")

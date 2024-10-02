@@ -6,6 +6,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -43,8 +44,9 @@ interface AytPortraitContract {
                         coroutines = get(),
                         lifecycle = get<AytPortraitActivity>().lifecycle.asEssentyLifecycle(),
                         log = get(),
-                        playControls = get(),
-                        store = get()
+                        mediaSessionListener = get(),
+                        store = get(),
+                        playSessionListener = get()
                     )
                 }
                 scoped {
@@ -59,9 +61,13 @@ interface AytPortraitContract {
                         log = get(),
                         livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
                         mediaSessionManager = get(),
-                        playerControls = get(),
+                        mediaSessionListener = get(),
                         mediaOrchestrator = get(),
-                        playlistItemOrchestrator = get()
+                        playlistItemOrchestrator = get(),
+                        playerSessionManager = get(),
+                        playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get<AytPortraitActivity>(), get()) }
@@ -95,7 +101,7 @@ interface AytPortraitContract {
                 scoped { LocalPlayerCastListener(get<AytPortraitActivity>(), get()) }
                 scoped<NavigationProvider> { EmptyNavigationProvider() }
                 scoped<CommitHost> { EmptyCommitHost() }
-                scoped { AlertDialogCreator(get<AytPortraitActivity>(), get()) }
+                factory<AlertDialogContract.Creator> { AlertDialogCreator(get<AytPortraitActivity>(), get()) }
                 scoped { AndroidShareWrapper(get<AytPortraitActivity>()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }

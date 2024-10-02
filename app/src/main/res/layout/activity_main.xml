@@ -38,7 +38,6 @@
         android:layout_gravity="bottom"
         android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_view"
-        android:translationY="@dimen/player_translation_y"
     />
 
     <uk.co.sentinelweb.cuer.app.ui.common.views.CastVolumeControlView

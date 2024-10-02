@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Cuer</string>
+    <string name="hub_app_name">Cuer Hub</string>
+
+    <string name="cast_dialog_not_connected">Not Connected</string>
+    <string name="cast_dialog_title">Cast Status</string>
+    <string name="cast_dialog_volume">Volume: %1$s</string>
+
+    <!-- remotes -->
+    <string name="remotes_dialog_title">Select Remote</string>
+    <string name="remotes_dialog_title_screen">Select Remote Screen</string>
+
+    <!-- cast controller -->
+    <string name="cast_control_unknown">Unknown</string>
+    <string name="cast_control_floating_window">Floating window</string>
+    <string name="cast_control_not_connected">Not Connected</string>
+
+</resources>
