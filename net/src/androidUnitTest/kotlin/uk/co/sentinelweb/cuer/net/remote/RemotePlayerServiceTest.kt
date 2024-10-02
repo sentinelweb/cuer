@@ -13,6 +13,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMOR
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
+import uk.co.sentinelweb.cuer.remote.server.Message
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.PlayPause
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.SeekToFraction
@@ -36,14 +38,14 @@ class RemotePlayerServiceTest {
         val fixtLocator = Locator("xxx", 222)
         val fixtIsPlaying = false
         val fixtMessage = PlayPause(fixtIsPlaying)
-        val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
+        val fixtResponse = ResponseMessage(fixtMessage)
+        coEvery { executor.getResponseMessage(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponseDomain(path = capture(pathSlot))
+            executor.getResponseMessage(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/PlayPause/$fixtIsPlaying", pathSlot.captured)
         confirmVerified(executor)
@@ -54,14 +56,14 @@ class RemotePlayerServiceTest {
         val fixtLocator = Locator("xxx", 222)
         val fixtFraction = 0.5f
         val fixtMessage = SeekToFraction(fixtFraction)
-        val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
+        val fixtResponse = ResponseMessage(fixtMessage)
+        coEvery { executor.getResponseMessage(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponseDomain(path = capture(pathSlot))
+            executor.getResponseMessage(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/SeekToFraction/$fixtFraction", pathSlot.captured)
         confirmVerified(executor)
@@ -73,14 +75,14 @@ class RemotePlayerServiceTest {
         val guid = "guid-xx-xx-xx"
         val fixtId = OrchestratorContract.Identifier(GUID(guid), MEMORY)
         val fixtMessage = PlayerSessionContract.PlayerCommandMessage.TrackSelected(fixtId, false)
-        val fixtResponse = ResponseDomain()
-        coEvery { executor.getResponseDomain(any()) } returns fixtResponse
+        val fixtResponse = ResponseMessage(fixtMessage)
+        coEvery { executor.getResponseMessage(any()) } returns fixtResponse
 
         sut.executeCommand(fixtLocator, fixtMessage)
 
         val pathSlot = slot<String>()
         coVerify {
-            executor.getResponseDomain(path = capture(pathSlot))
+            executor.getResponseMessage(path = capture(pathSlot))
         }
         assertEquals("xxx:222/player/command/TrackSelected/$guid", pathSlot.captured)
         confirmVerified(executor)

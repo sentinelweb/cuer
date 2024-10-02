@@ -32,7 +32,7 @@ internal class RemotePlayerService(
 
             is TrackSelected -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "TrackSelected")
-                .replaceUrlPlaceholder(P_ARG0, message.itemId.id.toString())
+                .replaceUrlPlaceholder(P_ARG0, message.itemId.id.value)
             // fixme not implemented on server: need to add source/resetPosition
             SkipBack -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "SkipBack")
