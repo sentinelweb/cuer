@@ -6,7 +6,7 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import androidx.fragment.app.FragmentActivity
 import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.appselect.AppSelectorBottomSheet
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringResource
@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.domain.LinkDomain
 class AndroidCryptoLauncher(
     private val activity: Activity,
     private val toast: ToastWrapper,
-    private val alertDialogCreator: AlertDialogCreator,
+    private val alertDialogCreator: AlertDialogContract.Creator,
     private val res: ResourceWrapper,
     log: LogWrapper,
 ) : CryptoLauncher {
@@ -35,7 +35,7 @@ class AndroidCryptoLauncher(
     }
 
     private fun showWarningDialog() {
-        alertDialogCreator.create(
+        alertDialogCreator.createAndShowDialog(
             AlertDialogModel(
                 title = res.getString(R.string.support_crypto_warning_title),
                 message = res.getString(R.string.support_crypto_warning_message),
@@ -45,7 +45,7 @@ class AndroidCryptoLauncher(
                 ),
                 cancel = AlertDialogModel.Button(StringResource.cancel)
             )
-        ).show()
+        )
     }
 
     private fun showCryptoAppLauncher() {

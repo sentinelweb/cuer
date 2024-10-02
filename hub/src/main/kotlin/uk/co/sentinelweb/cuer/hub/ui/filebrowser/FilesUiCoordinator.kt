@@ -53,13 +53,13 @@ class FilesUiCoordinator(
 
     }
 
-    override fun clickFolder(folder: PlaylistDomain) {
+    override fun onClickFolder(folder: PlaylistDomain) {
         currentFolder = folder.platformId
         log.tag("currentFolder; $currentFolder")
         refresh()
     }
 
-    override fun clickFile(file: PlaylistItemDomain) {
+    override fun onClickFile(file: PlaylistItemDomain) {
         if (listOf(VIDEO, AUDIO).contains(file.media.mediaType))
             playMedia(file)
         else if (FILE.equals(file.media.mediaType))

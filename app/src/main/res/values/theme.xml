@@ -29,7 +29,7 @@
         <item name="colorSurface">@color/surface</item>
         <item name="android:colorBackground">@color/background</item>
 
-        <item name="android:statusBarColor">?attr/colorNavigation</item>
+        <item name="android:statusBarColor">@color/build_primary_variant</item>
         <item name="android:navigationBarColor">?attr/colorNavigation</item>
         <item name="android:selectableItemBackground">@drawable/ic_ripple_item_background</item>
         <item name="android:selectableItemBackgroundBorderless">

@@ -56,7 +56,7 @@
 
     <style name="TextAppearance.App.Button"
            parent="@style/TextAppearance.MaterialComponents.Button">
-        <item name="android:textSize">14sp</item>
+        <item name="android:textSize">12sp</item>
         <item name="android:textColor">@color/white</item>
         <item name="fontFamily">?bodyFont</item>
         <item name="android:fontFamily">?bodyFont</item>
@@ -230,10 +230,16 @@
         <item name="android:textColor">@color/button_csl</item>
         <item name="strokeColor">@color/button_csl</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
-        <item name="android:layout_marginEnd">16dp</item>
-        <item name="android:layout_marginVertical">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginVertical">4dp</item>
         <item name="rippleColor">@color/grey_400</item>
-        <item name="iconSize">18dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="iconSize">16dp</item>
+        <item name="android:minWidth">16dp</item>
+        <item name="android:minHeight">32dp</item>
     </style>
 
     <style name="Header.Button.Solid" parent="@style/Widget.MaterialComponents.Button.Icon">
@@ -244,11 +250,17 @@
         <item name="tint">?colorPrimary</item>
         <item name="android:elevation">@dimen/button_elevation</item>
         <item name="android:layout_marginLeft">0dp</item>
-        <item name="android:layout_marginRight">16dp</item>
-        <item name="android:layout_marginVertical">8dp</item>
+        <item name="android:layout_marginEnd">8dp</item>
+        <item name="android:layout_marginVertical">4dp</item>
         <item name="android:textAppearance">?attr/textAppearanceButton</item>
         <item name="rippleColor">?colorPrimaryVariant</item>
-        <item name="iconSize">18dp</item>
+        <item name="android:paddingStart">8dp</item>
+        <item name="android:paddingEnd">8dp</item>
+        <item name="android:paddingTop">4dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="iconSize">16dp</item>
+        <item name="android:minWidth">16dp</item>
+        <item name="android:minHeight">32dp</item>
     </style>
     <!-- end Headers =========================== -->
 
@@ -476,6 +488,39 @@
         <item name="android:layout_height">@dimen/player_button_size</item>
         <item name="android:padding">@dimen/player_button_padding</item>
         <item name="android:tint">?playerButtonColor</item>
+    </style>
+    <!-- end CompactPlayer =========================== -->
+
+    <!-- PlayerNotif =========================== -->
+    <style name="PlayerNotif"/>
+
+    <style name="PlayerNotif.Button">
+        <item name="android:background">@color/notif_button_background_csl</item>
+        <!--        <item name="android:background">@color/red_500</item>-->
+        <item name="android:layout_width">@dimen/notif_button_size</item>
+        <item name="android:layout_height">@dimen/notif_button_size</item>
+        <item name="android:paddingHorizontal">@dimen/notif_button_icon_padding_h</item>
+        <item name="android:paddingVertical">@dimen/notif_button_icon_padding_v</item>
+        <item name="android:tint">@color/notif_button_csl</item>
+    </style>
+
+    <style name="PlayerNotif.Icon">
+        <item name="android:background">@color/transparent</item>
+        <item name="android:layout_width">@dimen/notif_icon_size</item>
+        <item name="android:layout_height">@dimen/notif_icon_size</item>
+        <item name="android:tint">@color/color_on_surface</item>
+    </style>
+
+    <style name="PlayerNotif.HeaderText" parent="@style/TextAppearance.App.Body2">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+    <style name="PlayerNotif.Text" parent="@style/TextAppearance.App.Body2">
+        <item name="android:textColor">@color/color_on_surface</item>
+    </style>
+
+    <style name="PlayerNotif.SmallText" parent="@style/TextAppearance.App.Caption">
+        <item name="android:textColor">@color/color_on_surface</item>
     </style>
     <!-- end CompactPlayer =========================== -->
 

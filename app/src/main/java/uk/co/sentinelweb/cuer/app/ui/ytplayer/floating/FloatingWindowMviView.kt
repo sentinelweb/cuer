@@ -6,8 +6,11 @@ import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.FloatingWindow
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Stop
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.AytViewHolder
@@ -19,6 +22,7 @@ class FloatingWindowMviView(
     private val aytViewHolder: AytViewHolder,
     private val windowManagement: FloatingWindowManagement,
     private val notification: PlayerControlsNotificationContract.External,
+    private val playerControls: PlayerContract.PlayerControls,
 ) : BaseMviView<Model, Event>(),
     PlayerContract.View {
 
@@ -35,6 +39,7 @@ class FloatingWindowMviView(
             }
             field = value
             currentButtons?.let { value?.setButtons(it) }
+            field?.setCastDetails(TargetDetails(FloatingWindow))
         }
 
     fun init() {
@@ -50,7 +55,7 @@ class FloatingWindowMviView(
 
     override val renderer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
-            notification.setPlayerState(it)
+            playerControls.setPlayerState(it)
             mainPlayControls
                 ?.apply { setPlayerState(it) }
             windowManagement.setPlayerState(it)
@@ -61,7 +66,7 @@ class FloatingWindowMviView(
         })
         diff(get = Model::playlistAndItem, set = { playlistAndItem ->
             currentItem = playlistAndItem
-            notification.setPlaylistItem(playlistAndItem?.item)
+            playerControls.setPlaylistItem(playlistAndItem?.item)
             mainPlayControls?.apply {
                 playlistAndItem?.item?.also { item ->
                     item.media.duration?.let { setDuration(it / 1000f) }
@@ -82,7 +87,7 @@ class FloatingWindowMviView(
             is Command -> {
                 label.command.let { aytViewHolder.processCommand(it) }
             }
-
+            is Stop -> service.stopSelf()
             else -> Unit
         }
     }
@@ -130,7 +135,5 @@ class FloatingWindowMviView(
         override fun skipFwd() {
             dispatch(Event.SkipFwdClicked)
         }
-
     }
-
 }

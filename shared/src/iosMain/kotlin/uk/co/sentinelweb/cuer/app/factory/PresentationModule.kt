@@ -28,7 +28,7 @@ import uk.co.sentinelweb.cuer.app.ui.resources.StarredPlaylistCustomisationResou
 import uk.co.sentinelweb.cuer.app.ui.resources.UnfinishedPlaylistCustomisationResources
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.listener.CastPlayerContextHolder
+import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromeCastPlayerContextHolder
 import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -250,7 +250,7 @@ object PresentationModule {
 
             }
         }
-        factory<CastPlayerContextHolder> {
+        factory<ChromeCastPlayerContextHolder> {
             object : CastPlayerContextHolder {
                 val log: LogWrapper = get()
 

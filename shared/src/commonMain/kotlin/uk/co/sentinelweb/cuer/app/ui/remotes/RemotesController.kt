@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
-import com.arkivanov.essenty.lifecycle.*
+import com.arkivanov.essenty.lifecycle.Lifecycle
+import com.arkivanov.essenty.lifecycle.doOnDestroy
 import com.arkivanov.mvikotlin.core.binder.Binder
 import com.arkivanov.mvikotlin.core.binder.BinderLifecycleMode
 import com.arkivanov.mvikotlin.extensions.coroutines.bind
@@ -40,11 +41,6 @@ class RemotesController(
             store.dispose()
             coroutines.cancel()
         }
-        lifecycle?.doOnCreate { log.d("creating") }
-        lifecycle?.doOnStart { log.d("staring") }
-        lifecycle?.doOnResume { log.d("resuming") }
-        lifecycle?.doOnPause { log.d("pausing") }
-        lifecycle?.doOnStop { log.d("stopping") }
     }
 
     fun onRefresh() {
@@ -72,6 +68,8 @@ class RemotesController(
             is Event.OnActionSync -> Intent.RemoteSync(remote)
             is Event.OnActionPlaylists -> Intent.RemotePlaylists(remote)
             is Event.OnActionFolders -> Intent.RemoteFolders(remote)
+            is Event.OnActionCuerConnect -> Intent.CuerConnect(remote)
+            is Event.OnActionCuerConnectScreen -> Intent.CuerConnectScreen(remote, screen)
         }
     }
 

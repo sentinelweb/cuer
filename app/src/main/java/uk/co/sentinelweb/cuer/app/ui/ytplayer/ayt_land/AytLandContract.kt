@@ -5,6 +5,7 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
@@ -57,6 +58,8 @@ interface AytLandContract {
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
                 scoped { ShowHideUi(get<AytLandActivity>()) }
@@ -78,7 +81,7 @@ interface AytLandContract {
                         )
                     )
                 }
-                scoped { AlertDialogCreator(get(), get()) }
+                factory<AlertDialogContract.Creator> { AlertDialogCreator(get(), get()) }
                 scoped { LocalPlayerCastListener(get(), get()) }
                 scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }

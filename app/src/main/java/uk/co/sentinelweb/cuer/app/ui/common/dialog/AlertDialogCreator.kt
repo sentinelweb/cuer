@@ -12,9 +12,9 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 class AlertDialogCreator(
     private val context: Context,
     private val strings: StringDecoder
-) {
+) : AlertDialogContract.Creator {
 
-    fun create(model: AlertDialogModel): AlertDialog {
+    override fun create(model: AlertDialogModel): AlertDialog {
         val builder = MaterialAlertDialogBuilder(context)
             .setTitle(model.title)
             .setPositiveButton(strings.get(model.confirm.label), object : DialogInterface.OnClickListener {
@@ -56,5 +56,13 @@ class AlertDialogCreator(
             builder.setOnDismissListener { it() }
         }
         return builder.create()
+    }
+
+    override fun createAndShowDialog(model: AlertDialogModel) {
+        create(model).show()
+    }
+
+    override fun dismissDialog(dialogRef: Any) {
+        (dialogRef as AlertDialog).dismiss()
     }
 }

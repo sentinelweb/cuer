@@ -4,11 +4,16 @@ import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
 import kotlinx.datetime.Clock
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract.DescriptionModel
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
 
 interface PlayerContract {
+
+    data class PlayerConfig(
+        val maxVolume: Float
+    )
 
     interface MviStore : Store<Intent, State, Label> {
         fun endSession()
@@ -28,6 +33,8 @@ interface PlayerContract {
             object PipPlayerOpen : Intent()
             object Support : Intent()
             object StarClick : Intent()
+            object Stop : Intent()
+            object FocusWindow : Intent()
 
             object OpenInApp : Intent()
             object Share : Intent()
@@ -42,12 +49,16 @@ interface PlayerContract {
             data class PlaylistChange(val item: PlaylistDomain) : Intent()
             data class SeekToFraction(val fraction: Float) : Intent()
             data class SeekToPosition(val ms: Long) : Intent()
+            data class VolumeChanged(val vol: Float) : Intent()
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Intent()
             data class Duration(val ms: Long) : Intent()
             data class Id(val videoId: String) : Intent()
+            data class ScreenAcquired(val screen: PlayerNodeDomain.Screen) : Intent()
         }
 
         sealed class Label {
+            object Stop : Label()
+            object FocusWindow : Label()
             data class Command(val command: PlayerCommand) : Label()
             data class LinkOpen(val link: LinkDomain.UrlLinkDomain) : Label()
             data class ChannelOpen(val channel: ChannelDomain) : Label()
@@ -61,7 +72,7 @@ interface PlayerContract {
 
         enum class Content { DESCRIPTION, PLAYLIST, PLAYLISTS }
 
-        data class State constructor(
+        data class State(
             val item: PlaylistItemDomain? = null,
             val playlist: PlaylistDomain? = null,
             val playerState: PlayerStateDomain = UNKNOWN,
@@ -69,6 +80,8 @@ interface PlayerContract {
             val skipBackText: String = "-",
             val content: Content = Content.DESCRIPTION,
             val position: Long = -1,
+            val volume: Float = 0f,
+            val screen: PlayerNodeDomain.Screen? = null
         ) {
             fun playlistAndItem(): PlaylistAndItemDomain? = item?.let {
                 PlaylistAndItemDomain(
@@ -93,6 +106,7 @@ interface PlayerContract {
             val content: Content,
             val playlistItem: PlaylistItemDomain?,
             val playlistAndItem: PlaylistAndItemDomain? = null,
+            val volume: Float = 0f,
         ) {
             data class Buttons(
                 val nextTrackEnabled: Boolean,
@@ -108,6 +122,7 @@ interface PlayerContract {
                 val lastTrackText: String?,
                 val skipFwdText: String?,
                 val skipBackText: String?,
+                val volumeText: String,
             )
 
             data class Times(
@@ -128,6 +143,7 @@ interface PlayerContract {
                         lastTrackText = "lastTrackText",
                         skipFwdText = "skipFwdText",
                         skipBackText = "skipBackText",
+                        volumeText = "0",
                     ),
                     buttons = Buttons(false, false, false),
                     description = DescriptionModel(
@@ -187,6 +203,7 @@ interface PlayerContract {
             object ShareClick : Event()
             object OpenClick : Event()
 
+            data class VolumeChanged(val vol: Float) : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
             data class PlayPauseClicked(val isPlaying: Boolean? = null) : Event()
             data class PositionReceived(val ms: Long) : Event()
@@ -198,6 +215,7 @@ interface PlayerContract {
             data class OnInitFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
             data class OnPlayItemFromService(val playlistAndItem: PlaylistAndItemDomain) : Event()
             data class OnSeekToPosition(val ms: Long) : Event()
+            data class OnScreenAcquired(val screen: PlayerNodeDomain.Screen) : Event()
         }
     }
 
@@ -214,13 +232,18 @@ interface PlayerContract {
         fun load(): PlaylistAndItemDomain?
     }
 
-    enum class ConnectionState {
-        CC_DISCONNECTED, CC_CONNECTING, CC_CONNECTED,
+    enum class ControlTarget {
+        Local, ChromeCast, CuerCast, FloatingWindow
+    }
+
+    enum class CastConnectionState {
+        Connected, Connecting, Disconnected
     }
 
     interface PlayerControls {
-        fun initMediaRouteButton()
-        fun setConnectionState(connState: ConnectionState)
+        //        fun initMediaRouteButton()
+        //fun setConnectionState(connState: CastConnectionState)
+        fun setCastDetails(details: TargetDetails)
         fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)
         fun removeListener(l: Listener)
@@ -237,6 +260,7 @@ interface PlayerContract {
         fun seekTo(ms: Long)
         fun getPlaylistItem(): PlaylistItemDomain?
         fun setButtons(buttons: View.Model.Buttons)
+        fun setVolume(fraction: Float)
 
         interface Listener {
             fun play()

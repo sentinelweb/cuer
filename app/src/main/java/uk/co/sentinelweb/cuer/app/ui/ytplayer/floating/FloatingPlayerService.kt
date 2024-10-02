@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.ytplayer.floating
 
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -15,16 +16,16 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.CuerAppState
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationContract
 import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationController
-import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationMedia
+import uk.co.sentinelweb.cuer.app.service.cast.notification.player.PlayerControlsNotificationCustom
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipPresenter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.main.MainActivity
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
+import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule.LOCAL_PLAYER
 import uk.co.sentinelweb.cuer.app.util.extension.serviceScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.wrapper.NotificationWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
@@ -47,7 +48,8 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         log.tag(this)
         _instance = this
         log.d("Service created")
-        appState.castNotificationChannelId = notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME)
+        appState.floatingNotificationChannelId =
+            notificationWrapper.createChannelId(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_MAX)
         controller.initialise()
     }
 
@@ -76,8 +78,8 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
         const val ACTION_INIT: String = "init"
         const val ACTION_PLAY_ITEM: String = "playitem"
 
-        private const val CHANNEL_ID: String = "cuer_floating_service"
-        private const val CHANNEL_NAME: String = "Cuer floating Service"
+        const val CHANNEL_ID: String = "cuer_floating_service"
+        const val CHANNEL_NAME: String = "Cuer Floating Service"
 
         private var _instance: FloatingPlayerService? = null
         fun instance(): FloatingPlayerService? = _instance
@@ -124,16 +126,18 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         skip = get(),
                         coroutines = get(),
                         log = get(),
-                        livePlaybackController = get(named(PlayerModule.LOCAL_PLAYER)),
+                        livePlaybackController = get(named(LOCAL_PLAYER)),
                         mediaSessionManager = get(),
                         mediaSessionListener = get(),
                         mediaOrchestrator = get(),
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
+                        config = PlayerContract.PlayerConfig(100f),
+                        prefs = get(),
                     ).create()
                 }
-                scoped { FloatingWindowMviView(get(), get(), get(), get()) }
+                scoped { FloatingWindowMviView(get(), get(), get(), get(), get()) }
                 scoped { FloatingWindowManagement(get(), get(), get(), get(), get()) }
                 scoped<SkipContract.External> {
                     SkipPresenter(
@@ -153,23 +157,34 @@ class FloatingPlayerService : Service(), FloatingPlayerContract.Service, Android
                         toastWrapper = get(),
                         skipControl = EmptySkipPresenter(),
                         mediaSessionManager = get(),
-                        res = get()
+                        timeProvider = get()
                     )
                 }
                 scoped<PlayerControlsNotificationContract.External> {
                     get<PlayerControlsNotificationController>()
                 }
-                scoped<PlayerControlsNotificationContract.Controller> {
+                scoped<PlayerContract.PlayerControls> {
                     get<PlayerControlsNotificationController>()
                 }
                 scoped<PlayerControlsNotificationContract.View> {
-                    PlayerControlsNotificationMedia(
+//                    PlayerControlsNotificationMedia(
+//                        service = get(),
+//                        appState = get(),
+//                        timeProvider = get(),
+//                        log = get(),
+//                        launchClass = AytPortraitActivity::class.java
+//                    )
+                    PlayerControlsNotificationCustom(
                         service = get(),
                         appState = get(),
                         timeProvider = get(),
                         log = get(),
-                        launchClass = AytPortraitActivity::class.java
+                        launchClass = MainActivity::class.java,
+                        playerUiMapper = get(),
+                        channelId = get<CuerAppState>().floatingNotificationChannelId,
+                        showVolumeControls = false,
                     )
+
                 }
                 scoped { PlayerControlsNotificationContract.State() }
             }

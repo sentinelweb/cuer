@@ -5,6 +5,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class RemotesModelMapper constructor(
@@ -27,8 +28,7 @@ class RemotesModelMapper constructor(
         )
     }
 
-    // todo different model type for remote
-    private fun mapRemoteNode(it: RemoteNodeDomain): RemoteNodeModel =
+    fun mapRemoteNode(it: RemoteNodeDomain): RemoteNodeModel =
         RemoteNodeModel(
             id = it.id,
             title = it.hostname ?: it.ipAddress,
@@ -38,6 +38,7 @@ class RemotesModelMapper constructor(
             hostname = it.hostname ?: "No hostname",
             authType = it.authType::class.simpleName ?: "-",
             domain = it,
+            screens = listOf(),
         )
 
     private fun mapLocalNode(it: LocalNodeDomain): LocalNodeModel =
@@ -50,5 +51,19 @@ class RemotesModelMapper constructor(
             hostname = it.hostname ?: "No hostname",
             authType = it.authConfig::class.simpleName ?: "-",
             domain = it
+        )
+
+    fun mapNodeAndScreen(node: RemoteNodeDomain, playerNodeDomain: PlayerNodeDomain): RemoteNodeModel =
+        mapRemoteNode(node).copy(
+            screens = playerNodeDomain.screens.map {
+                Screen(
+                    index = it.index,
+                    width = it.width,
+                    height = it.height,
+                    refreshRate = it.refreshRate,
+                    name = it.name,
+                    domain = it,
+                )
+            }
         )
 }

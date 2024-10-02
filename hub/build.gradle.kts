@@ -1,5 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
+// ./gradlew packageDmg
+
 plugins {
     kotlin("jvm")
     id("org.jetbrains.compose")
@@ -21,7 +23,6 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(project(":database"))
     implementation(project(":shared"))
-//    implementation(project(":sharedUi"))
     implementation(project(":domain"))
     implementation(project(":remote"))
     implementation(project(":net"))
@@ -34,23 +35,26 @@ dependencies {
     implementation(libs.ktorClientCio)
     implementation(libs.batikTranscoder)
     implementation(libs.multiplatformSettings)
+    implementation(libs.vlcj)
+    implementation(libs.jna)
+    implementation(libs.jnaPlatform)
+
     testImplementation(libs.junit)
     testImplementation(libs.koinTest)
     testImplementation(libs.koinTestJUnit4)
     testImplementation(libs.mockk)
     testImplementation(libs.turbine)
     testImplementation(libs.kotlinxCoroutinesTest)
-    implementation(libs.vlcj)
 }
-
+// lots on configuration info here
+// https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md
 compose.desktop {
     application {
         mainClass = "uk.co.sentinelweb.cuer.hub.main.MainKt"
-
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "CuerHub"
-            packageVersion = "1.0.0"// fixme shoudl use app_versionName but there are a lot of platform dependent rules
+            packageName = "Cuer"
+            packageVersion = "1.0.0"// fixme should use app_versionName but there are a lot of platform dependent rules
         }
     }
 }

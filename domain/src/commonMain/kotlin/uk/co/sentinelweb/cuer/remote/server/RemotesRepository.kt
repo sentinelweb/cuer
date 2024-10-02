@@ -6,6 +6,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
@@ -24,6 +25,8 @@ class RemotesRepository constructor(
     }
 
     private var _remoteNodes: MutableList<RemoteNodeDomain> = mutableListOf()
+    val remoteNodes: List<RemoteNodeDomain>
+        get() = _remoteNodes
 
     private val _updatesFlow: MutableStateFlow<List<RemoteNodeDomain>> = MutableStateFlow(emptyList())
 
@@ -33,11 +36,18 @@ class RemotesRepository constructor(
     private val updateRemotesMutex = Mutex()
 
     init {
-        coroutines.mainScope.launch { loadAll() }
+        coroutines.computationScope.launch { loadAll() }
     }
 
     fun getById(guid: GUID): RemoteNodeDomain? =
         _remoteNodes.find { it.id?.id == guid }
+    fun getByLocator(locator: OrchestratorContract.Identifier.Locator): RemoteNodeDomain? =
+        _remoteNodes.find { it.locator() == locator }
+
+    suspend fun getByName(name: String): RemoteNodeDomain? = updateRemotesMutex.withLock {
+        _remoteNodes
+            .find { it.hostname == name }
+    }
 
     suspend fun loadAll(): List<RemoteNodeDomain> = updateRemotesMutex.withLock {
         _remoteNodes.clear()

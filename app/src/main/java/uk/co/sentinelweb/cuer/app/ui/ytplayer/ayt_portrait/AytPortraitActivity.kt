@@ -151,7 +151,7 @@ class AytPortraitActivity : AppCompatActivity(),
         }
         log.d("onPostCreate")
         playerMviView = PlayerMviViewImpl(aytViewHolder)
-        playerFragment.initMediaRouteButton()
+        //playerFragment.initMediaRouteButton()
         playerController.onViewCreated(
             listOf(playerMviView, playerFragment.mviView),
             lifecycle.asEssentyLifecycle()
@@ -300,6 +300,9 @@ class AytPortraitActivity : AppCompatActivity(),
                 )
 
                 is Share -> shareWrapper.share(label.item.media)
+
+                is Stop -> finish()
+                is FocusWindow -> Unit
             }
         }
     }

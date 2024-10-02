@@ -7,7 +7,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.PLATFORM
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain.PlaylistTypeDomain.USER
 
-class PlaylistMergeUsecase constructor(
+class PlaylistMergeUsecase(
     private val playlistOrchestrator: PlaylistOrchestrator,
     private val log: LogWrapper
 ) {

@@ -1,0 +1,8 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+        android:height="@dimen/notif_button_size"
+        android:width="@dimen/notif_button_size"
+        android:viewportHeight="24"
+        android:viewportWidth="24">
+    <path android:fillColor="@color/color_on_surface"
+          android:pathData="M6,6h12v12H6z"/>
+</vector>

@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
@@ -35,12 +35,12 @@ object FilesComposeables {
                 .fillMaxHeight()
         ) {
             model.list.children.forEach {
-                Row(modifier = Modifier.clickable { view.clickFolder(it) }) {
+                Row(modifier = Modifier.clickable { view.onClickFolder(it) }) {
                     val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
                     Image(
                         painter = painterResource(icon),
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(Color(0xaa000000)), //, blendMode = BlendMode.Multiply
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface), //, blendMode = BlendMode.Multiply
                         modifier = Modifier.padding(16.dp)
                     )
                     Text(text = it.title, modifier = Modifier.padding(16.dp))
@@ -48,7 +48,7 @@ object FilesComposeables {
             }
             model.list.playlist.items.forEach {
                 Row(modifier = Modifier.clickable {
-                    view.clickFile(it)
+                    view.onClickFile(it)
                 }) {
                     val icon = when (it.media.mediaType) {
                         VIDEO -> Res.drawable.ic_video
@@ -59,7 +59,7 @@ object FilesComposeables {
                     Image(
                         painter = painterResource(icon),
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(Color(0xaa000000)), //, blendMode = BlendMode.Multiply
+                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface), //, blendMode = BlendMode.Multiply
                         modifier = Modifier.padding(16.dp)
                     )
                     Text(text = it.media.title ?: "No title", modifier = Modifier.padding(16.dp))

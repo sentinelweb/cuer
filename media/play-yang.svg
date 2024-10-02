@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   version="1.1"
-   width="24"
-   height="24"
-   viewBox="0 0 24 24"
-   id="svg51"
-   sodipodi:docname="play-yang.svg"
-   inkscape:version="1.2.1 (9c6d41e, 2022-07-14)"
-   inkscape:export-filename="play-yang-1024-white.png"
-   inkscape:export-xdpi="4915.2002"
-   inkscape:export-ydpi="4915.2002"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
+        version="1.1"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        id="svg51"
+        sodipodi:docname="play-yang.svg"
+        inkscape:version="1.3.2 (091e20e, 2023-11-25)"
+        inkscape:export-filename="play-yang-1024-white.png"
+        inkscape:export-xdpi="4915.2002"
+        inkscape:export-ydpi="4915.2002"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+        xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+        xmlns="http://www.w3.org/2000/svg"
+>
   <defs
      id="defs55" />
   <sodipodi:namedview
@@ -29,23 +29,16 @@
      inkscape:zoom="33.176748"
      inkscape:cx="9.6603802"
      inkscape:cy="12.68961"
-     inkscape:window-width="1164"
-     inkscape:window-height="946"
-     inkscape:window-x="626"
-     inkscape:window-y="1142"
+     inkscape:window-width="1656"
+     inkscape:window-height="1047"
+     inkscape:window-x="184"
+     inkscape:window-y="140"
      inkscape:window-maximized="0"
      inkscape:current-layer="svg51"
      inkscape:showpageshadow="2"
      inkscape:deskcolor="#d1d1d1" />
-  <ellipse
-     style="fill:#ffffff;fill-opacity:1;stroke-width:1.01782"
-     id="path949"
-     cx="11.981283"
-     cy="11.966211"
-     rx="9.6000967"
-     ry="9.554884" />
   <path
-     id="path269"
+          id="path3"
      style="fill:#e53935;fill-opacity:1;stroke:none;stroke-width:0.3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
      d="M 12 2 A 10 10 0 0 0 2 12 A 10 10 0 0 0 12 22 A 10 10 0 0 0 22 12 A 10 10 0 0 0 12 2 z M 12 4 A 4 4 0 0 1 16 8 A 4 4 0 0 1 12 12 A 4 4 0 0 0 8 16 A 4 4 0 0 0 12 20 A 8 8 0 0 1 4 12 A 8 8 0 0 1 12 4 z M 10.6875 6.0175781 L 10.6875 9.796875 L 13.849609 7.90625 L 10.6875 6.0175781 z M 13.423828 14.552734 L 13.423828 17.955078 L 10.578125 16.253906 L 13.423828 14.552734 z " />
 </svg>

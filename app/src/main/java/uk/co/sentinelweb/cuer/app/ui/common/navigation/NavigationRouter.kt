@@ -62,7 +62,12 @@ class NavigationRouter constructor(
                     ?.let { cryptoLauncher.launch(it) }
                     ?: throw IllegalArgumentException("$CRYPTO_LINK: $CRYPTO_ADDRESS param required")
 
-            NAV_BACK -> navController?.popBackStack()
+            NAV_BACK -> {
+                nav.params[BACK_PARAMS]?.let {
+                    navController?.popBackStack(it as Int, false)
+                } ?: navController?.popBackStack()
+            }
+
             NAV_FINISH -> activity.finish()
             YOUTUBE_CHANNEL -> if (!ytJavaApi.launchChannel(nav.params[CHANNEL_ID] as String)) {
                 toastWrapper.show("can't launch channel")
@@ -139,13 +144,9 @@ class NavigationRouter constructor(
             FOLDER_LIST -> navController?.navigate(
                 R.id.navigation_folders,
                 bundleOf(
-                    REMOTE_ID.name to nav.params[REMOTE_ID].toString()
+                    REMOTE_ID.name to nav.params[REMOTE_ID].toString(),
+                    FILE_PATH.name to nav.params[FILE_PATH]?.toString()
                 ),
-                /*nav.navOpts ?: */
-                navOptions(optionsBuilder = {
-                    launchSingleTop = true
-                    popUpTo(R.id.navigation_remotes, { inclusive = false })
-                }),
             )
 
             SHARE -> nav.getParam<String>(LINK)
@@ -172,6 +173,7 @@ class NavigationRouter constructor(
                         intent.removeExtra(PLAY_NOW.toString())
                         intent.removeExtra(SOURCE.name)
                     }
+
                     NavigationModel.Target.PLAYLIST_ITEM -> {
                         intent.removeExtra(KEY)
                         intent.removeExtra(PLAYLIST_ITEM.name)

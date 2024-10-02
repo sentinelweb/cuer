@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 @ExperimentalCoroutinesApi
-class PlayerController constructor(
+class PlayerController(
     private val queueConsumer: QueueMediatorContract.Consumer,
     private val modelMapper: PlayerModelMapper,
     private val coroutines: CoroutineContextProvider,

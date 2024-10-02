@@ -23,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.share.AndroidShareWrapper
 import uk.co.sentinelweb.cuer.app.util.share.EmailWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
 import kotlin.random.Random
 
@@ -34,6 +35,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
     private val emailWrapper: EmailWrapper by inject()
     private val shareWrapper: AndroidShareWrapper by inject()
     private val buildConfig: BuildConfigDomain by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private val versionCategory
         get() = findPreference(R.string.prefs_root_version_key)
@@ -79,6 +81,7 @@ class PrefRootFragment : PreferenceFragmentCompat(), PrefRootContract.View, Andr
             (view as ViewGroup).addView(it, 0)
             it.setupWithNavController(findNavController())
         }
+        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
         return view
     }
 

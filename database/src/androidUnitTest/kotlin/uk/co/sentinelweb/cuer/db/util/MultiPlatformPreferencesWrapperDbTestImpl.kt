@@ -23,6 +23,22 @@ class MultiPlatformPreferencesWrapperDbTestImpl : MultiPlatformPreferencesWrappe
         } else throw IllegalStateException("not implemented")
     }
 
+    override fun getFloat(field: MultiPlatformPreferences): Float? =
+        if (DATABASE_VERSION == field) {
+            map.get(field) as? Float
+        } else throw IllegalStateException("not implemented")
+    
+    override fun getFloat(field: MultiPlatformPreferences, def: Float): Float =
+        if (DATABASE_VERSION == field) {
+            map.get(field) as? Float ?: def
+        } else throw IllegalStateException("not implemented")
+
+    override fun putFloat(field: MultiPlatformPreferences, value: Float) {
+        if (DATABASE_VERSION == field) {
+            map.put(field, value)
+        } else throw IllegalStateException("not implemented")
+    }
+
     override fun getString(field: MultiPlatformPreferences, def: String?): String? {
         TODO("Not yet implemented")
     }

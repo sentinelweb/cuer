@@ -38,8 +38,7 @@ fun home(coordinator: HomeUiCoordinator) = application {
         onCloseRequest = ::onExit,
         state = windowState,
         title = "Cuer Hub",
-
-        ) {
+    ) {
         Home(coordinator)
     }
 }

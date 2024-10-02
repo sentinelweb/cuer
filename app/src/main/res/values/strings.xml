@@ -395,10 +395,27 @@
 
     <!-- remotes -->
     <string name="remotes_menu_ping">Ping</string>
+    <string name="remotes_cuer_connect">Connect</string>
+    <string name="remotes_cuer_connected">Connected to : %1$s</string>
+    <string name="remotes_cuer_connected_screen">Connected to : %1$s-[%2$d]</string>
 
     <!-- folders -->
     <string name="folders">Folders</string>
 
+    <!-- custom media notif -->
+    <string name="notif_description_album_art">Album art</string>
+    <string name="notif_description_previous_track">Previous track</string>
+    <string name="notif_description_rewind">Rewind</string>
+    <string name="notif_description_play">Play/Pause</string>
+    <string name="notif_description_forward">Forward</string>
+    <string name="notif_description_next_track">Next Track</string>
+    <string name="notif_description_disconnect">Disconnect</string>
+    <string name="notif_description_stop">Stop</string>
+    <string name="notif_description_star">Star/Unstar</string>
+    <string name="notif_description_vol_up">Vol +</string>
+    <string name="notif_description_vol_down">Vol -</string>
+    <string name="notif_description_vol_mute">Mute</string>
+    <string name="notif_target_arrow">&#x2192;</string>
 
     <!-- misc -->
     <string name="ok">OK</string>
@@ -425,4 +442,7 @@
     <string name="done">Done</string>
     <string name="finish">Finish</string>
     <string name="move">Move</string>
+    <string name="local">Local</string>
+    <string name="slash">/</string>
+
 </resources>

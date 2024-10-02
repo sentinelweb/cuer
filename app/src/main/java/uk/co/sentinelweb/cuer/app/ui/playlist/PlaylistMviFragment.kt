@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.playlist
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.transition.TransitionInflater
 import android.view.*
@@ -35,7 +36,7 @@ import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentPlaylistBinding
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogModel
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
@@ -63,10 +64,11 @@ import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.ui.share.ShareCommitter
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
 import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.glide.GlideStatusColorLoadListener
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferences.SHOW_VIDEO_CARDS
@@ -93,7 +95,7 @@ class PlaylistMviFragment : Fragment(),
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val toastWrapper: ToastWrapper by inject()
     private val log: LogWrapper by inject()
-    private val alertDialogCreator: AlertDialogCreator by inject()
+    private val alertDialogCreator: AlertDialogContract.Creator by inject()
     private val imageProvider: ImageProvider by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val navRouter: NavigationRouter by inject()
@@ -106,6 +108,7 @@ class PlaylistMviFragment : Fragment(),
     private val prefsWrapper: MultiPlatformPreferencesWrapper by inject()
     private val queueCastConnectionListener: QueueCastConnectionListener by inject()
     private val chromeCastWrapper: ChromeCastWrapper by inject()
+    private val statusBarColor: StatusBarColorWrapper by inject()
 
     private var _adapter: PlaylistAdapter? = null
     private val adapter: PlaylistAdapter
@@ -434,6 +437,8 @@ class PlaylistMviFragment : Fragment(),
                 controller.onRefresh()
             }
         queueCastConnectionListener.listenForState()
+        (binding.playlistHeaderImage.drawable as? BitmapDrawable)
+            ?.apply { statusBarColor.changeStatusBarColor(bitmap) }
     }
 
     override fun onPause() {
@@ -563,8 +568,10 @@ class PlaylistMviFragment : Fragment(),
     private fun setImage(url: String) {
         Glide.with(requireContext())
             .loadFirebaseOrOtherUrl(url, imageProvider)
-            //.transition(DrawableTransitionOptions.withCrossFade())
+//            .transition(DrawableTransitionOptions.withCrossFade())
+            .addListener(GlideStatusColorLoadListener(statusBarColorWrapper = statusBarColor))
             .into(binding.playlistHeaderImage)
+
     }
 
     private fun showUndo(msg: String, undoFunction: () -> Unit) {
@@ -634,7 +641,7 @@ class PlaylistMviFragment : Fragment(),
     }
 
     private fun showAlertDialog(model: AlertDialogModel) {
-        alertDialogCreator.create(model).show()
+        alertDialogCreator.createAndShowDialog(model)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -658,7 +665,7 @@ class PlaylistMviFragment : Fragment(),
             }
 
             QueueCastConnectionListener.CastState.CONNECTING -> {
-                binding.playlistFabPlay.setIconResource(R.drawable.ic_notif_buffer_black)
+                binding.playlistFabPlay.setIconResource(R.drawable.ic_notif_buffer)
                 binding.playlistFabPlay.text = getString(R.string.buffering)
             }
         }
@@ -827,11 +834,13 @@ class PlaylistMviFragment : Fragment(),
                         prefsWrapper = get(),
                         coroutines = get(),
                         floatingService = get(),
-                        playDialog = get(),
-                        strings = get()
+                        strings = get(),
+                        cuerCastPlayerWatcher = get(),
+                        alertDialogCreator = get(),
+                        parentScope = get<PlaylistMviFragment>().scope
                     )
                 }
-                scoped<PlayUseCase.Dialog> {
+                factory<PlayUseCase.Dialog> {
                     PlayDialog(
                         get<PlaylistMviFragment>(),
                         itemFactory = get(),
@@ -840,7 +849,6 @@ class PlaylistMviFragment : Fragment(),
                         castDialogWrapper = get(),
                         floatingService = get(),
                         log = get(),
-                        alertDialogCreator = get(),
                         youtubeApi = get()
                     )
                 }

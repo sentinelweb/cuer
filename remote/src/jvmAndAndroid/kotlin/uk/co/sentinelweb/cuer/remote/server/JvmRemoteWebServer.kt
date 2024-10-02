@@ -16,7 +16,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -38,6 +37,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PL
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API.P_SCREEN_INDEX
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_STATUS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
@@ -45,8 +45,10 @@ import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -65,6 +67,7 @@ class JvmRemoteWebServer(
     private val getFolderListUseCase: GetFolderListUseCase by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
     private val remotePlayerLaunchHost: RemotePlayerLaunchHost by inject()
+    private val playerSessionMessageMapper: PlayerSessionMessageMapper by inject()
 
     override val port: Int
         get() = localRepository.localNode.port
@@ -244,20 +247,42 @@ class JvmRemoteWebServer(
                             SkipBack::class.java.simpleName -> SkipBack
                             TrackFwd::class.java.simpleName -> TrackFwd
                             TrackBack::class.java.simpleName -> TrackBack
+                            FocusWindow::class.java.simpleName -> FocusWindow
+                            Stop::class.java.simpleName -> Stop
                             PlayPause::class.java.simpleName -> PlayPause(isPlaying = arg0.toBoolean())
                             SeekToFraction::class.java.simpleName -> SeekToFraction(fraction = arg0?.toFloat() ?: 0f)
+                            Volume::class.java.simpleName -> Volume(volume = arg0?.toFloat() ?: 0f)
                             else -> null
                         }?.also {
                             // fixme get operation success and return the code
                             logWrapper.d("messageParsed: $it: ${playerSessionHolder.playerSession}")
-                            playerSessionHolder.playerSession?.controlsListener?.messageRecieved(it)
-                                ?.also { call.respond(HttpStatusCode.OK) }
-                                ?: call.error(HttpStatusCode.BadRequest, "player session invalid")
+                            playerSessionHolder.playerSession
+                                ?.apply { controlsListener.messageRecieved(it) }
+                                ?.let { playerSessionMessageMapper.map(it) }
+                                ?.let { ResponseMessage(it) }
+                                ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                                ?: call.error(HttpStatusCode.ServiceUnavailable, "player session not available")
                         } ?: call.error(HttpStatusCode.BadRequest, "url is required")
                     } catch (e: NumberFormatException) {
                         call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
                     } catch (e: Exception) {
                         call.error(HttpStatusCode.InternalServerError, e.message)
+                    }
+                }
+
+                get(PLAYER_STATUS_API.PATH) {
+                    try {
+                        playerSessionHolder.playerSession
+                            ?.let { playerSessionMessageMapper.map(it) }
+                            //?.also{logWrapper.d("Mapped player status message: $it")}
+                            ?.let { ResponseMessage(it) }
+                            ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
+                            ?: call.error(HttpStatusCode.ServiceUnavailable, "player session invalid")
+                    } catch (e: NumberFormatException) {
+                        call.error(HttpStatusCode.BadRequest, "Number format is incorrect: ${e.message}")
+                    } catch (e: Exception) {
+                        call.error(HttpStatusCode.InternalServerError, e.message)
+                        logWrapper.e("Exception player status", e)
                     }
                 }
 
@@ -277,15 +302,14 @@ class JvmRemoteWebServer(
                     try {
                         (postData)
                             .let { deserialisePlaylistItem(it) }
-                            .also { logWrapper.d("item rx:" + it.summarise()) }
-                            .also { logWrapper.d("screen index:" + call.parameters[P_SCREEN_INDEX]) }
                             .let { item ->
                                 remotePlayerLaunchHost.launchVideo(
                                     item,
                                     // todo send bad request if no P_SCREEN_INDEX
-                                    call.parameters[P_SCREEN_INDEX]?.toInt() ?: 0
+                                    call.parameters[P_SCREEN_INDEX]?.toInt()
                                 )
                             }
+                            .also { call.respond(HttpStatusCode.OK) }
                             ?: call.error(HttpStatusCode.BadRequest, "item is required")
                     } catch (e: Throwable) {
                         call.error(HttpStatusCode.InternalServerError, null, e)
@@ -298,9 +322,7 @@ class JvmRemoteWebServer(
                     logWrapper.d("Folder: $path")
                     getFolderListUseCase.getFolderList(path)
                         ?.let { ResponseDomain(it) }
-                        ?.apply {
-                            call.respondText(serialise(), ContentType.Application.Json)
-                        }
+                        ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
                         ?: apply {
                             call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
                         }

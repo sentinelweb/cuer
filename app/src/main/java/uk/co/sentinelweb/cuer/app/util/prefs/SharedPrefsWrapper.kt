@@ -26,15 +26,26 @@ class SharedPrefsWrapper constructor(
         prefs.edit().putLong(field.fname, value).commit()
     }
 
-    override fun getInt(field: GeneralPreferences, def: Int): Int =
-        prefs.getInt(field.fname, def)
-
     override fun getInt(field: GeneralPreferences): Int? =
         if (prefs.contains(field.fname)) prefs.getInt(field.fname, 0)
         else null
 
+    override fun getInt(field: GeneralPreferences, def: Int): Int =
+        prefs.getInt(field.fname, def)
+
     override fun putInt(field: GeneralPreferences, value: Int) {
         prefs.edit().putInt(field.fname, value).apply()
+    }
+
+    override fun getFloat(field: GeneralPreferences): Float? =
+        if (prefs.contains(field.fname)) prefs.getFloat(field.fname, 0f)
+        else null
+
+    override fun getFloat(field: GeneralPreferences, def: Float): Float =
+        prefs.getFloat(field.fname, def)
+
+    override fun putFloat(field: GeneralPreferences, value: Float) {
+        prefs.edit().putFloat(field.fname, value).apply()
     }
 
     override fun getString(field: GeneralPreferences, def: String?): String? =

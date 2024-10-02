@@ -22,20 +22,22 @@ object FileBrowserAppComposeables {
 
     // todo use scaffold
     @Composable
-    fun FileBrowserAppWrapperUi(interactions: FilesContract.Interactions, appModelObservable: Flow<AppFilesUiModel>) {
-        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel(loading = false))
+    fun FileBrowserAppWrapperUi(appModelObservable: Flow<AppFilesUiModel>, viewModel: FileBrowserViewModel) {
+        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel.BLANK)
         CuerTheme {
             Surface {
                 Box(contentAlignment = Alignment.Center) {
                     Column(
                         modifier = Modifier
                             .fillMaxHeight()
+                            .padding(bottom = 60.dp)
                     ) {
                         Box(contentAlignment = Alignment.TopStart) {
                             CuerTopAppBarComposables.CuerAppBar(
-                                text = "Files",
+                                title = "Files",
+                                subTitle = appFileUiState.value.subTitle,
                                 backgroundColor = MaterialTheme.colors.primary,
-                                onUp = { },
+                                onUp = { viewModel.onUpClick() },
                                 actions = listOf(
                                     Action(CuerMenuItem.Help, { }),
                                     Action(CuerMenuItem.Settings, { }),
@@ -43,9 +45,8 @@ object FileBrowserAppComposeables {
                                 modifier = Modifier
                                     .height(56.dp)
                             )
-
                         }
-                        FilesComposeables.FilesUi(interactions = interactions)
+                        FilesComposeables.FilesUi(interactions = viewModel)
                     }
                     if (appFileUiState.value.loading) {
                         CircularProgressIndicator(

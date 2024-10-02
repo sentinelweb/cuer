@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -12,35 +13,43 @@ import uk.co.caprica.vlcj.media.MediaParsedStatus
 import uk.co.caprica.vlcj.media.MediaRef
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
+import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
 import java.awt.GraphicsEnvironment
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
+import java.awt.event.*
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
 
+@ExperimentalCoroutinesApi
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
+    private val showHideControls: VlcPlayerShowHideControls,
+    private val keyMap: VlcPlayerKeyMap,
 ) : JFrame(), KoinComponent {
-
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
     private val timeProvider: TimeProvider by inject()
+    private val timeFormatter: TimeFormatter by inject()
+    private val playerConfigProvider: PlayerConfigProvider by inject()
+    private lateinit var screenUsed: PlayerNodeDomain.Screen
 
     private lateinit var playButton: JButton
     private lateinit var pauseButton: JButton
@@ -54,6 +63,10 @@ class VlcPlayerSwingWindow(
     private lateinit var durText: JLabel
     private lateinit var titleText: JLabel
     private lateinit var bufferText: JLabel
+    private lateinit var volumeText: JLabel
+    private lateinit var controlsPane: JPanel
+
+    private var lastVolumeUpdateTime = 0L
 
     private var durationMs: Long? = null
 
@@ -70,20 +83,23 @@ class VlcPlayerSwingWindow(
         log.tag(this)
     }
 
-    fun assemble(screenIndex: Int = 0) {
-        createWindow(screenIndex)
+    fun assemble(screen: PlayerNodeDomain.Screen) {
+        val screenIndexUsed = createWindow(screen)
         createMediaPlayer()
         createControls()
+        showHideControls.setupInactivityTimer(this, mediaPlayerComponent, controlsPane)
+        keyMap.initialiseKeyMap(mediaPlayerComponent, this, coordinator)
+        screenUsed = playerConfigProvider.invoke().screens[screenIndexUsed]
     }
 
-    private fun createWindow(preferredScreen: Int) {
+    private fun createWindow(preferredScreen: PlayerNodeDomain.Screen): Int {
         this.defaultCloseOperation = DO_NOTHING_ON_CLOSE
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        val preferredExists = screenDevices.size > preferredScreen
+        val preferredExists = screenDevices.size > preferredScreen.index
         val selectedScreenIndex = if (preferredExists) {
-            preferredScreen
+            preferredScreen.index
         } else 0
         log.d("selectedScreenIndex: $selectedScreenIndex, preferredScreen: $preferredScreen")
         val selectedScreen = screenDevices[selectedScreenIndex]
@@ -102,15 +118,25 @@ class VlcPlayerSwingWindow(
         // Handle window closing operation
         this.addWindowListener(object : WindowAdapter() {
             override fun windowClosing(e: WindowEvent) {
-                coordinator.playerWindowDestroyed()
+                coordinator.destroyPlayerWindow()
             }
         })
         this.isVisible = true
+        return selectedScreenIndex
     }
 
+    // https://wiki.videolan.org/VLC_command-line_help/
     private fun createMediaPlayer() {
-        mediaPlayerComponent = CallbackMediaPlayerComponent()
+        mediaPlayerComponent =
+            CallbackMediaPlayerComponent(
+                "--stereo-mode", "1",
+                "--disable-screensaver",
+                "--video-title-show",
+                "--video-title-timeout", "3000",
+                "--quiet",
+            )
         this.contentPane.add(mediaPlayerComponent, CENTER)
+
         mediaPlayerComponent.mediaPlayer().events().addMediaEventListener(
             object : MediaEventAdapter() {
                 override fun mediaParsedChanged(media: Media, newStatus: MediaParsedStatus) {
@@ -152,7 +178,7 @@ class VlcPlayerSwingWindow(
                 }
 
                 var lastPosUpdateTime = 0L
-                override fun positionChanged(mediaPlayer: MediaPlayer?, newPosition: Float) {
+                override fun positionChanged(mediaPlayer: MediaPlayer, newPosition: Float) {
                     val current = timeProvider.currentTimeMillis()
                     if (current - lastPosUpdateTime > 1000) {
                         durationMs?.let {
@@ -161,22 +187,53 @@ class VlcPlayerSwingWindow(
                         }
                         lastPosUpdateTime = current
                     }
+                    dispatchCurrentPlayState(mediaPlayer)
                 }
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
                     log.d("event ready")
+                    coordinator.dispatch(OnScreenAcquired(screenUsed))
                     coordinator.dispatch(PlayerStateChanged(PLAYING))
                 }
 
                 override fun error(mediaPlayer: MediaPlayer?) {
                     coordinator.dispatch(PlayerStateChanged(PlayerStateDomain.ERROR))
                 }
+
+                override fun volumeChanged(mediaPlayer: MediaPlayer?, volume: Float) {
+                    val current = timeProvider.currentTimeMillis()
+                    if (current - lastVolumeUpdateTime > 1000 && volume >= 0) {
+                        super.volumeChanged(mediaPlayer, volume)
+                        val sendVolume = volume * 100
+                        log.d("mediaPlayer.volumeChanged: $volume $sendVolume")
+                        coordinator.dispatch(VolumeChanged(sendVolume))
+                        lastVolumeUpdateTime = current
+                    }
+                }
             }
         )
     }
 
+    private fun dispatchCurrentPlayState(mediaPlayer: MediaPlayer) {
+        when (mediaPlayer.status().state()) {
+            State.NOTHING_SPECIAL -> UNKNOWN
+            State.OPENING -> VIDEO_CUED
+            State.BUFFERING -> BUFFERING
+            State.PLAYING -> PLAYING
+            State.PAUSED -> PAUSED
+            State.STOPPED -> PAUSED
+            State.ENDED -> ENDED
+            State.ERROR -> PlayerStateDomain.ERROR
+            null -> UNKNOWN
+        }.apply { coordinator.dispatch(PlayerStateChanged(this)) }
+    }
+
     fun playItem(path: String) {
         durationMs = null
+        log.d("playItem: $path")
+        mediaPlayerComponent.mediaPlayer().media().info()
+            ?.apply { log.d("playItem: current ${this.mrl()}") }
+            ?: log.d("playItem: current is null")
         mediaPlayerComponent.mediaPlayer().media().prepare(path)
         mediaPlayerComponent.mediaPlayer().media().parsing().parse()
         // play after parse is complete
@@ -184,18 +241,25 @@ class VlcPlayerSwingWindow(
     }
 
     fun destroy() {
+//        mediaPlayerComponent.mediaPlayer().media().newMedia()
+        //mediaPlayerComponent.mediaPlayer().media().prepare(null as String?)
         mediaPlayerComponent.mediaPlayer().release()
+        mediaPlayerComponent.mediaPlayer().media()
         this@VlcPlayerSwingWindow.dispose()
     }
 
     private fun createControls() {
-        val controlsPane = JPanel()
+        controlsPane = JPanel()
         controlsPane.layout = BorderLayout()
         controlsPane.background = Color.BLACK
 
+        val buttonsLayoutPane = JPanel()
+        buttonsLayoutPane.background = Color.BLACK
+
         val buttonsPane = JPanel()
         buttonsPane.background = Color.BLACK
-        controlsPane.add(buttonsPane, CENTER)
+        controlsPane.add(buttonsLayoutPane, CENTER)
+        buttonsLayoutPane.add(buttonsPane, CENTER)
 
         val seekPane = JPanel()
         seekPane.layout = BorderLayout()
@@ -227,7 +291,7 @@ class VlcPlayerSwingWindow(
         stopButton = JButton("Stop").apply {
             buttonsPane.add(this)
             setIcon(loadSVG("drawable/ic_stop.svg", Black, 24).toImageIcon())
-            addActionListener { coordinator.playerWindowDestroyed() }
+            addActionListener { coordinator.destroyPlayerWindow() }
             isVisible = this@VlcPlayerSwingWindow.isUndecorated
         }
         forwardButton = JButton("Skip").apply {
@@ -244,6 +308,20 @@ class VlcPlayerSwingWindow(
             seekPane.add(this, CENTER)
             this.actualListener = seekChangeListner
         }
+        seekBar.addMouseMotionListener(object : MouseAdapter() {
+            override fun mouseMoved(e: MouseEvent) {
+                if (mediaPlayerComponent.mediaPlayer().media().info() != null) {
+                    val slider = e.source as JSlider
+                    val mouseX = e.x
+                    val value = slider.minimum + (slider.maximum - slider.minimum) * mouseX / slider.width
+                    val duration = mediaPlayerComponent.mediaPlayer().media().info().duration()
+                    val position = value.toDouble() / slider.maximum
+                    val timeInMillis = (duration * position).toLong()
+                    val timeFormatted = timeFormatter.formatTime(timeInMillis / 1000f)
+                    slider.toolTipText = timeFormatted
+                }
+            }
+        })
         posText = JLabel("00:00:00").apply {
             seekPane.add(this, WEST)
             foreground = Color.WHITE
@@ -254,21 +332,41 @@ class VlcPlayerSwingWindow(
             foreground = Color.WHITE
         }
         bufferText = JLabel("[Buffering]").apply {
-            buttonsPane.add(this)
+            buttonsLayoutPane.add(this, WEST)
             foreground = Color.WHITE
             isVisible = false
         }
+        volumeText = JLabel("Volume: ").apply {
+            buttonsLayoutPane.add(this, EAST)
+            foreground = Color.WHITE
+            isVisible = true
+        }
         titleText = JLabel("[No Title]").apply {
-            if (this@VlcPlayerSwingWindow.isUndecorated) {
-                controlsPane.add(this, NORTH)
-                foreground = Color.WHITE
-                isVisible = false
+            val textPane = JPanel()
+            textPane.background = Color.BLACK
+            textPane.add(this, CENTER)
+            controlsPane.add(textPane, NORTH)
+            foreground = Color.WHITE
+            isVisible = this@VlcPlayerSwingWindow.isUndecorated
+        }
+
+        // Add a mouse wheel listener to adjust the volume
+        val volumeWheelListener = object : MouseWheelListener {
+            override fun mouseWheelMoved(e: MouseWheelEvent) {
+                if (e.wheelRotation != 0) {
+                    val currentVolume = mediaPlayerComponent.mediaPlayer().audio().volume()
+                    val newVolume = (currentVolume + e.wheelRotation * 4).coerceIn(0, 200)
+                    coordinator.dispatch(VolumeChanged(newVolume.toFloat()))
+                    showHideControls.showControls()
+                }
             }
         }
+        mediaPlayerComponent.videoSurfaceComponent().addMouseWheelListener(volumeWheelListener)
+        controlsPane.addMouseWheelListener(volumeWheelListener)
     }
 
     fun updateUiPlayState(state: PlayerStateDomain) {
-        log.d("state:${state::class.java.simpleName}")
+        log.d("state:${state}")
         return when (state) {
             UNKNOWN -> Unit
             UNSTARTED -> Unit
@@ -298,6 +396,7 @@ class VlcPlayerSwingWindow(
     fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
         is Load -> {
             command.platformId
+                .also { log.d("") }
                 .let { folderListUseCase.truncatedToFullFolderPath(it) }
                 ?.also { playItem(it) }
                 ?: log.d("Cannot get full path ${command.platformId}")
@@ -318,12 +417,31 @@ class VlcPlayerSwingWindow(
         }
         forwardButton.text = "Forward [${texts.skipFwdText}]"
         rewindButton.text = "Rewind [${texts.skipBackText}]"
+        updateVolumeText(texts.volumeText)
+    }
+
+    private fun updateVolumeText(text: String?) {
+        log.d("updateVolumeText: (${text})")
+        volumeText.text = "Volume: $text"
     }
 
     fun updateButtons(it: PlayerContract.View.Model.Buttons) {
         nextButton.isEnabled = it.nextTrackEnabled
         prevButton.isEnabled = it.prevTrackEnabled
         seekBar.isEnabled = it.seekEnabled
+    }
+
+    fun updateVolume(newVolume: Float) {
+        log.d("updateVolume: (${newVolume})")
+        lastVolumeUpdateTime = timeProvider.currentTimeMillis()
+        mediaPlayerComponent.mediaPlayer().audio().setVolume(newVolume.toInt())
+    }
+
+    fun doFocus() {
+        toFront()
+        repaint()
+        requestFocus()
+        showHideControls.hideControls()
     }
 
     companion object {

@@ -10,9 +10,12 @@ interface PrefWrapper<T : Field> {
     fun getLong(field: T, def: Long): Long
     fun getLong(field: T): Long?
     fun putLong(field: T, value: Long)
-    fun getInt(field: T, def: Int): Int
     fun getInt(field: T): Int?
+    fun getInt(field: T, def: Int): Int
     fun putInt(field: T, value: Int)
+    fun getFloat(field: T): Float?
+    fun getFloat(field: T, def: Float): Float
+    fun putFloat(field: T, value: Float)
     fun getString(field: T, def: String?): String?
     fun putString(field: T, value: String)
     fun putEnum(field: T, value: Enum<*>)

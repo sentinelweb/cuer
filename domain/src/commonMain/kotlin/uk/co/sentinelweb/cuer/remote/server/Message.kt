@@ -10,7 +10,9 @@ import kotlinx.serialization.modules.plus
 import uk.co.sentinelweb.cuer.domain.ext.domainClassDiscriminator
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
 import uk.co.sentinelweb.cuer.remote.server.message.RequestMessage
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerStatusMessage
 
 interface Message {
 }
@@ -19,22 +21,27 @@ interface Message {
 ///////////////////////////////////////////////////////////////////////////
 fun AvailableMessage.serialise() = messageJsonSerializer.encodeToString(AvailableMessage.serializer(), this)
 fun deserialiseMulti(json: String) = messageJsonSerializer.decodeFromString(AvailableMessage.serializer(), json)
-fun PlayerSessionContract.PlayerMessage.serialise() =
-    messageJsonSerializer.encodeToString(PlayerSessionContract.PlayerMessage.serializer(), this)
+fun PlayerCommandMessage.serialise() =
+    messageJsonSerializer.encodeToString(PlayerCommandMessage.serializer(), this)
 
-fun deserialisePlayer(json: String) =
-    messageJsonSerializer.decodeFromString(PlayerSessionContract.PlayerMessage.serializer(), json)
+fun deserialisePlayerCommandMessage(json: String) =
+    messageJsonSerializer.decodeFromString(PlayerCommandMessage.serializer(), json)
 
 fun RequestMessage.serialise() = messageJsonSerializer.encodeToString(RequestMessage.serializer(), this)
+fun ResponseMessage.serialise() = messageJsonSerializer.encodeToString(ResponseMessage.serializer(), this)
 
 val messageSerializersModule = SerializersModule {
     mapOf(
         AvailableMessage::class to AvailableMessage.serializer(),
         RequestMessage::class to RequestMessage.serializer(),
-        PlayerSessionContract.PlayerMessage::class to PlayerSessionContract.PlayerMessage.serializer(),
+        ResponseMessage::class to ResponseMessage.serializer(),
+        PlayerCommandMessage::class to PlayerCommandMessage.serializer(),
+        PlayerStatusMessage::class to PlayerStatusMessage.serializer(),
     )
     polymorphic(Message::class, AvailableMessage::class, AvailableMessage.serializer())
     polymorphic(Message::class, RequestMessage::class, RequestMessage.serializer())
+    polymorphic(Message::class, ResponseMessage::class, ResponseMessage.serializer())
+    polymorphic(Message::class, PlayerStatusMessage::class, PlayerStatusMessage.serializer())
 
 }.plus(SerializersModule {
     contextual(Instant::class, InstantIso8601Serializer)

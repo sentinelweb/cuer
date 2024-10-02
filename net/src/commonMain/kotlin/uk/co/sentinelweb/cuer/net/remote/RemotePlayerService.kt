@@ -5,19 +5,22 @@ import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
 import uk.co.sentinelweb.cuer.net.client.ServiceExecutor
 import uk.co.sentinelweb.cuer.net.ext.replaceUrlPlaceholder
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_ARG0
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API.P_COMMAND
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_CONFIG_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_LAUNCH_VIDEO_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_STATUS_API
 import uk.co.sentinelweb.cuer.remote.server.ipport
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage
-import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerMessage.*
+import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 
 internal class RemotePlayerService(
     private val executor: ServiceExecutor
 ) {
-    internal suspend fun executeCommand(locator: Locator, message: PlayerMessage) {
+    // fixme find better way to send serializdd object
+    internal suspend fun executeCommand(locator: Locator, message: PlayerCommandMessage): ResponseMessage {
         val command = when (message) {
             is PlayPause -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "PlayPause")
@@ -29,7 +32,7 @@ internal class RemotePlayerService(
 
             is TrackSelected -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "TrackSelected")
-                .replaceUrlPlaceholder(P_ARG0, message.itemId.id.toString())
+                .replaceUrlPlaceholder(P_ARG0, message.itemId.id.value)
             // fixme not implemented on server: need to add source/resetPosition
             SkipBack -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "SkipBack")
@@ -42,13 +45,22 @@ internal class RemotePlayerService(
 
             TrackFwd -> PLAYER_COMMAND_API.PATH
                 .replaceUrlPlaceholder(P_COMMAND, "TrackFwd")
+
+            Stop -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "Stop")
+            FocusWindow -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "FocusWindow")
+
+            is Volume -> PLAYER_COMMAND_API.PATH
+                .replaceUrlPlaceholder(P_COMMAND, "Volume")
+                .replaceUrlPlaceholder(P_ARG0, message.volume.toString())
         }
-        executor.getResponse(path = locator.ipport() + command)
+        return executor.getResponseMessage(path = locator.ipport() + command)
     }
 
-    internal suspend fun executeConfig(locator: Locator): ResponseDomain =
-        executor.getResponse(
-            path = locator.ipport() + RemoteWebServerContract.Companion.PLAYER_CONFIG_API.PATH
+    internal suspend fun executeGetConfig(locator: Locator): ResponseDomain =
+        executor.getResponseDomain(
+            path = locator.ipport() + PLAYER_CONFIG_API.PATH
         )
 
     internal suspend fun executeLaunchVideo(
@@ -64,4 +76,9 @@ internal class RemotePlayerService(
             postData = item
         )
     }
+
+    internal suspend fun executeGetPlayerStatus(locator: Locator): ResponseMessage =
+        executor.getResponseMessage(
+            path = locator.ipport() + PLAYER_STATUS_API.PATH
+        )
 }

@@ -32,13 +32,16 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModelMapper
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerUiMapper
 import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
+import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.link.LinkExtractor
 import uk.co.sentinelweb.cuer.app.util.link.TimecodeExtractor
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
@@ -47,6 +50,7 @@ import uk.co.sentinelweb.cuer.app.util.recent.RecentLocalPlaylists
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 
 object SharedAppModule {
     private val queueModule = module {
@@ -69,7 +73,17 @@ object SharedAppModule {
     }
 
     private val dbModule = module {
-        single<DatabaseInitializer> { JsonDatabaseInitializer(get(), get(), get(), get(), get(), get(), get()) }
+        single<DatabaseInitializer> {
+            JsonDatabaseInitializer(
+                assetOperations = get(),
+                backup = get(),
+                preferences = get(),
+                coroutines = get(),
+                playlistUpdateUsecase = get(),
+                recentLocalPlaylists = get(),
+                log = get()
+            )
+        }
         single {
             PlaylistMemoryRepository(
                 coroutines = get(),
@@ -132,16 +146,53 @@ object SharedAppModule {
             )
         }
         factory<PlaylistUpdateUsecase.UpdateCheck> { PlaylistUpdateUsecase.PlatformUpdateCheck() }
-        factory { PlaylistMergeUsecase(get(), get()) }
-        factory { PlaylistMediaLookupUsecase(get(), get(), get()) }
-        factory { AddLinkUsecase(get(), get(), get(), get(), get()) }
+        factory { PlaylistMergeUsecase(playlistOrchestrator = get(), log = get()) }
+        factory { PlaylistMediaLookupUsecase(mediaOrchestrator = get(), playlistItemOrchestrator = get(), log = get()) }
+        factory {
+            AddLinkUsecase(
+                mediaOrchestrator = get(),
+                playlistItemOrchestrator = get(),
+                playlistOrchestrator = get(),
+                linkScanner = get(),
+                coProvider = get()
+            )
+        }
         factory { PlaylistMediaUpdateUsecase(get()) }
-        factory { PlaylistOrDefaultUsecase(get(), get(), get()) }
-        factory { AddPlaylistUsecase(get(), get(), get(), get()) }
-        factory { AddBrowsePlaylistUsecase(get(), get(), get(), get()) }
-        factory { MediaUpdateFromPlatformUseCase(get(), get()) }
+        factory {
+            PlaylistOrDefaultUsecase(
+                playlistDatabaseRepository = get(),
+                playlistMemoryRepository = get(),
+                log = get()
+            )
+        }
+        factory {
+            AddPlaylistUsecase(
+                playlistMediaLookupUsecase = get(),
+                playlistOrchestrator = get(),
+                recentLocalPlaylists = get(),
+                log = get()
+            )
+        }
+        factory {
+            AddBrowsePlaylistUsecase(
+                playlistOrchestrator = get(),
+                addPlaylistUsecase = get(),
+                connectivityWrapper = get(),
+                log = get()
+            )
+        }
+        factory { MediaUpdateFromPlatformUseCase(connectivity = get(), mediaOrchestrator = get()) }
         factory { GetPlaylistsFromDeviceUseCase(get()) }
-        factory { GetFolderListUseCase(get(), get(), get(), get(), get()) }
+        factory {
+            GetFolderListUseCase(
+                prefs = get(),
+                fileOperations = get(),
+                guidCreator = get(),
+                timeProvider = get(),
+                log = get()
+            )
+        }
+        factory { StarMediaUseCase(playlistItemOrchestrator = get(), log = get()) }
     }
 
     private val remoteModule = module {
@@ -164,17 +215,45 @@ object SharedAppModule {
                 log = get(),
             )
         }
+
     }
 
     private val playerModule = module {
-        factory { PlayerModelMapper(get(), get(), get(), get(), get()) }
-        single { MediaSessionListener(get(), get()) }
+        factory {
+            PlayerModelMapper(
+                timeFormatter = get(),
+                timeProvider = get(),
+                descriptionMapper = get(),
+                log = get(),
+                ribbonCreator = get()
+            )
+        }
+        single { MediaSessionListener(coroutines = get(), log = get()) }
         factory<SkipContract.Mapper> { SkipModelMapper(timeSinceFormatter = get()) }
         single { PlayerSessionHolder() }
-        factory { PlayerSessionManager(get(), get()) }
-        single { PlayerSessionListener(get(), get(), get()) } // fixme maybe move this to scoped declaration
+        factory { PlayerSessionManager(guidCreator = get(), playerSessionHolder = get(), log = get()) }
+        single {
+            PlayerSessionListener(
+                coroutines = get(),
+                mapper = get(),
+                log = get()
+            )
+        } // fixme maybe move this to scoped declaration
         single { PlayerEventToIntentMapper }
-        factory { PlayerMessageToIntentMapper(get()) }
+        single { PlayerSessionMessageMapper(guidCreator = get(), localRepository = get()) }
+        factory { PlayerMessageToIntentMapper(itemOrchestrator = get(), log = get()) }
+        single {
+            CuerCastPlayerWatcher(
+                state = CuerCastPlayerWatcher.State(),
+                remotePlayerInteractor = get(),
+                coroutines = get(),
+                mediaSessionManager = get(),
+                prefs = get(),
+                remotesRepository = get(),
+                log = get()
+            )
+        }
+        factory { CastPlayerUiMapper(get(), get(), get()) }
     }
 
     private val utilModule = module {
@@ -187,7 +266,14 @@ object SharedAppModule {
         factory { PlatformFileOperation() }
         factory { LinkExtractor() }
         factory { TimecodeExtractor() }
-        factory { BackupCheck(get(), get(), get(), get()) }
+        factory {
+            BackupCheck(
+                prefs = get(),
+                timeProvider = get(),
+                dateTimeFormatter = get(),
+                connectivityCheck = get()
+            )
+        }
         factory { IdGenerator(get()) }
         factory<IBackupJsonManager> {
             BackupUseCase(
@@ -208,8 +294,8 @@ object SharedAppModule {
     private val uiModule = module {
         factory { IconMapper() }
         factory { DurationTextColorMapper() }
-        factory { BrowseRecentCategories(get(), get()) }
-        factory { RecentLocalPlaylists(get(), get()) }
+        factory { BrowseRecentCategories(prefs = get(), log = get()) }
+        factory { RecentLocalPlaylists(prefs = get(), log = get()) }
         factory<UpcomingContract.Presenter> {
             UpcomingPresenter(
                 view = get(),
@@ -221,6 +307,7 @@ object SharedAppModule {
             )
         }
         factory { FilesModelMapper() }
+        factory { RemotesModelMapper(strings = get(), log = get()) }
     }
 
     val modules = listOf(utilModule)

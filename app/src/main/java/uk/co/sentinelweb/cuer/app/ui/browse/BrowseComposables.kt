@@ -52,7 +52,7 @@ object BrowseComposables {
                 Box(contentAlignment = Alignment.Center) {
                     Column {
                         CuerTopAppBarComposables.CuerAppBar(
-                            text = model.title,
+                            title = model.title,
                             onUp = { view.dispatch(Event.OnUpClicked) },
                             actions = listOf(
                                 Action(CuerMenuItem.Help,

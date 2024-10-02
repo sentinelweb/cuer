@@ -40,6 +40,6 @@ class GlideFallbackLoadListener constructor(
     ): Boolean {
         //_log.d("glide loading suceess url = $url")
         imageView.setImageDrawable(resource)
-        return true
+        return false
     }
 }

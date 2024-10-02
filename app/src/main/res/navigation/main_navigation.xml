@@ -282,9 +282,14 @@
             android:label="@string/folders">
         <argument
                 android:name="REMOTE_ID"
-                android:defaultValue="false"
                 app:argType="string"
                 app:nullable="false"
+        />
+
+        <argument
+                android:name="FILE_PATH"
+                app:argType="string"
+                app:nullable="true"
         />
     </fragment>
 </navigation>

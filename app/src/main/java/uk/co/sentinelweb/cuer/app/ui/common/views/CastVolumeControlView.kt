@@ -14,7 +14,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.ViewCastVolumeBinding
-import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeIn
 import uk.co.sentinelweb.cuer.app.util.extension.view.fadeOut
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
@@ -27,8 +27,8 @@ class CastVolumeControlView @JvmOverloads constructor(
     defStyle: Int = android.R.attr.seekBarStyle
 ) : LinearLayout(context, attrs, defStyle), KoinComponent {
 
+    lateinit var castController: CastController
     private val res: ResourceWrapper by inject()
-    private val cuerCastSessionListener: CuerCastSessionListener by inject()
     private val contextProvider: CoroutineContextProvider by inject()
     private val timeProvider: TimeProvider by inject()
 
@@ -52,17 +52,17 @@ class CastVolumeControlView @JvmOverloads constructor(
         super.onFinishInflate()
         binding.root.setOnClickListener { }
         binding.cvVolumeMuteIcon.setOnClickListener {
-            cuerCastSessionListener.currentCastSession
-                ?.apply { volume = 0.0 }
-                ?.apply { binding.cvVolume.progress = 0 }
-                ?.apply { updateIcon() }
+            castController
+                .apply { setVolume(0f) }
+                .apply { binding.cvVolume.progress = 0 }
+                .apply { updateIcon() }
         }
         binding.cvVolume.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
                     if (timeProvider.currentTimeMillis() - lastUpdateLong > 300) {
-                        cuerCastSessionListener.currentCastSession
-                            ?.apply { volume = progress.toDouble() / binding.cvVolume.max }
+                        castController
+                            .apply { setVolume(progress.toFloat() / binding.cvVolume.max) }
                         lastUpdateLong = timeProvider.currentTimeMillis()
                         triggerHide()
                         updateIcon()
@@ -72,9 +72,9 @@ class CastVolumeControlView @JvmOverloads constructor(
 
             override fun onStartTrackingTouch(view: SeekBar) {}
             override fun onStopTrackingTouch(view: SeekBar) {
-                cuerCastSessionListener.currentCastSession
-                    ?.apply { volume = level }
-                    ?.apply { updateIcon() }
+                castController
+                    .apply { setVolume(level.toFloat()) }
+                    .apply { updateIcon() }
             }
         })
     }
@@ -99,6 +99,7 @@ class CastVolumeControlView @JvmOverloads constructor(
     fun show() {
         if (!isVisible) {
             fadeIn()
+
         }
         triggerHide()
     }
@@ -117,8 +118,8 @@ class CastVolumeControlView @JvmOverloads constructor(
 
     fun updateValue() {
         show()
-        cuerCastSessionListener.currentCastSession
-            ?.apply { binding.cvVolume.setProgress((volume * binding.cvVolume.max).toInt()) }
+        castController
+            .apply { binding.cvVolume.setProgress((getVolume() * binding.cvVolume.max).toInt()) }
         updateIcon()
     }
 }

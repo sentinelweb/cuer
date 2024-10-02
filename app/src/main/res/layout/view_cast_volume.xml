@@ -45,7 +45,7 @@
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_gravity="center_horizontal"
-        app:srcCompat="@drawable/ic_cast_connected_24"
+        app:srcCompat="@drawable/ic_chromecast_connected"
         android:padding="8dp"
         app:tint="@color/white"
     />

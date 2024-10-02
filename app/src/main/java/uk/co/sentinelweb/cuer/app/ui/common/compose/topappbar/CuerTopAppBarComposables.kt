@@ -3,6 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.*
@@ -13,13 +14,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import uk.co.sentinelweb.cuer.app.R
 
 object CuerTopAppBarComposables {
     @Composable
     fun CuerAppBar(
-        text: String,
+        title: String,
+        subTitle: String? = null,
         modifier: Modifier = Modifier,
         backgroundColor: Color = MaterialTheme.colors.primarySurface,
         contentColor: Color = contentColorFor(backgroundColor),
@@ -28,12 +31,23 @@ object CuerTopAppBarComposables {
     ) {
         TopAppBar(
             title = {
-                Text(
-                    text = text,
-                    style = MaterialTheme.typography.h4,
-                    maxLines = 1,
-                    color = Color.White,
-                )
+                Column {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.h5,
+                        maxLines = 1,
+                        color = Color.White,
+                    )
+                    if (subTitle != null) {
+                        Text(
+                            text = subTitle,
+                            style = MaterialTheme.typography.h6,
+                            maxLines = 1,
+                            color = Color.White,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
             },
             navigationIcon = {
                 if (onUp != null) {

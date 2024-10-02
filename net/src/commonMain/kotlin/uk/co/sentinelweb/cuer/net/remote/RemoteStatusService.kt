@@ -12,7 +12,7 @@ internal class RemoteStatusService(
 
     internal suspend fun sendAvailable(
         node: RemoteNodeDomain,
-        msg: RequestMessage
+        msg: RequestMessage// todo ResponseMessage?
     ): Unit = executor.post(
         path = node.ipport() + AVAILABLE_API.PATH,
         body = msg,

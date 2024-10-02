@@ -10,14 +10,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.*
 import uk.co.sentinelweb.cuer.app.usecase.GetPlaylistsFromDeviceUseCase
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
-import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
@@ -31,9 +29,7 @@ import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Pin
 
 class RemotesStoreFactory constructor(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
-    private val strings: StringDecoder,
     private val log: LogWrapper,
-    private val prefs: MultiPlatformPreferencesWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
@@ -42,7 +38,7 @@ class RemotesStoreFactory constructor(
     private val locationPermissionLaunch: LocationPermissionLaunch,
     private val wifiStateProvider: WifiStateProvider,
     private val getPlaylistsFromDeviceUseCase: GetPlaylistsFromDeviceUseCase,
-    private val playlistsOrchestrator: PlaylistOrchestrator
+    private val castController: CastController,
 ) {
 
     init {
@@ -108,7 +104,19 @@ class RemotesStoreFactory constructor(
                 is Intent.RemotePlaylists -> getRemotePlaylists(intent)
                 is Intent.RemoteFolders -> getRemoteFolders(intent)
                 is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
+                is Intent.CuerConnect -> cuerConnect(intent)
+                is Intent.CuerConnectScreen -> cuerConnectScreen(intent)
             }
+
+        private fun cuerConnect(intent: Intent.CuerConnect) {
+            // fixme check screens
+            publish(Label.CuerSelectScreen(intent.remote))
+        }
+
+        private fun cuerConnectScreen(intent: Intent.CuerConnectScreen) {
+            castController.connectCuerCast(intent.remote, intent.screen)
+            publish(Label.CuerConnected(intent.remote, intent.screen))
+        }
 
         private fun deleteRemote(intent: Intent.RemoteDelete) {
             coroutines.mainScope.launch { remotesRepository.removeNode(intent.remote) }
@@ -216,6 +224,7 @@ class RemotesStoreFactory constructor(
         private fun getRemoteFolders(intent: Intent.RemoteFolders) {
             intent.remote.id
                 ?.run { publish(Label.ActionFolders(this)) }
+                ?.run { publish(Label.None) } // stops label re-firing on back from folders
         }
     }
 

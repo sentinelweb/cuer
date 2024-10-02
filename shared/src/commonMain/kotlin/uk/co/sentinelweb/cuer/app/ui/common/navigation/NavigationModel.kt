@@ -45,7 +45,7 @@ data class NavigationModel constructor(
         PLAYLISTS(listOf()),
         PLAYLIST_EDIT(listOf(Param.PLAYLIST_ID, Param.SOURCE), listOf()),
         PLAYLIST_CREATE(listOf(Param.SOURCE), listOf()),
-        FOLDER_LIST(listOf(Param.REMOTE_ID), listOf()),
+        FOLDER_LIST(listOf(Param.REMOTE_ID), listOf(Param.FILE_PATH)),
         BROWSE,
         NAV_BACK, // use navigation to go back
         NAV_FINISH, // use navigation to finish activity
@@ -86,6 +86,8 @@ data class NavigationModel constructor(
         DO_AUTO_BACKUP(Boolean::class),
         ONBOARD_CONFIG(OnboardingContract.Config::class),
         ONBOARD_KEY(String::class),
+        BACK_PARAMS(Int::class),
+        FILE_PATH(String::class)
         ;
     }
 

@@ -57,7 +57,7 @@ object RemotesComposables {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
                     CuerTopAppBarComposables.CuerAppBar(
-                        text = model.title,
+                        title = model.title,
                         backgroundColor = Color.Transparent,
                         onUp = { view.dispatch(OnUpClicked) },
                         actions = listOf(
@@ -79,7 +79,8 @@ object RemotesComposables {
                     ) {
                         Header(model, view)
                         LazyColumn(
-                            modifier = Modifier.height(300.dp),
+                            modifier = Modifier
+                                .height(400.dp), // fixme need to calc height for device (or make scrollable)
                             contentPadding = PaddingValues(top = 4.dp)
                         ) {
                             items(model.remoteNodes) { remote ->
@@ -178,92 +179,123 @@ object RemotesComposables {
             .takeIf { it }
             ?.let { MaterialTheme.colors.onSurface }
             ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd,
+        Column(
+            Modifier
+                .background(MaterialTheme.colors.surface)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-                    .background(MaterialTheme.colors.surface),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Icon(
-                    painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
-                    tint = contentColor,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .padding(4.dp)
-                )
-                Column { // todo use textview
-                    Text(
-                        text = remote.title,
-                        color = contentColor,
-                        style = MaterialTheme.typography.h5,
-                        modifier = Modifier
-                            .padding(start = 8.dp),
-                    )
-                    Text(
-                        text = remote.address,
-                        color = contentColor,
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                    Text(
-                        text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
-                        color = contentColor,
-                        style = MaterialTheme.typography.body2,
-                        modifier = Modifier.padding(start = 8.dp)
-                    )
-                }
-            }
-            // overflow button and dropdown
             Box(
-                modifier = Modifier.wrapContentWidth(align = Alignment.End),
+                modifier = Modifier
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.CenterEnd,
             ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_more_vert),
-                    tint = colorResource(R.color.grey_500),
-                    contentDescription = null,
+                Row(
                     modifier = Modifier
-                        .size(48.dp)
-                        .padding(8.dp)
-                        .clickable { expanded = !expanded },
-                )
-                DropdownMenu(
-                    expanded = expanded,
-                    modifier = Modifier.width(200.dp),
-                    onDismissRequest = { expanded = false }
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    DropdownMenuItem(onClick = {
-                        expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
-                    }) {
-                        Text(stringResource(R.string.remotes_menu_ping))
+                    Icon(
+                        painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
+                        tint = contentColor,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(4.dp)
+                    )
+                    Column { // todo use textview
+                        Text(
+                            text = remote.title,
+                            color = contentColor,
+                            style = MaterialTheme.typography.h5,
+                            modifier = Modifier
+                                .padding(start = 8.dp),
+                        )
+                        Text(
+                            text = remote.address,
+                            color = contentColor,
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                        Text(
+                            text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
+                            color = contentColor,
+                            style = MaterialTheme.typography.body2,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
                     }
+                }
+                // overflow button and dropdown
+                Box(
+                    modifier = Modifier.wrapContentWidth(align = Alignment.End),
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.ic_more_vert),
+                        tint = colorResource(R.color.grey_500),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(48.dp)
+                            .padding(8.dp)
+                            .clickable { expanded = !expanded },
+                    )
+                    DropdownMenu(
+                        expanded = expanded,
+                        modifier = Modifier.width(200.dp),
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(onClick = {
+                            expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
+                        }) {
+                            Text(stringResource(R.string.remotes_menu_ping))
+                        }
 //                    DropdownMenuItem(onClick = {
 //                        expanded = dispatchAndClose(view, OnActionSync(remote.domain))
 //                    }) {
 //                        Text("Sync")
 //                    }
-                    DropdownMenuItem(onClick = {
-                        expanded = dispatchAndClose(view, OnActionDelete(remote.domain))
-                    }) {
-                        Text(stringResource(R.string.menu_delete))
-                    }
-                    Divider()
-                    DropdownMenuItem(onClick = {
-                        expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))
-                    }) {
-                        Text(stringResource(R.string.playlists_title))
-                    }
-                    DropdownMenuItem(onClick = {
-                        expanded = dispatchAndClose(view, OnActionFolders(remote.domain))
-                    }) {
-                        Text(stringResource(R.string.folders))
+                        DropdownMenuItem(onClick = {
+                            expanded = dispatchAndClose(view, OnActionDelete(remote.domain))
+                        }) {
+                            Text(stringResource(R.string.menu_delete))
+                        }
+//                        Divider()
+//                        DropdownMenuItem(onClick = {
+//                            expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))
+//                        }) {
+//                            Text(stringResource(R.string.playlists_title))
+//                        }
+//                        DropdownMenuItem(onClick = {
+//                            expanded = dispatchAndClose(view, OnActionFolders(remote.domain))
+//                        }) {
+//                            Text(stringResource(R.string.folders))
+//                        }
+//                        DropdownMenuItem(onClick = {
+//                            expanded = dispatchAndClose(view, OnActionCuerConnect(remote.domain))
+//                        }) {
+//                            Text(stringResource(R.string.remotes_cuer_connect))
+//                        }
                     }
                 }
+            }
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .padding(horizontal = dimensionResource(R.dimen.page_margin))
+                    .padding(bottom = 8.dp)
+            ) {
+                HeaderButton(stringResource(R.string.playlists_title), R.drawable.ic_playlists) {
+                    view.dispatch(
+                        OnActionPlaylists(remote.domain)
+                    )
+                }
+                HeaderButton(stringResource(R.string.folders), R.drawable.ic_folder_open) {
+                    view.dispatch(
+                        OnActionFolders(remote.domain)
+                    )
+                }
+                HeaderButton(
+                    stringResource(R.string.remotes_cuer_connect),
+                    R.drawable.ic_cuer_cast_connected
+                ) { view.dispatch(OnActionCuerConnect(remote.domain)) }
             }
         }
     }

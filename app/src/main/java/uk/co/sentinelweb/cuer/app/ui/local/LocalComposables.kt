@@ -53,7 +53,7 @@ object LocalComposables {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
                     CuerAppBar(
-                        text = model.title,
+                        title = model.title,
                         backgroundColor = colorResource(id = R.color.black_transparent_background),
                         onUp = { view.dispatch(Event.OnUpClicked) },
                         modifier = Modifier

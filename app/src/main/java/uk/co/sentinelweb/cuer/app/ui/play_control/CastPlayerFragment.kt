@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
-import androidx.annotation.ColorRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.FragmentNavigatorExtras
@@ -16,19 +15,37 @@ import com.google.android.material.snackbar.Snackbar
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.core.context.GlobalContext.get
+import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.CastPlayerViewBinding
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
+import uk.co.sentinelweb.cuer.app.ui.common.dialog.play.PlayDialog
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipView
+import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.util.cast.ChromeCastWrapper
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.CastConnectionState.*
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.ControlTarget.*
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemFactory
+import uk.co.sentinelweb.cuer.app.ui.playlist.item.ItemModelMapper
+import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
+import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
+import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
 import uk.co.sentinelweb.cuer.app.util.image.ImageProvider
 import uk.co.sentinelweb.cuer.app.util.image.loadFirebaseOrOtherUrl
+import uk.co.sentinelweb.cuer.app.util.wrapper.PlatformLaunchWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.YoutubeJavaApiWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -45,10 +62,12 @@ class CastPlayerFragment() :
     private val res: ResourceWrapper by inject()
     private val navigationProvider: NavigationProvider by inject()
     private val log: LogWrapper by inject()
+    private val castController: CastController by scope.inject()
 
     init {
         log.tag(this)
     }
+
     private var _binding: CastPlayerViewBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("CastPlayerViewBinding not bound")
 
@@ -76,6 +95,7 @@ class CastPlayerFragment() :
         binding.castPlayerPlaylistText.setOnClickListener { presenter.onPlaylistClick() }
         binding.castPlayerImage.setOnClickListener { presenter.onPlaylistItemClick() }
         binding.castPlayerSupport.setOnClickListener { presenter.onSupport() }
+        binding.castButton.setOnClickListener { presenter.onCastClick() }
         binding.castPlayerSeek.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -103,9 +123,33 @@ class CastPlayerFragment() :
         binding.castPlayerTrackLast.isEnabled = prevTrackEnabled
     }
 
+    override fun setTargetDetails(details: CastPlayerContract.State.TargetDetails) {
+        when (details.target) {
+            Local -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
+            ChromeCast -> when (details.connectionState) {
+                Connected -> binding.castButton.setImageResource(R.drawable.ic_chromecast_connected)
+                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_chromecast)
+            }
+
+            CuerCast -> when (details.connectionState) {
+                Connected -> binding.castButton.setImageResource(R.drawable.ic_cuer_cast_connected)
+                Connecting, Disconnected -> binding.castButton.setImageResource(R.drawable.ic_cuer_cast)
+            }
+
+            FloatingWindow -> binding.castButton.setImageResource(R.drawable.ic_picture_in_picture)
+        }
+        when (details.connectionState) {
+            Connected, Disconnected -> hideBuffering()
+            Connecting -> showBuffering()
+        }
+        binding.castConnectionSummary.text = details.name
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         linkScopeToActivity()
+        // should be a better way to inject castController but seems to be a lot of circular refs
+        presenter.setCastController(castController)
     }
 
     override fun onDestroyView() {
@@ -119,9 +163,9 @@ class CastPlayerFragment() :
         presenter.onResume()
     }
 
-    override fun initMediaRouteButton() {
-        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
-    }
+//    override fun initMediaRouteButton() {
+//        chromeCastWrapper.initMediaRouteButton(binding.mediaRouteButton)
+//    }
 
     override fun setPosition(second: String) {
         binding.castPlayerPosition.text = second
@@ -132,9 +176,23 @@ class CastPlayerFragment() :
         second?.apply { binding.castPlayerLiveTime.text = second }
     }
 
-    override fun setDurationColors(@ColorRes text: Int, @ColorRes upcomingBackground: Int) {
-        binding.castPlayerDuration.setTextColor(res.getColor(text))
-        binding.castPlayerDuration.setBackgroundColor(res.getColor(upcomingBackground))
+    override fun setDurationStyle(style: CastPlayerContract.DurationStyle) = when (style) {
+        Normal -> {
+            binding.castPlayerDuration.setTextColor(res.getColor(R.color.text_primary))
+            binding.castPlayerDuration.setBackgroundColor(res.getColor(R.color.transparent))
+        }
+
+        Upcoming -> {
+            binding.castPlayerDuration.setTextColor(res.getColor(R.color.white))
+            binding.castPlayerDuration.setBackgroundColor(res.getColor(R.color.upcoming_background))
+            binding.castPlayerDuration.text = getString(R.string.upcoming)
+        }
+
+        Live -> {
+            binding.castPlayerDuration.setTextColor(res.getColor(R.color.white))
+            binding.castPlayerDuration.setBackgroundColor(res.getColor(R.color.live_background))
+            binding.castPlayerDuration.text = getString(R.string.live)
+        }
     }
 
     override fun setDuration(duration: String) {
@@ -220,7 +278,7 @@ class CastPlayerFragment() :
         navigationProvider.navigate(navModel)
     }
 
-    override fun makeItemTransitionExtras() =
+    /*override*/ fun makeItemTransitionExtras() =
         FragmentNavigatorExtras(
             binding.castPlayerTitle to TRANS_TITLE,
             binding.castPlayerImage to TRANS_IMAGE
@@ -229,5 +287,74 @@ class CastPlayerFragment() :
     companion object {
         val TRANS_IMAGE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_image) }
         val TRANS_TITLE by lazy { get().get<ResourceWrapper>().getString(R.string.cast_player_trans_title) }
+
+        @JvmStatic
+        val viewModule = module {
+            factory { CompactPlayerScroll() }
+            scope(named<CastPlayerFragment>()) {
+                scoped { CastPlayerContract.State() } // was viewModel
+                scoped<CastPlayerContract.View> { get<CastPlayerFragment>() }
+                scoped<CastPlayerContract.Presenter> {
+                    CastPlayerPresenter(
+                        view = get(),
+                        mapper = get(),
+                        state = get(),
+                        log = get(),
+                        skipControl = get(),
+                        playUseCase = get(),
+                        playlistAndItemMapper = get(),
+                        remotesRepository = get(),
+                    )
+                }
+                scoped<SkipContract.External> {
+                    SkipPresenter(
+                        view = get(),
+                        state = SkipContract.State(),
+                        log = get(),
+                        mapper = get(),
+                        prefsWrapper = get()
+                    )
+                }
+                scoped<SkipContract.View> {
+                    SkipView(
+                        selectDialogCreator = SelectDialogCreator(context = this.getFragmentActivity())
+                    )
+                }
+
+                // todo play usecase - extract
+                scoped<PlatformLaunchWrapper> { YoutubeJavaApiWrapper(this.getFragmentActivity(), get()) }
+                // fixme needed for play dialog - but shouldn't be needed - remove
+                scoped { navigationRouter(false, this.getFragmentActivity(), false) }
+                scoped {
+                    PlayUseCase(
+                        queue = get(),
+                        ytCastContextHolder = get(),
+                        prefsWrapper = get(),
+                        coroutines = get(),
+                        floatingService = get(),
+                        strings = get(),
+                        cuerCastPlayerWatcher = get(),
+                        alertDialogCreator = get(),
+                        parentScope = get<CastPlayerFragment>().scope
+                    )
+                }
+                factory<PlayUseCase.Dialog> {
+                    PlayDialog(
+                        get<CastPlayerFragment>(),
+                        itemFactory = get(),
+                        itemModelMapper = get(),
+                        navigationRouter = get(),
+                        castDialogWrapper = get(),
+                        floatingService = get(),
+                        log = get(),
+                        youtubeApi = get(),
+                    )
+                }
+                scoped { ItemFactory(get(), get(), get()) }
+                scoped { ItemModelMapper(get(), get(), get(), get()) }
+
+            }
+        }
     }
+
 }

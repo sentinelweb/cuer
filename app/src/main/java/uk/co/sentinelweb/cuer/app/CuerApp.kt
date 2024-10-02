@@ -11,8 +11,8 @@ import uk.co.sentinelweb.cuer.app.di.Modules
 import uk.co.sentinelweb.cuer.app.exception.TerminatedWhilePlayingError
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.receiver.ScreenStateReceiver
-import uk.co.sentinelweb.cuer.app.service.cast.YoutubeCastServiceManager
-import uk.co.sentinelweb.cuer.app.util.cast.CuerCastSessionListener
+import uk.co.sentinelweb.cuer.app.service.cast.CastServiceManager
+import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastSessionListener
 import uk.co.sentinelweb.cuer.app.util.firebase.FirebaseWrapper
 import uk.co.sentinelweb.cuer.app.util.permission.NotificationChannelCreator
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
@@ -32,9 +32,9 @@ class CuerApp : Application() {
     private val databaseInit: DatabaseInitializer by inject()
     private val firebaseWrapper: FirebaseWrapper by inject()
     private val log: LogWrapper by inject()
-    private val castServiceManager: YoutubeCastServiceManager by inject()
+    private val castServiceManager: CastServiceManager by inject()
     private val serviceWrapper: ServiceWrapper by inject()
-    private val castSessionListener: CuerCastSessionListener by inject()
+    private val castSessionListener: ChromeCastSessionListener by inject()
     private val queue: QueueMediatorContract.Producer by inject()
     private val screenStateReceiver: ScreenStateReceiver by inject()
     private val wifiReceiver: WifiStateProvider by inject()
