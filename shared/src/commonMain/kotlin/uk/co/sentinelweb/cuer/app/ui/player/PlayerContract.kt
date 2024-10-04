@@ -222,7 +222,7 @@ interface PlayerContract {
     sealed class PlayerCommand {
         object Play : PlayerCommand()
         object Pause : PlayerCommand()
-        data class Load(val platformId: String, val startPosition: Long) : PlayerCommand()
+        data class Load(val item: PlaylistItemDomain, val startPosition: Long) : PlayerCommand()
         data class SkipFwd(val ms: Int) : PlayerCommand()
         data class SkipBack(val ms: Int) : PlayerCommand()
         data class SeekTo(val ms: Long) : PlayerCommand()

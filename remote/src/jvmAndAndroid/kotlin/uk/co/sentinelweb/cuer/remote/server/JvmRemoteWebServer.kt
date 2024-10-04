@@ -14,6 +14,9 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
@@ -49,6 +52,7 @@ import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -302,6 +306,7 @@ class JvmRemoteWebServer(
                     try {
                         (postData)
                             .let { deserialisePlaylistItem(it) }
+//                            .let {it.copy(media = it.media.copy())}
                             .let { item ->
                                 remotePlayerLaunchHost.launchVideo(
                                     item,
@@ -326,6 +331,48 @@ class JvmRemoteWebServer(
                         ?: apply {
                             call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
                         }
+                }
+                //http://192.168.1.12:9843/video-stream/torrent:::::farscape-s1:::::Farscape%20S01E03%20Back%20and%20Back%20and%20Back%20to%20the%20Future.mp4
+                get("/video-stream/{filePath}") {
+                    val filePath = call.parameters["filePath"]
+//                        ?.substring("/video-stream".length)
+                        ?.replace(":::::","/")
+                    if (filePath == null) {
+                        call.respond(HttpStatusCode.BadRequest, "File filePath is missing")
+                        return@get
+                    }
+                    logWrapper.d("/video-stream/filepath: $filePath")
+
+                    val parentPath = filePath.substring(0, filePath.lastIndexOf("/"))
+                    val item = getFolderListUseCase.getFolderList(parentPath)
+                        ?.children?.filter { it.platformId?.endsWith(filePath)?:false }
+                    val fullPath =  getFolderListUseCase.truncatedToFullFolderPath(filePath)
+                    logWrapper.d("/video-stream/filepath: $fullPath")
+
+                    val file = File(fullPath)
+                    if (!file.exists()) {
+                        call.respond(HttpStatusCode.NotFound, "File not found")
+                        return@get
+                    }
+
+                    val byteRange = call.request.header(HttpHeaders.Range)
+                    if (byteRange != null) {
+                        val range = parseRange(byteRange, file.length())
+                        if (range != null) {
+                            val (start, end) = range
+                            call.response.header(HttpHeaders.ContentRange, "bytes $start-$end/${file.length()}")
+                            call.respondBytesWriter(
+                                status = HttpStatusCode.PartialContent,
+                                contentType = ContentType.defaultForFile(file)
+                            ) {
+                                writeFilePart(file, start, end)
+                            }
+                        } else {
+                            call.respond(HttpStatusCode.RequestedRangeNotSatisfiable)
+                        }
+                    } else {
+                        call.respondFile(file)
+                    }
                 }
                 static("/") {
                     resources("")
@@ -352,3 +399,26 @@ suspend fun ApplicationCall.error(
         ContentType.Application.Json
     )
 }
+
+
+fun parseRange(rangeHeader: String, fileLength: Long): Pair<Long, Long>? {
+    val range = rangeHeader.removePrefix("bytes=").split("-")
+    val start = range[0].toLongOrNull() ?: return null
+    val end = range.getOrNull(1)?.toLongOrNull() ?: (fileLength - 1)
+    return if (start <= end) start to end else null
+}
+
+suspend fun ByteWriteChannel.writeFilePart(file: File, start: Long, end: Long) =
+    withContext(Dispatchers.IO) {
+        file.inputStream().use { inputStream ->
+            inputStream.skip(start)
+            var remaining = end - start + 1
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            while (remaining > 0) {
+                val read = inputStream.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
+                if (read == -1) break
+                writeFully(buffer, 0, read)
+                remaining -= read
+            }
+        }
+    }

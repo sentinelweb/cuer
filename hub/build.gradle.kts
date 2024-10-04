@@ -33,6 +33,7 @@ dependencies {
     implementation(libs.kotlinxCoroutinesJdk8)
     implementation(libs.ktorClientCore)
     implementation(libs.ktorClientCio)
+    implementation(libs.kotlinxDatetime)
     implementation(libs.batikTranscoder)
     implementation(libs.multiplatformSettings)
     implementation(libs.vlcj)

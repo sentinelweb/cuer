@@ -15,6 +15,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.REMOTE
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -23,9 +24,14 @@ import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.FILE
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.http
+import uk.co.sentinelweb.cuer.remote.server.locator
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
@@ -42,6 +48,7 @@ class VlcPlayerSwingWindow(
     private val folderListUseCase: GetFolderListUseCase,
     private val showHideControls: VlcPlayerShowHideControls,
     private val keyMap: VlcPlayerKeyMap,
+    private val localRepository: LocalRepository,
 ) : JFrame(), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
@@ -395,11 +402,11 @@ class VlcPlayerSwingWindow(
 
     fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
         is Load -> {
-            command.platformId
-                .also { log.d("") }
-                .let { folderListUseCase.truncatedToFullFolderPath(it) }
+            command.item
+                .also { log.d("${it.media.platformId}") }
+                .let { mapPath(it) }
                 ?.also { playItem(it) }
-                ?: log.d("Cannot get full path ${command.platformId}")
+                ?: log.d("Cannot get full path ${command.item.media.platformId}")
         }
 
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
@@ -408,6 +415,16 @@ class VlcPlayerSwingWindow(
         is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
         is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
     }.also { log.d("command:${command::class.java.simpleName}") }
+
+    private fun mapPath(item: PlaylistItemDomain) =
+        item
+            .takeIf { it.id != null && it.id?.source == REMOTE && it.id?.locator != null }
+            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
+            ?.takeIf { it.media.mediaType == FILE }
+            ?.let { it.copy(media = it.media.copy(platformId = "${it.id?.locator?.http()}/video-stream/${it.media.platformId}")) }
+            ?.media
+            ?.platformId
+            ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     fun updateTexts(texts: PlayerContract.View.Model.Texts) {
         if (!this@VlcPlayerSwingWindow.isUndecorated) {

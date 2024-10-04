@@ -256,7 +256,7 @@ class PlayerStoreFactory(
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
-                    Load(intent.item.media.platformId, intent.item.media.startPosition())
+                    Load(intent.item, intent.item.media.startPosition())
                 )
             )
         }
@@ -286,7 +286,7 @@ class PlayerStoreFactory(
             when (playState) {
                 VIDEO_CUED -> {
                     item?.media?.apply {
-                        publish(Label.Command(Load(platformId, startPosition())))
+                        publish(Label.Command(Load(item, startPosition())))
                     }
                     Unit
                 }

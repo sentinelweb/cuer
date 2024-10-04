@@ -222,7 +222,8 @@ class VlcPlayerUiCoordinator(
                         coordinator = get(),
                         folderListUseCase = get(),
                         showHideControls = VlcPlayerShowHideControls(),
-                        keyMap = VlcPlayerKeyMap()
+                        keyMap = VlcPlayerKeyMap(),
+                        localRepository = get()
                     )
                 }
             }
