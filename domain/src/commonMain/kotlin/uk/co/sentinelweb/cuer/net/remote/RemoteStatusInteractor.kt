@@ -12,4 +12,11 @@ interface RemoteStatusInteractor {
         remote: RemoteNodeDomain,
     ): NetResult<Boolean>
 
+    @Throws(Exception::class)
+    suspend fun sendTo(
+        messageType: AvailableMessage.MsgType,
+        remote: RemoteNodeDomain,
+        target: RemoteNodeDomain,
+    ): NetResult<Boolean>
+
 }

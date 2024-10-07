@@ -257,6 +257,11 @@ object RemotesComposables {
                         }) {
                             Text(stringResource(R.string.menu_delete))
                         }
+                        DropdownMenuItem(onClick = {
+                            expanded = dispatchAndClose(view, OnActionSendTo(remote.domain))
+                        }) {
+                            Text(stringResource(R.string.menu_sendto))
+                        }
 //                        Divider()
 //                        DropdownMenuItem(onClick = {
 //                            expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))

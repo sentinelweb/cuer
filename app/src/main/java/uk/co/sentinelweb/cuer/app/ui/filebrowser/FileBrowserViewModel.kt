@@ -86,7 +86,7 @@ class FileBrowserViewModel(
                     )
                 } else {
                     remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
-                        launchRemotePlayer(remoteNode, screen)
+                        launchRemotePlayer(remoteNode, screen ?: throw IllegalStateException("No screen selected"))
                     })
                 }
                 appModelObservable.value = appModelMapper.map(state = state, loading = false)

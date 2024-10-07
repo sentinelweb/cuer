@@ -169,6 +169,15 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                                 value.node
                             )
 
+                        is CuerSelectSendTo ->
+                            remotesDialogLauncher.launchRemotesDialog(
+                                { remoteNodeDomain, screen ->
+                                    remotesMviView.dispatch(Event.OnActionSendToSelected(value.sendNode, remoteNodeDomain))
+                                    remotesDialogLauncher.hideRemotesDialog()
+                                },
+                                null
+                            )
+
                         None -> Unit
                     }
                 }

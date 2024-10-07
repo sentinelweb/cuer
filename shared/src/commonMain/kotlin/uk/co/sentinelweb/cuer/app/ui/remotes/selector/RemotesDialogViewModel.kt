@@ -21,7 +21,7 @@ class RemotesDialogViewModel(
     private val coroutines: CoroutineContextProvider,
 ) {
 
-    lateinit var listener: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit
+    lateinit var listener: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit
 
     private val _model = MutableStateFlow(Model.blank)
     val model: Flow<Model> = _model
@@ -34,7 +34,11 @@ class RemotesDialogViewModel(
 
     fun onNodeSelected(node: RemoteNodeDomain) {
         coroutines.mainScope.launch {
-            remoteSelected(node)
+            if (state.isSelectNodeOnly) {
+                listener(node, null)
+            } else {
+                remoteSelected(node)
+            }
         }
     }
 
@@ -59,7 +63,11 @@ class RemotesDialogViewModel(
             }
     }
 
-    private suspend fun map() {
+    private fun map() {
         _model.value = Model(repo.remoteNodes.map { mapper.mapRemoteNode(it) })
+    }
+
+    fun setSelectNodeOnly() {
+        state.isSelectNodeOnly = true
     }
 }

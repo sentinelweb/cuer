@@ -24,10 +24,30 @@ class AvailableMessageMapper(
         )
     }
 
+    fun mapToMulticastMessage(remoteNode: RemoteNodeDomain): AvailableMessage.DeviceInfo {
+        return AvailableMessage.DeviceInfo(
+            id = remoteNode.id,
+            hostname = remoteNode.hostname,
+            deviceType = remoteNode.deviceType,
+            version = config.version,
+            ipAddress = remoteNode.ipAddress,
+            port = remoteNode.port,
+            device = remoteNode.device,
+            authType = mapAuthType(remoteNode.authType),
+            versionCode = config.versionCode,
+        )
+    }
+
     private fun mapAuthType(authType: LocalNodeDomain.AuthConfig): AvailableMessage.AuthMethod = when (authType) {
         is LocalNodeDomain.AuthConfig.Open -> AvailableMessage.AuthMethod.Open
         is LocalNodeDomain.AuthConfig.Username -> AvailableMessage.AuthMethod.Username
         is LocalNodeDomain.AuthConfig.Confirm -> AvailableMessage.AuthMethod.Confirm
+    }
+
+    private fun mapAuthType(authType: RemoteNodeDomain.AuthType): AvailableMessage.AuthMethod = when (authType) {
+        is RemoteNodeDomain.AuthType.Open -> AvailableMessage.AuthMethod.Open
+        is RemoteNodeDomain.AuthType.Username -> AvailableMessage.AuthMethod.Username
+        is RemoteNodeDomain.AuthType.Token -> AvailableMessage.AuthMethod.Confirm
     }
 
     fun mapFromMulticastMessage(
