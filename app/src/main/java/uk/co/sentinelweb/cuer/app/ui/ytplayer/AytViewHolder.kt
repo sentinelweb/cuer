@@ -200,9 +200,9 @@ class AytViewHolder(
         log.d(command.toString())
         when (command) {
             is PlayerContract.PlayerCommand.Load -> {
-                log.d("PlayerCommand.Load: $_currentVideoId != ${command.platformId} start:${command.startPosition}")
-                if (_currentVideoId != command.platformId) {
-                    _player?.loadVideo(command.platformId, command.startPosition / 1000f)
+                log.d("PlayerCommand.Load: $_currentVideoId != ${command.item.media.platformId} start:${command.startPosition}")
+                if (_currentVideoId != command.item.media.platformId) {
+                    _player?.loadVideo(command.item.media.platformId, command.startPosition / 1000f)
                     _progressBar?.isVisible = true
                 } else {
                     _player?.play()

@@ -78,6 +78,7 @@ class FileBrowserViewModel(
         viewModelScope.launch {
             appModelObservable.value = appModelMapper.map(state = state, loading = true)
             state.sourceNode?.apply {
+                // fixme when this is possible on both platforms - need a broader check
                 if (cuerCastPlayerWatcher.isWatching()) {
                     launchRemotePlayer(
                         cuerCastPlayerWatcher.remoteNode ?: throw IllegalStateException("No remote"),
@@ -101,7 +102,12 @@ class FileBrowserViewModel(
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
-            castController.connectCuerCast(state.sourceNode, screen)
+            // todo check if already connected to remote node
+            // todo also check if the dialog has connected
+            if (!castController.isConnected()) {
+                // assumes here that sourecnode == targetnode
+                castController.connectCuerCast(state.sourceNode, screen)
+            }
             remoteDialogLauncher.hideRemotesDialog()
             appModelObservable.value = appModelMapper.map(state = state, loading = false)
         }
