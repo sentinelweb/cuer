@@ -101,22 +101,22 @@ class CuerCastPlayerWatcher(
     fun isCommunicating(): Boolean = state.isCommunicating
 
     suspend fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls): Boolean {
-        prefs.curecastRemoteNodeName
-            ?.also { name ->
-                    remotesRepository.getByName(name)
-                        ?.also { foundNode ->
-                            prefs.cuerCastScreen?.also { screenIndex ->
-                                screen =
-                                    remotePlayerInteractor.getPlayerConfig(foundNode.locator())
-                                        .data
-                                        ?.screens
-                                        ?.getOrNull(screenIndex)
-                                        ?.also { remoteNode = foundNode }
-                                        ?.also { mainPlayerControls = playerControls }
-                                return true
-                            }
-                        }
-            }
+//        prefs.curecastRemoteNodeName
+//            ?.also { name ->
+//                    remotesRepository.getByName(name)
+//                        ?.also { foundNode ->
+//                            prefs.cuerCastScreen?.also { screenIndex ->
+//                                screen =
+//                                    remotePlayerInteractor.getPlayerConfig(foundNode.locator())
+//                                        .data
+//                                        ?.screens
+//                                        ?.getOrNull(screenIndex)
+//                                        ?.also { remoteNode = foundNode }
+//                                        ?.also { mainPlayerControls = playerControls }
+//                                return true
+//                            }
+//                        }
+//            }
         return false
     }
 
@@ -151,11 +151,11 @@ class CuerCastPlayerWatcher(
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
                 ?.apply { item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) } }
-                ?.apply {// fixme enable when we have playlist
+                ?.apply { // fixme enable when we have playlist
                     mainPlayerControls?.setButtons(Buttons(false, false, true))
                 }
                 ?.apply { mediaSessionManager.setMedia(this.item.media, null) } // fixme get playlist
-                ?.apply {// fixme get liveOffset, playlist
+                ?.apply { // fixme get liveOffset, playlist
                     mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
                 }
                 ?.apply { mainPlayerControls?.setVolume(volume / volumeMax) }
