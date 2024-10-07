@@ -41,6 +41,7 @@ import uk.co.sentinelweb.cuer.hub.ui.player.cast.*
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
 import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
@@ -80,6 +81,7 @@ object Modules {
         PreferencesUiCoordinator.uiModule,
         FilesUiCoordinator.uiModule,
         VlcPlayerUiCoordinator.uiModule,
+        RemotesDialogLauncher.launcherModule,
     )
 
     private val resourcesModule = module {

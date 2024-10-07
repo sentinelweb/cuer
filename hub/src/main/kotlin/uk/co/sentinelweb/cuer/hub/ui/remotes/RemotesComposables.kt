@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageEnumMapper
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 
 object RemotesComposables {
@@ -38,6 +39,7 @@ object RemotesComposables {
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
         val state = coordinator.modelObservable.collectAsState(initial = blankModel())
         RemotesView(state.value, coordinator)
+        ShowRemotesDialogIfNecessary(coordinator.remotesDialogLauncher)
     }
 
     @Composable
@@ -231,6 +233,11 @@ object RemotesComposables {
                         expanded = dispatchAndClose(view, Event.OnActionDelete(remote.domain))
                     }) {
                         Text("Delete")
+                    }
+                    DropdownMenuItem(onClick = {
+                        expanded = dispatchAndClose(view, Event.OnActionSendTo(remote.domain))
+                    }) {
+                        Text("Send To ...")
                     }
                     Divider()
                     DropdownMenuItem(onClick = {
