@@ -245,17 +245,53 @@ class VlcPlayerSwingWindow(
             ?: log.d("playItem: current is null")
         mediaPlayerComponent.mediaPlayer().media().prepare(path)
         mediaPlayerComponent.mediaPlayer().media().parsing().parse()
-        // play after parse is complete
-//        mediaPlayerComponent.mediaPlayer().media().play(path)
     }
 
     fun destroy() {
-//        mediaPlayerComponent.mediaPlayer().media().newMedia()
-        //mediaPlayerComponent.mediaPlayer().media().prepare(null as String?)
         mediaPlayerComponent.mediaPlayer().release()
         mediaPlayerComponent.mediaPlayer().media()
         this@VlcPlayerSwingWindow.dispose()
     }
+
+    fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
+        is Load -> {
+            command.item
+                .also { log.d("playStateChanged LOAD: ${it.media.platformId}") }
+                .let { mapPath(it) }
+                //?.let { "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }
+                ?.also { log.d("playStateChanged mappedPth: $it") }
+                ?.also { playItem(it) }
+                ?: log.d("Cannot get full path ${command.item.media.platformId}")
+        }
+
+        is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
+        is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
+        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
+        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
+        is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
+    }.also { log.d("command:${command::class.java.simpleName}") }
+
+    private fun mapPath(item: PlaylistItemDomain) =
+        item
+            .also { log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}") }
+            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
+            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
+            ?.takeIf { it.media.mediaType == VIDEO }
+            ?.let {
+                it.copy(
+                    media = it.media.copy(
+                        platformId = "${it.id?.locator?.http()}/video-stream/${
+                            URLEncoder.encode(
+                                it.media.platformId,
+                                "UTF-8"
+                            )
+                        }"
+                    )
+                )
+            }
+            ?.media
+            ?.platformId
+            ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     private fun createControls() {
         controlsPane = JPanel()
@@ -401,46 +437,6 @@ class VlcPlayerSwingWindow(
         posText.text = times.positionText
         durText.text = times.durationText
     }
-
-    fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
-        is Load -> {
-            command.item
-                .also { log.d("playStateChanged LOAD: ${it.media.platformId}") }
-                .let { mapPath(it) }
-                //?.let { "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }
-                ?.also { log.d("playStateChanged mappedPth: $it") }
-                ?.also { playItem(it) }
-                ?: log.d("Cannot get full path ${command.item.media.platformId}")
-        }
-
-        is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
-        is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
-        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
-        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
-        is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
-    }.also { log.d("command:${command::class.java.simpleName}") }
-
-    private fun mapPath(item: PlaylistItemDomain) =
-        item
-            .also { log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}") }
-            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
-            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
-            ?.takeIf { it.media.mediaType == VIDEO }
-            ?.let {
-                it.copy(
-                    media = it.media.copy(
-                        platformId = "${it.id?.locator?.http()}/video-stream/${
-                            URLEncoder.encode(
-                                it.media.platformId,
-                                "UTF-8"
-                            )
-                        }"
-                    )
-                )
-            }
-            ?.media
-            ?.platformId
-            ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     fun updateTexts(texts: PlayerContract.View.Model.Texts) {
         if (!this@VlcPlayerSwingWindow.isUndecorated) {
