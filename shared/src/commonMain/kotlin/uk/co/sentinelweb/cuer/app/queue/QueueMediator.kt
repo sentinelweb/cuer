@@ -9,6 +9,8 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Companion.NO_PLAYLIST
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Operation.*
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
 import uk.co.sentinelweb.cuer.app.orchestrator.flatOptions
 import uk.co.sentinelweb.cuer.app.usecase.PlaylistMediaUpdateUsecase
@@ -236,6 +238,8 @@ class QueueMediator constructor(
 
     private suspend fun updateCurrentItemFromMedia(updatedMedia: MediaDomain) {
         state.currentItem = state.currentItem
+            // todo support local netowrk
+            ?.takeIf { listOf(MEMORY, LOCAL).contains(it.id?.source)  }
             ?.run {
                 media.let {
                     MediaPositionUpdateDomain(

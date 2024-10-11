@@ -15,7 +15,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.REMOTE
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -418,7 +418,7 @@ class VlcPlayerSwingWindow(
 
     private fun mapPath(item: PlaylistItemDomain) =
         item
-            .takeIf { it.id != null && it.id?.source == REMOTE && it.id?.locator != null }
+            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
             ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
             ?.takeIf { it.media.mediaType == FILE }
             ?.let { it.copy(media = it.media.copy(platformId = "${it.id?.locator?.http()}/video-stream/${it.media.platformId}")) }

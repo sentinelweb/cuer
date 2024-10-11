@@ -20,8 +20,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.REMOTE
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
@@ -387,23 +386,23 @@ class JvmRemoteWebServer(
     private fun rewriteIdsToRemote(it: PlaylistAndChildrenDomain) = it.copy(
         playlist = it.playlist.copy(
             id = it.playlist.id?.copy(
-                source = REMOTE,
+                source = LOCAL_NETWORK,
                 locator = localRepository.localNode.locator()
             ),
             items = it.playlist.items.map {
                 it.copy(
                     id = it.id?.copy(
-                        source = REMOTE,
+                        source = LOCAL_NETWORK,
                         locator = localRepository.localNode.locator()
                     ),
                     media = it.media.copy(
                         id = it.media.id?.copy(
-                            source = REMOTE,
+                            source = LOCAL_NETWORK,
                             locator = localRepository.localNode.locator()
                         ),
                         channelData = it.media.channelData.copy(
                             id = it.media.channelData.id?.copy(
-                                source = REMOTE,
+                                source = LOCAL_NETWORK,
                                 locator = localRepository.localNode.locator()
                             )
                         )
