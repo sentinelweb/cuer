@@ -85,8 +85,8 @@ class FileBrowserViewModel(
                         cuerCastPlayerWatcher.screen ?: throw IllegalStateException("No remote screen")
                     )
                 } else {
-                    remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
-                        launchRemotePlayer(remoteNode, screen ?: throw IllegalStateException("No screen selected"))
+                    remoteDialogLauncher.launchRemotesDialog({ targetNode, screen ->
+                        launchRemotePlayer(targetNode, screen ?: throw IllegalStateException("No screen selected"))
                     })
                 }
                 appModelObservable.value = appModelMapper.map(state = state, loading = false)
@@ -94,11 +94,11 @@ class FileBrowserViewModel(
         }
     }
 
-    private fun launchRemotePlayer(remoteNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
+    private fun launchRemotePlayer(targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
         viewModelScope.launch {
             appModelObservable.value = appModelMapper.map(state = state, loading = true)
             playerInteractor.launchPlayerVideo(
-                remoteNode.locator(),
+                targetNode.locator(),
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
@@ -106,7 +106,7 @@ class FileBrowserViewModel(
             // todo also check if the dialog has connected
             if (!castController.isConnected()) {
                 // assumes here that sourecnode == targetnode
-                castController.connectCuerCast(state.sourceNode, screen)
+                castController.connectCuerCast(targetNode, screen)
             }
             remoteDialogLauncher.hideRemotesDialog()
             appModelObservable.value = appModelMapper.map(state = state, loading = false)
