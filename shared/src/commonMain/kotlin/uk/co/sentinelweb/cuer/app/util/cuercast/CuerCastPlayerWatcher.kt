@@ -31,6 +31,7 @@ class CuerCastPlayerWatcher(
     private val remotesRepository: RemotesRepository,
     private val log: LogWrapper,
 ) {
+
     data class State(
         var lastMessage: PlayerSessionContract.PlayerStatusMessage? = null,
         var isCommunicating: Boolean = false
@@ -43,7 +44,8 @@ class CuerCastPlayerWatcher(
     var remoteNode: RemoteNodeDomain? = null
         get() = field
         set(value) {
-            prefs.curecastRemoteNodeName = value?.hostname
+            log.e("Remote node set to: ${value?.name()} ${value?.locator()}", Exception())
+            prefs.curecastRemoteNodeName = value?.hostname // fixme store guid
             field = value
         }
 
@@ -87,7 +89,6 @@ class CuerCastPlayerWatcher(
                 startPolling()
             }
             field = value
-            //currentButtons?.let { value?.setButtons(it) }
         }
 
     fun getConnectionDescription() =
@@ -98,25 +99,26 @@ class CuerCastPlayerWatcher(
     fun isWatching(): Boolean = remoteNode != null
 
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
+
     fun isCommunicating(): Boolean = state.isCommunicating
 
     suspend fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls): Boolean {
-//        prefs.curecastRemoteNodeName
-//            ?.also { name ->
-//                    remotesRepository.getByName(name)
-//                        ?.also { foundNode ->
-//                            prefs.cuerCastScreen?.also { screenIndex ->
-//                                screen =
-//                                    remotePlayerInteractor.getPlayerConfig(foundNode.locator())
-//                                        .data
-//                                        ?.screens
-//                                        ?.getOrNull(screenIndex)
-//                                        ?.also { remoteNode = foundNode }
-//                                        ?.also { mainPlayerControls = playerControls }
-//                                return true
-//                            }
-//                        }
-//            }
+        prefs.curecastRemoteNodeName
+            ?.also { name ->
+                    remotesRepository.getByName(name)
+                        ?.also { foundNode ->
+                            prefs.cuerCastScreen?.also { screenIndex ->
+                                screen =
+                                    remotePlayerInteractor.getPlayerConfig(foundNode.locator())
+                                        .data
+                                        ?.screens
+                                        ?.getOrNull(screenIndex)
+                                        ?.also { remoteNode = foundNode }
+                                        ?.also { mainPlayerControls = playerControls }
+                                return true
+                            }
+                        }
+            }
         return false
     }
 

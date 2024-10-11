@@ -29,6 +29,7 @@ class RemotesDialogLauncher : RemotesDialogContract.Launcher, KoinComponent {
         node: RemoteNodeDomain?,
         isSelectNodeOnly: Boolean
     ) {
+        viewModel.resetState()
         viewModel.listener = callback
         if (isSelectNodeOnly) {
             viewModel.setSelectNodeOnly()

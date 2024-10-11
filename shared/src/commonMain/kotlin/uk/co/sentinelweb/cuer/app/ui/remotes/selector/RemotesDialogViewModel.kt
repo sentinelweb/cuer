@@ -70,4 +70,10 @@ class RemotesDialogViewModel(
     fun setSelectNodeOnly() {
         state.isSelectNodeOnly = true
     }
+
+    fun resetState() {
+        state.selectedNode = null
+        state.selectedNodeConfig = null
+        state.isSelectNodeOnly = false
+    }
 }
