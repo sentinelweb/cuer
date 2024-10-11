@@ -24,7 +24,6 @@ import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.FILE
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
@@ -408,7 +407,8 @@ class VlcPlayerSwingWindow(
             command.item
                 .also { log.d("playStateChanged LOAD: ${it.media.platformId}") }
                 .let { mapPath(it) }
-                ?.also{ log.d("playStateChanged mappedPth: $it")}
+                //?.let { "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }
+                ?.also { log.d("playStateChanged mappedPth: $it") }
                 ?.also { playItem(it) }
                 ?: log.d("Cannot get full path ${command.item.media.platformId}")
         }
@@ -421,13 +421,23 @@ class VlcPlayerSwingWindow(
     }.also { log.d("command:${command::class.java.simpleName}") }
 
     private fun mapPath(item: PlaylistItemDomain) =
-        // todo remove when url is rewritten
         item
-            .also {log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}")}
+            .also { log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}") }
             .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
             ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
             ?.takeIf { it.media.mediaType == VIDEO }
-            ?.let { it.copy(media = it.media.copy(platformId = "${it.id?.locator?.http()}/video-stream/${URLEncoder.encode(it.media.platformId, "UTF-8")}")) }
+            ?.let {
+                it.copy(
+                    media = it.media.copy(
+                        platformId = "${it.id?.locator?.http()}/video-stream/${
+                            URLEncoder.encode(
+                                it.media.platformId,
+                                "UTF-8"
+                            )
+                        }"
+                    )
+                )
+            }
             ?.media
             ?.platformId
             ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
