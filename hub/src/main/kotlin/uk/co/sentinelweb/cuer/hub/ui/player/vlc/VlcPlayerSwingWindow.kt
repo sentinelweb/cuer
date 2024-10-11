@@ -25,10 +25,12 @@ import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.FILE
+import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.locator
@@ -37,6 +39,7 @@ import java.awt.BorderLayout.*
 import java.awt.Color
 import java.awt.GraphicsEnvironment
 import java.awt.event.*
+import java.net.URLEncoder
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
@@ -403,8 +406,9 @@ class VlcPlayerSwingWindow(
     fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
         is Load -> {
             command.item
-                .also { log.d("${it.media.platformId}") }
+                .also { log.d("playStateChanged LOAD: ${it.media.platformId}") }
                 .let { mapPath(it) }
+                ?.also{ log.d("playStateChanged mappedPth: $it")}
                 ?.also { playItem(it) }
                 ?: log.d("Cannot get full path ${command.item.media.platformId}")
         }
@@ -417,11 +421,13 @@ class VlcPlayerSwingWindow(
     }.also { log.d("command:${command::class.java.simpleName}") }
 
     private fun mapPath(item: PlaylistItemDomain) =
+        // todo remove when url is rewritten
         item
+            .also {log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}")}
             .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
             ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
-            ?.takeIf { it.media.mediaType == FILE }
-            ?.let { it.copy(media = it.media.copy(platformId = "${it.id?.locator?.http()}/video-stream/${it.media.platformId}")) }
+            ?.takeIf { it.media.mediaType == VIDEO }
+            ?.let { it.copy(media = it.media.copy(platformId = "${it.id?.locator?.http()}/video-stream/${URLEncoder.encode(it.media.platformId, "UTF-8")}")) }
             ?.media
             ?.platformId
             ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)

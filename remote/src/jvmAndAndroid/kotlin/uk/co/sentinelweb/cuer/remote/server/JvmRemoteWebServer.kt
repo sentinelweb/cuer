@@ -56,6 +56,7 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
+import java.net.URLDecoder
 
 // todo break this up into use cases
 class JvmRemoteWebServer(
@@ -340,15 +341,16 @@ class JvmRemoteWebServer(
                     val filePath = call.parameters["filePath"]
 //                        ?.substring("/video-stream".length)
                         ?.replace(":::::", "/")
+                        ?.let { URLDecoder.decode(it, "UTF-8") }
                     if (filePath == null) {
                         call.respond(HttpStatusCode.BadRequest, "File filePath is missing")
                         return@get
                     }
                     logWrapper.d("/video-stream/filepath: $filePath")
 
-                    val parentPath = filePath.substring(0, filePath.lastIndexOf("/"))
-                    val item = getFolderListUseCase.getFolderList(parentPath)
-                        ?.children?.filter { it.platformId?.endsWith(filePath) ?: false }
+//                    val parentPath = filePath.substring(0, filePath.lastIndexOf("/"))
+//                    val item = getFolderListUseCase.getFolderList(parentPath)
+//                        ?.children?.filter { it.platformId?.endsWith(filePath) ?: false }
                     val fullPath = getFolderListUseCase.truncatedToFullFolderPath(filePath)
                     logWrapper.d("/video-stream/filepath: $fullPath")
 
