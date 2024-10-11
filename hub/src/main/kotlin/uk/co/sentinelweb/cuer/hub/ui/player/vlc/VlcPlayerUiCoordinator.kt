@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
+import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -81,7 +82,7 @@ class VlcPlayerUiCoordinator(
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
                 .apply { assemble(screen) }
                 .also { SleepPreventer.preventSleep() }
-        } else throw IllegalStateException("Can't find VLC")
+        } else error("Can't find VLC")
     }
 
     override fun destroy() {
@@ -148,6 +149,7 @@ class VlcPlayerUiCoordinator(
             if (playlist.id?.source == MEMORY) {
                 playlistOrchestrator.save(playlist, playlist.id!!.deepOptions())
             }
+            log.d("showPlayer: play itemId:${item.id?.serialise()}")
             playerItemLoader.setPlaylistAndItem(
                 PlaylistAndItemDomain(
                     playlistId = playlist.id,

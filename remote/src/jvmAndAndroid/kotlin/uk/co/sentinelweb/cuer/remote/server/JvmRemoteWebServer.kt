@@ -21,11 +21,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.REMOTE
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.PlaylistAndChildrenDomain
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
 import uk.co.sentinelweb.cuer.domain.ext.serialise
@@ -305,8 +307,9 @@ class JvmRemoteWebServer(
                     val postData = call.receiveText()
                     try {
                         (postData)
+                            .also { logWrapper.d("launchitem: postdata: ${it}") }
                             .let { deserialisePlaylistItem(it) }
-//                            .let {it.copy(media = it.media.copy())}
+                            .also { logWrapper.d("launchitem: ${it.id?.serialise()}") }
                             .let { item ->
                                 remotePlayerLaunchHost.launchVideo(
                                     item,
@@ -326,6 +329,7 @@ class JvmRemoteWebServer(
                     val path = call.parameters[FOLDER_LIST_API.P_PARAM]
                     logWrapper.d("Folder: $path")
                     getFolderListUseCase.getFolderList(path)
+                        ?.let { rewriteIdsToRemote(it) } // todo rewrite platformid -> http
                         ?.let { ResponseDomain(it) }
                         ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
                         ?: apply {
@@ -336,7 +340,7 @@ class JvmRemoteWebServer(
                 get("/video-stream/{filePath}") {
                     val filePath = call.parameters["filePath"]
 //                        ?.substring("/video-stream".length)
-                        ?.replace(":::::","/")
+                        ?.replace(":::::", "/")
                     if (filePath == null) {
                         call.respond(HttpStatusCode.BadRequest, "File filePath is missing")
                         return@get
@@ -345,8 +349,8 @@ class JvmRemoteWebServer(
 
                     val parentPath = filePath.substring(0, filePath.lastIndexOf("/"))
                     val item = getFolderListUseCase.getFolderList(parentPath)
-                        ?.children?.filter { it.platformId?.endsWith(filePath)?:false }
-                    val fullPath =  getFolderListUseCase.truncatedToFullFolderPath(filePath)
+                        ?.children?.filter { it.platformId?.endsWith(filePath) ?: false }
+                    val fullPath = getFolderListUseCase.truncatedToFullFolderPath(filePath)
                     logWrapper.d("/video-stream/filepath: $fullPath")
 
                     val file = File(fullPath)
@@ -379,6 +383,43 @@ class JvmRemoteWebServer(
                 }
             }
         }
+
+    private fun rewriteIdsToRemote(it: PlaylistAndChildrenDomain) = it.copy(
+        playlist = it.playlist.copy(
+            id = it.playlist.id?.copy(
+                source = REMOTE,
+                locator = localRepository.localNode.locator()
+            ),
+            items = it.playlist.items.map {
+                it.copy(
+                    id = it.id?.copy(
+                        source = REMOTE,
+                        locator = localRepository.localNode.locator()
+                    ),
+                    media = it.media.copy(
+                        id = it.media.id?.copy(
+                            source = REMOTE,
+                            locator = localRepository.localNode.locator()
+                        ),
+                        channelData = it.media.channelData.copy(
+                            id = it.media.channelData.id?.copy(
+                                source = REMOTE,
+                                locator = localRepository.localNode.locator()
+                            )
+                        )
+                    )
+                )
+            }
+        ),
+        children = it.children.map { child ->
+            child.copy(
+                id = child.id?.copy(
+                    source = REMOTE,
+                    locator = localRepository.localNode.locator()
+                )
+            )
+        }
+    )
 }
 
 
