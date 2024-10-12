@@ -27,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
@@ -47,6 +48,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PL
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
@@ -58,7 +60,6 @@ import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
 import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.net.URLDecoder
 
 // todo break this up into use cases
 class JvmRemoteWebServer(
@@ -338,12 +339,9 @@ class JvmRemoteWebServer(
                             call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
                         }
                 }
-                //http://192.168.1.12:9843/video-stream/torrent:::::farscape-s1:::::Farscape%20S01E03%20Back%20and%20Back%20and%20Back%20to%20the%20Future.mp4
-                get("/video-stream/{filePath}") {
+                get(VIDEO_STREAM_API.PATH) {
                     val filePath = call.parameters["filePath"]
-//                        ?.substring("/video-stream".length)
-                        ?.replace(":::::", "/")
-                        ?.let { URLDecoder.decode(it, "UTF-8") }
+                        ?.let { URLEncoder.decode(it, "UTF-8") }
                     if (filePath == null) {
                         call.respond(HttpStatusCode.BadRequest, "File filePath is missing")
                         return@get

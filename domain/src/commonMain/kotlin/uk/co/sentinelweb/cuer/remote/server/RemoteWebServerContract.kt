@@ -49,5 +49,10 @@ interface RemoteWebServerContract {
             val PATH = "/folders"
             val P_PARAM = "p"
         }
+        object VIDEO_STREAM_API {
+            val P_FILEPATH = "filePath"
+            val ROUTE = "/video-stream"
+            val PATH = "$ROUTE/{$P_FILEPATH}"
+        }
     }
 }

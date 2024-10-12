@@ -2,7 +2,6 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -26,13 +25,14 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.VIDEO
+import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
 import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.locator
 import java.awt.BorderLayout
@@ -40,7 +40,6 @@ import java.awt.BorderLayout.*
 import java.awt.Color
 import java.awt.GraphicsEnvironment
 import java.awt.event.*
-import java.net.URLEncoder
 import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
@@ -275,18 +274,15 @@ class VlcPlayerSwingWindow(
 
     private fun mapPath(item: PlaylistItemDomain) =
         item
-            .also { log.d("mapPath: id:${item.id?.serialise()} mediaType:${it.media.mediaType}") }
             .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
             ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
-            ?.takeIf { it.media.mediaType == VIDEO }
+            ?.takeIf { it.media.platform == PlatformDomain.FILESYSTEM }
             ?.let {
                 it.copy(
                     media = it.media.copy(
-                        platformId = "${it.id?.locator?.http()}/video-stream/${
-                            URLEncoder.encode(
-                                it.media.platformId,
-                                "UTF-8"
-                            )
+                        platformId =
+                        "${it.id?.locator?.http()}${VIDEO_STREAM_API.ROUTE}/${
+                            URLEncoder.encode(it.media.platformId, "UTF-8")
                         }"
                     )
                 )
