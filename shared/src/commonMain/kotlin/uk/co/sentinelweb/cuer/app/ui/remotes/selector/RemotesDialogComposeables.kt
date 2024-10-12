@@ -87,12 +87,10 @@ object RemotesDialogComposeables {
         remote: RemotesContract.View.RemoteNodeModel,
         viewModel: RemotesDialogViewModel
     ) {
-        // fixme why isAvailable false?
         val contentColor = remote.domain.isAvailable
             .takeIf { it }
             ?.let { MaterialTheme.colorScheme.onSurface }
             ?: MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-//        val contentColor = MaterialTheme.colors.onSurface
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -108,7 +106,7 @@ object RemotesDialogComposeables {
                 Image(
                     painter = painterResource(RemotesIconMapper.map(remote.deviceType)),
                     contentDescription = "Remote Icon",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                    colorFilter = ColorFilter.tint(contentColor),
                     modifier = Modifier
                         .size(48.dp)
                         .padding(8.dp)

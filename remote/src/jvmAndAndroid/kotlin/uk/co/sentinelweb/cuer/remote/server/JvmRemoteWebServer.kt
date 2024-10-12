@@ -14,17 +14,24 @@ import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.utils.io.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
+import uk.co.sentinelweb.cuer.domain.ext.rewriteIdsToSource
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
@@ -41,6 +48,7 @@ import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PL
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLISTS_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYLIST_SOURCE_API
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
 import uk.co.sentinelweb.cuer.remote.server.database.RemoteDatabaseAdapter
 import uk.co.sentinelweb.cuer.remote.server.ext.checkNull
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage
@@ -49,6 +57,7 @@ import uk.co.sentinelweb.cuer.remote.server.message.ResponseMessage
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerCommandMessage.*
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionHolder
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionMessageMapper
+import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -301,7 +310,9 @@ class JvmRemoteWebServer(
                     val postData = call.receiveText()
                     try {
                         (postData)
+                            .also { logWrapper.d("launchitem: postdata: ${it}") }
                             .let { deserialisePlaylistItem(it) }
+                            .also { logWrapper.d("launchitem: ${it.id?.serialise()}") }
                             .let { item ->
                                 remotePlayerLaunchHost.launchVideo(
                                     item,
@@ -321,11 +332,52 @@ class JvmRemoteWebServer(
                     val path = call.parameters[FOLDER_LIST_API.P_PARAM]
                     logWrapper.d("Folder: $path")
                     getFolderListUseCase.getFolderList(path)
+                        ?.rewriteIdsToSource(LOCAL_NETWORK, localRepository.localNode.locator())
                         ?.let { ResponseDomain(it) }
                         ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
                         ?: apply {
                             call.respond(HttpStatusCode.NotFound, "No folder with path: $path")
                         }
+                }
+                get(VIDEO_STREAM_API.PATH) {
+                    val filePath = call.parameters["filePath"]
+                        ?.let { URLEncoder.decode(it, "UTF-8") }
+                    if (filePath == null) {
+                        call.respond(HttpStatusCode.BadRequest, "File filePath is missing")
+                        return@get
+                    }
+                    logWrapper.d("/video-stream/filepath: $filePath")
+
+//                    val parentPath = filePath.substring(0, filePath.lastIndexOf("/"))
+//                    val item = getFolderListUseCase.getFolderList(parentPath)
+//                        ?.children?.filter { it.platformId?.endsWith(filePath) ?: false }
+                    val fullPath = getFolderListUseCase.truncatedToFullFolderPath(filePath)
+                    logWrapper.d("/video-stream/filepath: $fullPath")
+
+                    val file = File(fullPath)
+                    if (!file.exists()) {
+                        call.respond(HttpStatusCode.NotFound, "File not found")
+                        return@get
+                    }
+
+                    val byteRange = call.request.header(HttpHeaders.Range)
+                    if (byteRange != null) {
+                        val range = parseRange(byteRange, file.length())
+                        if (range != null) {
+                            val (start, end) = range
+                            call.response.header(HttpHeaders.ContentRange, "bytes $start-$end/${file.length()}")
+                            call.respondBytesWriter(
+                                status = HttpStatusCode.PartialContent,
+                                contentType = ContentType.defaultForFile(file)
+                            ) {
+                                writeFilePart(file, start, end)
+                            }
+                        } else {
+                            call.respond(HttpStatusCode.RequestedRangeNotSatisfiable)
+                        }
+                    } else {
+                        call.respondFile(file)
+                    }
                 }
                 static("/") {
                     resources("")
@@ -352,3 +404,26 @@ suspend fun ApplicationCall.error(
         ContentType.Application.Json
     )
 }
+
+
+fun parseRange(rangeHeader: String, fileLength: Long): Pair<Long, Long>? {
+    val range = rangeHeader.removePrefix("bytes=").split("-")
+    val start = range[0].toLongOrNull() ?: return null
+    val end = range.getOrNull(1)?.toLongOrNull() ?: (fileLength - 1)
+    return if (start <= end) start to end else null
+}
+
+suspend fun ByteWriteChannel.writeFilePart(file: File, start: Long, end: Long) =
+    withContext(Dispatchers.IO) {
+        file.inputStream().use { inputStream ->
+            inputStream.skip(start)
+            var remaining = end - start + 1
+            val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+            while (remaining > 0) {
+                val read = inputStream.read(buffer, 0, minOf(buffer.size.toLong(), remaining).toInt())
+                if (read == -1) break
+                writeFully(buffer, 0, read)
+                remaining -= read
+            }
+        }
+    }

@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.remote.server.ServerState
 import uk.co.sentinelweb.cuer.remote.server.http
 import uk.co.sentinelweb.cuer.remote.server.message.AvailableMessage.MsgType.Ping
 
-class RemotesStoreFactory constructor(
+class RemotesStoreFactory(
     private val storeFactory: StoreFactory = DefaultStoreFactory(),
     private val log: LogWrapper,
     private val remoteServerManager: RemoteServerContract.Manager,
@@ -106,6 +106,8 @@ class RemotesStoreFactory constructor(
                 is Intent.LocalUpdate -> dispatch(Result.UpdateServerState)
                 is Intent.CuerConnect -> cuerConnect(intent)
                 is Intent.CuerConnectScreen -> cuerConnectScreen(intent)
+                is Intent.ActionSendTo -> sendTo(intent)
+                is Intent.ActionSendToSelected -> sendToSelected(intent)
             }
 
         private fun cuerConnect(intent: Intent.CuerConnect) {
@@ -147,6 +149,16 @@ class RemotesStoreFactory constructor(
                     )
                 )
             }
+        }
+
+        private fun sendToSelected(intent: Intent.ActionSendToSelected) {
+            coroutines.ioScope.launch {
+                remoteStatusInteractor.sendTo(Ping, intent.sendNode, intent.target).isSuccessful
+            }
+        }
+
+        private fun sendTo(intent: Intent.ActionSendTo) {
+            publish(Label.CuerSelectSendTo(intent.sendNode))
         }
 
         private fun config(intent: Intent) {

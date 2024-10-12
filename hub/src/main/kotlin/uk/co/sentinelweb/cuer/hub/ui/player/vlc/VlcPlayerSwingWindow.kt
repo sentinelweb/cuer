@@ -15,17 +15,26 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
+import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
+import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
+import uk.co.sentinelweb.cuer.remote.server.http
+import uk.co.sentinelweb.cuer.remote.server.locator
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
@@ -42,6 +51,8 @@ class VlcPlayerSwingWindow(
     private val folderListUseCase: GetFolderListUseCase,
     private val showHideControls: VlcPlayerShowHideControls,
     private val keyMap: VlcPlayerKeyMap,
+    private val localRepository: LocalRepository,
+    private val coroutineContextProvider: CoroutineContextProvider
 ) : JFrame(), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
@@ -142,9 +153,10 @@ class VlcPlayerSwingWindow(
                 override fun mediaParsedChanged(media: Media, newStatus: MediaParsedStatus) {
                     val ms = media.info().duration()
                     log.d("duration: $ms")
-                    durationMs = ms
-                    coordinator.dispatch(DurationReceived(ms))
-                    mediaPlayerComponent.mediaPlayer().media().play(media.newMediaRef())
+                    if (ms > -1) {
+                        durationMs = ms
+                        coordinator.dispatch(DurationReceived(ms))
+                    }
                 }
             }
         )
@@ -234,19 +246,50 @@ class VlcPlayerSwingWindow(
         mediaPlayerComponent.mediaPlayer().media().info()
             ?.apply { log.d("playItem: current ${this.mrl()}") }
             ?: log.d("playItem: current is null")
-        mediaPlayerComponent.mediaPlayer().media().prepare(path)
-        mediaPlayerComponent.mediaPlayer().media().parsing().parse()
-        // play after parse is complete
-//        mediaPlayerComponent.mediaPlayer().media().play(path)
+        mediaPlayerComponent.mediaPlayer().media().play(path)
     }
 
     fun destroy() {
-//        mediaPlayerComponent.mediaPlayer().media().newMedia()
-        //mediaPlayerComponent.mediaPlayer().media().prepare(null as String?)
         mediaPlayerComponent.mediaPlayer().release()
-        mediaPlayerComponent.mediaPlayer().media()
         this@VlcPlayerSwingWindow.dispose()
     }
+
+    fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
+        is Load -> {
+            command.item
+                .also { log.d("playStateChanged LOAD: ${it.media.platformId}") }
+                .let { mapPath(it) }
+                //?.let { "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" }
+                ?.also { log.d("playStateChanged mappedPth: $it") }
+                ?.also { playItem(it) }
+                ?: log.d("Cannot get full path ${command.item.media.platformId}")
+        }
+
+        is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
+        is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
+        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
+        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
+        is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
+    }.also { log.d("command:${command::class.java.simpleName}") }
+
+    private fun mapPath(item: PlaylistItemDomain) =
+        item
+            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
+            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
+            ?.takeIf { it.media.platform == PlatformDomain.FILESYSTEM }
+            ?.let {
+                it.copy(
+                    media = it.media.copy(
+                        platformId =
+                        "${it.id?.locator?.http()}${VIDEO_STREAM_API.ROUTE}/${
+                            URLEncoder.encode(it.media.platformId, "UTF-8")
+                        }"
+                    )
+                )
+            }
+            ?.media
+            ?.platformId
+            ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     private fun createControls() {
         controlsPane = JPanel()
@@ -392,22 +435,6 @@ class VlcPlayerSwingWindow(
         posText.text = times.positionText
         durText.text = times.durationText
     }
-
-    fun playStateChanged(command: PlayerContract.PlayerCommand) = when (command) {
-        is Load -> {
-            command.platformId
-                .also { log.d("") }
-                .let { folderListUseCase.truncatedToFullFolderPath(it) }
-                ?.also { playItem(it) }
-                ?: log.d("Cannot get full path ${command.platformId}")
-        }
-
-        is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
-        is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
-        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
-        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
-        is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
-    }.also { log.d("command:${command::class.java.simpleName}") }
 
     fun updateTexts(texts: PlayerContract.View.Model.Texts) {
         if (!this@VlcPlayerSwingWindow.isUndecorated) {

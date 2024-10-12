@@ -12,10 +12,11 @@ class RemotesDialogLauncher(
 
     private var dialogFragment: DialogFragment? = null
     override fun launchRemotesDialog(
-        callback: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
-        node: RemoteNodeDomain?
+        callback: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+        node: RemoteNodeDomain?,
+        isSelectNodeOnly: Boolean
     ) {
-        dialogFragment = RemotesDialogFragment.newInstance(callback, node)
+        dialogFragment = RemotesDialogFragment.newInstance(callback, node, isSelectNodeOnly)
         dialogFragment?.show(activity.supportFragmentManager, CAST_DIALOG_FRAGMENT_TAG)
     }
 

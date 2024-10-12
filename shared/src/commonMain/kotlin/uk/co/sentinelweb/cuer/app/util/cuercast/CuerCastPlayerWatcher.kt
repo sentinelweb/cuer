@@ -31,6 +31,7 @@ class CuerCastPlayerWatcher(
     private val remotesRepository: RemotesRepository,
     private val log: LogWrapper,
 ) {
+
     data class State(
         var lastMessage: PlayerSessionContract.PlayerStatusMessage? = null,
         var isCommunicating: Boolean = false
@@ -43,7 +44,8 @@ class CuerCastPlayerWatcher(
     var remoteNode: RemoteNodeDomain? = null
         get() = field
         set(value) {
-            prefs.curecastRemoteNodeName = value?.hostname
+            log.e("Remote node set to: ${value?.name()} ${value?.locator()}", Exception())
+            prefs.curecastRemoteNodeName = value?.hostname // fixme store guid
             field = value
         }
 
@@ -87,7 +89,6 @@ class CuerCastPlayerWatcher(
                 startPolling()
             }
             field = value
-            //currentButtons?.let { value?.setButtons(it) }
         }
 
     fun getConnectionDescription() =
@@ -98,6 +99,7 @@ class CuerCastPlayerWatcher(
     fun isWatching(): Boolean = remoteNode != null
 
     fun isPlaying(): Boolean = state.lastMessage?.playbackState == PlayerStateDomain.PLAYING
+
     fun isCommunicating(): Boolean = state.isCommunicating
 
     suspend fun attemptRestoreConnection(playerControls: PlayerContract.PlayerControls): Boolean {
@@ -145,17 +147,17 @@ class CuerCastPlayerWatcher(
         withContext(coroutines.Main) {
             result.takeIf { it.isSuccessful }
                 ?.data
-                ?.let { addBlankRemoteIdToItem(it) }
+                //?.let { addBlankRemoteIdToItem(it) }
                 ?.let { addThumbnailToMedia(it) }
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
                 ?.apply { item.media.duration?.let { mainPlayerControls?.setDuration(it / 1000f) } }
                 ?.apply { item.media.positon?.let { mainPlayerControls?.setCurrentSecond(it / 1000f) } }
-                ?.apply {// fixme enable when we have playlist
+                ?.apply { // fixme enable when we have playlist
                     mainPlayerControls?.setButtons(Buttons(false, false, true))
                 }
                 ?.apply { mediaSessionManager.setMedia(this.item.media, null) } // fixme get playlist
-                ?.apply {// fixme get liveOffset, playlist
+                ?.apply { // fixme get liveOffset, playlist
                     mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
                 }
                 ?.apply { mainPlayerControls?.setVolume(volume / volumeMax) }
@@ -206,14 +208,14 @@ class CuerCastPlayerWatcher(
             )
         } else it
 
-    private fun addBlankRemoteIdToItem(it: PlayerSessionContract.PlayerStatusMessage) =
-        if (it.item.id == null) {
-            it.copy(
-                item = it.item.copy(
-                    id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
-                )
-            )
-        } else it
+//    private fun addBlankRemoteIdToItem(it: PlayerSessionContract.PlayerStatusMessage) =
+//        if (it.item.id == null) {
+//            it.copy(
+//                item = it.item.copy(
+//                    id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
+//                )
+//            )
+//        } else it
 
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {

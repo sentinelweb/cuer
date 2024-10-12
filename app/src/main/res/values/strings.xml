@@ -24,6 +24,7 @@
     <string name="menu_pin">Pin</string>
     <string name="menu_share">Share</string>
     <string name="menu_delete">Delete</string>
+    <string name="menu_sendto">Send to …</string>
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_restart">Restart</string>
     <string name="menu_settings">Settings</string>

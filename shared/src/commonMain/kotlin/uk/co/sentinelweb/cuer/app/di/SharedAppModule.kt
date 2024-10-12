@@ -157,7 +157,7 @@ object SharedAppModule {
                 coProvider = get()
             )
         }
-        factory { PlaylistMediaUpdateUsecase(get()) }
+        factory { PlaylistMediaUpdateUsecase(get(), get()) }
         factory {
             PlaylistOrDefaultUsecase(
                 playlistDatabaseRepository = get(),

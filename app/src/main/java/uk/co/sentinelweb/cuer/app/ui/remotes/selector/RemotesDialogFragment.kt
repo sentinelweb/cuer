@@ -21,8 +21,9 @@ import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class RemotesDialogFragment(
-    private val selectedListener: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
-    private val selectedNode: RemoteNodeDomain?
+    private val selectedListener: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+    private val selectedNode: RemoteNodeDomain?,
+    private val isSelectNodeOnly: Boolean,
 ) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
@@ -31,7 +32,7 @@ class RemotesDialogFragment(
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
     private var _binding: FragmentComposeBinding? = null
-    private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
+    private val binding get() = _binding ?: throw IllegalStateException("RemotesDialogFragment view not bound")
 
     init {
         log.tag(this)
@@ -61,7 +62,12 @@ class RemotesDialogFragment(
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.listener = selectedListener
-        selectedNode?.apply { viewModel.onNodeSelected(this) }
+        if (isSelectNodeOnly) {
+            viewModel.setSelectNodeOnly()
+        } else {
+            selectedNode
+                ?.apply { viewModel.onNodeSelected(this) }
+        }
         binding.composeView.setContent {
             RemotesDialogComposeables.RemotesDialogUi(viewModel)
         }
@@ -89,10 +95,11 @@ class RemotesDialogFragment(
 
     companion object {
         fun newInstance(
-            selected: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
-            selectedNode: RemoteNodeDomain?
+            selected: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+            selectedNode: RemoteNodeDomain?,
+            isSelectNodeOnly: Boolean
         ): RemotesDialogFragment {
-            return RemotesDialogFragment(selected, selectedNode)
+            return RemotesDialogFragment(selected, selectedNode, isSelectNodeOnly)
         }
 
         @JvmStatic
@@ -110,5 +117,4 @@ class RemotesDialogFragment(
             }
         }
     }
-
 }

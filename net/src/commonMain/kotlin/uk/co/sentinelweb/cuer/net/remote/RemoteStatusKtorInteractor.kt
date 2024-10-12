@@ -36,4 +36,23 @@ internal class RemoteStatusKtorInteractor(
                 NetResult.Error(e)
             }
         }
+
+    override suspend fun sendTo(
+        messageType: AvailableMessage.MsgType,
+        remote: RemoteNodeDomain,
+        target: RemoteNodeDomain
+    ): NetResult<Boolean> =
+        try {
+            val availableMessage = AvailableMessage(
+                messageType,
+                availableMessageMapper.mapToMulticastMessage(remote)
+            )
+            val dto =
+                availableService.sendAvailable(target, RequestMessage(availableMessage))
+            NetResult.Data(true)
+        } catch (e: RequestFailureException) {
+            NetResult.HttpError(e)
+        } catch (e: Exception) {
+            NetResult.Error(e)
+        }
 }

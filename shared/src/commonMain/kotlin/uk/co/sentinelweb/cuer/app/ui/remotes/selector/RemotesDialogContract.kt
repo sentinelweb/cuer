@@ -7,8 +7,9 @@ import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 interface RemotesDialogContract {
     interface Launcher {
         fun launchRemotesDialog(
-            callback: (RemoteNodeDomain, PlayerNodeDomain.Screen) -> Unit,
-            node: RemoteNodeDomain? = null
+            callback: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+            node: RemoteNodeDomain? = null,
+            isSelectNodeOnly: Boolean = false,
         )
 
         fun hideRemotesDialog()
@@ -17,6 +18,7 @@ interface RemotesDialogContract {
     data class State(
         var selectedNode: RemoteNodeDomain? = null,
         var selectedNodeConfig: PlayerNodeDomain? = null,
+        var isSelectNodeOnly: Boolean = false,
     )
 
     data class Model(

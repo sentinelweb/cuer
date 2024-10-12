@@ -70,6 +70,8 @@ class RemotesController(
             is Event.OnActionFolders -> Intent.RemoteFolders(remote)
             is Event.OnActionCuerConnect -> Intent.CuerConnect(remote)
             is Event.OnActionCuerConnectScreen -> Intent.CuerConnectScreen(remote, screen)
+            is Event.OnActionSendTo -> Intent.ActionSendTo(sendNode)
+            is Event.OnActionSendToSelected -> Intent.ActionSendToSelected(sendNode, target)
         }
     }
 

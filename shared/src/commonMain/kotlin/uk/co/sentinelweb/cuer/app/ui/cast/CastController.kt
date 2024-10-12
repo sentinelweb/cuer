@@ -100,6 +100,9 @@ class CastController(
         }
     }
 
+    fun isConnected(): Boolean =
+        cuerCastPlayerWatcher.isWatching() || chromeCastHolder.isConnected()
+
     fun killCurrentSession() {
         chromeCastHolder.destroy()
         cuerCastPlayerWatcher.cleanup()

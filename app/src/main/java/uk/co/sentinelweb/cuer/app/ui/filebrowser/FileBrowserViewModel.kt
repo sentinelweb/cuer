@@ -78,14 +78,15 @@ class FileBrowserViewModel(
         viewModelScope.launch {
             appModelObservable.value = appModelMapper.map(state = state, loading = true)
             state.sourceNode?.apply {
+                // fixme when this is possible on both platforms - need a broader check
                 if (cuerCastPlayerWatcher.isWatching()) {
                     launchRemotePlayer(
                         cuerCastPlayerWatcher.remoteNode ?: throw IllegalStateException("No remote"),
                         cuerCastPlayerWatcher.screen ?: throw IllegalStateException("No remote screen")
                     )
                 } else {
-                    remoteDialogLauncher.launchRemotesDialog({ remoteNode, screen ->
-                        launchRemotePlayer(remoteNode, screen)
+                    remoteDialogLauncher.launchRemotesDialog({ targetNode, screen ->
+                        launchRemotePlayer(targetNode, screen ?: throw IllegalStateException("No screen selected"))
                     })
                 }
                 appModelObservable.value = appModelMapper.map(state = state, loading = false)
@@ -93,15 +94,20 @@ class FileBrowserViewModel(
         }
     }
 
-    private fun launchRemotePlayer(remoteNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
+    private fun launchRemotePlayer(targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
         viewModelScope.launch {
             appModelObservable.value = appModelMapper.map(state = state, loading = true)
             playerInteractor.launchPlayerVideo(
-                remoteNode.locator(),
+                targetNode.locator(),
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
-            castController.connectCuerCast(state.sourceNode, screen)
+            // todo check if already connected to remote node
+            // todo also check if the dialog has connected
+            if (!castController.isConnected()) {
+                // assumes here that sourecnode == targetnode
+                castController.connectCuerCast(targetNode, screen)
+            }
             remoteDialogLauncher.hideRemotesDialog()
             appModelObservable.value = appModelMapper.map(state = state, loading = false)
         }

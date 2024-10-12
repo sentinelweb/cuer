@@ -281,7 +281,7 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
             when (label) {
                 is Command -> label.command.let { command ->
                     when (command) {
-                        is Load -> player.cueVideo(command.platformId, command.startPosition.toInt())
+                        is Load -> player.cueVideo(command.item.media.platformId, command.startPosition.toInt())
                         is Play -> player.play()
                         is Pause -> player.pause()
                         is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)

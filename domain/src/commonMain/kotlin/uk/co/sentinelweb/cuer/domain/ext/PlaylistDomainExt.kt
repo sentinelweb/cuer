@@ -1,7 +1,10 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import rewriteIdsToSource
 import summarise
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.domain.*
 
 fun PlaylistDomain.currentItem() =
@@ -218,3 +221,10 @@ fun PlaylistDomain.orderIsAscending() =
             acc && lastIsBefore
         } else acc
     }
+
+
+fun PlaylistDomain.rewriteIdsToSource(source: Source, locator: Locator?) = this.copy(
+    id = this.id?.copy(source = source, locator = locator),
+    items = this.items.map { it.rewriteIdsToSource(source, locator) },
+    channelData = this.channelData?.rewriteIdsToSource(source, locator)
+)
