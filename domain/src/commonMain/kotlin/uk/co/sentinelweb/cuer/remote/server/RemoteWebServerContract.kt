@@ -12,47 +12,47 @@ interface RemoteWebServerContract {
         const val WEB_SERVER_PORT_DEF = 9090
 
         object AVAILABLE_API {
-            val PATH = "/available"
+            const val PATH = "/available"
         }
         object PLAYLISTS_API {
             val PATH = "/playlists"
         }
 
         object PLAYLIST_API {
-            val PATH = "/playlist/{id}"
+            const val PATH = "/playlist/{id}"
         }
 
         object PLAYLIST_SOURCE_API {
-            val PATH = "/playlist-src/{src}/{id}"
+            const val PATH = "/playlist-src/{src}/{id}"
         }
 
         object PLAYER_COMMAND_API {
-            val P_COMMAND = "command"
-            val P_ARG0 = "arg0"
-            val PATH = "/player/command/{$P_COMMAND}/{$P_ARG0}"
+            const val P_COMMAND = "command"
+            const val P_ARG0 = "arg0"
+            const val PATH = "/player/command/{$P_COMMAND}/{$P_ARG0}"
         }
 
         object PLAYER_CONFIG_API {
-            val PATH = "/player/config"
+            const val PATH = "/player/config"
         }
 
         object PLAYER_LAUNCH_VIDEO_API {
-            val P_SCREEN_INDEX = "screenIndex"
-            val PATH = "/player/launch"
+            const val P_SCREEN_INDEX = "screenIndex"
+            const val PATH = "/player/launch"
         }
 
         object PLAYER_STATUS_API {
-            val PATH = "/player/status"
+            const val PATH = "/player/status"
         }
 
         object FOLDER_LIST_API {
-            val PATH = "/folders"
-            val P_PARAM = "p"
+            const val PATH = "/folders"
+            const val P_PARAM = "p"
         }
         object VIDEO_STREAM_API {
-            val P_FILEPATH = "filePath"
-            val ROUTE = "/video-stream"
-            val PATH = "$ROUTE/{$P_FILEPATH}"
+            const val P_FILEPATH = "filePath"
+            const val ROUTE = "/video-stream"
+            const val PATH = "$ROUTE/{$P_FILEPATH}"
         }
     }
 }
