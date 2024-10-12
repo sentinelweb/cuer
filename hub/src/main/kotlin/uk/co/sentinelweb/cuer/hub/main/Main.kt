@@ -8,6 +8,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
+import uk.co.sentinelweb.cuer.hub.util.JarJnaCheck
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 
@@ -43,5 +44,6 @@ fun main() {
 //        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "My Custom App Name");
 //    }
 
+    JarJnaCheck().check()
     home(homeUiCoordinator)
 }

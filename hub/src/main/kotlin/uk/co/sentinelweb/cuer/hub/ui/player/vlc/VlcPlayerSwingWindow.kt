@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -21,6 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.mappers.TimeFormatter
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -51,6 +53,7 @@ class VlcPlayerSwingWindow(
     private val showHideControls: VlcPlayerShowHideControls,
     private val keyMap: VlcPlayerKeyMap,
     private val localRepository: LocalRepository,
+    private val coroutineContextProvider: CoroutineContextProvider
 ) : JFrame(), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
@@ -151,9 +154,10 @@ class VlcPlayerSwingWindow(
                 override fun mediaParsedChanged(media: Media, newStatus: MediaParsedStatus) {
                     val ms = media.info().duration()
                     log.d("duration: $ms")
-                    durationMs = ms
-                    coordinator.dispatch(DurationReceived(ms))
-                    mediaPlayerComponent.mediaPlayer().media().play(media.newMediaRef())
+                    if (ms > -1) {
+                        durationMs = ms
+                        coordinator.dispatch(DurationReceived(ms))
+                    }
                 }
             }
         )
@@ -243,13 +247,11 @@ class VlcPlayerSwingWindow(
         mediaPlayerComponent.mediaPlayer().media().info()
             ?.apply { log.d("playItem: current ${this.mrl()}") }
             ?: log.d("playItem: current is null")
-        mediaPlayerComponent.mediaPlayer().media().prepare(path)
-        mediaPlayerComponent.mediaPlayer().media().parsing().parse()
+        mediaPlayerComponent.mediaPlayer().media().play(path)
     }
 
     fun destroy() {
         mediaPlayerComponent.mediaPlayer().release()
-        mediaPlayerComponent.mediaPlayer().media()
         this@VlcPlayerSwingWindow.dispose()
     }
 
