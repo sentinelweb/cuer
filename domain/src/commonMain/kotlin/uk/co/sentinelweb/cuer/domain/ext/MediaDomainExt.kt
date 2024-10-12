@@ -1,7 +1,11 @@
 package uk.co.sentinelweb.cuer.domain.ext
 
+import rewriteIdsToSource
 import summarise
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.REMOTE
+import uk.co.sentinelweb.cuer.domain.*
 
 fun MediaDomain.stringMedia(): String = "id=$id title=$title platform=$platform platformId=$platformId"
 
@@ -20,3 +24,8 @@ fun MediaDomain.startPosition(): Long {
 fun MediaDomain.summarise(): String = """
     MEDIA: id: $id,platform: $platform - $platformId,  title: $title, [channel: ${channelData.summarise()}]
 """.trimIndent()
+
+fun MediaDomain.rewriteIdsToSource(source: Source, locator: Locator?) = this.copy(
+    id = this.id?.copy(source = source, locator = locator),
+    channelData = this.channelData.rewriteIdsToSource(source, locator)
+)

@@ -147,7 +147,7 @@ class CuerCastPlayerWatcher(
         withContext(coroutines.Main) {
             result.takeIf { it.isSuccessful }
                 ?.data
-                ?.let { addBlankRemoteIdToItem(it) }
+                //?.let { addBlankRemoteIdToItem(it) }
                 ?.let { addThumbnailToMedia(it) }
                 ?.apply { mainPlayerControls?.setPlayerState(playbackState) }
                 ?.apply { mainPlayerControls?.setPlaylistItem(item) }
@@ -208,14 +208,14 @@ class CuerCastPlayerWatcher(
             )
         } else it
 
-    private fun addBlankRemoteIdToItem(it: PlayerSessionContract.PlayerStatusMessage) =
-        if (it.item.id == null) {
-            it.copy(
-                item = it.item.copy(
-                    id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
-                )
-            )
-        } else it
+//    private fun addBlankRemoteIdToItem(it: PlayerSessionContract.PlayerStatusMessage) =
+//        if (it.item.id == null) {
+//            it.copy(
+//                item = it.item.copy(
+//                    id = Identifier(GUID(""), LOCAL_NETWORK, remoteNode?.locator())
+//                )
+//            )
+//        } else it
 
 
     private val controlsListener = object : PlayerContract.PlayerControls.Listener {

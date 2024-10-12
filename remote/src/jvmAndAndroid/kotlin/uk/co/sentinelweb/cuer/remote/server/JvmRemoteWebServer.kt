@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -26,9 +27,10 @@ import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlaylistAndChildrenDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
+import uk.co.sentinelweb.cuer.domain.ext.rewriteIdsToSource
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
@@ -329,7 +331,7 @@ class JvmRemoteWebServer(
                     val path = call.parameters[FOLDER_LIST_API.P_PARAM]
                     logWrapper.d("Folder: $path")
                     getFolderListUseCase.getFolderList(path)
-                        ?.let { rewriteIdsToRemote(it) } // todo rewrite platformid -> http
+                        ?.rewriteIdsToSource(LOCAL_NETWORK, localRepository.localNode.locator())
                         ?.let { ResponseDomain(it) }
                         ?.apply { call.respondText(serialise(), ContentType.Application.Json) }
                         ?: apply {
@@ -384,43 +386,6 @@ class JvmRemoteWebServer(
                 }
             }
         }
-
-    private fun rewriteIdsToRemote(it: PlaylistAndChildrenDomain) = it.copy(
-        playlist = it.playlist.copy(
-            id = it.playlist.id?.copy(
-                source = LOCAL_NETWORK,
-                locator = localRepository.localNode.locator()
-            ),
-            items = it.playlist.items.map {
-                it.copy(
-                    id = it.id?.copy(
-                        source = LOCAL_NETWORK,
-                        locator = localRepository.localNode.locator()
-                    ),
-                    media = it.media.copy(
-                        id = it.media.id?.copy(
-                            source = LOCAL_NETWORK,
-                            locator = localRepository.localNode.locator()
-                        ),
-                        channelData = it.media.channelData.copy(
-                            id = it.media.channelData.id?.copy(
-                                source = LOCAL_NETWORK,
-                                locator = localRepository.localNode.locator()
-                            )
-                        )
-                    )
-                )
-            }
-        ),
-        children = it.children.map { child ->
-            child.copy(
-                id = child.id?.copy(
-                    source = REMOTE,
-                    locator = localRepository.localNode.locator()
-                )
-            )
-        }
-    )
 }
 
 
