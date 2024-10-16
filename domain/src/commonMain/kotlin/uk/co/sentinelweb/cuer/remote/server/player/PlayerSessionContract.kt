@@ -17,9 +17,10 @@ interface PlayerSessionContract {
 //            playlist: PlaylistDomain?
 //        )
 
-        fun setMedia(media: MediaDomain, playlist: PlaylistDomain?)
+        //fun setMedia(media: MediaDomain, playlist: PlaylistDomain?)
+        fun setItem(item: PlaylistItemDomain, playlist: PlaylistDomain?)
         fun updatePlaybackState(
-            media: MediaDomain,
+            item: PlaylistItemDomain,
             state: PlayerStateDomain,
             liveOffset: Long?,
             playlist: PlaylistDomain?

@@ -13,6 +13,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class MediaSessionManager(
     private val appState: CuerAppState,
@@ -52,15 +53,15 @@ class MediaSessionManager(
         state.bitmapUrl = null
     }
 
-    override fun setMedia(media: MediaDomain, playlist: PlaylistDomain?) {
-        if (media.thumbNail == null) {
+    override fun setItem(item: PlaylistItemDomain, playlist: PlaylistDomain?) {
+        if (item.media.thumbNail == null) {
             state.bitmapUrl = null
             state.bitmap = null
-        } else if (media.thumbNail?.url != state.bitmapUrl) {
-            state.bitmapUrl = media.thumbNail?.url
-            Glide.with(context).asBitmap().load(state.bitmapUrl).into(BitmapLoadTarget(media, playlist))
+        } else if (item.media.thumbNail?.url != state.bitmapUrl) {
+            state.bitmapUrl = item.media.thumbNail?.url
+            Glide.with(context).asBitmap().load(state.bitmapUrl).into(BitmapLoadTarget(item.media, playlist))
         }
-        appState.mediaSession?.setMetadata(metadataMapper.map(media, state.bitmap, playlist))
+        appState.mediaSession?.setMetadata(metadataMapper.map(item.media, state.bitmap, playlist))
     }
 
     inner class BitmapLoadTarget(
@@ -77,12 +78,12 @@ class MediaSessionManager(
     }
 
     override fun updatePlaybackState(
-        media: MediaDomain,
+        item: PlaylistItemDomain,
         state: PlayerStateDomain,
         liveOffset: Long?,
         playlist: PlaylistDomain?
     ) {
-        appState.mediaSession?.setPlaybackState(playbackStateMapper.map(media, state, liveOffset, playlist))
+        appState.mediaSession?.setPlaybackState(playbackStateMapper.map(item.media, state, liveOffset, playlist))
     }
 
 //    override fun setRemotePlaybackType() {

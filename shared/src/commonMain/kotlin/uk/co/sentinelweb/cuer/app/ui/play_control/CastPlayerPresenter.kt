@@ -2,6 +2,10 @@ package uk.co.sentinelweb.cuer.app.ui.play_control
 
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.FOLDER_LIST
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.DurationStyle.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.TargetDetails
@@ -11,8 +15,10 @@ import uk.co.sentinelweb.cuer.app.usecase.PlayUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ImageDomain
 import uk.co.sentinelweb.cuer.domain.PlatformDomain
+import uk.co.sentinelweb.cuer.domain.PlatformDomain.FILESYSTEM
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
+import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.domain.mappers.PlaylistAndItemMapper
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 
@@ -270,9 +276,9 @@ class CastPlayerPresenter(
                 NavigationModel(
                     NavigationModel.Target.PLAYLIST,
                     mapOf(
-                        NavigationModel.Param.PLAYLIST_ID to it.id.value,
-                        NavigationModel.Param.PLAY_NOW to false,
-                        NavigationModel.Param.SOURCE to it.source
+                        Param.PLAYLIST_ID to it.id.value,
+                        Param.PLAY_NOW to false,
+                        SOURCE to it.source
                     )
                 )
             )
@@ -282,24 +288,26 @@ class CastPlayerPresenter(
     override fun onPlaylistItemClick() {
         state.playlistItem?.let { item ->
             when (item.media.platform) {
-                PlatformDomain.FILESYSTEM -> (item.id?.locator
+                FILESYSTEM -> (item.id?.locator
+                    ?.also { log.d("locator: $it") }
                     ?.let { remotesRepository.getByLocator(it) })
+                    ?.also { log.d("found: ${it.name()}") }
                     ?.let { foundNode ->
                         NavigationModel(
-                            NavigationModel.Target.FOLDER_LIST,
+                            FOLDER_LIST,
                             mapOf(
-                                NavigationModel.Param.REMOTE_ID to foundNode.id?.id?.value,
-                                NavigationModel.Param.FILE_PATH to item.media.platformId.substringBeforeLast("/")
+                                REMOTE_ID to foundNode.id?.id?.value,
+                                FILE_PATH to item.media.platformId.substringBeforeLast("/")
                             )
                         )
                     }
 
                 else -> NavigationModel(
-                    NavigationModel.Target.PLAYLIST_ITEM,
+                    PLAYLIST_ITEM,
                     mapOf(
-                        NavigationModel.Param.PLAYLIST_ITEM to item,
+                        Param.PLAYLIST_ITEM to item,
                         //FRAGMENT_NAV_EXTRAS to view.makeItemTransitemionExtras(),
-                        NavigationModel.Param.SOURCE to item.id!!.source
+                        SOURCE to item.id!!.source
                     )
                 )
             }?.also { view.navigate(it) }

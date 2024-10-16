@@ -223,7 +223,7 @@ class PlayerStoreFactory(
             playlistAndItem
                 .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
                 .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
-                .apply { playerSessionManager.setMedia(item.media, null) }
+                .apply { playerSessionManager.setItem(item, null) }
                 //.apply { log.d("config.maxVolume: ${config.maxVolume}") }
                 .apply { playerSessionManager.setVolumeMax(config.maxVolume) }
                 .apply { playerSessionManager.setVolume(prefs.volume) }
@@ -248,11 +248,11 @@ class PlayerStoreFactory(
             livePlaybackController.clear(intent.item.media.platformId)
 
             mediaSessionManager.checkCreateMediaSession(mediaSessionListener)
-            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            mediaSessionManager.setItem(intent.item, queueConsumer.playlist)
 
             playerSessionManager.checkCreateMediaSession(playerSessionListener)
             playerSessionManager.setVolumeMax(config.maxVolume)
-            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            playerSessionManager.setItem(intent.item, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
@@ -311,13 +311,13 @@ class PlayerStoreFactory(
 
         private fun PlaylistItemDomain.updatePlaybackState(playState: PlayerStateDomain) {
             mediaSessionManager.updatePlaybackState(
-                this.media,
+                this,
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist
             )
             playerSessionManager.updatePlaybackState(
-                this.media,// todo item(this)
+                this,
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist
