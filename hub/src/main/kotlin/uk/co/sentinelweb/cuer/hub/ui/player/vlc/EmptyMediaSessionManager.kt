@@ -8,9 +8,11 @@ import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 
 class EmptyMediaSessionManager : MediaSessionContract.Manager {
+
     override fun checkCreateMediaSession(controls: PlayerContract.PlayerControls.Listener) = Unit
 
     override fun destroyMediaSession() = Unit
+
     override fun setItem(item: PlaylistItemDomain, playlist: PlaylistDomain?)=Unit
 
     override fun updatePlaybackState(
@@ -18,8 +20,6 @@ class EmptyMediaSessionManager : MediaSessionContract.Manager {
         state: PlayerStateDomain,
         liveOffset: Long?,
         playlist: PlaylistDomain?
-    ) {
-        TODO("Not yet implemented")
-    }
+    )  = Unit
 
 }
