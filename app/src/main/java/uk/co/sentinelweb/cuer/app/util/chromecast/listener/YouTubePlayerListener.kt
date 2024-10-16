@@ -14,7 +14,6 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.isLiveOrUpcoming
@@ -40,7 +39,7 @@ class YouTubePlayerListener(
         var playState: PlayerStateDomain = PlayerStateDomain.UNKNOWN,
         var positionSec: Float = 0f,
         var durationSec: Float = 0f,
-        var currentMedia: MediaDomain? = null,
+        var currentItem: PlaylistItemDomain? = null,
         var lastUpdateMedia: Long = -1L,
         var lastUpdateUI: Long = -1L,
         var receivedVideoId: String? = null,
@@ -62,7 +61,7 @@ class YouTubePlayerListener(
         queue.currentItemFlow
             .distinctUntilChanged { old, new -> old?.media?.id == new?.media?.id }
             .onEach { loadVideo(it) }
-            .onEach { item -> item?.let { mediaSessionManager.setMedia(item.media, queue.playlist) } }
+            .onEach { item -> item?.let { mediaSessionManager.setItem(item, queue.playlist) } }
             .launchIn(coroutines.mainScope)
     }
 
@@ -100,14 +99,14 @@ class YouTubePlayerListener(
         // log.d("onVideoDuration dur=${state.durationSec} durObTime=${state.durationObtainedTime}")
         this.youTubePlayer = youTubePlayer
         state.durationSec = duration
-        state.currentMedia
+        state.currentItem?.media
             ?.takeIf { it.isLiveBroadcast }
             ?.apply { livePlaybackController.gotDuration((duration * 1000).toLong()) }
         playerUi?.setDuration(duration)
         updateMedia(false, durSec = duration)
         playerUi?.setButtons(buildButtons(queue.currentItem))
-        state.currentMedia
-            ?.apply { mediaSessionManager.setMedia(this, queue.playlist) }
+        state.currentItem
+            ?.apply { mediaSessionManager.setItem(this, queue.playlist) }
     }
 
     override fun onCurrentSecond(youTubePlayer: YouTubePlayer, second: Float) {
@@ -126,11 +125,11 @@ class YouTubePlayerListener(
     }
 
     private fun updateMediaSessionManagerPlaybackState() {
-        state.currentMedia?.apply {
+        state.currentItem?.apply {
             mediaSessionManager.updatePlaybackState(
                 this,
                 state.playState,
-                if (isLiveBroadcast) getLiveOffsetMs() else null,
+                if (media.isLiveBroadcast) getLiveOffsetMs() else null,
                 queue.playlist
             )
         }
@@ -143,17 +142,20 @@ class YouTubePlayerListener(
     }
 
     private fun updateMedia(throttle: Boolean, posSec: Float? = null, durSec: Float? = null) {
-        state.currentMedia = state.currentMedia?.run {
+        state.currentItem = state.currentItem?.run {
             copy(
-                positon = posSec?.let { (it * 1000).toLong() } ?: positon,
-                duration = durSec?.let { (it * 1000).toLong() } ?: duration,
-                dateLastPlayed = timeProvider.instant()
+                media = media.copy(
+                    positon = posSec?.let { (it * 1000).toLong() } ?: media.positon,
+                    duration = durSec?.let { (it * 1000).toLong() } ?: media.duration,
+                    dateLastPlayed = timeProvider.instant()
+                )
             )
         }
+
         if (shouldUpdateMedia(throttle)) {
-            if (state.receivedVideoId != null && state.receivedVideoId == state.currentMedia?.platformId) {
-                state.currentMedia?.apply { queue.updateCurrentMediaItem(this) }
-            } else log.d("Not updating media: ${state.receivedVideoId} != ${state.currentMedia?.platformId}")
+            if (state.receivedVideoId != null && state.receivedVideoId == state.currentItem?.media?.platformId) {
+                state.currentItem?.media?.apply { queue.updateCurrentMediaItem(this) }
+            } else log.d("Not updating media: ${state.receivedVideoId} != ${state.currentItem?.media?.platformId}")
             setTimeUpdateMedia()
         }
     }
@@ -208,13 +210,13 @@ class YouTubePlayerListener(
         this.youTubePlayer = youTubePlayer
         state.receivedVideoId = videoId
         livePlaybackController.gotVideoId(videoId)
-        log.d("Got id: $videoId media=${state.currentMedia?.stringMedia()}")
+        log.d("Got id: $videoId media=${state.currentItem?.media?.stringMedia()}")
     }
 
     override fun onVideoLoadedFraction(youTubePlayer: YouTubePlayer, loadedFraction: Float) {
         this.youTubePlayer = youTubePlayer
     }
-    // endregion
+// endregion
 
     // region  CastPlayerContract.PresenterExternal.Listener
     override fun play() {
@@ -276,7 +278,7 @@ class YouTubePlayerListener(
             handleError(e)
         }
     }
-    // endregion
+// endregion
 
     private fun handleError(e: Exception) {
         playerUi?.error("Error: ${e.message ?: "Unknown - check log"}")
@@ -289,13 +291,13 @@ class YouTubePlayerListener(
             livePlaybackController.clear(media.platformId)
             log.d("loadVideo: play position: pos =  $startPos ms")
             youTubePlayer?.loadVideo(media.platformId, (startPos / 1000).toFloat())
-            state.currentMedia = media
+            state.currentItem = this
             playerUi?.setPlaylistItem(queue.currentItem)
             playerUi?.setPlaylistName(queue.playlist?.title ?: "none")
             playerUi?.setPlaylistImage(queue.playlist?.let { it.thumb ?: it.image })
             playerUi?.setButtons(buildButtons(this))
         } ?: run {
-            state.currentMedia = null
+            state.currentItem = null
             state.receivedVideoId = null
             youTubePlayer?.pause()
             playerUi?.reset()
@@ -316,12 +318,12 @@ class YouTubePlayerListener(
     private fun setupPlayer(controls: PlayerContract.PlayerControls) {
         controls.apply {
             addListener(this@YouTubePlayerListener)
-            setTitle(state.currentMedia?.title ?: "No Media")
+            setTitle(state.currentItem?.media?.title ?: "No Media")
             setPlayerState(state.playState)
             setDuration(state.durationSec)
             setCurrentSecond(state.positionSec)
-            if (state.currentMedia == null) {
-                state.currentMedia = queue.currentItem?.media
+            if (state.currentItem?.media == null) {
+                state.currentItem = queue.currentItem
             }
             setPlaylistItem(queue.currentItem)
         }

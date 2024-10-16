@@ -248,7 +248,7 @@ class PlayerStoreFactory(
             livePlaybackController.clear(intent.item.media.platformId)
 
             mediaSessionManager.checkCreateMediaSession(mediaSessionListener)
-            mediaSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            mediaSessionManager.setItem(intent.item, queueConsumer.playlist)
 
             playerSessionManager.checkCreateMediaSession(playerSessionListener)
             playerSessionManager.setVolumeMax(config.maxVolume)
@@ -311,7 +311,7 @@ class PlayerStoreFactory(
 
         private fun PlaylistItemDomain.updatePlaybackState(playState: PlayerStateDomain) {
             mediaSessionManager.updatePlaybackState(
-                this.media,
+                this,
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist

@@ -156,9 +156,9 @@ class CuerCastPlayerWatcher(
                 ?.apply { // fixme enable when we have playlist
                     mainPlayerControls?.setButtons(Buttons(false, false, true))
                 }
-                ?.apply { mediaSessionManager.setMedia(this.item.media, null) } // fixme get playlist
+                ?.apply { mediaSessionManager.setItem(this.item, null) } // fixme get playlist
                 ?.apply { // fixme get liveOffset, playlist
-                    mediaSessionManager.updatePlaybackState(this.item.media, this.playbackState, null, null)
+                    mediaSessionManager.updatePlaybackState(this.item, this.playbackState, null, null)
                 }
                 ?.apply { mainPlayerControls?.setVolume(volume / volumeMax) }
                 ?.apply { state.lastMessage = this }
@@ -179,7 +179,7 @@ class CuerCastPlayerWatcher(
                             log.d("reset media")
                             mainPlayerControls?.setPlaylistItem(null)
                             mainPlayerControls?.setButtons(Buttons(false, false, false))
-                            state.lastMessage?.item?.media?.also {
+                            state.lastMessage?.item?.also {
                                 mediaSessionManager.updatePlaybackState(it, PlayerStateDomain.UNKNOWN, null, null)
                             }
                         }
