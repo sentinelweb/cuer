@@ -223,7 +223,7 @@ class PlayerStoreFactory(
             playlistAndItem
                 .apply { mediaSessionManager.checkCreateMediaSession(mediaSessionListener) }
                 .apply { playerSessionManager.checkCreateMediaSession(playerSessionListener) }
-                .apply { playerSessionManager.setMedia(item.media, null) }
+                .apply { playerSessionManager.setItem(item, null) }
                 //.apply { log.d("config.maxVolume: ${config.maxVolume}") }
                 .apply { playerSessionManager.setVolumeMax(config.maxVolume) }
                 .apply { playerSessionManager.setVolume(prefs.volume) }
@@ -252,7 +252,7 @@ class PlayerStoreFactory(
 
             playerSessionManager.checkCreateMediaSession(playerSessionListener)
             playerSessionManager.setVolumeMax(config.maxVolume)
-            playerSessionManager.setMedia(intent.item.media, queueConsumer.playlist)
+            playerSessionManager.setItem(intent.item, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
             publish(
                 Label.Command(
@@ -317,7 +317,7 @@ class PlayerStoreFactory(
                 queueConsumer.playlist
             )
             playerSessionManager.updatePlaybackState(
-                this.media,// todo item(this)
+                this,
                 playState,
                 if (media.isLiveBroadcast) livePlaybackController.getLiveOffsetMs() else null,
                 queueConsumer.playlist

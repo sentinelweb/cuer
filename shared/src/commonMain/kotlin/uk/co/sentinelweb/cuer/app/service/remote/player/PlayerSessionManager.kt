@@ -3,10 +3,7 @@ package uk.co.sentinelweb.cuer.app.service.remote.player
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL
 import uk.co.sentinelweb.cuer.app.orchestrator.toIdentifier
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain
-import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
-import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.creator.GuidCreator
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSession
 import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
@@ -37,18 +34,18 @@ class PlayerSessionManager(
         playerSessionHolder.playerSession = null
     }
 
-    override fun setMedia(media: MediaDomain, playlist: PlaylistDomain?) {
-        playerSessionHolder.playerSession?.media = media
+    override fun setItem(item: PlaylistItemDomain, playlist: PlaylistDomain?) {
+        playerSessionHolder.playerSession?.item = item
         playerSessionHolder.playerSession?.playlist = playlist
     }
 
     override fun updatePlaybackState(
-        media: MediaDomain,
+        item: PlaylistItemDomain,
         state: PlayerStateDomain,
         liveOffset: Long?,
         playlist: PlaylistDomain?
     ) {
-        playerSessionHolder.playerSession?.media = media
+        playerSessionHolder.playerSession?.item = item
         playerSessionHolder.playerSession?.playlist = playlist
         playerSessionHolder.playerSession?.liveOffset = liveOffset
         playerSessionHolder.playerSession?.playbackState = state
