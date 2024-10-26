@@ -26,7 +26,7 @@ kotlin {
                 outputFileName = outputJsLibName
             }
             runTask {
-                devServer = devServer?.copy(port = 3000)
+                // devServer = devServer?.copy(port = 3000)
             }
         }
         binaries.executable()

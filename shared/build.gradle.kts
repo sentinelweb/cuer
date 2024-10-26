@@ -78,6 +78,10 @@ kotlin {
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.coil.kmp)
+
 //                println("---------------" + compose.runtime)
 //                println("---------------" + compose.material)
 ////                println("---------------" + compose.compiler.auto)
@@ -158,6 +162,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+dependencies {
+    implementation(libs.androidx.ui.android)
 }
 
 tasks.withType<KotlinCompile>().configureEach {

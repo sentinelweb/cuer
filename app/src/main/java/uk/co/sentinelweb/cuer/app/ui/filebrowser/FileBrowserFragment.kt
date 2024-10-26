@@ -22,7 +22,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserContract.Label
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.getFragmentActivity
@@ -37,7 +37,7 @@ import uk.co.sentinelweb.cuer.domain.toGUID
 class FileBrowserFragment : Fragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<FileBrowserFragment>()
-    private val viewModel: FileBrowserViewModel by inject()
+    private val viewModel: FilesViewModel by inject()
     private val log: LogWrapper by inject()
     private val snackbarWrapper: SnackbarWrapper by inject()
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
@@ -83,7 +83,11 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            FileBrowserAppComposeables.FileBrowserAppWrapperUi(
+//            FileBrowserAppComposeables.FileBrowserAppWrapperUi(
+//                appModelObservable = viewModel.appModelObservable,
+//                viewModel = viewModel
+//            )
+            FilesComposeables.FileBrowserAppWrapperUi(
                 appModelObservable = viewModel.appModelObservable,
                 viewModel = viewModel
             )
@@ -135,8 +139,8 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         val fragmentModule = module {
             scope(named<FileBrowserFragment>()) {
                 scoped {
-                    FileBrowserViewModel(
-                        state = FileBrowserContract.State(),
+                    FilesViewModel(
+                        state = FilesContract.State(),
                         filesInteractor = get(),
                         remotesRepository = get(),
                         mapper = get(),
@@ -145,11 +149,9 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         castController = get(),
                         remoteDialogLauncher = get(),
                         cuerCastPlayerWatcher = get(),
-                        appModelMapper = get()
                     )
                 }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
-                scoped { FileBrowserAppModelMapper() }
             }
         }
     }

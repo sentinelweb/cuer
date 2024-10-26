@@ -18,7 +18,7 @@ fun CuerTheme(
 ) {
     val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
-    var (colors, type, shapes) = createMdcTheme(
+    val (colors, type, shapes) = createMdcTheme(
         context = context,
         layoutDirection = layoutDirection
     )
