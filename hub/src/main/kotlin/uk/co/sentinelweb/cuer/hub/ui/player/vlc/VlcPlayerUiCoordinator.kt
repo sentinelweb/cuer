@@ -38,6 +38,10 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import uk.co.sentinelweb.cuer.hub.ui.emptystubs.EmptyCustomisationResources
+import uk.co.sentinelweb.cuer.hub.ui.emptystubs.EmptyLivePlaybackController
+import uk.co.sentinelweb.cuer.hub.ui.emptystubs.EmptyMediaSessionManager
+import uk.co.sentinelweb.cuer.hub.ui.emptystubs.EmptyRibbonCreator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
@@ -167,12 +171,6 @@ class VlcPlayerUiCoordinator(
 
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> VlcPlayerUiCoordinator(parent) }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(NewItems)) { EmptyCustomisationResources() }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(Starred)) { EmptyCustomisationResources() }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(Unfinished)) { EmptyCustomisationResources() }
-            factory<RibbonCreator> { EmptyRibbonCreator() }
-            factory<LivePlaybackContract.Controller> { EmptyLivePlaybackController() }
-            factory<MediaSessionContract.Manager> { EmptyMediaSessionManager() }
             single { FolderMemoryPlaylistItemLoader() }
             single<PlayerContract.PlaylistItemLoader> { get<FolderMemoryPlaylistItemLoader>() }
 

@@ -151,7 +151,7 @@ interface MainContract {
                         log = get(),
                     )
                 }
-                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(activity = get<MainActivity>()) }
+                scoped<CastContract.DialogLauncher> { CastDialogLauncher(activity = get<MainActivity>()) }
                 scoped<ChromecastContract.DialogWrapper> {
                     CastDialogWrapper(
                         activity = get<MainActivity>(),

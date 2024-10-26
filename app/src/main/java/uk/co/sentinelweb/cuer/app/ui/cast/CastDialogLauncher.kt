@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentActivity
 
 class CastDialogLauncher(
     private val activity: FragmentActivity
-) : CastContract.CastDialogLauncher {
+) : CastContract.DialogLauncher {
 
     private var dialogFragment: DialogFragment? = null
 

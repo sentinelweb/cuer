@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
+import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.domain.*
 
 interface FilesContract {
@@ -28,12 +29,31 @@ interface FilesContract {
         val subTitle: String?
     ) {
         companion object {
-            val BLANK = AppFilesUiModel(loading = false, subTitle = null)
+            val Initial = AppFilesUiModel(loading = false, subTitle = null)
         }
     }
 
     sealed class Label {
         object Init : Label()
         object Up : Label()
+    }
+
+    companion object {
+        val module = module {
+            factory{
+                FilesViewModel(
+                    state = FilesContract.State(),
+                    filesInteractor = get(),
+                    remotesRepository = get(),
+                    mapper = get(),
+                    playerInteractor = get(),
+                    log = get(),
+                    castController = get(),
+                    remoteDialogLauncher = get(),
+                    cuerCastPlayerWatcher = get(),
+                )
+            }
+            factory { FilesModelMapper() }
+        }
     }
 }

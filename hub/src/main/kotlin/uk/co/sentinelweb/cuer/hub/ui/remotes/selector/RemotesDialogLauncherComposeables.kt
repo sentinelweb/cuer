@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import org.jetbrains.skia.Surface
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogComposeables
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher.DisplayModel
 
 object RemotesDialogLauncherComposeables {
@@ -24,15 +25,6 @@ object RemotesDialogLauncherComposeables {
         val displayModel = remotesDialogLauncher.modelObservable.collectAsState(DisplayModel.blankModel)
 
         if (displayModel.value.isSelectRemotesVisible) {
-//            AlertDialog(
-//                modifier = Modifier.height(540.dp),
-//                onDismissRequest = {remotesDialogLauncher.hideRemotesDialog()},
-//                title = {},
-//                buttons = {},
-//                text = {
-//                    RemotesDialogComposeables.RemotesDialogUi(remotesDialogLauncher.viewModel)
-//                }
-//            )
             Dialog(onDismissRequest = { remotesDialogLauncher.hideRemotesDialog() }) {
                 Surface(
                     shape = MaterialTheme.shapes.medium,

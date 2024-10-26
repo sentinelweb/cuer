@@ -19,6 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesController
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesStoreFactory
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -43,7 +44,7 @@ class RemotesUiCoordinator :
     override var modelObservable = MutableStateFlow(Model.blankModel())
         private set
 
-    val remotesDialogLauncher: RemotesDialogLauncher by scope.inject()
+    val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
 
     private val controller: RemotesController by scope.inject()
     private val log: LogWrapper by inject()
@@ -158,9 +159,6 @@ class RemotesUiCoordinator :
                         coroutines = get(),
                         log = get()
                     )
-                }
-                scoped {
-                    RemotesDialogLauncher()
                 }
             }
         }

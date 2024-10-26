@@ -33,7 +33,7 @@ ios-deploy-target = "14"
 native-coroutines = "0.31.1"
 coroutines = "1.9.0"
 lifecycle-viewmodel-ktx = "2.2.0"
-androidx-lifecycle = "2.8.1"
+androidx-lifecycle = "2.8.3"
 material = "1.6.1"
 recyclerview = "1.2.1"
 swipe-refresh = "1.1.0"
@@ -139,8 +139,13 @@ coilCompose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coreSplashscreen = { module = "androidx.core:core-splashscreen", version.ref = "splash" }
 androidx-palette-ktx = { group = "androidx.palette", name = "palette-ktx", version.ref = "paletteKtx" }
 androidx-lifecycle-viewmodel = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidx-lifecycle" }
+#androidx-lifecycle-viewmodel-desktop = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-desktop", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidx-lifecycle" }
+androidx-lifecycle-viewmodel-compose-desktop = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose-desktop", version.ref = "androidx-lifecycle" }
+#androidx-lifecycle-viewmodel-desktop = { group = "org.jetbrains.androidx.lifecycle", name = "lifecycle-viewmodel-desktop", version.ref = "androidx-lifecycle" }
 coil-kmp = {group="io.coil-kt.coil3", name="coil-compose", version.ref = "coil-kmp"}
+kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
 
 # testing
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

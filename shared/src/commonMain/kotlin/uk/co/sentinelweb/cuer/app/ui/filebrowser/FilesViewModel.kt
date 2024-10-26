@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.AppFilesUiModel.Companion
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
@@ -32,7 +31,7 @@ class FilesViewModel(
 ): ViewModel(), FilesContract.Interactions {
 
     override val modelObservable = MutableStateFlow(blankModel())
-    val appModelObservable = MutableStateFlow(FilesContract.AppFilesUiModel.BLANK)
+    val appModelObservable = MutableStateFlow(FilesContract.AppFilesUiModel.Initial)
 
     val _labels = MutableStateFlow<Label>(Label.Init)
     val labels: Flow<Label>

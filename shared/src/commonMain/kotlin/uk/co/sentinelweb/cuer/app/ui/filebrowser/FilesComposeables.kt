@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +15,6 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
-import uk.co.sentinelweb.cuer.app.ui.common.compose.SharedThemeView
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.AppFilesUiModel
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
@@ -26,7 +24,7 @@ object FilesComposeables {
     // todo use scaffold
     @Composable
     fun FileBrowserAppWrapperUi(appModelObservable: Flow<AppFilesUiModel>, viewModel: FilesViewModel) {
-        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel.BLANK)
+        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel.Initial)
         CuerSharedTheme {
             Surface {
                 Box(contentAlignment = Alignment.Center) {

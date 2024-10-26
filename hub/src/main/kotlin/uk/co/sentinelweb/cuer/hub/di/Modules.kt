@@ -11,13 +11,20 @@ import uk.co.sentinelweb.cuer.app.db.repository.file.AssetOperations
 import uk.co.sentinelweb.cuer.app.db.repository.file.ConfigDirectory
 import uk.co.sentinelweb.cuer.app.db.repository.file.JsonFileInteractor
 import uk.co.sentinelweb.cuer.app.di.SharedAppModule
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
+import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.service.cast.CastServiceContract
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.ui.cast.CastContract
 import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
+import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
+import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
+import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
@@ -34,10 +41,11 @@ import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
+import uk.co.sentinelweb.cuer.hub.ui.emptystubs.*
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
-import uk.co.sentinelweb.cuer.hub.ui.player.cast.*
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
@@ -82,6 +90,7 @@ object Modules {
         FilesUiCoordinator.uiModule,
         VlcPlayerUiCoordinator.uiModule,
         RemotesDialogLauncher.launcherModule,
+        FilesUiCoordinator2.uiModule,
     )
 
     private val resourcesModule = module {
@@ -92,8 +101,6 @@ object Modules {
     private val utilModule = module {
         factory<LogWrapper> { SystemLogWrapper() }
         factory { LifecycleRegistry() }
-        factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
-        factory<VibrateWrapper> { EmptyVibrateWrapper() }
         factory<Settings> {
             val preferences = Preferences.userRoot().node(".cuer")
             JvmPreferencesSettings(preferences)
@@ -175,16 +182,29 @@ object Modules {
                     )
                 }
         }
-        factory<WakeLockManager> { EmptyWakeLockManager() }
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
+        factory<RemotesDialogContract.Launcher> { RemotesDialogLauncher() }
+    }
 
+    val emptyModule = module {
         factory<PlayerContract.PlayerControls> { EmptyPlayerControls() }
         factory<ChromecastContract.PlayerContextHolder> { EmptyChromeCastPlayerContextHolder() }
         factory<FloatingPlayerContract.Manager> { EmptyFloatingPlayerManager() }
         factory<ChromecastContract.Wrapper> { EmptyChromeCastWrapper() }
         factory<CastServiceContract.Manager> { EmptyYoutubeCastServiceManager() }
+        factory<WakeLockManager> { EmptyWakeLockManager() }
+        factory<AppPlaylistInteractor.CustomisationResources>(named(NewItems)) { EmptyCustomisationResources() }
+        factory<AppPlaylistInteractor.CustomisationResources>(named(Starred)) { EmptyCustomisationResources() }
+        factory<AppPlaylistInteractor.CustomisationResources>(named(Unfinished)) { EmptyCustomisationResources() }
+        factory<RibbonCreator> { EmptyRibbonCreator() }
+        factory<LivePlaybackContract.Controller> { EmptyLivePlaybackController() }
+        factory<MediaSessionContract.Manager> { EmptyMediaSessionManager() }
+        factory<LocationPermissionLaunch> { EmptyLocationPermissionLaunch() }
+        factory<VibrateWrapper> { EmptyVibrateWrapper() }
+        factory<ChromecastContract.DialogWrapper> { EmptyChromecastDialogWrapper() }
+        factory<CastContract.DialogLauncher> { EmptyCastDialogLauncher() }
     }
 
     val allModules = listOf(resourcesModule)
@@ -200,4 +220,5 @@ object Modules {
         .plus(NetModule.modules)
         .plus(JvmDatabaseModule.modules)
         .plus(DatabaseCommonModule.modules)
+        .plus(emptyModule)
 }

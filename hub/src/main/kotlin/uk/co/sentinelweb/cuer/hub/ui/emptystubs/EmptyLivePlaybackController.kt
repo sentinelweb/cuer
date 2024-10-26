@@ -1,4 +1,4 @@
-package uk.co.sentinelweb.cuer.hub.ui.player.vlc
+package uk.co.sentinelweb.cuer.hub.ui.emptystubs
 
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 

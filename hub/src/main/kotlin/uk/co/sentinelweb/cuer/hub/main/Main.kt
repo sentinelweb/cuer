@@ -44,6 +44,6 @@ fun main() {
 //        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "My Custom App Name");
 //    }
 
-    JarJnaCheck().check()
+//    JarJnaCheck().check()
     home(homeUiCoordinator)
 }

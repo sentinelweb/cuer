@@ -80,9 +80,7 @@ class FilesUiCoordinator(
         @JvmStatic
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator(parent, get(), get()) }
-            scope(named<FilesUiCoordinator>()) {
-
-            }
+            scope(named<FilesUiCoordinator>()) {}
         }
     }
 }

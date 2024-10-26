@@ -153,7 +153,7 @@ interface ShareContract {
                         log = get(),
                     )
                 }
-                scoped<CastContract.CastDialogLauncher> { CastDialogLauncher(activity = get<ShareActivity>()) }
+                scoped<CastContract.DialogLauncher> { CastDialogLauncher(activity = get<ShareActivity>()) }
                 scoped<ChromecastContract.DialogWrapper> {
                     CastDialogWrapper(
                         activity = get<ShareActivity>(),

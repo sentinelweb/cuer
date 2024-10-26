@@ -10,6 +10,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
@@ -138,19 +139,19 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         @JvmStatic
         val fragmentModule = module {
             scope(named<FileBrowserFragment>()) {
-                scoped {
-                    FilesViewModel(
-                        state = FilesContract.State(),
-                        filesInteractor = get(),
-                        remotesRepository = get(),
-                        mapper = get(),
-                        playerInteractor = get(),
-                        log = get(),
-                        castController = get(),
-                        remoteDialogLauncher = get(),
-                        cuerCastPlayerWatcher = get(),
-                    )
-                }
+//                viewModel{
+//                    FilesViewModel(
+//                        state = FilesContract.State(),
+//                        filesInteractor = get(),
+//                        remotesRepository = get(),
+//                        mapper = get(),
+//                        playerInteractor = get(),
+//                        log = get(),
+//                        castController = get(),
+//                        remoteDialogLauncher = get(),
+//                        cuerCastPlayerWatcher = get(),
+//                    )
+//                }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }

@@ -12,11 +12,13 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
@@ -34,10 +36,10 @@ class HomeUiCoordinator :
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
-
     val remotes: RemotesUiCoordinator by inject()
     val preferencesUiCoordinator: PreferencesUiCoordinator by inject()
-    val filesUiCoordinator: FilesUiCoordinator by inject { parametersOf(this) }
+    val filesUiCoordinator: FilesUiCoordinator2 by inject { parametersOf(this) }
+
     private val remoteServiceManager: RemoteServerContract.Manager by inject()
     private val log: LogWrapper by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
@@ -102,7 +104,6 @@ class HomeUiCoordinator :
             single { HomeUiCoordinator() }
             factory<RemotePlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
             scope(named<HomeUiCoordinator>()) {
-
             }
         }
     }

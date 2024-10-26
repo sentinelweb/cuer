@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageEnumMapper
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageFromUrl
 import uk.co.sentinelweb.cuer.hub.ui.common.image.ImageSvg
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.remote.server.ServerState
 
@@ -39,7 +40,7 @@ object RemotesComposables {
     fun RemotesUi(coordinator: RemotesUiCoordinator) {
         val state = coordinator.modelObservable.collectAsState(initial = blankModel())
         RemotesView(state.value, coordinator)
-        ShowRemotesDialogIfNecessary(coordinator.remotesDialogLauncher)
+        ShowRemotesDialogIfNecessary(coordinator.remotesDialogLauncher as RemotesDialogLauncher)
     }
 
     @Composable

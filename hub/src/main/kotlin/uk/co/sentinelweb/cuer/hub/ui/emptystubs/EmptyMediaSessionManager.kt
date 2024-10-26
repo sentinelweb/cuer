@@ -1,8 +1,7 @@
-package uk.co.sentinelweb.cuer.hub.ui.player.vlc
+package uk.co.sentinelweb.cuer.hub.ui.emptystubs
 
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
-import uk.co.sentinelweb.cuer.domain.MediaDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
