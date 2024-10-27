@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel.Companion.blankModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -28,10 +28,9 @@ class FilesViewModel(
     private val castController: CastController,
     private val remoteDialogLauncher: RemotesDialogContract.Launcher,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
-): ViewModel(), FilesContract.Interactions {
+) : ViewModel(), FilesContract.ViewModel {
 
-    override val modelObservable = MutableStateFlow(blankModel())
-    val appModelObservable = MutableStateFlow(FilesContract.AppFilesUiModel.Initial)
+    override val modelObservable = MutableStateFlow(Initial)
 
     val _labels = MutableStateFlow<Label>(Label.Init)
     val labels: Flow<Label>
@@ -41,21 +40,21 @@ class FilesViewModel(
         log.tag(this)
     }
 
-    fun init(id: GUID, path: String?) {
+    override fun init(id: GUID, path: String?) {
         state.sourceRemoteId = id
         state.sourceNode = remotesRepository.getById(id)
         state.path = path
         loadCurrentPath()
     }
 
-    fun onBackClick() {
+    override fun onBackClick() {
         state.currentFolder
             ?.takeIf { it.children.size > 0 && state.path != null }
             ?.also { onClickFolder(it.children[0]) }
             ?: run { _labels.value = Label.Up }
     }
 
-    fun onUpClick() {
+    override fun onUpClick() {
         _labels.value = Label.Up
     }
 
@@ -74,7 +73,7 @@ class FilesViewModel(
     private fun playMedia(file: PlaylistItemDomain) {
         state.selectedFile = file
         viewModelScope.launch {
-            appModelObservable.value = mapper.map(state = state, loading = true)
+            map(true)
             state.sourceNode?.apply {
                 // fixme when this is possible on both platforms - need a broader check
                 if (cuerCastPlayerWatcher.isWatching()) {
@@ -87,14 +86,18 @@ class FilesViewModel(
                         launchRemotePlayer(targetNode, screen ?: throw IllegalStateException("No screen selected"))
                     })
                 }
-                appModelObservable.value = mapper.map(state = state, loading = false)
             }
+            map(false)
         }
+    }
+
+    override fun onRefreshClick() {
+        loadCurrentPath()
     }
 
     private fun launchRemotePlayer(targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
         viewModelScope.launch {
-            appModelObservable.value = mapper.map(state = state, loading = true)
+            map(true)
             playerInteractor.launchPlayerVideo(
                 targetNode.locator(),
                 state.selectedFile ?: throw IllegalStateException(),
@@ -107,7 +110,7 @@ class FilesViewModel(
                 castController.connectCuerCast(targetNode, screen)
             }
             remoteDialogLauncher.hideRemotesDialog()
-            appModelObservable.value = mapper.map(state = state, loading = false)
+            map(false)
         }
     }
 
@@ -117,14 +120,15 @@ class FilesViewModel(
 
     private fun loadCurrentPath() {
         viewModelScope.launch {
-            appModelObservable.value = mapper.map(state = state, loading = true)
+            map(true)
             state.sourceNode?.apply {
                 state.currentFolder = filesInteractor.getFolderList(this.locator(), state.path).data
-                state.currentFolder?.apply {
-                    modelObservable.value = mapper.map(this)
-                }
-                appModelObservable.value = mapper.map(state = state, loading = false)
             }
+            map(false)
         }
+    }
+
+    private fun map(loading: Boolean) {
+        modelObservable.value = mapper.map(state = state, loading = loading)
     }
 }

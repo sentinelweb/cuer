@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 import javax.swing.JSlider
 import javax.swing.event.ChangeEvent
 
-class PromrammaticallyChangingSlider : JSlider {
+class ProgrammaticallyChangingSlider : JSlider {
     private var programmaticChange = false
 
     var actualListener: ((e: ChangeEvent) -> Unit)? = null

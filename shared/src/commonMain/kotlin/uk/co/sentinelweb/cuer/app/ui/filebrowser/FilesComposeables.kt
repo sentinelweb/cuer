@@ -2,7 +2,10 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -15,105 +18,151 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.AppFilesUiModel
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.PlaylistDomain
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object FilesComposeables {
 
     // todo use scaffold
     @Composable
-    fun FileBrowserAppWrapperUi(appModelObservable: Flow<AppFilesUiModel>, viewModel: FilesViewModel) {
-        val appFileUiState = appModelObservable.collectAsState(initial = AppFilesUiModel.Initial)
+    fun FileBrowserAppUi(modelObservable: Flow<FilesContract.FilesModel>, viewModel: FilesContract.ViewModel) {
+        val model = modelObservable.collectAsState(initial = Initial)
         CuerSharedTheme {
             Surface {
-                Box(contentAlignment = Alignment.Center) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(bottom = 60.dp)
-                    ) {
-                        Box(contentAlignment = Alignment.TopStart) {
-                            CuerSharedAppBar(
-                                title = "Files",
-                                subTitle = appFileUiState.value.subTitle,
-                                backgroundColor = MaterialTheme.colorScheme.primary,
-                                onUp = { viewModel.onUpClick() },
-                                actions = listOf(
-                                    Action(CuerMenuItem.Help, { }),
-                                    Action(CuerMenuItem.Settings, { }),
-                                ),
-                                modifier = Modifier
-                                    .height(56.dp)
-                            )
-                        }
-//                        SharedThemeView()
-                        FilesUi(interactions = viewModel)
-                    }
-                    if (appFileUiState.value.loading) {
-                        CircularProgressIndicator(
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 8.dp,
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .padding(bottom = 60.dp)
+                ) {
+                    Box(contentAlignment = Alignment.TopStart) {
+                        CuerSharedAppBar(
+                            title = "Files",
+                            subTitle = model.value.subTitle,
+                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            onUp = { viewModel.onUpClick() },
+                            actions = listOf(
+                                Action(CuerMenuItem.Help, { }),
+                                Action(CuerMenuItem.Settings, { }),
+                            ),
                             modifier = Modifier
-                                .width(64.dp)
-                                .height(64.dp)
+                                .height(56.dp)
                         )
                     }
+//                        SharedThemeView()
+                    FilesView(model = model.value, viewModel = viewModel)
                 }
             }
         }
     }
+
     @Composable
-    fun FilesUi(interactions: FilesContract.Interactions) {
-        val state = interactions.modelObservable.collectAsState(initial = FilesModel.blankModel())
-        FilesView(state.value, interactions)
+    fun FileBrowserDesktopUi(viewModel: FilesContract.ViewModel) {
+        val model = viewModel.modelObservable.collectAsState(initial = Initial)
+        CuerSharedTheme {
+            Surface {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Box(contentAlignment = Alignment.TopStart) {
+                        CuerSharedAppBar(
+                            title = model.value.subTitle ?: "No host",// todo map
+                            backgroundColor = MaterialTheme.colorScheme.background,
+                            contentColor = MaterialTheme.colorScheme.onBackground,
+                            onUp = { viewModel.onUpClick() },
+                            actions = listOf(
+                                Action(item = CuerMenuItem.Reload, action = {viewModel.onRefreshClick()})
+                            ),
+                            modifier = Modifier
+                                .height(56.dp)
+                        )
+                    }
+//                        SharedThemeView()
+                    FilesView(model = model.value, viewModel = viewModel)
+                }
+            }
+        }
     }
 
     @Composable
-    private fun FilesView(model: FilesModel, view: FilesContract.Interactions) {
-        Column(
-            modifier = Modifier.padding(8.dp)
-                .background(MaterialTheme.colorScheme.surface)
-                .verticalScroll(rememberScrollState())
-                .fillMaxHeight()
-        ) {
-            model.list.children.forEach {
-                Row(modifier = Modifier.clickable { view.onClickFolder(it) }) {
-                    val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
-                    Image(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Text(
-                        text = it.title,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(16.dp))
+    private fun FilesView(model: FilesContract.FilesModel, viewModel: FilesContract.ViewModel) {
+        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.padding(8.dp)
+                    .background(MaterialTheme.colorScheme.surface)
+                    .verticalScroll(rememberScrollState())
+                    .align(Alignment.TopStart)
+            ) {
+                model.list?.children?.forEach {
+                    FolderRow(viewModel, it)
+                }
+                model.list?.playlist?.items?.forEach {
+                    FileRow(viewModel, it)
                 }
             }
-            model.list.playlist.items.forEach {
-                Row(modifier = Modifier.clickable {
-                    view.onClickFile(it)
-                }) {
-                    val icon = when (it.media.mediaType) {
-                        VIDEO -> Res.drawable.ic_video
-                        AUDIO -> Res.drawable.ic_mic
-                        WEB -> Res.drawable.ic_browse // not valid here
-                        FILE -> Res.drawable.ic_file
-                    }
-                    Image(
-                        painter = painterResource(icon),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                        modifier = Modifier.padding(16.dp)
-                    )
-                    Text(text = it.media.title ?: "No title",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(16.dp))
-                }
+            if (model.loading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.primary,
+                    strokeWidth = 8.dp,
+                    modifier = Modifier
+                        .width(64.dp)
+                        .height(64.dp)
+                        .align(Alignment.Center)
+                )
             }
+        }
+    }
+
+    @Composable
+    private fun FileRow(
+        viewModel: FilesContract.ViewModel,
+        it: PlaylistItemDomain
+    ) {
+        Row(modifier = Modifier.clickable {
+            viewModel.onClickFile(it)
+        }) {
+            val icon = when (it.media.mediaType) {
+                VIDEO -> Res.drawable.ic_video
+                AUDIO -> Res.drawable.ic_mic
+                WEB -> Res.drawable.ic_browse // not valid here
+                FILE -> Res.drawable.ic_file
+            }
+            Image(
+                painter = painterResource(icon),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                modifier = Modifier.padding(16.dp)
+            )
+            Text(
+                text = it.media.title ?: "No title",
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(16.dp)
+            )
+        }
+    }
+
+    @Composable
+    private fun FolderRow(
+        viewModel: FilesContract.ViewModel,
+        it: PlaylistDomain
+    ) {
+        Row(modifier = Modifier.clickable { viewModel.onClickFolder(it) }) {
+            val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
+            Image(
+                painter = painterResource(icon),
+                contentDescription = null,
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+                modifier = Modifier.padding(16.dp)
+            )
+            Text(
+                text = it.title,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(16.dp)
+            )
         }
     }
 }

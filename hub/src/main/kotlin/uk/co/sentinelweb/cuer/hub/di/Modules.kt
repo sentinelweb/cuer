@@ -42,7 +42,6 @@ import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
 import uk.co.sentinelweb.cuer.hub.service.update.UpdateService
 import uk.co.sentinelweb.cuer.hub.ui.emptystubs.*
-import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
@@ -87,7 +86,7 @@ object Modules {
         UpdateService.serviceModule,
         LocalUiCoordinator.uiModule,
         PreferencesUiCoordinator.uiModule,
-        FilesUiCoordinator.uiModule,
+//        FilesUiCoordinator.uiModule,
         VlcPlayerUiCoordinator.uiModule,
         RemotesDialogLauncher.launcherModule,
         FilesUiCoordinator2.uiModule,

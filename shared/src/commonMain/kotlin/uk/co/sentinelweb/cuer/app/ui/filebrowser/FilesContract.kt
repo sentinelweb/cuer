@@ -7,12 +7,16 @@ import uk.co.sentinelweb.cuer.domain.*
 
 interface FilesContract {
 
-    interface Interactions {
+    interface ViewModel {
         val modelObservable: Flow<FilesModel>
 
         fun onClickFolder(folder: PlaylistDomain)
 
         fun onClickFile(file: PlaylistItemDomain)
+        fun onUpClick()
+        fun onBackClick()
+        fun init(id: GUID, path: String?)
+        fun onRefreshClick()
     }
 
     @Serializable
@@ -24,12 +28,14 @@ interface FilesContract {
         var selectedFile: PlaylistItemDomain? = null,
     )
 
-    data class AppFilesUiModel(
+
+    data class FilesModel(
         val loading: Boolean,
-        val subTitle: String?
+        val subTitle: String?,
+        val list: PlaylistAndChildrenDomain?,
     ) {
         companion object {
-            val Initial = AppFilesUiModel(loading = false, subTitle = null)
+            val Initial = FilesModel(loading = false, subTitle = null, list = null)
         }
     }
 
@@ -40,19 +46,6 @@ interface FilesContract {
 
     companion object {
         val module = module {
-            factory{
-                FilesViewModel(
-                    state = FilesContract.State(),
-                    filesInteractor = get(),
-                    remotesRepository = get(),
-                    mapper = get(),
-                    playerInteractor = get(),
-                    log = get(),
-                    castController = get(),
-                    remoteDialogLauncher = get(),
-                    cuerCastPlayerWatcher = get(),
-                )
-            }
             factory { FilesModelMapper() }
         }
     }

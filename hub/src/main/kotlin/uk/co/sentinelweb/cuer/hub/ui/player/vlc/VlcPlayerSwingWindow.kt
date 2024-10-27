@@ -69,7 +69,7 @@ class VlcPlayerSwingWindow(
     private lateinit var forwardButton: JButton
     private lateinit var prevButton: JButton
     private lateinit var nextButton: JButton
-    private lateinit var seekBar: PromrammaticallyChangingSlider
+    private lateinit var seekBar: ProgrammaticallyChangingSlider
     private lateinit var posText: JLabel
     private lateinit var durText: JLabel
     private lateinit var titleText: JLabel
@@ -347,7 +347,7 @@ class VlcPlayerSwingWindow(
             setIcon(loadSVG("drawable/ic_player_track_f.svg", Black, 24).toImageIcon())
             addActionListener { coordinator.dispatch(TrackFwdClicked) }
         }
-        seekBar = PromrammaticallyChangingSlider(0, 1000, 0).apply {
+        seekBar = ProgrammaticallyChangingSlider(0, 1000, 0).apply {
             seekPane.add(this, CENTER)
             this.actualListener = seekChangeListner
         }

@@ -84,12 +84,8 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-//            FileBrowserAppComposeables.FileBrowserAppWrapperUi(
-//                appModelObservable = viewModel.appModelObservable,
-//                viewModel = viewModel
-//            )
-            FilesComposeables.FileBrowserAppWrapperUi(
-                appModelObservable = viewModel.appModelObservable,
+            FilesComposeables.FileBrowserAppUi(
+                modelObservable = viewModel.modelObservable,
                 viewModel = viewModel
             )
         }
@@ -139,19 +135,19 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         @JvmStatic
         val fragmentModule = module {
             scope(named<FileBrowserFragment>()) {
-//                viewModel{
-//                    FilesViewModel(
-//                        state = FilesContract.State(),
-//                        filesInteractor = get(),
-//                        remotesRepository = get(),
-//                        mapper = get(),
-//                        playerInteractor = get(),
-//                        log = get(),
-//                        castController = get(),
-//                        remoteDialogLauncher = get(),
-//                        cuerCastPlayerWatcher = get(),
-//                    )
-//                }
+                viewModel{
+                    FilesViewModel(
+                        state = FilesContract.State(),
+                        filesInteractor = get(),
+                        remotesRepository = get(),
+                        mapper = get(),
+                        playerInteractor = get(),
+                        log = get(),
+                        castController = get(),
+                        remoteDialogLauncher = get(),
+                        cuerCastPlayerWatcher = get(),
+                    )
+                }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
             }
         }

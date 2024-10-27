@@ -18,8 +18,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FilesUi
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
@@ -79,10 +78,7 @@ fun Home(coordinator: HomeUiCoordinator) {
                     when (state.value.route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
                         //Files -> FilesUi(coordinator.filesUiCoordinator)
-                        Files -> FilesComposeables.FileBrowserAppWrapperUi(
-                            coordinator.filesUiCoordinator.viewModel.appModelObservable,
-                            coordinator.filesUiCoordinator.viewModel
-                        )
+                        Files -> FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
                     }
                 }
             }

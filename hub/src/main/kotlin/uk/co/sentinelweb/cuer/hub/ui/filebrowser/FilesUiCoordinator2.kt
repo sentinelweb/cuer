@@ -9,12 +9,11 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModel
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
-import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
-import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
@@ -27,7 +26,7 @@ class FilesUiCoordinator2(
     private val parent: HomeUiCoordinator,
     private val remotesRepository: RemotesRepository,
     private val log: LogWrapper
-) : UiCoordinator<FilesModel>,
+) : UiCoordinator<FilesContract.FilesModel>,
     DesktopScopeComponent,
 //    FilesContract.Interactions,
     KoinComponent {
@@ -41,7 +40,7 @@ class FilesUiCoordinator2(
     val viewModel: FilesViewModel by scope.inject()
 
     //override lateinit var modelObservable: MutableStateFlow<FilesModel>
-    override val modelObservable = MutableStateFlow(FilesModel.blankModel())
+    override val modelObservable = MutableStateFlow(Initial)
 
     override fun create() {
         viewModel.viewModelScope.launch {
@@ -75,7 +74,7 @@ class FilesUiCoordinator2(
 //    }
 
     private fun playMedia(item: PlaylistItemDomain) {
-        parent.showPlayer(item, modelObservable.value.list.playlist)
+        parent.showPlayer(item, modelObservable.value.list?.playlist ?: error("No filelist present"))
     }
 
     private fun showFile(file: PlaylistItemDomain) {
@@ -88,22 +87,35 @@ class FilesUiCoordinator2(
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> FilesUiCoordinator2(parent, get(), get()) }
             scope(named<FilesUiCoordinator2>()) {
+                scoped {
+                    FilesViewModel(
+                        state = State(),
+                        filesInteractor = get(),
+                        remotesRepository = get(),
+                        mapper = get(),
+                        playerInteractor = get(),
+                        log = get(),
+                        castController = get(),
+                        remoteDialogLauncher = get(),
+                        cuerCastPlayerWatcher = get(),
+                    )
+                }
+                scoped {
+                    CastController(
+                        cuerCastPlayerWatcher = get(),
+                        chromeCastHolder = get(),
+                        chromeCastDialogWrapper = get(),
+                        chromeCastWrapper = get(),
+                        floatingManager = get(),
+                        playerControls = get(),
+                        castDialogLauncher = get(),
+                        ytServiceManager = get(),
+                        coroutines = get(),
+                        log = get(),
+                    )
+                }
+            }
 
-            }
-            factory {
-                CastController(
-                    cuerCastPlayerWatcher = get(),
-                    chromeCastHolder = get(),
-                    chromeCastDialogWrapper = get(),
-                    chromeCastWrapper = get(),
-                    floatingManager = get(),
-                    playerControls = get(),
-                    castDialogLauncher = get(),
-                    ytServiceManager = get(),
-                    coroutines = get(),
-                    log = get(),
-                )
-            }
         }
     }
 }

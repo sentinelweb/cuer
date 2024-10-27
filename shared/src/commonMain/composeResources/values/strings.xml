@@ -7,6 +7,9 @@
     <string name="menu_paste">Paste &amp; add</string>
     <string name="menu_help">Help</string>
     <string name="menu_search">Search</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_sort_alpha">Alphabetical</string>
+    <string name="menu_sort_category">Categories</string>
 
     <!-- cast dialog -->
     <string name="cast_dialog_not_connected">Not Connected</string>

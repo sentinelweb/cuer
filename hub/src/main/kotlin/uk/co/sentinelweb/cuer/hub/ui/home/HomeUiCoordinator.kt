@@ -17,7 +17,6 @@ import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
