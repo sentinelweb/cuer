@@ -12,10 +12,11 @@ interface FilesContract {
 
         fun onClickFolder(folder: PlaylistDomain)
 
+        fun init(remoteId: GUID, path: String?)
+        fun init(node: NodeDomain?, path: String?)
         fun onClickFile(file: PlaylistItemDomain)
         fun onUpClick()
         fun onBackClick()
-        fun init(id: GUID, path: String?)
         fun onRefreshClick()
     }
 

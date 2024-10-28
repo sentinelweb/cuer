@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -112,6 +113,9 @@ sealed class CuerMenuItem(
     object SortAlpha : CuerMenuItem(Res.string.menu_sort_alpha, Res.drawable.ic_sort_by_alpha)
     object SortCategory : CuerMenuItem(Res.string.menu_sort_category, Res.drawable.ic_category)
 
+    object Folders : CuerMenuItem(Res.string.menu_folders, Res.drawable.ic_folder)
+    object ThemeTest : CuerMenuItem(Res.string.menu_theme_test, Res.drawable.ic_edit)
+    object LocalConfig : CuerMenuItem(Res.string.menu_local_config, Res.drawable.ic_menu_settings)
 }
 
 data class Action(

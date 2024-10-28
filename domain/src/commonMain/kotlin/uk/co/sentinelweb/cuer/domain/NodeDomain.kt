@@ -1,5 +1,8 @@
 package uk.co.sentinelweb.cuer.domain
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 open class NodeDomain : Domain {
 
     // todo make isDesktop function (mac, win, linux)

@@ -12,6 +12,7 @@ import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
@@ -75,7 +76,11 @@ class FilesUiCoordinator(
         TODO("Not yet implemented")
     }
 
-    override fun init(id: GUID, path: String?) {
+    override fun init(remoteId: GUID, path: String?) {
+        TODO("Not yet implemented")
+    }
+
+    override fun init(node: NodeDomain?, path: String?) {
         TODO("Not yet implemented")
     }
 

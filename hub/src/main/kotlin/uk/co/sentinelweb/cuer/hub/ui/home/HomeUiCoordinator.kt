@@ -29,7 +29,7 @@ import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeUiCoordinator :
-    UiCoordinator<HomeModel>,
+    UiCoordinator<HomeContract.HomeModel>,
     DesktopScopeComponent,
     RemotePlayerLaunchHost,
     KoinComponent {
@@ -46,7 +46,7 @@ class HomeUiCoordinator :
 
     private var playerUiCoordinator: VlcPlayerUiCoordinator? = null
 
-    override var modelObservable = MutableStateFlow(HomeModel.blankModel)
+    override var modelObservable = MutableStateFlow(HomeContract.HomeModel.Initial)
         private set
 
     override fun create() {
@@ -67,7 +67,7 @@ class HomeUiCoordinator :
         scope.close()
     }
 
-    fun go(route: HomeModel.DisplayRoute) {
+    fun go(route: HomeContract.HomeModel.DisplayRoute) {
         modelObservable.value = modelObservable.value.copy(route = route)
     }
 

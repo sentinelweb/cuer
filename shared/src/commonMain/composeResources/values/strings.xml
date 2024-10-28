@@ -15,6 +15,9 @@
     <string name="menu_move">Move</string>
     <string name="menu_ping">Ping</string>
     <string name="menu_sendto">Send to ...</string>
+    <string name="menu_folders">Folders</string>
+    <string name="menu_theme_test">Theme</string>
+    <string name="menu_local_config">Local config</string>
 
     <!-- cast dialog -->
     <string name="cast_dialog_not_connected">Not Connected</string>

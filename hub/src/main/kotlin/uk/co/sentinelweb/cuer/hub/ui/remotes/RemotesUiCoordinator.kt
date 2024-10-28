@@ -5,37 +5,33 @@ import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
-import org.koin.java.KoinJavaComponent
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
-import uk.co.sentinelweb.cuer.app.ui.local.LocalContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.*
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.ActionConfig
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.CuerSelectSendTo
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.name
-import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
-class RemotesUiCoordinator :
+class RemotesUiCoordinator(
+//    private val navigator: (DisplayRoute) -> Unit
+) :
     UiCoordinator<Model>,
     DesktopScopeComponent,
     KoinComponent,
@@ -91,9 +87,16 @@ class RemotesUiCoordinator :
                     true,
                 )
             }
+
             ActionConfig -> {
 
             }
+
+            is ActionFolders -> {
+
+                //navigator(DisplayRoute.Folders(label.node))
+            }
+
             else -> Unit
         }
     }

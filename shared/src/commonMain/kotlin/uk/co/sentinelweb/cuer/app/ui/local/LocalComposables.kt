@@ -163,7 +163,6 @@ object LocalComposables : KoinComponent {
                             Open -> Unit
                             Confirm -> Unit
                             is Username -> {
-
                                 TextField(
                                     value = (localNode.authConfig as Username).username,
                                     onValueChange = {

@@ -4,48 +4,60 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.*
-import androidx.compose.material.ButtonDefaults.buttonColors
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
 
-@Composable
-fun cuerOutlineButtonColors() = buttonColors(
-    backgroundColor = MaterialTheme.colors.surface,
-    contentColor = MaterialTheme.colors.onSurface,
-    disabledBackgroundColor = MaterialTheme.colors.surface,
-    disabledContentColor = Color.Gray
-)
+private lateinit var outlineButtonColors: ButtonColors
+private lateinit var solidButtonColors: ButtonColors
 
 @Composable
-fun cuerSolidButtonColors() = buttonColors(
-    backgroundColor = MaterialTheme.colors.primary,
-    contentColor = Color.White,
-    disabledBackgroundColor = MaterialTheme.colors.primaryVariant,
-    disabledContentColor = Color.Gray
-)
+fun initButtonColors() {
+    outlineButtonColors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.surface,
+        contentColor = MaterialTheme.colorScheme.onSurface,
+        disabledContainerColor = Color.LightGray,
+        disabledContentColor = Color.DarkGray
+    )
+
+    solidButtonColors = ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = Color.White,
+        disabledContainerColor = Color.LightGray,
+        disabledContentColor = Color.DarkGray
+    )
+}
+
+@Composable fun outlineBorderColor(enabled: Boolean) = if (enabled) MaterialTheme.colorScheme.onSurface else Color.LightGray
+@Composable fun outlineContentColor(enabled: Boolean) = if (enabled) MaterialTheme.colorScheme.onSurface else Color.LightGray
+
+@Composable fun solidBorderColor(enabled: Boolean) = if (enabled) MaterialTheme.colorScheme.primary else Color.LightGray
+@Composable fun solidContentColor(enabled: Boolean) = if (enabled) MaterialTheme.colorScheme.primary else Color.LightGray
 
 @Composable
-fun cuerOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(1.dp, cuerOutlineButtonColors().contentColor(enabled).value)
+fun cuerOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(1.dp, outlineBorderColor(enabled))
+
 val cuerOutlineButtonStrokEnabler = @Composable { e: Boolean -> cuerOutlineButtonStroke(e) }
 
 @Composable
-fun cuerSolidButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerSolidButtonColors().backgroundColor(enabled).value)
+fun cuerSolidButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, solidBorderColor(enabled))
 val cuerSolidButtonStrokeEnabler = @Composable { e: Boolean -> cuerSolidButtonStroke(e) }
 
-@Composable
-fun cuerNoOutlineButtonStroke(enabled: Boolean = true) = BorderStroke(0.dp, cuerOutlineButtonColors().backgroundColor(enabled).value)
+//@Composable
+//private fun containerColor(enabled: Boolean) = if (enabled) MaterialTheme.colorScheme.onSurface else Color.LightGray
+
 
 @Composable
 fun HeaderButton(
     text: String,
     icon: DrawableResource,
     modifier: Modifier = Modifier,
-    colors: ButtonColors = cuerOutlineButtonColors(),
+    colors: ButtonColors = outlineButtonColors,
     border: @Composable (Boolean) -> BorderStroke = cuerOutlineButtonStrokEnabler,
     enabled: Boolean = true,
     action: () -> Unit
@@ -53,17 +65,18 @@ fun HeaderButton(
     Button(
         onClick = { action() },
         modifier = modifier
-            .padding(end = 8.dp),
+            .padding(end = 8.dp)
+            .shadow(if (enabled) 4.dp else 0.dp, shape = MaterialTheme.shapes.small),
 
         border = border(enabled),
         colors = colors,
         enabled = enabled,
-        elevation = ButtonDefaults.elevation(0.dp),
+        shape = MaterialTheme.shapes.small,
         contentPadding = PaddingValues(horizontal = 2.dp, vertical = 0.dp)
     ) {
         Icon(
             painter = painterResource(icon),
-            tint = colors.contentColor(enabled).value,
+            tint = if (enabled) colors.contentColor else colors.disabledContentColor,
             contentDescription = null,
             modifier = Modifier
                 .size(24.dp)
@@ -71,9 +84,9 @@ fun HeaderButton(
         )
         Text(
             text = text.uppercase(),
-            style = MaterialTheme.typography.button,
-            modifier = Modifier.padding(end = 8.dp),
-            color = colors.contentColor(enabled).value,
+            style = MaterialTheme.typography.bodySmall,
+            modifier = Modifier.padding(end = 8.dp, start = 8.dp),
+            color = if (enabled) colors.contentColor else colors.disabledContentColor
         )
     }
 }
@@ -86,5 +99,5 @@ fun HeaderButtonSolid(
     enabled: Boolean = true,
     action: () -> Unit
 ) {
-    HeaderButton(text, icon, modifier, cuerSolidButtonColors(), cuerSolidButtonStrokeEnabler, enabled, action)
+    HeaderButton(text, icon, modifier, solidButtonColors, cuerSolidButtonStrokeEnabler, enabled, action)
 }

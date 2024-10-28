@@ -4,11 +4,6 @@ import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
@@ -20,10 +15,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import uk.co.sentinelweb.cuer.app.ui.common.compose.SharedThemeView
+import uk.co.sentinelweb.cuer.app.ui.common.compose.*
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.*
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
@@ -49,30 +44,19 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
     val state = coordinator.modelObservable
-        .collectAsState(initial = HomeModel(Settings))
-    MaterialTheme {
+        .collectAsState(initial = HomeContract.HomeModel(Settings))
+    CuerSharedTheme {
         Scaffold(
             topBar = {
-                //CuerSharedAppBarComposables.CuerSharedAppBar
-                TopAppBar(
-                    title = { Text(text = "Cuer hub") },
-                    actions = {
-                        IconButton(onClick = { coordinator.go(ThemeTest) }) {
-                            Icon(Icons.Filled.ArrowDropDown, contentDescription = "ThemeTest")
-                        }
-
-                        IconButton(onClick = { coordinator.go(Files) }) {
-                            Icon(Icons.Filled.List, contentDescription = "Files")
-                        }
-
-                        IconButton(onClick = { coordinator.go(Settings) }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                        }
-
-                        IconButton(onClick = { coordinator.go(LocalConfig) }) {
-                            Icon(Icons.Filled.AccountCircle, contentDescription = "Local config")
-                        }
-                    }
+                CuerSharedAppBarComposables.CuerSharedAppBar(
+                    title = "Cuer hub",
+                    contentColor = Color.White,
+                    actions = listOf(
+                        Action(CuerMenuItem.ThemeTest, action = {coordinator.go(ThemeTest)}),
+                        Action(CuerMenuItem.LocalConfig, action = {coordinator.go(LocalConfig)}),
+                        Action(CuerMenuItem.Folders, action = {coordinator.go(Folders())}),
+                        Action(CuerMenuItem.Settings, action = {coordinator.go(Settings)}),
+                    ),
                 )
             }
         ) {
@@ -82,13 +66,16 @@ fun Home(coordinator: HomeUiCoordinator) {
                 }
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
+                        .fillMaxSize()
                         .background(Color.White)
                 ) {
-                    when (state.value.route) {
+                    val route = state.value.route
+                    when (route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        Files -> FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
+                        is Folders -> {
+                            coordinator.filesUiCoordinator.viewModel.init(route.node, null)
+                            FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
+                        }
                         ThemeTest -> SharedThemeView.View()
                         LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                     }

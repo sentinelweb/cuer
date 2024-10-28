@@ -40,11 +40,17 @@ class FilesViewModel(
         log.tag(this)
     }
 
-    override fun init(id: GUID, path: String?) {
-        state.sourceRemoteId = id
-        state.sourceNode = remotesRepository.getById(id)
+    override fun init(remoteId: GUID, path: String?) {
+        state.sourceRemoteId = remoteId
+        state.sourceNode = remotesRepository.getById(remoteId)
         state.path = path
         loadCurrentPath()
+    }
+
+    override fun init(node: NodeDomain?, path: String?) {
+//        if () {
+//
+//        }
     }
 
     override fun onBackClick() {

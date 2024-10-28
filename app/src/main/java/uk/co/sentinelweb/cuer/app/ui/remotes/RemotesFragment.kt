@@ -148,7 +148,10 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         is Message -> snackbarWrapper.make(value.msg)
                         ActionConfig -> showConfigFragment()
                         is ActionFolders -> navigationProvider.navigate(
-                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to value.remoteId.id.value))
+                            NavigationModel(
+                                FOLDER_LIST,
+                                mapOf(REMOTE_ID to (value.node.id?.id?.value ?: error("No Id")))
+                            )
                         )
 
                         is CuerConnected ->
@@ -172,7 +175,12 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         is CuerSelectSendTo ->
                             remotesDialogLauncher.launchRemotesDialog(
                                 { remoteNodeDomain, screen ->
-                                    remotesMviView.dispatch(Event.OnActionSendToSelected(value.sendNode, remoteNodeDomain))
+                                    remotesMviView.dispatch(
+                                        Event.OnActionSendToSelected(
+                                            value.sendNode,
+                                            remoteNodeDomain
+                                        )
+                                    )
                                     remotesDialogLauncher.hideRemotesDialog()
                                 },
                                 null

@@ -50,7 +50,7 @@ class RemotesContract {
             object ActionHelp : Label()
             object ActionPasteAdd : Label()
             object ActionConfig : Label()
-            data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
+            data class ActionFolders(val node: RemoteNodeDomain) : Label()
             data class Message(val msg: String) : Label()
             data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
             data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()

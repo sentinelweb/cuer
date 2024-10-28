@@ -50,7 +50,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private var _binding: FragmentComposeBinding? = null
     private val binding get() = _binding ?: throw IllegalStateException("BrowseFragment view not bound")
 
-    private var dialogFragment: DialogFragment? = null
+    //private var dialogFragment: DialogFragment? = null
 
     private val remoteIdArg: GUID? by lazy {
         NavigationModel.Param.REMOTE_ID.getString(arguments)?.toGUID()
@@ -119,11 +119,6 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onResume()
         edgeToEdgeWrapper.setDecorFitsSystemWindows(requireActivity())
         // controller.onRefresh()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // playerView.showPlayer()
     }
 
     override fun onDestroyView() {

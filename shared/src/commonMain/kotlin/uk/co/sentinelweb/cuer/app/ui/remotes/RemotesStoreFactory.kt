@@ -234,9 +234,9 @@ class RemotesStoreFactory(
         }
 
         private fun getRemoteFolders(intent: Intent.RemoteFolders) {
-            intent.remote.id
-                ?.run { publish(Label.ActionFolders(this)) }
-                ?.run { publish(Label.None) } // stops label re-firing on back from folders
+            intent.remote
+                .run { publish(Label.ActionFolders(this)) }
+                .run { publish(Label.None) } // stops label re-firing on back from folders
         }
     }
 

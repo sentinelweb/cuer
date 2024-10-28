@@ -15,6 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
+import uk.co.sentinelweb.cuer.app.ui.common.compose.views.initButtonColors
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
 import uk.co.sentinelweb.cuer.shared.generated.resources.didactgothic_regular
 import uk.co.sentinelweb.cuer.shared.generated.resources.montserrat_variable_font_wght
@@ -41,7 +42,7 @@ val colorMove = Color( 0xFFe53935)
 
 
 @Composable
-internal fun CuerSharedTheme(
+fun CuerSharedTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit,
 ) {
@@ -132,7 +133,7 @@ internal fun CuerSharedTheme(
             fontSize = 12.sp
         ),
     )
-
+    initButtonColors()
     MaterialTheme(
         typography = CuerTypography,
         shapes = AppShapes,
