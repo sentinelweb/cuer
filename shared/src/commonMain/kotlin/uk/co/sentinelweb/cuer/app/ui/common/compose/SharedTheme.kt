@@ -29,11 +29,13 @@ private val AppShapes = Shapes(
 )
 
 private val cuerLightColors = lightColorScheme(
-    primary = Color( 0xFFe53935)
+    primary = Color( 0xFFe53935),
+    onPrimary = Color.White,
 )
 
 private val cuerDarkColors = darkColorScheme(
     primary = Color( 0xFFe53935),
+    onPrimary = Color.White,
 )
 
 val colorDelete = Color( 0xFFe53935)
