@@ -74,7 +74,7 @@ object FilesComposeables {
                             contentColor = MaterialTheme.colorScheme.onBackground,
                             onUp = { viewModel.onUpClick() },
                             actions = listOf(
-                                Action(item = CuerMenuItem.Reload, action = {viewModel.onRefreshClick()})
+                                Action(item = CuerMenuItem.Reload, action = { viewModel.onRefreshClick() })
                             ),
                             modifier = Modifier
                                 .height(56.dp)
@@ -121,9 +121,11 @@ object FilesComposeables {
         viewModel: FilesContract.ViewModel,
         it: PlaylistItemDomain
     ) {
-        Row(modifier = Modifier.clickable {
-            viewModel.onClickFile(it)
-        }) {
+        Row(
+            modifier = Modifier
+                .clickable { viewModel.onClickFile(it) }
+                .fillMaxWidth()
+        ) {
             val icon = when (it.media.mediaType) {
                 VIDEO -> Res.drawable.ic_video
                 AUDIO -> Res.drawable.ic_mic
@@ -150,7 +152,10 @@ object FilesComposeables {
         viewModel: FilesContract.ViewModel,
         it: PlaylistDomain
     ) {
-        Row(modifier = Modifier.clickable { viewModel.onClickFolder(it) }) {
+        Row(modifier = Modifier
+            .clickable { viewModel.onClickFolder(it) }
+            .fillMaxWidth()
+        ) {
             val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
             Image(
                 painter = painterResource(icon),

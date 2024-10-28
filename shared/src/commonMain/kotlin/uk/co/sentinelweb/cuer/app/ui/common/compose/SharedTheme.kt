@@ -32,8 +32,13 @@ private val cuerLightColors = lightColorScheme(
 )
 
 private val cuerDarkColors = darkColorScheme(
-    primary = Color( 0xFFe53935)
+    primary = Color( 0xFFe53935),
 )
+
+val colorDelete = Color( 0xFFe53935)
+val colorEdit = Color( 0xFFe53935)
+val colorMove = Color( 0xFFe53935)
+
 
 @Composable
 internal fun CuerSharedTheme(

@@ -94,7 +94,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            RemotesComposables.RemotesUi(remotesMviView)
+            RemotesComposables.RemotesAppUi(remotesMviView)
         }
         statusBarColor.setStatusBarColorResource(R.color.blue_grey_900)
         observeLabels()

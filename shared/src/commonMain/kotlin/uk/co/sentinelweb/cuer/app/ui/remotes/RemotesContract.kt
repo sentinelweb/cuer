@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import kotlinx.coroutines.flow.StateFlow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -67,6 +68,7 @@ class RemotesContract {
     }
 
     interface View : MviView<View.Model, View.Event> {
+        val modelObservable: StateFlow<Model>
 
         fun processLabel(label: MviStore.Label)
 
@@ -80,7 +82,7 @@ class RemotesContract {
             val wifiState: WifiStateProvider.WifiState,
         ) {
             companion object {
-                fun blankModel() = Model(
+                val Initial = Model(
                     title = "Dummy",
                     imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
                     localNode = LocalNodeModel.blankModel(),

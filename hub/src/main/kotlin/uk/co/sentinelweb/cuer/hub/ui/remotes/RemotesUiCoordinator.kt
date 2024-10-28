@@ -1,36 +1,39 @@
 package uk.co.sentinelweb.cuer.hub.ui.remotes
 
+import androidx.compose.runtime.Composable
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
+import org.koin.java.KoinJavaComponent
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.*
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.ActionConfig
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.CuerSelectSendTo
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesController
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesStoreFactory
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
-import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
+import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
-import uk.co.sentinelweb.cuer.remote.server.locator
 
 class RemotesUiCoordinator :
     UiCoordinator<Model>,
@@ -41,8 +44,7 @@ class RemotesUiCoordinator :
 
     override val scope: Scope = desktopScopeWithSource(this)
 
-    override var modelObservable = MutableStateFlow(Model.blankModel())
-        private set
+    override val modelObservable = MutableStateFlow(Initial)
 
     val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
 
@@ -51,8 +53,6 @@ class RemotesUiCoordinator :
     private val lifecycle: LifecycleRegistry by inject()
 
     private var _localCoordinator: LocalUiCoordinator? = null
-
-
 
     init {
         log.tag(this)
@@ -73,6 +73,23 @@ class RemotesUiCoordinator :
         scope.close()
     }
 
+    @Composable
+    fun RemotesDesktopUi() {
+        RemotesComposables.RemotesDesktopUi(this)
+        ShowRemotesDialogIfNecessary(this.remotesDialogLauncher as RemotesDialogLauncher)
+        LocalComposables.showDialog(
+            isDialogOpen = isDialogOpen,
+            coordinator = this.localCoordinator(),
+            onClose = {
+                KoinJavaComponent.getKoin().get<CoroutineContextProvider>().mainScope.launch {
+                    delay(50)
+                    this@RemotesUiCoordinator.destroyLocalCoordinator()
+                }
+                isDialogOpen = false
+            },
+        )
+    }
+
     override fun processLabel(label: RemotesContract.MviStore.Label) {
         log.d("label: $label")
         when (label) {
@@ -86,6 +103,9 @@ class RemotesUiCoordinator :
                     null,
                     true,
                 )
+            }
+            ActionConfig -> {
+
             }
             else -> Unit
         }

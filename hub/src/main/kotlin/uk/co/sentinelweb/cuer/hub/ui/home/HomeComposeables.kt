@@ -19,10 +19,12 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
-import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 
 fun home(coordinator: HomeUiCoordinator) = application {
     val windowState = rememberWindowState(
@@ -51,6 +53,7 @@ fun Home(coordinator: HomeUiCoordinator) {
     MaterialTheme {
         Scaffold(
             topBar = {
+                //CuerSharedAppBarComposables.CuerSharedAppBar
                 TopAppBar(
                     title = { Text(text = "Cuer hub") },
                     actions = {
@@ -66,7 +69,7 @@ fun Home(coordinator: HomeUiCoordinator) {
         ) {
             Row {
                 Box(modifier = Modifier.width(400.dp)) {
-                    RemotesUi(coordinator.remotes)
+                    coordinator.remotes.RemotesDesktopUi()
                 }
                 Box(
                     modifier = Modifier
@@ -74,10 +77,8 @@ fun Home(coordinator: HomeUiCoordinator) {
                         .fillMaxHeight()
                         .background(Color.White)
                 ) {
-                    //TestUi(coordinator)
                     when (state.value.route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        //Files -> FilesUi(coordinator.filesUiCoordinator)
                         Files -> FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
                     }
                 }

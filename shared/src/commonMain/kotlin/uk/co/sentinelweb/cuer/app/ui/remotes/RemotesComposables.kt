@@ -1,33 +1,27 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
+import coil3.compose.rememberAsyncImagePainter
 import com.arkivanov.mvikotlin.core.view.BaseMviView
-import com.google.accompanist.glide.rememberGlidePainter
-import org.koin.core.context.GlobalContext
-import uk.co.sentinelweb.cuer.app.R
-import uk.co.sentinelweb.cuer.app.ui.common.compose.Const.PREVIEW_LOG_WRAPPER
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerTheme
-import uk.co.sentinelweb.cuer.app.ui.common.compose.HeaderButton
-import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.Action
-import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerMenuItem
-import uk.co.sentinelweb.cuer.app.ui.common.compose.topappbar.CuerTopAppBarComposables
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.views.HeaderButton
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.deleteSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.editSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.swipeToDismiss
@@ -35,30 +29,37 @@ import uk.co.sentinelweb.cuer.app.ui.common.mapper.ImageEnumMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
-import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
-import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.ANDROID
-import uk.co.sentinelweb.cuer.remote.server.ServerState.*
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.Initial
+import uk.co.sentinelweb.cuer.remote.server.ServerState
+import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object RemotesComposables {
-    val log: LogWrapper by lazy { GlobalContext.get().get<LogWrapper>().apply { tag(this) } }
 
     @Composable
-    fun RemotesUi(view: RemotesMviViewProxy) {
-        RemotesView(view.observableModel, view)
+    fun RemotesAppUi(view: RemotesContract.View) {
+        val model = view.modelObservable.collectAsState(initial = Initial)
+        RemotesViewApp(model.value, view as BaseMviView<Model, Event>)
     }
 
-    // todo use scaffold
-    @OptIn(ExperimentalMaterialApi::class)
     @Composable
-    fun RemotesView(model: Model, view: BaseMviView<Model, Event>) {
-        CuerTheme {
+    fun RemotesDesktopUi(view: RemotesContract.View) {
+        val model = view.modelObservable.collectAsState(initial = Initial)
+        CuerSharedTheme {
+            Surface {
+                RemotesScreen(model.value, view as BaseMviView<Model, Event>)
+            }
+        }
+    }
+
+    @Composable
+    fun RemotesViewApp(model: Model, view: BaseMviView<Model, Event>) {
+        CuerSharedTheme {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
-                    CuerTopAppBarComposables.CuerAppBar(
+                    CuerSharedAppBarComposables.CuerSharedAppBar(
                         title = model.title,
                         backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         onUp = { view.dispatch(OnUpClicked) },
                         actions = listOf(
                             Action(CuerMenuItem.Help, { view.dispatch(OnActionHelpClicked) }),
@@ -70,27 +71,40 @@ object RemotesComposables {
                             .zIndex(1f)
                             .height(56.dp)
                     )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(MaterialTheme.colors.surface)
-                            .verticalScroll(rememberScrollState())
-                            .padding(bottom = 128.dp)
-                    ) {
-                        Header(model, view)
-                        LazyColumn(
-                            modifier = Modifier
-                                .height(400.dp), // fixme need to calc height for device (or make scrollable)
-                            contentPadding = PaddingValues(top = 4.dp)
-                        ) {
-                            items(model.remoteNodes) { remote ->
-                                swipeToDismiss(
-                                    editSwipeResources { view.dispatch(OnActionPingNodeClicked(remote.domain)) },
-                                    deleteSwipeResources { view.dispatch(OnActionDelete(remote.domain)) }
-                                ) { RemoteRow(remote, view) }
-                            }
+                    RemotesScreen(model, view)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalMaterialApi::class)
+    @Composable
+    private fun RemotesScreen(
+        model: Model,
+        view: BaseMviView<Model, Event>
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface)
+                .verticalScroll(rememberScrollState())
+                .padding(bottom = 128.dp)
+        ) {
+            Header(model, view)
+            LazyColumn(
+                modifier = Modifier
+                    .height(400.dp), // fixme need to calc height for device (or make scrollable)
+                contentPadding = PaddingValues(top = 4.dp)
+            ) {
+                items(model.remoteNodes) { remote ->
+                    swipeToDismiss(
+                        editSwipeResources {
+                            view.dispatch(OnActionPingNodeClicked(remote.domain))
+                        },
+                        deleteSwipeResources {
+                            view.dispatch(OnActionDelete(remote.domain))
                         }
-                    }
+                    ) { RemoteRow(remote, view) }
                 }
             }
         }
@@ -105,7 +119,8 @@ object RemotesComposables {
             model.imageUrl
                 ?.also { url ->
                     Image(
-                        painter = rememberGlidePainter(request = url, fadeIn = true),
+                        //painter = rememberAsyncImagePainter(model.imageUrl),
+                        painter = painterResource(Res.drawable.remotes),
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -119,7 +134,7 @@ object RemotesComposables {
                 ?.run {
                     Text(
                         text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
-                        color = colorResource(R.color.white),
+                        color = Color.White,
                         modifier = Modifier
                             .align(Alignment.BottomStart)
                             .padding(16.dp)
@@ -133,30 +148,39 @@ object RemotesComposables {
         }
         Row(
             modifier = Modifier.padding(
-                start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                start = 16.dp,
                 top = 16.dp,
             )
         ) {
             when (model.serverState) {
-                STOPPED, INITIAL -> HeaderButton(
+                ServerState.STOPPED, ServerState.INITIAL -> HeaderButton(
                     if (model.wifiState.isConnected) "Start" else "No WiFi",
-                    R.drawable.ic_play,
+                    Res.drawable.ic_play,
                     enabled = model.wifiState.isConnected
                 ) { view.dispatch(OnActionStartServerClicked) }
 
-                STARTED -> HeaderButton("Stop", R.drawable.ic_stop) { view.dispatch(OnActionStopServerClicked) }
+                ServerState.STARTED -> HeaderButton(
+                    "Stop",
+                    Res.drawable.ic_stop
+                ) { view.dispatch(OnActionStopServerClicked) }
             }
-            if (model.serverState == STARTED) {
-                HeaderButton("Ping", R.drawable.ic_ping) { view.dispatch(OnActionPingMulticastClicked) }
+            if (model.serverState == ServerState.STARTED) {
+                HeaderButton(
+                    "Ping",
+                    Res.drawable.ic_ping
+                ) { view.dispatch(OnActionPingMulticastClicked) }
             }
-            HeaderButton("Config", R.drawable.ic_menu_settings) { view.dispatch(OnActionConfigClicked) }
+            HeaderButton(
+                "Config",
+                Res.drawable.ic_menu_settings
+            ) { view.dispatch(OnActionConfigClicked) }
         }
         model.address?.also {
             Text(
                 text = it,
-                style = MaterialTheme.typography.h3,
+                style = MaterialTheme.typography.headlineMedium,
                 modifier = Modifier.padding(
-                    start = dimensionResource(R.dimen.app_bar_header_margin_start),
+                    start = 16.dp,
                     top = 8.dp,
                     bottom = 0.dp
                 )
@@ -165,8 +189,11 @@ object RemotesComposables {
         model.localNode.apply {
             Text(
                 text = "$hostname : $deviceType : ${authType}",
-                style = MaterialTheme.typography.body2,
-                modifier = Modifier.padding(start = dimensionResource(R.dimen.app_bar_header_margin_start), top = 8.dp)
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = 8.dp
+                )
             )
         }
     }
@@ -177,11 +204,11 @@ object RemotesComposables {
         var expanded by remember { mutableStateOf(false) }
         val contentColor = remote.domain.isAvailable
             .takeIf { it }
-            ?.let { MaterialTheme.colors.onSurface }
-            ?: MaterialTheme.colors.onSurface.copy(alpha = 0.3f)
+            ?.let { MaterialTheme.colorScheme.onSurface }
+            ?: MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
         Column(
             Modifier
-                .background(MaterialTheme.colors.surface)
+                .background(MaterialTheme.colorScheme.surface)
         ) {
             Box(
                 modifier = Modifier
@@ -206,31 +233,32 @@ object RemotesComposables {
                         Text(
                             text = remote.title,
                             color = contentColor,
-                            style = MaterialTheme.typography.h5,
+                            style = MaterialTheme.typography.headlineSmall,
                             modifier = Modifier
                                 .padding(start = 8.dp),
                         )
                         Text(
                             text = remote.address,
                             color = contentColor,
-                            style = MaterialTheme.typography.body2,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                         Text(
                             text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
                             color = contentColor,
-                            style = MaterialTheme.typography.body2,
+                            style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
                 }
+
                 // overflow button and dropdown
                 Box(
                     modifier = Modifier.wrapContentWidth(align = Alignment.End),
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_more_vert),
-                        tint = colorResource(R.color.grey_500),
+                        painter = painterResource(Res.drawable.ic_more_vert),
+                        tint = Color.Gray,
                         contentDescription = null,
                         modifier = Modifier
                             .size(48.dp)
@@ -242,27 +270,38 @@ object RemotesComposables {
                         modifier = Modifier.width(200.dp),
                         onDismissRequest = { expanded = false }
                     ) {
-                        DropdownMenuItem(onClick = {
-                            expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
-                        }) {
-                            Text(stringResource(R.string.remotes_menu_ping))
-                        }
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.menu_ping)) },
+                            colors = MenuDefaults.itemColors(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            onClick = {
+                                expanded = dispatchAndClose(view, OnActionPingNodeClicked(remote.domain))
+                            })
+
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.menu_delete)) },
+                            colors = MenuDefaults.itemColors(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            onClick = {
+                                expanded = dispatchAndClose(view, OnActionDelete(remote.domain))
+                            })
+
+                        DropdownMenuItem(
+                            text = { Text(stringResource(Res.string.menu_sendto)) },
+                            colors = MenuDefaults.itemColors(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            onClick = {
+                                expanded = dispatchAndClose(view, OnActionSendTo(remote.domain))
+                            })
+//                        Divider()
 //                    DropdownMenuItem(onClick = {
 //                        expanded = dispatchAndClose(view, OnActionSync(remote.domain))
 //                    }) {
 //                        Text("Sync")
 //                    }
-                        DropdownMenuItem(onClick = {
-                            expanded = dispatchAndClose(view, OnActionDelete(remote.domain))
-                        }) {
-                            Text(stringResource(R.string.menu_delete))
-                        }
-                        DropdownMenuItem(onClick = {
-                            expanded = dispatchAndClose(view, OnActionSendTo(remote.domain))
-                        }) {
-                            Text(stringResource(R.string.menu_sendto))
-                        }
-//                        Divider()
 //                        DropdownMenuItem(onClick = {
 //                            expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))
 //                        }) {
@@ -284,22 +323,22 @@ object RemotesComposables {
             Row(
                 modifier = Modifier
                     .horizontalScroll(rememberScrollState())
-                    .padding(horizontal = dimensionResource(R.dimen.page_margin))
+                    .padding(horizontal = 16.dp)
                     .padding(bottom = 8.dp)
             ) {
-                HeaderButton(stringResource(R.string.playlists_title), R.drawable.ic_playlists) {
-                    view.dispatch(
-                        OnActionPlaylists(remote.domain)
-                    )
-                }
-                HeaderButton(stringResource(R.string.folders), R.drawable.ic_folder_open) {
-                    view.dispatch(
-                        OnActionFolders(remote.domain)
-                    )
-                }
                 HeaderButton(
-                    stringResource(R.string.remotes_cuer_connect),
-                    R.drawable.ic_cuer_cast_connected
+                    stringResource(Res.string.rm_playlists),
+                    Res.drawable.ic_playlists
+                ) { view.dispatch(OnActionPlaylists(remote.domain)) }
+
+                HeaderButton(
+                    stringResource(Res.string.rm_folders),
+                    Res.drawable.ic_folder_open
+                ) { view.dispatch(OnActionFolders(remote.domain)) }
+
+                HeaderButton(
+                    stringResource(Res.string.rm_cuer_connect),
+                    Res.drawable.ic_cuer_cast_connected
                 ) { view.dispatch(OnActionCuerConnect(remote.domain)) }
             }
         }
@@ -312,24 +351,4 @@ object RemotesComposables {
         view.dispatch(event)
         return false
     }
-}
-
-@Preview(name = "Top level")
-@Composable
-@ExperimentalAnimationApi
-private fun RemotesPreview() {
-    val modelMapper = RemotesModelMapper(GlobalContext.get().get(), PREVIEW_LOG_WRAPPER)
-    val localNode = LocalNodeDomain(
-        id = null, ipAddress = "x.x.x.x", port = 1234, hostname = "hostname", deviceType = ANDROID,
-    )
-    val view = object : BaseMviView<Model, Event>() {}
-    RemotesComposables.RemotesView(
-        modelMapper.map(
-            RemotesContract.MviStore.State(
-                localNode = localNode,
-                wifiState = WifiStateProvider.WifiState()
-            )
-        ),
-        view
-    )
 }
