@@ -22,7 +22,9 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.name
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.Folders
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
@@ -30,7 +32,7 @@ import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
 class RemotesUiCoordinator(
-//    private val navigator: (DisplayRoute) -> Unit
+    private val parent: HomeUiCoordinator,
 ) :
     UiCoordinator<Model>,
     DesktopScopeComponent,
@@ -93,8 +95,7 @@ class RemotesUiCoordinator(
             }
 
             is ActionFolders -> {
-
-                //navigator(DisplayRoute.Folders(label.node))
+                parent.go(Folders(label.node))
             }
 
             else -> Unit
@@ -109,7 +110,7 @@ class RemotesUiCoordinator(
     companion object {
         @JvmStatic
         val uiModule = module {
-            factory { RemotesUiCoordinator() }
+            factory { (parent: HomeUiCoordinator) -> RemotesUiCoordinator(parent) }
             scope(named<RemotesUiCoordinator>()) {
                 scoped {
                     RemotesController(

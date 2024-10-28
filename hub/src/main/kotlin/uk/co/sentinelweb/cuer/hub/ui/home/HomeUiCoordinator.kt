@@ -35,7 +35,7 @@ class HomeUiCoordinator :
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
-    val remotesCoordinator: RemotesUiCoordinator by inject()
+    val remotesCoordinator: RemotesUiCoordinator by inject() { parametersOf(this) }
     val preferencesUiCoordinator: PreferencesUiCoordinator by inject()
     val filesUiCoordinator: FilesUiCoordinator2 by inject { parametersOf(this) }
     val localCoordinator:LocalUiCoordinator by inject()

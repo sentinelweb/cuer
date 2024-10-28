@@ -23,7 +23,7 @@ interface FilesContract {
     @Serializable
     data class State(
         var sourceRemoteId: GUID? = null,
-        var sourceNode: RemoteNodeDomain? = null,
+        var sourceNode: NodeDomain? = null,
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
         var selectedFile: PlaylistItemDomain? = null,

@@ -9,12 +9,14 @@ import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.net.remote.RemoteFilesInteractor
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
 
@@ -28,6 +30,8 @@ class FilesViewModel(
     private val castController: CastController,
     private val remoteDialogLauncher: RemotesDialogContract.Launcher,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
+    private val getFolderListUseCase: GetFolderListUseCase,
+    private val localRepository: LocalRepository,
 ) : ViewModel(), FilesContract.ViewModel {
 
     override val modelObservable = MutableStateFlow(Initial)
@@ -40,6 +44,7 @@ class FilesViewModel(
         log.tag(this)
     }
 
+    // fixme: used by app could make remoteId=null for local
     override fun init(remoteId: GUID, path: String?) {
         state.sourceRemoteId = remoteId
         state.sourceNode = remotesRepository.getById(remoteId)
@@ -48,9 +53,9 @@ class FilesViewModel(
     }
 
     override fun init(node: NodeDomain?, path: String?) {
-//        if () {
-//
-//        }
+        state.sourceNode = node ?: localRepository.localNode
+        state.path = path
+        loadCurrentPath()
     }
 
     override fun onBackClick() {
@@ -128,7 +133,12 @@ class FilesViewModel(
         viewModelScope.launch {
             map(true)
             state.sourceNode?.apply {
-                state.currentFolder = filesInteractor.getFolderList(this.locator(), state.path).data
+                when (this) {
+                    is RemoteNodeDomain -> state.currentFolder =
+                        filesInteractor.getFolderList(this.locator(), state.path).data
+
+                    is LocalNodeDomain -> state.currentFolder = getFolderListUseCase.getFolderList(state.path)
+                }
             }
             map(false)
         }

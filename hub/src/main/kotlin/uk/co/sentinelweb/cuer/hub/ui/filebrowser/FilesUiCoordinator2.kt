@@ -13,7 +13,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Compan
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
@@ -28,7 +28,6 @@ class FilesUiCoordinator2(
     private val log: LogWrapper
 ) : UiCoordinator<FilesContract.FilesModel>,
     DesktopScopeComponent,
-//    FilesContract.Interactions,
     KoinComponent {
 
     init {
@@ -39,39 +38,21 @@ class FilesUiCoordinator2(
 
     val viewModel: FilesViewModel by scope.inject()
 
-    //override lateinit var modelObservable: MutableStateFlow<FilesModel>
     override val modelObservable = MutableStateFlow(Initial)
 
     override fun create() {
         viewModel.viewModelScope.launch {
             viewModel.init(remotesRepository.getByName("airy")?.id?.id!!, null)
         }
-        //modelObservable = viewModel.modelObservable
-        //refresh()
     }
 
-//    fun refresh() {
-//        getFolders.getFolderList(currentFolder)
-//            ?.let { modelObservable.value = mapper.map(it) }
-//    }
+    fun init(node: NodeDomain) {
+        viewModel.init(node, null)
+    }
 
     override fun destroy() {
 
     }
-
-//    override fun onClickFolder(folder: PlaylistDomain) {
-//        currentFolder = folder.platformId
-//        log.tag("currentFolder; $currentFolder")
-//        refresh()
-//    }
-//
-//    override fun onClickFile(file: PlaylistItemDomain) {
-//        if (listOf(VIDEO, AUDIO).contains(file.media.mediaType))
-//            playMedia(file)
-//        else if (FILE.equals(file.media.mediaType))
-//            showFile(file)
-//
-//    }
 
     private fun playMedia(item: PlaylistItemDomain) {
         parent.showPlayer(item, modelObservable.value.list?.playlist ?: error("No filelist present"))
@@ -98,6 +79,8 @@ class FilesUiCoordinator2(
                         castController = get(),
                         remoteDialogLauncher = get(),
                         cuerCastPlayerWatcher = get(),
+                        getFolderListUseCase = get(),
+                        localRepository = get(),
                     )
                 }
                 scoped {
