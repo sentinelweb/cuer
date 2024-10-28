@@ -6,6 +6,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.arkivanov.mvikotlin.core.view.BaseMviView
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.Companion.DUMMY_LOCAL_NODE
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Label
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View
@@ -24,10 +26,9 @@ class LocalMviViewProxy constructor(
         log.tag(this)
     }
 
-    var observableModel: Model by mutableStateOf(
-        MODEL_INIT
-    )
-        private set
+    private val _modelObservable: MutableStateFlow<Model> = MutableStateFlow(MODEL_INIT)
+    override val modelObservable: StateFlow<Model>
+        get() = _modelObservable
 
     var observableLoading: Boolean by mutableStateOf(false)
         private set
@@ -41,7 +42,7 @@ class LocalMviViewProxy constructor(
 
     override fun render(model: Model) {
         log.d(model.toString())
-        observableModel = model
+        _modelObservable.value = model
     }
 
     fun loading(isLoading: Boolean) {

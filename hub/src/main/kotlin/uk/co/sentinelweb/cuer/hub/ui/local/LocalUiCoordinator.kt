@@ -13,7 +13,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model
-import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model.Companion.blankModel
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.local.LocalController
 import uk.co.sentinelweb.cuer.app.ui.local.LocalModelMapper
 import uk.co.sentinelweb.cuer.app.ui.local.LocalStoreFactory
@@ -31,7 +31,7 @@ class LocalUiCoordinator :
 
     override val scope: Scope = desktopScopeWithSource(this)
 
-    override var modelObservable = MutableStateFlow(blankModel())
+    override var modelObservable = MutableStateFlow(Initial)
         private set
 
     private val controller: LocalController by scope.inject()

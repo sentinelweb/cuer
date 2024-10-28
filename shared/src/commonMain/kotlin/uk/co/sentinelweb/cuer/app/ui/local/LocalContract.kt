@@ -2,6 +2,8 @@ package uk.co.sentinelweb.cuer.app.ui.local
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import kotlinx.coroutines.flow.StateFlow
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain.AuthConfig
@@ -35,6 +37,8 @@ class LocalContract {
 
     interface View : MviView<View.Model, View.Event> {
 
+        val modelObservable: StateFlow<Model>
+
         fun processLabel(label: MviStore.Label)
 
         data class Model(
@@ -46,7 +50,7 @@ class LocalContract {
             val wifiState: WifiStateProvider.WifiState
         ) {
             companion object {
-                fun blankModel() = Model(
+                val Initial = Model(
                     title = "",
                     imageUrl = "",
                     localNodeDomain = LocalNodeDomain(id = null, ipAddress = "", port = 0),

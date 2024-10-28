@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
@@ -18,10 +19,10 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import uk.co.sentinelweb.cuer.app.ui.common.compose.SharedThemeView
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesComposables
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
@@ -57,9 +58,14 @@ fun Home(coordinator: HomeUiCoordinator) {
                 TopAppBar(
                     title = { Text(text = "Cuer hub") },
                     actions = {
+                        IconButton(onClick = { coordinator.go(ThemeTest) }) {
+                            Icon(Icons.Filled.ArrowDropDown, contentDescription = "ThemeTest")
+                        }
+
                         IconButton(onClick = { coordinator.go(Files) }) {
                             Icon(Icons.Filled.List, contentDescription = "Files")
                         }
+
                         IconButton(onClick = { coordinator.go(Settings) }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings")
                         }
@@ -80,6 +86,7 @@ fun Home(coordinator: HomeUiCoordinator) {
                     when (state.value.route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
                         Files -> FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
+                        ThemeTest -> SharedThemeView.View()
                     }
                 }
             }

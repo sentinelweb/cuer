@@ -59,7 +59,7 @@ object RemotesComposables {
                     CuerSharedAppBarComposables.CuerSharedAppBar(
                         title = model.title,
                         backgroundColor = Color.Transparent,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        contentColor = Color.White,
                         onUp = { view.dispatch(OnUpClicked) },
                         actions = listOf(
                             Action(CuerMenuItem.Help, { view.dispatch(OnActionHelpClicked) }),
@@ -119,8 +119,7 @@ object RemotesComposables {
             model.imageUrl
                 ?.also { url ->
                     Image(
-                        //painter = rememberAsyncImagePainter(model.imageUrl),
-                        painter = painterResource(Res.drawable.remotes),
+                        painter = painterResource(Res.drawable.header_remotes),
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxWidth()

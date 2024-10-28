@@ -22,9 +22,7 @@ object PreferenceComposeables {
 
     @Composable
     private fun PreferencesView(model: PreferencesModel, view: PreferencesUiCoordinator) {
-
         Column(modifier = Modifier.padding(8.dp)) {
-            // HelloSharedWorld()
             FolderPaths(model, view)
             DbInitCheckBoxRow(model, view)
         }

@@ -27,7 +27,6 @@ import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialog
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.ext.name
-import uk.co.sentinelweb.cuer.hub.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
@@ -77,17 +76,17 @@ class RemotesUiCoordinator :
     fun RemotesDesktopUi() {
         RemotesComposables.RemotesDesktopUi(this)
         ShowRemotesDialogIfNecessary(this.remotesDialogLauncher as RemotesDialogLauncher)
-        LocalComposables.showDialog(
-            isDialogOpen = isDialogOpen,
-            coordinator = this.localCoordinator(),
-            onClose = {
-                KoinJavaComponent.getKoin().get<CoroutineContextProvider>().mainScope.launch {
-                    delay(50)
-                    this@RemotesUiCoordinator.destroyLocalCoordinator()
-                }
-                isDialogOpen = false
-            },
-        )
+//        LocalComposables.showDialog(
+//            isDialogOpen = isDialogOpen,
+//            coordinator = this.localCoordinator(),
+//            onClose = {
+//                KoinJavaComponent.getKoin().get<CoroutineContextProvider>().mainScope.launch {
+//                    delay(50)
+//                    this@RemotesUiCoordinator.destroyLocalCoordinator()
+//                }
+//                isDialogOpen = false
+//            },
+//        )
     }
 
     override fun processLabel(label: RemotesContract.MviStore.Label) {

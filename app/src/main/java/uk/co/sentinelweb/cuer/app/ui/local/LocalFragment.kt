@@ -73,7 +73,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            LocalComposables.LocalUi(view = localMviView)
+            LocalComposables.LocalAppUi(view = localMviView)
         }
         observeLabels()
     }
