@@ -24,7 +24,6 @@ class LocalContract {
             object Up : Label()
             data class Message(val msg: String) : Label()
             object Saved : Label()
-
         }
 
         data class State(

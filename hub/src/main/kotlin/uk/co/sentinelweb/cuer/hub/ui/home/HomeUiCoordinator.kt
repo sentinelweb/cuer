@@ -12,12 +12,12 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
-import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
+import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
@@ -35,9 +35,10 @@ class HomeUiCoordinator :
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
-    val remotes: RemotesUiCoordinator by inject()
+    val remotesCoordinator: RemotesUiCoordinator by inject()
     val preferencesUiCoordinator: PreferencesUiCoordinator by inject()
     val filesUiCoordinator: FilesUiCoordinator2 by inject { parametersOf(this) }
+    val localCoordinator:LocalUiCoordinator by inject()
 
     private val remoteServiceManager: RemoteServerContract.Manager by inject()
     private val log: LogWrapper by inject()
@@ -50,17 +51,20 @@ class HomeUiCoordinator :
 
     override fun create() {
         log.tag(this)
-        remotes.create()
+        remotesCoordinator.create()
         preferencesUiCoordinator.create()
         filesUiCoordinator.create()
+        localCoordinator.create()
     }
 
     override fun destroy() {
         remoteServiceManager.stop()
-        remotes.destroy()
+        remotesCoordinator.destroy()
         preferencesUiCoordinator.destroy()
         filesUiCoordinator.destroy()
         playerUiCoordinator?.destroy()
+        localCoordinator.destroy()
+        scope.close()
     }
 
     fun go(route: HomeModel.DisplayRoute) {

@@ -5,7 +5,7 @@ data class HomeModel(
     val route: DisplayRoute = DisplayRoute.Settings
 ) {
     enum class DisplayRoute {
-        Settings, Files, ThemeTest
+        Settings, Files, ThemeTest, LocalConfig,
     }
 
     companion object {

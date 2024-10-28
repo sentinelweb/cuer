@@ -16,6 +16,7 @@ import org.koin.dsl.module
 import org.koin.java.KoinJavaComponent
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.cast.EmptyCastDialogLauncher
+import uk.co.sentinelweb.cuer.app.ui.local.LocalContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.ActionConfig
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.CuerSelectSendTo
@@ -51,8 +52,6 @@ class RemotesUiCoordinator :
     private val log: LogWrapper by inject()
     private val lifecycle: LifecycleRegistry by inject()
 
-    private var _localCoordinator: LocalUiCoordinator? = null
-
     init {
         log.tag(this)
     }
@@ -76,17 +75,6 @@ class RemotesUiCoordinator :
     fun RemotesDesktopUi() {
         RemotesComposables.RemotesDesktopUi(this)
         ShowRemotesDialogIfNecessary(this.remotesDialogLauncher as RemotesDialogLauncher)
-//        LocalComposables.showDialog(
-//            isDialogOpen = isDialogOpen,
-//            coordinator = this.localCoordinator(),
-//            onClose = {
-//                KoinJavaComponent.getKoin().get<CoroutineContextProvider>().mainScope.launch {
-//                    delay(50)
-//                    this@RemotesUiCoordinator.destroyLocalCoordinator()
-//                }
-//                isDialogOpen = false
-//            },
-//        )
     }
 
     override fun processLabel(label: RemotesContract.MviStore.Label) {
@@ -113,21 +101,6 @@ class RemotesUiCoordinator :
     override fun render(model: Model) {
         log.d("render: ${model.title}")
         this.modelObservable.value = model
-    }
-
-    fun localCoordinator(): LocalUiCoordinator {
-        if (_localCoordinator == null) {
-            _localCoordinator = getKoin().get()
-            _localCoordinator?.create()
-        }
-        return _localCoordinator ?: throw IllegalStateException("_localCoordinator is null")
-    }
-
-    fun destroyLocalCoordinator() {
-        if (_localCoordinator != null) {
-            _localCoordinator?.destroy()
-            _localCoordinator = null
-        }
     }
 
     companion object {

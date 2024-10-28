@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
@@ -21,11 +22,9 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.app.ui.common.compose.SharedThemeView
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesComposables
+import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
-import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
-import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 
 fun home(coordinator: HomeUiCoordinator) = application {
     val windowState = rememberWindowState(
@@ -69,13 +68,17 @@ fun Home(coordinator: HomeUiCoordinator) {
                         IconButton(onClick = { coordinator.go(Settings) }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings")
                         }
+
+                        IconButton(onClick = { coordinator.go(LocalConfig) }) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "Local config")
+                        }
                     }
                 )
             }
         ) {
             Row {
                 Box(modifier = Modifier.width(400.dp)) {
-                    coordinator.remotes.RemotesDesktopUi()
+                    coordinator.remotesCoordinator.RemotesDesktopUi()
                 }
                 Box(
                     modifier = Modifier
@@ -87,6 +90,7 @@ fun Home(coordinator: HomeUiCoordinator) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
                         Files -> FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
                         ThemeTest -> SharedThemeView.View()
+                        LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                     }
                 }
             }
