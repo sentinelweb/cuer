@@ -16,7 +16,6 @@ import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
@@ -72,10 +71,7 @@ fun Home(coordinator: HomeUiCoordinator) {
                     val route = state.value.route
                     when (route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        is Folders -> {
-                            coordinator.filesUiCoordinator.viewModel.init(route.node, null)
-                            FileBrowserDesktopUi(coordinator.filesUiCoordinator.viewModel)
-                        }
+                        is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
                         ThemeTest -> SharedThemeView.View()
                         LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                     }

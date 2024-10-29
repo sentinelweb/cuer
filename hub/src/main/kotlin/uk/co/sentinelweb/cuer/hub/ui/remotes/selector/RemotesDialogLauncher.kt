@@ -6,21 +6,31 @@ import org.koin.core.component.inject
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogViewModel
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher.DisplayModel.Companion.Initial
 
-class RemotesDialogLauncher : RemotesDialogContract.Launcher, KoinComponent {
+class RemotesDialogLauncher(
+    private val log: LogWrapper,
+) : RemotesDialogContract.Launcher, KoinComponent {
 
-    var modelObservable = MutableStateFlow(DisplayModel.blankModel)
+    var modelObservable = MutableStateFlow(Initial)
         private set
 
     val viewModel: RemotesDialogViewModel by inject()
 
+    init {
+        log.tag(this)
+    }
+
     data class DisplayModel(
         val isSelectRemotesVisible: Boolean,
+        val unique: Double = Math.random(),
     ) {
         companion object {
-            val blankModel = DisplayModel(false)
+            val Initial = DisplayModel(false)
         }
     }
 
@@ -34,7 +44,7 @@ class RemotesDialogLauncher : RemotesDialogContract.Launcher, KoinComponent {
         if (isSelectNodeOnly) {
             viewModel.setSelectNodeOnly()
         } else {
-            node?.also { viewModel.onNodeSelected(it)}
+            node?.also { viewModel.onNodeSelected(it) }
         }
         modelObservable.value = DisplayModel(true)
     }

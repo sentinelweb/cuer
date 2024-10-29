@@ -184,7 +184,7 @@ object Modules {
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
-        factory<RemotesDialogContract.Launcher> { RemotesDialogLauncher() }
+        single<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get()) }
     }
 
     val emptyModule = module {

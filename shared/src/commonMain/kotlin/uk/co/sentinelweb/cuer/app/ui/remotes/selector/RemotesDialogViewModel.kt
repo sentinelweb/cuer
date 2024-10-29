@@ -27,9 +27,11 @@ class RemotesDialogViewModel(
     val model: Flow<Model> = _model
 
     init {
-        coroutines.mainScope.launch {
-            map()
-        }
+        coroutines.mainScope.launch { map() }
+    }
+
+    fun setSelectNodeOnly() {
+        state.isSelectNodeOnly = true
     }
 
     fun onNodeSelected(node: RemoteNodeDomain) {
@@ -40,10 +42,6 @@ class RemotesDialogViewModel(
                 remoteSelected(node)
             }
         }
-    }
-
-    fun onScreenSelected(node: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
-        listener(node, screen)
     }
 
     private suspend fun remoteSelected(node: RemoteNodeDomain) = withContext(coroutines.IO) {
@@ -63,12 +61,12 @@ class RemotesDialogViewModel(
             }
     }
 
-    private fun map() {
-        _model.value = Model(repo.remoteNodes.map { mapper.mapRemoteNode(it) })
+    fun onScreenSelected(node: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
+        listener(node, screen)
     }
 
-    fun setSelectNodeOnly() {
-        state.isSelectNodeOnly = true
+    private fun map() {
+        _model.value = Model(repo.remoteNodes.map { mapper.mapRemoteNode(it) })
     }
 
     fun resetState() {

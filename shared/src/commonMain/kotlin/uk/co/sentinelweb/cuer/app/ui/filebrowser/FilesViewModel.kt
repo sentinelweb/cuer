@@ -75,10 +75,11 @@ class FilesViewModel(
     }
 
     override fun onClickFile(file: PlaylistItemDomain) {
-        if (listOf(VIDEO, AUDIO).contains(file.media.mediaType))
+        if (listOf(VIDEO, AUDIO).contains(file.media.mediaType)) {
             playMedia(file)
-        else if (FILE.equals(file.media.mediaType))
+        } else if (FILE.equals(file.media.mediaType)) {
             showFile(file)
+        }
     }
 
     private fun playMedia(file: PlaylistItemDomain) {

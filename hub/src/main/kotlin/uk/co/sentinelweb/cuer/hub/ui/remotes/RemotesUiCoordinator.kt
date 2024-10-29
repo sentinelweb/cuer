@@ -81,7 +81,7 @@ class RemotesUiCoordinator(
             is CuerSelectSendTo -> {
                 remotesDialogLauncher.launchRemotesDialog(
                     { remoteNodeDomain, screen ->
-                        println("selected node: target: ${remoteNodeDomain.name()}, targets: ${label.sendNode.name()}")
+                        println("selected node: send: ${label.sendNode.name()} to: ${remoteNodeDomain.name()}")
                         dispatch(Event.OnActionSendToSelected(label.sendNode, remoteNodeDomain))
                         remotesDialogLauncher.hideRemotesDialog()
                     },

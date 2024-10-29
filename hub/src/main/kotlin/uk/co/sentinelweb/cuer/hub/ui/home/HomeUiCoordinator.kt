@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.Folders
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
@@ -68,6 +69,10 @@ class HomeUiCoordinator :
     }
 
     fun go(route: HomeContract.HomeModel.DisplayRoute) {
+        when (route) {
+            is Folders -> filesUiCoordinator.viewModel.init(route.node, null)
+            else -> Unit
+        }
         modelObservable.value = modelObservable.value.copy(route = route)
     }
 

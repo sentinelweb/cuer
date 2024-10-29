@@ -1,5 +1,9 @@
 package uk.co.sentinelweb.cuer.hub.ui.filebrowser
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -8,15 +12,19 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.viewer.openFileInDefaultApp
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
+import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
@@ -40,9 +48,11 @@ class FilesUiCoordinator2(
 
     override val modelObservable = MutableStateFlow(Initial)
 
+    val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
+
     override fun create() {
         viewModel.viewModelScope.launch {
-            viewModel.init(remotesRepository.getByName("airy")?.id?.id!!, null)
+            viewModel.init(null, null)
         }
     }
 
@@ -51,6 +61,13 @@ class FilesUiCoordinator2(
     }
 
     override fun destroy() {
+
+    }
+
+    @Composable
+    fun FileBrowserDesktopUi() {
+            FileBrowserDesktopUi(this.viewModel)
+            ShowRemotesDialogIfNecessary(this.remotesDialogLauncher as RemotesDialogLauncher)
 
     }
 
