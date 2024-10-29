@@ -13,14 +13,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
-import coil3.compose.rememberAsyncImagePainter
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.HeaderButton
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.deleteSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.editSwipeResources
@@ -46,7 +43,16 @@ object RemotesComposables {
         val model = view.modelObservable.collectAsState(initial = Initial)
         CuerSharedTheme {
             Surface {
-                RemotesScreen(model.value, view as BaseMviView<Model, Event>)
+                Box(contentAlignment = Alignment.TopStart) {
+                    CuerSharedAppBar(
+                        title = stringResource(Res.string.rm_title) + " : " + model.value.title,
+                        backgroundColor = colorTransparentBlack,
+                        contentColor = Color.White,
+                        modifier = Modifier
+                            .zIndex(1f)
+                    )
+                    RemotesScreen(model.value, view as BaseMviView<Model, Event>)
+                }
             }
         }
     }
@@ -56,7 +62,7 @@ object RemotesComposables {
         CuerSharedTheme {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
-                    CuerSharedAppBarComposables.CuerSharedAppBar(
+                    CuerSharedAppBar(
                         title = model.title,
                         backgroundColor = Color.Transparent,
                         contentColor = Color.White,
@@ -116,18 +122,15 @@ object RemotesComposables {
         view: BaseMviView<Model, Event>
     ) {
         Box(modifier = Modifier.height(160.dp)) {
-            model.imageUrl
-                ?.also { url ->
-                    Image(
-                        painter = painterResource(Res.drawable.header_remotes),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(160.dp)
-                            .wrapContentHeight(),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+            Image(
+                painter = painterResource(Res.drawable.header_remotes),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .wrapContentHeight(),
+                contentScale = ContentScale.Crop
+            )
             model.wifiState
                 .takeIf { it.isConnected }
                 ?.run {
@@ -174,7 +177,7 @@ object RemotesComposables {
                 Res.drawable.ic_menu_settings
             ) { view.dispatch(OnActionConfigClicked) }
         }
-        model.address?.also {
+        model.localNode.hostname.also {
             Text(
                 text = it,
                 style = MaterialTheme.typography.headlineMedium,
@@ -187,7 +190,7 @@ object RemotesComposables {
         }
         model.localNode.apply {
             Text(
-                text = "$hostname : $deviceType : ${authType}",
+                text = "$address : $deviceType : ${authType}",
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(
                     start = 16.dp,

@@ -25,7 +25,6 @@ private val AppShapes = Shapes(
     small = CutCornerShape(topStart = 8.dp, bottomEnd = 8.dp),
     medium = CutCornerShape(topStart = 16.dp, bottomEnd = 16.dp),
     large = CutCornerShape(topStart = 32.dp, bottomEnd = 32.dp),
-    extraLarge = CutCornerShape(topStart = 32.dp, bottomEnd = 32.dp)
 )
 
 private val cuerLightColors = lightColorScheme(
@@ -41,6 +40,7 @@ private val cuerDarkColors = darkColorScheme(
 val colorDelete = Color( 0xFFe53935)
 val colorEdit = Color( 0xFFe53935)
 val colorMove = Color( 0xFFe53935)
+val colorTransparentBlack = Color( 0x440000000)
 
 
 @Composable
@@ -50,7 +50,6 @@ fun CuerSharedTheme(
 ) {
 
     val Montserrat = FontFamily(
-        //Font(Res.font.montserrat_light)
         Font(Res.font.montserrat_variable_font_wght),
     )
 
@@ -135,7 +134,9 @@ fun CuerSharedTheme(
             fontSize = 12.sp
         ),
     )
+
     initButtonColors()
+
     MaterialTheme(
         typography = CuerTypography,
         shapes = AppShapes,

@@ -89,7 +89,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 viewModel = viewModel
             )
         }
-        statusBarColor.setStatusBarColorResource(R.color.primary_variant)
+        statusBarColor.setStatusBarColorResource(R.color.black)
         bindFlow(viewModel.labels, ::observeLabels)
     }
 

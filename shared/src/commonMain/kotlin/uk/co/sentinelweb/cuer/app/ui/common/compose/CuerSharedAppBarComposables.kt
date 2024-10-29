@@ -1,10 +1,11 @@
 package uk.co.sentinelweb.cuer.app.ui.common.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -56,10 +57,9 @@ object CuerSharedAppBarComposables {
                 if (onUp != null) {
                     IconButton(onClick = { onUp() }) {
                         Icon(
-                            Icons.Default.ArrowBack,
+                            Icons.AutoMirrored.Filled.ArrowBack,
                             tint = contentColor,
                             contentDescription = stringResource(Res.string.up)
-
                         )
                     }
                 }
@@ -115,7 +115,7 @@ sealed class CuerMenuItem(
 
     object Folders : CuerMenuItem(Res.string.menu_folders, Res.drawable.ic_folder)
     object ThemeTest : CuerMenuItem(Res.string.menu_theme_test, Res.drawable.ic_edit)
-    object LocalConfig : CuerMenuItem(Res.string.menu_local_config, Res.drawable.ic_menu_settings)
+    object LocalConfig : CuerMenuItem(Res.string.menu_local_config, Res.drawable.ic_settings_ethernet)
 }
 
 data class Action(

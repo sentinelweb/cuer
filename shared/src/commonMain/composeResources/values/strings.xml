@@ -29,6 +29,7 @@
     <string name="remotes_dialog_title_screen">Select Remote Screen</string>
 
     <!-- remotes -->
+    <string name="rm_title">Remotes</string>
     <string name="rm_playlists">Playlists</string>
     <string name="rm_folders">Folders</string>
     <string name="rm_cuer_connect">Connect</string>

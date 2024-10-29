@@ -32,11 +32,12 @@ interface FilesContract {
 
     data class FilesModel(
         val loading: Boolean,
-        val subTitle: String?,
+        val nodeName: String?,
+        val filePath: String?,
         val list: PlaylistAndChildrenDomain?,
     ) {
         companion object {
-            val Initial = FilesModel(loading = false, subTitle = null, list = null)
+            val Initial = FilesModel(loading = false, nodeName = null, filePath = null, list = null)
         }
     }
 

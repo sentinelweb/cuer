@@ -9,7 +9,8 @@ class FilesModelMapper {
         loading: Boolean,
     ) = FilesContract.FilesModel(
         loading = loading,
-        subTitle = state.sourceNode?.let { it.name() + (state.path?.let { "/$it" } ?: "") },
+        nodeName = state.sourceNode?.name(),
+        filePath = state.path?.let { "/$it" },
         list = state.currentFolder,
     )
 }

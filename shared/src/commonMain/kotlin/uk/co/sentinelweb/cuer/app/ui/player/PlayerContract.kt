@@ -134,7 +134,7 @@ interface PlayerContract {
             )
 
             companion object {
-                fun blankModel(): Model = Model(
+                val Initial: Model = Model(
                     texts = Texts(
                         title = "No title",
                         playlistTitle = "playlistTitle",
@@ -241,8 +241,6 @@ interface PlayerContract {
     }
 
     interface PlayerControls {
-        //        fun initMediaRouteButton()
-        //fun setConnectionState(connState: CastConnectionState)
         fun setCastDetails(details: TargetDetails)
         fun setPlayerState(playState: PlayerStateDomain)
         fun addListener(l: Listener)

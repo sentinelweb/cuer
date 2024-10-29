@@ -10,7 +10,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
@@ -18,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentBlack
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -37,18 +40,31 @@ object FilesComposeables {
                         .fillMaxHeight()
                         .padding(bottom = 60.dp)
                 ) {
-                    Box(contentAlignment = Alignment.TopStart) {
+                    Box(
+                        contentAlignment = Alignment.TopStart,
+                        modifier = Modifier
+                            .height(60.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.header_files_smoke),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .height(60.dp)
+                                .wrapContentHeight(),
+                            contentScale = ContentScale.Crop
+                        )
                         CuerSharedAppBar(
                             title = "Files",
-                            subTitle = model.value.subTitle,
-                            backgroundColor = MaterialTheme.colorScheme.primary,
+                            subTitle = model.value.nodeName + (model.value.filePath ?: ""),
+                            contentColor = Color.White,
+                            backgroundColor = colorTransparentBlack,
                             onUp = { viewModel.onUpClick() },
                             actions = listOf(
                                 Action(CuerMenuItem.Help, { }),
                                 Action(CuerMenuItem.Settings, { }),
                             ),
-                            modifier = Modifier
-                                .height(56.dp)
+                            modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
                         )
                     }
 //                        SharedThemeView()
@@ -67,20 +83,31 @@ object FilesComposeables {
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
-                    Box(contentAlignment = Alignment.TopStart) {
+                    Box(
+                        contentAlignment = Alignment.TopStart,
+                        modifier = Modifier
+                            .height(60.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(Res.drawable.header_files_smoke),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentHeight(),
+                        )
                         CuerSharedAppBar(
-                            title = model.value.subTitle ?: "No host",// todo map
-                            backgroundColor = MaterialTheme.colorScheme.background,
-                            contentColor = MaterialTheme.colorScheme.onBackground,
-                            onUp = { viewModel.onUpClick() },
+                            title = model.value.nodeName ?: "No host",
+                            subTitle = model.value.filePath,
+                            backgroundColor = colorTransparentBlack,
+                            contentColor = Color.White,
+                            onUp = null,
                             actions = listOf(
                                 Action(item = CuerMenuItem.Reload, action = { viewModel.onRefreshClick() })
                             ),
                             modifier = Modifier
-                                .height(56.dp)
                         )
                     }
-//                        SharedThemeView()
                     FilesView(model = model.value, viewModel = viewModel)
                 }
             }
