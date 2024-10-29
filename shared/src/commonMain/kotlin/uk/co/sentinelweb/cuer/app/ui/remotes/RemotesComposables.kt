@@ -2,8 +2,6 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -16,8 +14,11 @@ import androidx.compose.ui.zIndex
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentBlack
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.HeaderButton
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.deleteSwipeResources
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.editSwipeResources
@@ -72,6 +73,7 @@ object RemotesComposables {
                             Action(CuerMenuItem.Search, { view.dispatch(OnActionSearchClicked) }),
                             Action(CuerMenuItem.PasteAdd, { view.dispatch(OnActionPasteAdd) }),
                             Action(CuerMenuItem.Settings, { view.dispatch(OnActionSettingsClicked) }),
+                            Action(CuerMenuItem.LocalConfig, { view.dispatch(OnActionConfigClicked) }),
                         ),
                         modifier = Modifier
                             .zIndex(1f)
@@ -97,12 +99,10 @@ object RemotesComposables {
                 .padding(bottom = 128.dp)
         ) {
             Header(model, view)
-            LazyColumn(
-                modifier = Modifier
-                    .height(400.dp), // fixme need to calc height for device (or make scrollable)
-                contentPadding = PaddingValues(top = 4.dp)
+            Column(
+                modifier = Modifier, // fixme need to calc height for device (or make scrollable)
             ) {
-                items(model.remoteNodes) { remote ->
+                model.remoteNodes.forEach { remote ->
                     swipeToDismiss(
                         editSwipeResources {
                             view.dispatch(OnActionPingNodeClicked(remote.domain))
@@ -121,38 +121,47 @@ object RemotesComposables {
         model: Model,
         view: BaseMviView<Model, Event>
     ) {
-        Box(modifier = Modifier.height(160.dp)) {
+        Box(modifier = Modifier.height(220.dp)) {
             Image(
                 painter = painterResource(Res.drawable.header_remotes),
                 contentDescription = "",
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(160.dp)
-                    .wrapContentHeight(),
+                    .fillMaxSize(),
                 contentScale = ContentScale.Crop
             )
-            model.wifiState
-                .takeIf { it.isConnected }
-                ?.run {
-                    Text(
-                        text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
-                        color = Color.White,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(16.dp)
-                            .clickable {
-                                if (isObscured) {
-                                    view.dispatch(OnActionObscuredPermClicked)
-                                }
-                            },
-                    )
-                }
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+            ) {
+                RowLocalNodeInfo(model.localNode, MaterialTheme.colorScheme.onSurface)
+                model.wifiState
+                    .takeIf { it.isConnected }
+                    ?.run {
+                        Text(
+                            text = if (!isObscured) "SSID: $ssid" else "SSID hidden",
+                            color = Color.White,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .clickable {
+                                    if (isObscured) {
+                                        view.dispatch(OnActionObscuredPermClicked)
+                                    }
+                                },
+                        )
+                    }
+                RowLocalNodeButtons(model, view)
+                Box(modifier = Modifier.height(1.dp).fillMaxWidth().background(Color.Gray))
+            }
         }
+    }
+
+    @Composable
+    private fun RowLocalNodeButtons(
+        model: Model,
+        view: BaseMviView<Model, Event>
+    ) {
         Row(
-            modifier = Modifier.padding(
-                start = 16.dp,
-                top = 16.dp,
-            )
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         ) {
             when (model.serverState) {
                 ServerState.STOPPED, ServerState.INITIAL -> HeaderButton(
@@ -172,31 +181,6 @@ object RemotesComposables {
                     Res.drawable.ic_ping
                 ) { view.dispatch(OnActionPingMulticastClicked) }
             }
-            HeaderButton(
-                "Config",
-                Res.drawable.ic_menu_settings
-            ) { view.dispatch(OnActionConfigClicked) }
-        }
-        model.localNode.hostname.also {
-            Text(
-                text = it,
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 8.dp,
-                    bottom = 0.dp
-                )
-            )
-        }
-        model.localNode.apply {
-            Text(
-                text = "$address : $deviceType : ${authType}",
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    top = 8.dp
-                )
-            )
         }
     }
 
@@ -217,42 +201,7 @@ object RemotesComposables {
                     .fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd,
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
-                        tint = contentColor,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(48.dp)
-                            .padding(4.dp)
-                    )
-                    Column { // todo use textview
-                        Text(
-                            text = remote.title,
-                            color = contentColor,
-                            style = MaterialTheme.typography.headlineSmall,
-                            modifier = Modifier
-                                .padding(start = 8.dp),
-                        )
-                        Text(
-                            text = remote.address,
-                            color = contentColor,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                        Text(
-                            text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
-                            color = contentColor,
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
-                    }
-                }
+                RowRemoteNodeInfo(remote, contentColor)
 
                 // overflow button and dropdown
                 Box(
@@ -342,6 +291,92 @@ object RemotesComposables {
                     stringResource(Res.string.rm_cuer_connect),
                     Res.drawable.ic_cuer_cast_connected
                 ) { view.dispatch(OnActionCuerConnect(remote.domain)) }
+            }
+        }
+    }
+
+    @Composable
+    private fun RowRemoteNodeInfo(
+        remote: RemotesContract.View.RemoteNodeModel,
+        contentColor: Color
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
+                tint = contentColor,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(4.dp)
+            )
+            Column { // todo use textview
+                Text(
+                    text = remote.title,
+                    color = contentColor,
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(start = 8.dp),
+                )
+                Text(
+                    text = remote.address,
+                    color = contentColor,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(
+                    text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
+                    color = contentColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+    }
+
+    @Composable
+    private fun RowLocalNodeInfo(
+        remote: RemotesContract.View.LocalNodeModel,
+        contentColor: Color
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                painter = painterResource(ImageEnumMapper.map(remote.deviceType)),
+                tint = contentColor,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(48.dp)
+                    .padding(4.dp)
+            )
+            Column { // todo use textview
+                Text(
+                    text = remote.title,
+                    color = contentColor,
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier
+                        .padding(start = 8.dp),
+                )
+                Text(
+                    text = remote.address,
+                    color = contentColor,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+                Text(
+                    text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
+                    color = contentColor,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(start = 8.dp)
+                )
             }
         }
     }

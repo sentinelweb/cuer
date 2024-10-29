@@ -162,7 +162,8 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                                     value.screen?.index ?: 0
                                 )
                             ).show()
-
+                        is Error ->
+                            snackbarWrapper.make(value.message).show()
                         is CuerSelectScreen ->
                             remotesDialogLauncher.launchRemotesDialog(
                                 { remoteNodeDomain, screen ->

@@ -55,6 +55,7 @@ class RemotesContract {
             data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
             data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()
             data class CuerSelectSendTo(val sendNode: RemoteNodeDomain) : Label()
+            data class Error(val message:String) : Label()
 
         }
 

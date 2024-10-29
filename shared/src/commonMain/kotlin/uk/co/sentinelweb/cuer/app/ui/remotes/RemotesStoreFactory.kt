@@ -217,19 +217,32 @@ class RemotesStoreFactory(
 
         private fun syncRemote(intent: Intent.RemoteSync) {
             coroutines.ioScope.launch {
-                getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
-                    .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
-                    //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
-                    .also { log.d(it.toString()) }
-
+                runCatching {
+                    getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                        .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
+                        //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
+                        .also { log.d(it.toString()) }
+                }.onFailure { e ->
+                    withContext(coroutines.Main) {
+                        publish(Label.Error(e.message?.let { "${intent.remote.hostname}: $it" }
+                            ?: "Could not get playlists from: ${intent.remote.hostname}"))
+                    }
+                }
                 //log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
             }
         }
 
         private fun getRemotePlaylists(intent: Intent.RemotePlaylists) {
             coroutines.ioScope.launch {
-                val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
-                log.d(playlists.toString())
+                runCatching {
+                    val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                    log.d(playlists.toString())
+                }.onFailure { e ->
+                    withContext(coroutines.Main) {
+                        publish(Label.Error(e.message?.let { "${intent.remote.hostname}: $it" }
+                            ?: "Could not get playlists from: ${intent.remote.hostname}"))
+                    }
+                }
             }
         }
 
