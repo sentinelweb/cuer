@@ -72,6 +72,7 @@ class RemotesController(
             is Event.OnActionCuerConnectScreen -> Intent.CuerConnectScreen(remote, screen)
             is Event.OnActionSendTo -> Intent.ActionSendTo(sendNode)
             is Event.OnActionSendToSelected -> Intent.ActionSendToSelected(sendNode, target)
+            is Event.OnActionEditAddress -> Intent.EditAddress(remote, newAddress)
         }
     }
 

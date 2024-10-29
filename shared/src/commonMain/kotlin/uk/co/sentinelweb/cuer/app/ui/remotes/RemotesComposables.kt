@@ -2,13 +2,17 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.arkivanov.mvikotlin.core.view.BaseMviView
@@ -188,6 +192,10 @@ object RemotesComposables {
     @Composable
     private fun RemoteRow(remote: RemotesContract.View.RemoteNodeModel, view: BaseMviView<Model, Event>) {
         var expanded by remember { mutableStateOf(false) }
+        var editAddress by remember { mutableStateOf(false) }
+//        var textState by remember { mutableStateOf(TextFieldValue(remote.address)) }
+//        val keyboardController = LocalSoftwareKeyboardController.current
+
         val contentColor = remote.domain.isAvailable
             .takeIf { it }
             ?.let { MaterialTheme.colorScheme.onSurface }
@@ -199,13 +207,24 @@ object RemotesComposables {
             Box(
                 modifier = Modifier
                     .fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd,
+                contentAlignment = Alignment.CenterStart,
             ) {
-                RowRemoteNodeInfo(remote, contentColor)
-
+                if (editAddress) {
+                    IpAddressPortInput(
+                        remote.address,
+                        onSubmit = {
+                            view.dispatch(OnActionEditAddress(remote.domain, it))
+                            editAddress = false
+                        }
+                    )
+                } else {
+                    RowRemoteNodeInfo(remote, contentColor)
+                }
                 // overflow button and dropdown
                 Box(
-                    modifier = Modifier.wrapContentWidth(align = Alignment.End),
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .wrapContentWidth(align = Alignment.End),
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_more_vert),
@@ -246,6 +265,16 @@ object RemotesComposables {
                             ),
                             onClick = {
                                 expanded = dispatchAndClose(view, OnActionSendTo(remote.domain))
+                            })
+
+                        DropdownMenuItem(
+                            text = { Text("Edit Address") },
+                            colors = MenuDefaults.itemColors(
+                                textColor = MaterialTheme.colorScheme.onSurface,
+                            ),
+                            onClick = {
+                                editAddress = !editAddress
+                                expanded = false
                             })
 //                        Divider()
 //                    DropdownMenuItem(onClick = {
@@ -377,6 +406,81 @@ object RemotesComposables {
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier.padding(start = 8.dp)
                 )
+            }
+        }
+    }
+
+    fun isValidIpAndPort(input: String): Boolean {
+        val regex =
+            Regex("^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?):([0-9]{1,5})\$")
+        return regex.matches(input) && input.split(":")[1].toIntOrNull()?.let { it in 0..65535 } == true
+    }
+
+    @Composable
+    fun IpAddressPortInput(initial: String, onSubmit: (String) -> Unit) {
+        var textFieldState by remember { mutableStateOf(initial) }
+        var errorState by remember { mutableStateOf(false) }
+
+        Column {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp)
+                    .align(Alignment.Start)
+            ) {
+                OutlinedTextField(
+                    value = textFieldState,
+                    onValueChange = {
+                        textFieldState = it
+                        errorState = !isValidIpAndPort(it)
+                    },
+                    label = { Text("Enter IP:Port") },
+                    isError = errorState,
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (isValidIpAndPort(textFieldState)) {
+                                onSubmit(textFieldState)
+                            } else {
+                                errorState = true
+                            }
+                        }
+                    ),
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier.fillMaxWidth(0.7f),
+                )
+                Button(
+                    onClick = {
+                        if (isValidIpAndPort(textFieldState)) {
+                            onSubmit(textFieldState)
+                        } else {
+                            errorState = true
+                        }
+                    },
+                    shape = MaterialTheme.shapes.medium,
+                    modifier = Modifier
+                        .size(width = 72.dp, height = 48.dp)
+                        .align(CenterVertically)
+                        .padding(start = 8.dp),
+                    enabled = !errorState
+                ) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_tick),
+                        tint = Color.White,
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+//                    Text("OK")
+                }
+            }
+            if (errorState) {
+                Text("Invalid IP address or port",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                    )
             }
         }
     }

@@ -108,7 +108,14 @@ class RemotesStoreFactory(
                 is Intent.CuerConnectScreen -> cuerConnectScreen(intent)
                 is Intent.ActionSendTo -> sendTo(intent)
                 is Intent.ActionSendToSelected -> sendToSelected(intent)
+                is Intent.EditAddress -> editAddress(intent)
             }
+
+        private fun editAddress(intent: Intent.EditAddress) {
+            coroutines.mainScope.launch {
+                remotesRepository.updateAddress(intent.remote, intent.newAddress)
+            }
+        }
 
         private fun cuerConnect(intent: Intent.CuerConnect) {
             // fixme check screens

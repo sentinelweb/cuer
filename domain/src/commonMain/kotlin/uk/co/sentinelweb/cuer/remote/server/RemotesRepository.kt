@@ -103,6 +103,19 @@ class RemotesRepository constructor(
     private fun saveAll() {
         jsonFileInteractor.saveJson(_remoteNodes.serialise())
     }
+
+    suspend fun updateAddress(remote: RemoteNodeDomain, newAddress: String) {
+        val splitPair = newAddress.split(":")
+            .takeIf { it.size == 2 }
+            ?.let { it[0] to it[1].toInt() }
+
+        _remoteNodes
+            .takeIf { splitPair != null }
+            ?.find { it.id == remote.id }
+            ?.copy( ipAddress = splitPair!!.first, port = splitPair.second)
+            ?.also {addUpdateNode(it)}
+
+    }
 }
 
 

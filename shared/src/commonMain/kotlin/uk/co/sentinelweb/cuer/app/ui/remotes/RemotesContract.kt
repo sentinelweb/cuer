@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.StateFlow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
@@ -40,6 +41,7 @@ class RemotesContract {
             data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
             data class CuerConnect(val remote: RemoteNodeDomain) : Intent()
             data class CuerConnectScreen(val remote: RemoteNodeDomain, val screen: Screen?) : Intent()
+            data class EditAddress(val remote: RemoteNodeDomain, val newAddress: String) : Intent()
         }
 
         sealed class Label {
@@ -55,7 +57,7 @@ class RemotesContract {
             data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
             data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()
             data class CuerSelectSendTo(val sendNode: RemoteNodeDomain) : Label()
-            data class Error(val message:String) : Label()
+            data class Error(val message: String) : Label()
 
         }
 
@@ -159,8 +161,12 @@ class RemotesContract {
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
             data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
             data class OnActionCuerConnect(val remote: RemoteNodeDomain) : Event()
-            data class OnActionCuerConnectScreen(val remote: RemoteNodeDomain, val screen: PlayerNodeDomain.Screen?) :
-                Event()
+            data class OnActionCuerConnectScreen(
+                val remote: RemoteNodeDomain,
+                val screen: PlayerNodeDomain.Screen?
+            ) : Event()
+
+            data class OnActionEditAddress(val remote: RemoteNodeDomain, val newAddress: String) : Event()
         }
     }
 }
