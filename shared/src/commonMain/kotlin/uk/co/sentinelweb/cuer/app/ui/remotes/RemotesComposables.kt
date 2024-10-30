@@ -50,7 +50,7 @@ object RemotesComposables {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
                     CuerSharedAppBar(
-                        title = stringResource(Res.string.rm_title),// + ": " + model.value.title,
+                        title = stringResource(Res.string.rm_title),
                         backgroundColor = colorTransparentBlack,
                         contentColor = Color.White,
                         modifier = Modifier

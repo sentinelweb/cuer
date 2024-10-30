@@ -151,6 +151,12 @@
             android:screenOrientation="landscape"
             tools:ignore="LockedOrientationActivity" />
 
+        <activity
+            android:name="uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoPlayerActivity"
+            android:label="@string/title_activity_fullscreen"
+            android:screenOrientation="landscape"
+            tools:ignore="LockedOrientationActivity" />
+
         <service
                 android:name="uk.co.sentinelweb.cuer.app.service.cast.CastService"
             android:exported="false">

@@ -147,6 +147,7 @@ dependencies {
     implementation(libs.composeUiToolingPreview)
     implementation(libs.composeUiTooling)
     implementation(libs.androidx.palette.ktx)
+    implementation(libs.androidx.activity.compose)
 
     // mvikotlin
     debugImplementation(libs.mvikotlinAndroidDebug)
@@ -174,21 +175,16 @@ dependencies {
     implementation(libs.mediarouter)
     implementation(libs.media)
 
+    // exoplayer
+    implementation(libs.exoplayer)
+
     // firebase
 //    implementation(platform(libs.firebaseBom))
-//    implementation(libs.firebaseStorageKtx)
-//    implementation(libs.firebaseCrashlyticsKtx)
-//    implementation(libs.firebaseAnalyticsKtx)
-//    implementation(libs.firebaseUiStorage)
-    // FIREBASE
-    // Import the BoM for the Firebase platform
-    implementation(platform("com.google.firebase:firebase-bom:$ver_firebase_bom"))
-    // Declare the dependency for the Cloud Storage library
-    // When using the BoM, you don't specify versions in Firebase library dependencies
-    implementation("com.google.firebase:firebase-storage-ktx")
-    implementation("com.google.firebase:firebase-crashlytics-ktx")
-    implementation("com.google.firebase:firebase-analytics-ktx")
-    implementation("com.firebaseui:firebase-ui-storage:$ver_firebase_ui")
+    implementation(project.dependencies.enforcedPlatform(libs.firebaseBom.get()))
+    implementation(libs.firebaseStorageKtx)
+    implementation(libs.firebaseCrashlyticsKtx)
+    implementation(libs.firebaseAnalyticsKtx)
+    implementation(libs.firebaseUiStorage)
 
     // serialization
     implementation(libs.kotlinxSerializationCore)

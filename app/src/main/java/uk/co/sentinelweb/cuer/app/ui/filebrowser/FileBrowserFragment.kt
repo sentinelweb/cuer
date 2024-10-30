@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NA
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
+import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoPlayerActivity
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -150,7 +152,11 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped<PlayerLaunchHost> {
                     object : PlayerLaunchHost {
-                        override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) = Unit
+                        override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
+                            val activity = get<FileBrowserFragment>().activity
+                            Intent(activity,  ExoPlayerActivity::class.java)
+                                .let { activity!!.startActivity(it) }
+                        }
                     }
                 }
             }
