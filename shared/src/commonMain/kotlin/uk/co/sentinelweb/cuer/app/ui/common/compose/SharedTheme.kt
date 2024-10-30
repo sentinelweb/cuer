@@ -40,7 +40,8 @@ private val cuerDarkColors = darkColorScheme(
 val colorDelete = Color( 0xFFe53935)
 val colorEdit = Color( 0xFF43a047)
 val colorMove = Color( 0xFF1e88e5)
-val colorTransparentBlack = Color( 0x440000000)
+val colorTransparentBlack = Color( 0x44000000)
+val colorTransparentYellow = Color( 0x22ffff00)
 
 @Composable
 fun CuerSharedTheme(

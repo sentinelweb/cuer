@@ -28,6 +28,9 @@
     <string name="remotes_dialog_title">Select Device</string>
     <string name="remotes_dialog_title_screen">Select Screen</string>
 
+    <!-- files -->
+    <string name="files_title">Files</string>
+
     <!-- remotes -->
     <string name="rm_title">Remotes</string>
     <string name="rm_playlists">Playlists</string>

@@ -16,11 +16,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
-import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem
+import org.jetbrains.compose.resources.stringResource
+import uk.co.sentinelweb.cuer.app.ui.common.compose.*
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
-import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
-import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentBlack
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
@@ -55,10 +53,10 @@ object FilesComposeables {
                             contentScale = ContentScale.Crop
                         )
                         CuerSharedAppBar(
-                            title = "Files",
+                            title = stringResource(Res.string.files_title),
                             subTitle = model.value.nodeName + (model.value.filePath ?: ""),
                             contentColor = Color.White,
-                            backgroundColor = colorTransparentBlack,
+                            backgroundColor = colorTransparentYellow,
                             onUp = { viewModel.onUpClick() },
                             actions = listOf(
                                 Action(CuerMenuItem.Help, { }),
@@ -97,9 +95,9 @@ object FilesComposeables {
                                 .wrapContentHeight(),
                         )
                         CuerSharedAppBar(
-                            title = model.value.nodeName ?: "No host",
+                            title = stringResource(Res.string.files_title) +": " + (model.value.nodeName ?: "No host"),
                             subTitle = model.value.filePath,
-                            backgroundColor = colorTransparentBlack,
+                            backgroundColor = colorTransparentYellow,
                             contentColor = Color.White,
                             onUp = null,
                             actions = listOf(

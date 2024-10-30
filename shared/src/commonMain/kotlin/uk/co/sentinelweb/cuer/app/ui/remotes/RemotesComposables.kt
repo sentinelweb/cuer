@@ -50,7 +50,7 @@ object RemotesComposables {
             Surface {
                 Box(contentAlignment = Alignment.TopStart) {
                     CuerSharedAppBar(
-                        title = stringResource(Res.string.rm_title) + " : " + model.value.title,
+                        title = stringResource(Res.string.rm_title),// + ": " + model.value.title,
                         backgroundColor = colorTransparentBlack,
                         contentColor = Color.White,
                         modifier = Modifier
@@ -137,7 +137,7 @@ object RemotesComposables {
                 modifier = Modifier
                     .align(Alignment.BottomStart)
             ) {
-                RowLocalNodeInfo(model.localNode, MaterialTheme.colorScheme.onSurface)
+                RowLocalNodeInfo(model.localNode, Color.White)
                 model.wifiState
                     .takeIf { it.isConnected }
                     ?.run {
@@ -193,8 +193,6 @@ object RemotesComposables {
     private fun RemoteRow(remote: RemotesContract.View.RemoteNodeModel, view: BaseMviView<Model, Event>) {
         var expanded by remember { mutableStateOf(false) }
         var editAddress by remember { mutableStateOf(false) }
-//        var textState by remember { mutableStateOf(TextFieldValue(remote.address)) }
-//        val keyboardController = LocalSoftwareKeyboardController.current
 
         val contentColor = remote.domain.isAvailable
             .takeIf { it }
@@ -276,27 +274,14 @@ object RemotesComposables {
                                 editAddress = !editAddress
                                 expanded = false
                             })
-//                        Divider()
-//                    DropdownMenuItem(onClick = {
-//                        expanded = dispatchAndClose(view, OnActionSync(remote.domain))
-//                    }) {
-//                        Text("Sync")
-//                    }
-//                        DropdownMenuItem(onClick = {
-//                            expanded = dispatchAndClose(view, OnActionPlaylists(remote.domain))
-//                        }) {
-//                            Text(stringResource(R.string.playlists_title))
-//                        }
-//                        DropdownMenuItem(onClick = {
-//                            expanded = dispatchAndClose(view, OnActionFolders(remote.domain))
-//                        }) {
-//                            Text(stringResource(R.string.folders))
-//                        }
-//                        DropdownMenuItem(onClick = {
-//                            expanded = dispatchAndClose(view, OnActionCuerConnect(remote.domain))
-//                        }) {
-//                            Text(stringResource(R.string.remotes_cuer_connect))
-//                        }
+
+                        HorizontalDivider()
+
+                        DropdownMenuItem(
+                            text = { Text("Sync") },
+                            onClick = {
+                                expanded = dispatchAndClose(view, OnActionSync(remote.domain))
+                            })
                     }
                 }
             }
@@ -475,12 +460,13 @@ object RemotesComposables {
                 }
             }
             if (errorState) {
-                Text("Invalid IP address or port",
+                Text(
+                    "Invalid IP address or port",
                     color = MaterialTheme.colorScheme.error,
                     style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                    )
+                )
             }
         }
     }
