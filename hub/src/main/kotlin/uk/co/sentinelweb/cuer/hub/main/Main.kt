@@ -20,13 +20,13 @@ fun main() {
 
     val koin: Koin = getKoin()
 
+    koin.get<RemoteConfigFileInitialiseer>()
+        .apply { initIfNecessary() }
+
     val databaseInit = koin.get<DatabaseInitializer>()
     if (!databaseInit.isInitialized()) {
         databaseInit.initDatabase("db/default-dbinit.json")
     }
-
-    koin.get<RemoteConfigFileInitialiseer>()
-        .apply { initIfNecessary() }
 
     koin.get<KeyStoreManager>()
         .apply { generateKeysIfNecessary() }
