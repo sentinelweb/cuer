@@ -70,7 +70,9 @@ class PlatformWifiInfo {
     private fun getIpAddressLinux(): String {
         val process = Runtime.getRuntime().exec("hostname -I")
         BufferedReader(InputStreamReader(process.inputStream)).use { reader ->
-            return reader.readLine().trim()
+            return reader.readLine().trim().let {
+                it.substring(0, it.indexOf(" "))
+            }
         }
     }
 
