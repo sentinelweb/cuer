@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
 import uk.co.sentinelweb.cuer.net.remote.RemoteFilesInteractor
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
@@ -32,6 +33,7 @@ class FilesViewModel(
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
     private val getFolderListUseCase: GetFolderListUseCase,
     private val localRepository: LocalRepository,
+    private val localPlayerLaunchHost: PlayerLaunchHost,
 ) : ViewModel(), FilesContract.ViewModel {
 
     override val modelObservable = MutableStateFlow(Initial)
@@ -95,7 +97,15 @@ class FilesViewModel(
                     )
                 } else {
                     remoteDialogLauncher.launchRemotesDialog({ targetNode, screen ->
-                        launchRemotePlayer(targetNode, screen ?: throw IllegalStateException("No screen selected"))
+                        when (targetNode) {
+                            is RemoteNodeDomain ->
+                                launchRemotePlayer(
+                                    targetNode,
+                                    screen ?: throw IllegalStateException("No screen selected")
+                                )
+
+                            is LocalNodeDomain -> launchLocalPlayer(targetNode, screen, file)
+                        }
                     })
                 }
             }
@@ -105,6 +115,15 @@ class FilesViewModel(
 
     override fun onRefreshClick() {
         loadCurrentPath()
+    }
+
+    private fun launchLocalPlayer(
+        targetNode: LocalNodeDomain?,
+        screen: PlayerNodeDomain.Screen?,
+        file: PlaylistItemDomain
+    ) {
+        localPlayerLaunchHost.launchVideo(file, screen?.index)
+        remoteDialogLauncher.hideRemotesDialog()
     }
 
     private fun launchRemotePlayer(targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {

@@ -21,8 +21,8 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companio
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.Folders
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
@@ -80,9 +80,11 @@ class RemotesUiCoordinator(
         when (label) {
             is CuerSelectSendTo -> {
                 remotesDialogLauncher.launchRemotesDialog(
-                    { remoteNodeDomain, screen ->
-                        println("selected node: send: ${label.sendNode.name()} to: ${remoteNodeDomain.name()}")
-                        dispatch(Event.OnActionSendToSelected(label.sendNode, remoteNodeDomain))
+                    { nodeDomain, screen ->
+                        if (nodeDomain is RemoteNodeDomain) {
+                            println("selected node: send: ${label.sendNode.name()} to: ${nodeDomain.name()}")
+                            dispatch(Event.OnActionSendToSelected(label.sendNode, nodeDomain))
+                        }
                         remotesDialogLauncher.hideRemotesDialog()
                     },
                     null,

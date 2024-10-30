@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
-import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator2
+import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.Folders
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
@@ -26,19 +26,19 @@ import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
-import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
+import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeUiCoordinator :
     UiCoordinator<HomeContract.HomeModel>,
     DesktopScopeComponent,
-    RemotePlayerLaunchHost,
+    PlayerLaunchHost,
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
     val remotesCoordinator: RemotesUiCoordinator by inject() { parametersOf(this) }
     val preferencesUiCoordinator: PreferencesUiCoordinator by inject()
-    val filesUiCoordinator: FilesUiCoordinator2 by inject { parametersOf(this) }
+    val filesUiCoordinator: FilesUiCoordinator by inject { parametersOf(this) }
     val localCoordinator:LocalUiCoordinator by inject()
 
     private val remoteServiceManager: RemoteServerContract.Manager by inject()
@@ -110,7 +110,7 @@ class HomeUiCoordinator :
         @JvmStatic
         val uiModule = module {
             single { HomeUiCoordinator() }
-            factory<RemotePlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
+            factory<PlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
             scope(named<HomeUiCoordinator>()) {
             }
         }

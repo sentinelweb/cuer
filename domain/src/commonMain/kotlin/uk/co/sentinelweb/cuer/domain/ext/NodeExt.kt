@@ -11,3 +11,9 @@ fun NodeDomain.name() = when(this) {
     is RemoteNodeDomain -> this.name()
     else -> "Invalid node: $this"
 }
+fun NodeDomain.isAvailable() = when(this) {
+    is LocalNodeDomain -> true
+    is RemoteNodeDomain -> isAvailable
+    else -> error("Invalid node: $this")
+}
+

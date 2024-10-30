@@ -50,6 +50,7 @@ fun Home(coordinator: HomeUiCoordinator) {
                 CuerSharedAppBarComposables.CuerSharedAppBar(
                     title = "Cuer hub",
                     contentColor = Color.White,
+                    backgroundColor = Color(0xFF222222),
                     actions = listOf(
                         Action(CuerMenuItem.ThemeTest, action = {coordinator.go(ThemeTest)}),
                         Action(CuerMenuItem.LocalConfig, action = {coordinator.go(LocalConfig)}),

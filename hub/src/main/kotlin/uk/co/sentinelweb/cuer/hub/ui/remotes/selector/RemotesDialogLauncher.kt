@@ -6,8 +6,8 @@ import org.koin.core.component.inject
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogViewModel
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher.DisplayModel.Companion.Initial
@@ -35,7 +35,7 @@ class RemotesDialogLauncher(
     }
 
     override fun launchRemotesDialog(
-        callback: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+        callback: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit,
         node: RemoteNodeDomain?,
         isSelectNodeOnly: Boolean
     ) {
@@ -59,11 +59,12 @@ class RemotesDialogLauncher(
         val launcherModule = module {
             factory {
                 RemotesDialogViewModel(
-                    repo = get(),
+                    remotesRepository = get(),
                     mapper = get(),
                     coroutines = get(),
                     playerInteractor = get(),
-                    state = RemotesDialogContract.State()
+                    state = RemotesDialogContract.State(),
+                    localRepository = get()
                 )
             }
         }

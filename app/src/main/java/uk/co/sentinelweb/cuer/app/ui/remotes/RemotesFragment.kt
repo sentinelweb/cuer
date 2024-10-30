@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 
 class RemotesFragment : Fragment(), AndroidScopeComponent {
@@ -166,8 +167,15 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                             snackbarWrapper.make(value.message).show()
                         is CuerSelectScreen ->
                             remotesDialogLauncher.launchRemotesDialog(
-                                { remoteNodeDomain, screen ->
-                                    remotesMviView.dispatch(Event.OnActionCuerConnectScreen(remoteNodeDomain, screen))
+                                { nodeDomain, screen ->
+                                    if (nodeDomain is RemoteNodeDomain) {
+                                        remotesMviView.dispatch(
+                                            Event.OnActionCuerConnectScreen(
+                                                nodeDomain,
+                                                screen
+                                            )
+                                        )
+                                    }
                                     remotesDialogLauncher.hideRemotesDialog()
                                 },
                                 value.node
@@ -175,13 +183,15 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
                         is CuerSelectSendTo ->
                             remotesDialogLauncher.launchRemotesDialog(
-                                { remoteNodeDomain, screen ->
-                                    remotesMviView.dispatch(
-                                        Event.OnActionSendToSelected(
-                                            value.sendNode,
-                                            remoteNodeDomain
+                                { nodeDomain, screen ->
+                                    if (nodeDomain is RemoteNodeDomain) {
+                                        remotesMviView.dispatch(
+                                            Event.OnActionSendToSelected(
+                                                value.sendNode,
+                                                nodeDomain
+                                            )
                                         )
-                                    )
+                                    }
                                     remotesDialogLauncher.hideRemotesDialog()
                                 },
                                 null

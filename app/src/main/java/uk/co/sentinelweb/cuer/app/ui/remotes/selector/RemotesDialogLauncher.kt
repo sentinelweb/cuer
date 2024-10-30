@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.remotes.selector
 
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
@@ -12,7 +13,7 @@ class RemotesDialogLauncher(
 
     private var dialogFragment: DialogFragment? = null
     override fun launchRemotesDialog(
-        callback: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit,
+        callback: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit,
         node: RemoteNodeDomain?,
         isSelectNodeOnly: Boolean
     ) {

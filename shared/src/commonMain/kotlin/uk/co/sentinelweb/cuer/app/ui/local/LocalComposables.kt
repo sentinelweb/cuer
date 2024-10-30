@@ -105,17 +105,14 @@ object LocalComposables : KoinComponent {
             ) { mutableStateOf(model.localNodeDomain) }
 
             Row(
-                modifier = Modifier.padding(
-                    start = 8.dp,
-                    top = 16.dp,
-                )
+                modifier = Modifier.padding(start = 8.dp, top = 16.dp)
             ) {
-                HeaderButtonSolid("Save", Res.drawable.ic_tick) {
-                    view.dispatch(
-                        Event.OnActionSaveClicked(
-                            localNode
-                        )
-                    )
+                HeaderButtonSolid(
+                    "Save",
+                    Res.drawable.ic_tick,
+                    modifier = Modifier.padding(start = 8.dp)
+                ) {
+                    view.dispatch(Event.OnActionSaveClicked(localNode))
                 }
             }
 

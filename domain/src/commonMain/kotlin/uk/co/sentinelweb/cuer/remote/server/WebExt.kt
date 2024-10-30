@@ -13,6 +13,11 @@ fun Locator.ipport() = "$address:$port"
 
 fun RemoteNodeDomain.locator() = Locator(ipAddress, port)
 fun LocalNodeDomain.locator() = Locator(ipAddress, port)
+fun NodeDomain.locator() = when (this) {
+    is RemoteNodeDomain -> locator()
+    is LocalNodeDomain -> locator()
+    else -> throw IllegalArgumentException("Unknown node type")
+}
 
 fun Pair<String, Int>.http() = "http://$first:$second"
 fun LocalNodeDomain.http() = "http://$ipAddress:$port"

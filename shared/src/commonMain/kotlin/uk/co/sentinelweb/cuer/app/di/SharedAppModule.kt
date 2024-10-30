@@ -39,6 +39,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogModelMapper
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
@@ -308,6 +309,7 @@ object SharedAppModule {
             )
         }
         factory { RemotesModelMapper(strings = get(), log = get()) }
+        factory { RemotesDialogModelMapper() }
     }
 
     private val uiModules = listOf(FilesContract.module)

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class CastDialogViewModel(
     private val castController: CastController,
@@ -22,9 +23,11 @@ class CastDialogViewModel(
 
     fun connectCuerCast() {
         if (!_model.value.cuerCastStatus.isConnected) {
-            remotesLauncher.launchRemotesDialog({ remoteNode, selectedScreen ->
+            remotesLauncher.launchRemotesDialog({ node, selectedScreen ->
                 remotesLauncher.hideRemotesDialog()
-                castController.connectCuerCast(remoteNode, selectedScreen)
+                if (node is RemoteNodeDomain) {
+                    castController.connectCuerCast(node, selectedScreen)
+                }
             }, null)
         }
     }

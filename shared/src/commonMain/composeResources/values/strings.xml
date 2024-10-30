@@ -25,8 +25,8 @@
     <string name="cast_dialog_volume">Volume: %1$s</string>
 
     <!-- remotes dialog -->
-    <string name="remotes_dialog_title">Select Remote</string>
-    <string name="remotes_dialog_title_screen">Select Remote Screen</string>
+    <string name="remotes_dialog_title">Select Device</string>
+    <string name="remotes_dialog_title_screen">Select Screen</string>
 
     <!-- remotes -->
     <string name="rm_title">Remotes</string>

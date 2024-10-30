@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
@@ -33,7 +32,9 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.toGUID
+import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 
 class FileBrowserFragment : Fragment(), AndroidScopeComponent {
 
@@ -130,7 +131,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         @JvmStatic
         val fragmentModule = module {
             scope(named<FileBrowserFragment>()) {
-                viewModel{
+                viewModel {
                     FilesViewModel(
                         state = FilesContract.State(),
                         filesInteractor = get(),
@@ -143,10 +144,17 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                         cuerCastPlayerWatcher = get(),
                         getFolderListUseCase = get(),
                         localRepository = get(),
+                        localPlayerLaunchHost = get()
                     )
                 }
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
+                scoped<PlayerLaunchHost> {
+                    object : PlayerLaunchHost {
+                        override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) = Unit
+                    }
+                }
             }
         }
+
     }
 }

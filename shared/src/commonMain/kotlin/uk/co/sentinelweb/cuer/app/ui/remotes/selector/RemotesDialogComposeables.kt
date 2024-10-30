@@ -18,6 +18,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
+import uk.co.sentinelweb.cuer.domain.ext.isAvailable
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
 import uk.co.sentinelweb.cuer.shared.generated.resources.ic_tv
@@ -86,10 +87,10 @@ object RemotesDialogComposeables {
 
     @Composable
     private fun RemoteRow(
-        remote: RemotesContract.View.RemoteNodeModel,
+        remote: RemotesDialogContract.Model.NodeModel,
         viewModel: RemotesDialogViewModel
     ) {
-        val contentColor = remote.domain.isAvailable
+        val contentColor = remote.domain.isAvailable()
             .takeIf { it }
             ?.let { MaterialTheme.colorScheme.onSurface }
             ?: MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
@@ -130,9 +131,9 @@ object RemotesDialogComposeables {
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     Text(
-                        text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
+                        text = "${remote.deviceType} : ${remote.device}",// : ${remote.authType}
                         color = contentColor,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -164,9 +165,9 @@ object RemotesDialogComposeables {
                                 .padding(start = 8.dp),
                         )
                         Text(
-                            text = "${screen.width} x ${screen.height} @ ${screen.refreshRate} ",
+                            text = "${screen.width} x ${screen.height} @ ${screen.refreshRate}",
                             color = contentColor,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }
