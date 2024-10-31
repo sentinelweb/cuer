@@ -34,7 +34,9 @@ interface FilesContract {
         val dateModified: Instant?,
         val isDirectory: Boolean,
         val tags: List<String>,
-        val type: ListItemType
+        val type: ListItemType,
+        val ext: String? = null,
+        val season: String? = null,
     )
 
     enum class ListItemType {

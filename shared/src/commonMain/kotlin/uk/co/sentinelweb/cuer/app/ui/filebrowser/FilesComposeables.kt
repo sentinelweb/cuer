@@ -169,66 +169,11 @@ object FilesComposeables {
                 modifier = Modifier.padding(16.dp)
             )
             Text(
-                text = listItem.title,
+                text = "${listItem.title} ${listItem.season?:""} ${listItem.ext?:""}",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(16.dp)
             )
         }
     }
-
-//    @Composable
-//    private fun FileRow(
-//        viewModel: FilesContract.ViewModel,
-//        it: PlaylistItemDomain
-//    ) {
-//        Row(
-//            modifier = Modifier
-//                .clickable { viewModel.onClickFile(it) }
-//                .fillMaxWidth()
-//        ) {
-//            val icon = when (it.media.mediaType) {
-//                VIDEO -> Res.drawable.ic_video
-//                AUDIO -> Res.drawable.ic_mic
-//                WEB -> Res.drawable.ic_browse // not valid here
-//                FILE -> Res.drawable.ic_file
-//            }
-//            Image(
-//                painter = painterResource(icon),
-//                contentDescription = null,
-//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-//                modifier = Modifier.padding(16.dp)
-//            )
-//            Text(
-//                text = it.media.title ?: "No title",
-//                style = MaterialTheme.typography.bodyMedium,
-//                color = MaterialTheme.colorScheme.onSurface,
-//                modifier = Modifier.padding(16.dp)
-//            )
-//        }
-//    }
-//
-//    @Composable
-//    private fun FolderRow(
-//        viewModel: FilesContract.ViewModel,
-//        it: PlaylistDomain
-//    ) {
-//        Row(modifier = Modifier
-//            .clickable { viewModel.onClickFolder(it) }
-//            .fillMaxWidth()
-//        ) {
-//            val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
-//            Image(
-//                painter = painterResource(icon),
-//                contentDescription = null,
-//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-//                modifier = Modifier.padding(16.dp)
-//            )
-//            Text(
-//                text = it.title,
-//                color = MaterialTheme.colorScheme.onSurface,
-//                modifier = Modifier.padding(16.dp)
-//            )
-//        }
-//    }
 }

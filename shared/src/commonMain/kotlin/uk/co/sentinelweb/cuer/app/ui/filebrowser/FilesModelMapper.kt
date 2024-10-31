@@ -3,7 +3,7 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItem
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
 import uk.co.sentinelweb.cuer.domain.Domain
-import uk.co.sentinelweb.cuer.domain.MediaDomain
+import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistAndChildrenDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 
@@ -16,7 +16,10 @@ class FilesModelMapper {
         loading = loading,
         nodeName = state.sourceNode?.name(),
         filePath = state.path?.let { "/$it" },
-        list = state.currentListItems,
+        list = state.currentListItems
+            ?.entries
+            ?.sortedWith(compareBy({ it.key.title.lowercase() }, { it.key.season?.lowercase() }))
+            ?.associate { it.toPair() },
     )
 
     fun mapToIntermediate(fileList: PlaylistAndChildrenDomain): Map<ListItem, Domain> =
@@ -30,59 +33,73 @@ class FilesModelMapper {
                     type = UP,
                 ) to f
             } else {
-                val (title, tags) = cleanTitle(f.title)
-                ListItem(
-                    title = title,
+                cleanTitle(f.title).copy(
                     dateModified = f.config.lastUpdate,
-                    tags = tags,
                     isDirectory = true,
                     type = FOLDER,
                 ) to f
             }
         }.plus(fileList.playlist.items.mapNotNull { f ->
             f.media.title?.let {
-                val (title, tags) = cleanTitle(it)
-                ListItem(
-                    title = title,
+                cleanTitle(it).copy(
                     dateModified = f.dateAdded,
-                    tags = tags,
                     isDirectory = true,
                     type = when (f.media.mediaType) {
-                        MediaDomain.MediaTypeDomain.VIDEO -> VIDEO
-                        MediaDomain.MediaTypeDomain.AUDIO -> AUDIO
-                        MediaDomain.MediaTypeDomain.WEB -> WEB
-                        MediaDomain.MediaTypeDomain.FILE -> FILE
+                        MediaTypeDomain.VIDEO -> VIDEO
+                        MediaTypeDomain.AUDIO -> AUDIO
+                        MediaTypeDomain.WEB -> WEB
+                        MediaTypeDomain.FILE -> FILE
                     }
                 ) to f
             }
         }).toMap()
 
-    fun cleanTitle(title: String): Pair<String, List<String>> {
-        // Regular expressions for tags, season/episode, and resolution
-        val bracketPattern = "\\[(.+?)\\]".toRegex()
-        val seasonEpisodePattern = "(?i)s\\d{2}e\\d{2}".toRegex()
-        val resolutionPattern = "\\b\\d{3,4}p\\b".toRegex()
+    val unwantedSubstrings =
+        listOf("WEB", "WEBRip", "H.264", "AAC", "h264", "BluRay", "Xvid", "DVDRip", "Rip", "x264",
+            "AMZN", "x265", "HEVC", "HDTV", "HMAX", "DDP5")
+            .map { it to it.toRegex(RegexOption.IGNORE_CASE) }
+    val bracketPattern = "\\[(.+?)\\]".toRegex()
+    val seasonEpisodePattern = "(?i)s\\d{2}e\\d{2}".toRegex()
+    val resolutionPattern = "\\b\\d{3,4}p\\b".toRegex()
+    val sizePattern = "\\b\\d{3,4}[mM][bB]\\b".toRegex()
+    val fileExtensionPattern = "\\.([a-zA-Z0-9]+)$".toRegex()
 
+    fun cleanTitle(title: String): ListItem {
         // Extract items in square brackets as tags
         val tags = bracketPattern.findAll(title).map { it.groupValues[1] }.toMutableList()
 
         // Extract season/episode code and resolution
-        val seasonEpisode = seasonEpisodePattern.find(title)?.value
-        val resolution = resolutionPattern.find(title)?.value
+        resolutionPattern.find(title)?.value?.let { tags.add(it) }
+        sizePattern.find(title)?.value?.let { tags.add(it) }
 
-        // Add season/episode and resolution to tags if they exist
-        seasonEpisode?.let { tags.add(it) }
-        resolution?.let { tags.add(it) }
+        val season = seasonEpisodePattern.find(title)?.value
+        val ext = fileExtensionPattern.find(title)?.groupValues?.get(1)
 
+        var cleanedTitle = title
+
+        for (substring in unwantedSubstrings) {
+            substring.second.find(title)?.value?.let { tags.add(it) }
+            cleanedTitle = cleanedTitle.replace(substring.first, "")
+        }
         // Clean the title to be human-readable
-        val humanReadableTitle = title
-            .replace(bracketPattern, "") // Remove brackets and their content
-            .replace(seasonEpisodePattern, "") // Remove season/episode code
-            .replace(resolutionPattern, "") // Remove resolution
-            .replace("[._-]".toRegex(), " ") // Replace special characters with space
-            .replace("\\s+".toRegex(), " ") // Replace multiple spaces with a single space
+        cleanedTitle = cleanedTitle
+            .replace(bracketPattern, "")
+            .replace(seasonEpisodePattern, "")
+            .replace(resolutionPattern, "")
+            .replace(sizePattern, "")
+            .replace(fileExtensionPattern, "")
+            .replace("[._-]".toRegex(), " ")
+            .replace("\\s+".toRegex(), " ")
             .trim()
 
-        return Pair(humanReadableTitle, tags)
+        return ListItem(
+            title = cleanedTitle,
+            dateModified = null,
+            isDirectory = false,
+            tags = tags,
+            type = FILE,
+            ext = ext,
+            season = season,
+        )
     }
 }
