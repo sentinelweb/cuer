@@ -73,7 +73,7 @@ fun ExoPlayerScreen() {
             )
             PlayerControls(player!!)
         }
-        val title = "Video Title" // Replace with actual title if available
+//        val title = "Video Title" // Replace with actual title if available
 //        Text(
 //            text = title,
 //            color = Color.White,

@@ -6,7 +6,7 @@ import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModelMapper
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -25,7 +25,7 @@ class FilesUiCoordinatorOld(
     private val parent: HomeUiCoordinator,
     private val getFolders: GetFolderListUseCase,
     private val log: LogWrapper
-) : UiCoordinator<FilesContract.FilesModel>,
+) : UiCoordinator<FilesContract.Model>,
     DesktopScopeComponent,
     FilesContract.ViewModel,
     KoinComponent {
@@ -85,7 +85,7 @@ class FilesUiCoordinatorOld(
     }
 
     private fun playMedia(item: PlaylistItemDomain) {
-        parent.showPlayer(item, modelObservable.value.list?.playlist?:error("No playlist"))
+        //parent.showPlayer(item, modelObservable.value.list?.playlist?:error("No playlist"))
     }
 
     override fun onRefreshClick() {

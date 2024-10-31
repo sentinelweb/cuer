@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
@@ -84,6 +84,8 @@ class FilesViewModel(
         }
     }
 
+    private fun showFile(file: PlaylistItemDomain) = Unit // stub
+
     private fun playMedia(file: PlaylistItemDomain) {
         state.selectedFile = file
         viewModelScope.launch {
@@ -126,7 +128,9 @@ class FilesViewModel(
         remoteDialogLauncher.hideRemotesDialog()
     }
 
-    private fun launchRemotePlayer(targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
+    private fun launchRemotePlayer(
+        targetNode: RemoteNodeDomain, screen: PlayerNodeDomain.Screen
+    ) {
         viewModelScope.launch {
             map(true)
             playerInteractor.launchPlayerVideo(
@@ -145,10 +149,6 @@ class FilesViewModel(
         }
     }
 
-    private fun showFile(file: PlaylistItemDomain) {
-
-    }
-
     private fun loadCurrentPath() {
         viewModelScope.launch {
             map(true)
@@ -159,6 +159,7 @@ class FilesViewModel(
 
                     is LocalNodeDomain -> state.currentFolder = getFolderListUseCase.getFolderList(state.path)
                 }
+                state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
             }
             map(false)
         }

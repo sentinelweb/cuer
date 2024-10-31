@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.serialization.Serializable
+import kotlinx.datetime.Instant
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.domain.*
 
 interface FilesContract {
 
     interface ViewModel {
-        val modelObservable: Flow<FilesModel>
+        val modelObservable: Flow<Model>
 
         fun onClickFolder(folder: PlaylistDomain)
 
@@ -20,24 +20,36 @@ interface FilesContract {
         fun onRefreshClick()
     }
 
-    @Serializable
     data class State(
         var sourceRemoteId: GUID? = null,
         var sourceNode: NodeDomain? = null,
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
+        var currentListItems: Map<ListItem, Domain>? = null,
         var selectedFile: PlaylistItemDomain? = null,
     )
 
+    data class ListItem(
+        val title: String,
+        val dateModified: Instant?,
+        val isDirectory: Boolean,
+        val tags: List<String>,
+        val type: ListItemType
+    )
 
-    data class FilesModel(
+    enum class ListItemType {
+        VIDEO, AUDIO, WEB, FILE, FOLDER, UP
+    }
+
+    data class Model(
         val loading: Boolean,
         val nodeName: String?,
         val filePath: String?,
-        val list: PlaylistAndChildrenDomain?,
+        val list: Map<ListItem, Domain>?,
     ) {
+
         companion object {
-            val Initial = FilesModel(loading = false, nodeName = null, filePath = null, list = null)
+            val Initial = Model(loading = false, nodeName = null, filePath = null, list = null)
         }
     }
 

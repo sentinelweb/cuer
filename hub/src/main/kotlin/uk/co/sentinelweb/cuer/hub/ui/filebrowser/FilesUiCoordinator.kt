@@ -11,7 +11,7 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 class FilesUiCoordinator(
     private val parent: HomeUiCoordinator,
     private val log: LogWrapper
-) : UiCoordinator<FilesContract.FilesModel>,
+) : UiCoordinator<FilesContract.Model>,
     DesktopScopeComponent,
     KoinComponent {
 

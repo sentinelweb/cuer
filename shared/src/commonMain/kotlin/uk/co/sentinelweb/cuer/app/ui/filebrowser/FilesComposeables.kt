@@ -19,8 +19,9 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.FilesModel.Companion.Initial
-import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
+import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
@@ -29,7 +30,7 @@ object FilesComposeables {
 
     // todo use scaffold
     @Composable
-    fun FileBrowserAppUi(modelObservable: Flow<FilesContract.FilesModel>, viewModel: FilesContract.ViewModel) {
+    fun FileBrowserAppUi(modelObservable: Flow<FilesContract.Model>, viewModel: FilesContract.ViewModel) {
         val model = modelObservable.collectAsState(initial = Initial)
         CuerSharedTheme {
             Surface {
@@ -113,7 +114,7 @@ object FilesComposeables {
     }
 
     @Composable
-    private fun FilesView(model: FilesContract.FilesModel, viewModel: FilesContract.ViewModel) {
+    private fun FilesView(model: FilesContract.Model, viewModel: FilesContract.ViewModel) {
         Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier.padding(8.dp)
@@ -121,11 +122,8 @@ object FilesComposeables {
                     .verticalScroll(rememberScrollState())
                     .align(Alignment.TopStart)
             ) {
-                model.list?.children?.forEach {
-                    FolderRow(viewModel, it)
-                }
-                model.list?.playlist?.items?.forEach {
-                    FileRow(viewModel, it)
+                model.list?.forEach {
+                    ListRow(viewModel, it.key, it.value)
                 }
             }
             if (model.loading) {
@@ -142,20 +140,27 @@ object FilesComposeables {
     }
 
     @Composable
-    private fun FileRow(
+    private fun ListRow(
         viewModel: FilesContract.ViewModel,
-        it: PlaylistItemDomain
+        listItem: FilesContract.ListItem,
+        domain: Domain
     ) {
         Row(
             modifier = Modifier
-                .clickable { viewModel.onClickFile(it) }
+                .clickable { when(domain) {
+                    is PlaylistItemDomain -> viewModel.onClickFile(domain)
+                    is PlaylistDomain -> viewModel.onClickFolder(domain)
+                    else -> Unit
+                } }
                 .fillMaxWidth()
         ) {
-            val icon = when (it.media.mediaType) {
+            val icon = when (listItem.type) {
                 VIDEO -> Res.drawable.ic_video
                 AUDIO -> Res.drawable.ic_mic
                 WEB -> Res.drawable.ic_browse // not valid here
                 FILE -> Res.drawable.ic_file
+                FOLDER -> Res.drawable.ic_folder
+                UP -> Res.drawable.ic_up
             }
             Image(
                 painter = painterResource(icon),
@@ -164,7 +169,7 @@ object FilesComposeables {
                 modifier = Modifier.padding(16.dp)
             )
             Text(
-                text = it.media.title ?: "No title",
+                text = listItem.title,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(16.dp)
@@ -172,27 +177,58 @@ object FilesComposeables {
         }
     }
 
-    @Composable
-    private fun FolderRow(
-        viewModel: FilesContract.ViewModel,
-        it: PlaylistDomain
-    ) {
-        Row(modifier = Modifier
-            .clickable { viewModel.onClickFolder(it) }
-            .fillMaxWidth()
-        ) {
-            val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
-            Image(
-                painter = painterResource(icon),
-                contentDescription = null,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-                modifier = Modifier.padding(16.dp)
-            )
-            Text(
-                text = it.title,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(16.dp)
-            )
-        }
-    }
+//    @Composable
+//    private fun FileRow(
+//        viewModel: FilesContract.ViewModel,
+//        it: PlaylistItemDomain
+//    ) {
+//        Row(
+//            modifier = Modifier
+//                .clickable { viewModel.onClickFile(it) }
+//                .fillMaxWidth()
+//        ) {
+//            val icon = when (it.media.mediaType) {
+//                VIDEO -> Res.drawable.ic_video
+//                AUDIO -> Res.drawable.ic_mic
+//                WEB -> Res.drawable.ic_browse // not valid here
+//                FILE -> Res.drawable.ic_file
+//            }
+//            Image(
+//                painter = painterResource(icon),
+//                contentDescription = null,
+//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+//                modifier = Modifier.padding(16.dp)
+//            )
+//            Text(
+//                text = it.media.title ?: "No title",
+//                style = MaterialTheme.typography.bodyMedium,
+//                color = MaterialTheme.colorScheme.onSurface,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
+//    }
+//
+//    @Composable
+//    private fun FolderRow(
+//        viewModel: FilesContract.ViewModel,
+//        it: PlaylistDomain
+//    ) {
+//        Row(modifier = Modifier
+//            .clickable { viewModel.onClickFolder(it) }
+//            .fillMaxWidth()
+//        ) {
+//            val icon = if (it.title.equals("..")) Res.drawable.ic_up else Res.drawable.ic_folder
+//            Image(
+//                painter = painterResource(icon),
+//                contentDescription = null,
+//                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
+//                modifier = Modifier.padding(16.dp)
+//            )
+//            Text(
+//                text = it.title,
+//                color = MaterialTheme.colorScheme.onSurface,
+//                modifier = Modifier.padding(16.dp)
+//            )
+//        }
+//    }
 }
