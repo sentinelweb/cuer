@@ -112,6 +112,7 @@ sealed class CuerMenuItem(
 
     object SortAlpha : CuerMenuItem(Res.string.menu_sort_alpha, Res.drawable.ic_sort_by_alpha)
     object SortCategory : CuerMenuItem(Res.string.menu_sort_category, Res.drawable.ic_category)
+    object SortTime : CuerMenuItem(Res.string.menu_sort_time, Res.drawable.ic_sort_time)
 
     object Folders : CuerMenuItem(Res.string.menu_folders, Res.drawable.ic_folder)
     object ThemeTest : CuerMenuItem(Res.string.menu_theme_test, Res.drawable.ic_edit)

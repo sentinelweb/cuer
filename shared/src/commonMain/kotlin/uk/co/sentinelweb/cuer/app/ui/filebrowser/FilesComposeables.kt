@@ -9,6 +9,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -17,10 +18,15 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem.*
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentYellow
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
 import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
@@ -60,13 +66,13 @@ object FilesComposeables {
                             backgroundColor = colorTransparentYellow,
                             onUp = { viewModel.onUpClick() },
                             actions = listOf(
-                                Action(CuerMenuItem.Help, { }),
-                                Action(CuerMenuItem.Settings, { }),
+                                Action(SortAlpha, { viewModel.onSort(Alpha) }),
+                                Action(SortTime, { viewModel.onSort(Time) }),
+                                Action(item = Reload, action = { viewModel.onRefreshClick() }),
                             ),
                             modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
                         )
                     }
-//                        SharedThemeView()
                     FilesView(model = model.value, viewModel = viewModel)
                 }
             }
@@ -96,13 +102,15 @@ object FilesComposeables {
                                 .wrapContentHeight(),
                         )
                         CuerSharedAppBar(
-                            title = stringResource(Res.string.files_title) +": " + (model.value.nodeName ?: "No host"),
+                            title = stringResource(Res.string.files_title) + ": " + (model.value.nodeName ?: "No host"),
                             subTitle = model.value.filePath,
                             backgroundColor = colorTransparentYellow,
                             contentColor = Color.White,
                             onUp = null,
                             actions = listOf(
-                                Action(item = CuerMenuItem.Reload, action = { viewModel.onRefreshClick() })
+                                Action(item = SortAlpha, action = { viewModel.onSort(Alpha) }),
+                                Action(item = SortTime, action = { viewModel.onSort(Time) }),
+                                Action(item = Reload, action = { viewModel.onRefreshClick() }),
                             ),
                             modifier = Modifier
                         )
@@ -122,8 +130,9 @@ object FilesComposeables {
                     .verticalScroll(rememberScrollState())
                     .align(Alignment.TopStart)
             ) {
+                model.upListItem?.also { ListRow(viewModel, it.first, it.second) }
                 model.list?.forEach {
-                    ListRow(viewModel, it.key, it.value)
+                    ListRow(viewModel, it.first, it.second)
                 }
             }
             if (model.loading) {
@@ -147,11 +156,13 @@ object FilesComposeables {
     ) {
         Row(
             modifier = Modifier
-                .clickable { when(domain) {
-                    is PlaylistItemDomain -> viewModel.onClickFile(domain)
-                    is PlaylistDomain -> viewModel.onClickFolder(domain)
-                    else -> Unit
-                } }
+                .clickable {
+                    when (domain) {
+                        is PlaylistItemDomain -> viewModel.onClickFile(domain)
+                        is PlaylistDomain -> viewModel.onClickFolder(domain)
+                        else -> Unit
+                    }
+                }
                 .fillMaxWidth()
         ) {
             val icon = when (listItem.type) {
@@ -168,12 +179,26 @@ object FilesComposeables {
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier.padding(16.dp)
             )
-            Text(
-                text = "${listItem.title} ${listItem.season?:""} ${listItem.ext?:""}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(16.dp)
-            )
+            Column(
+                Modifier.fillMaxWidth()
+                    .padding(8.dp)
+                    .align(CenterVertically)
+            ) {
+                Text(
+                    text = "${listItem.title} ${listItem.season ?: ""} ${listItem.ext ?: ""}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(4.dp)
+                )
+                if (listItem.timeSince != null) {
+                    Text(
+                        text = listItem.timeSince,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(2.dp)
+                    )
+                }
+            }
         }
     }
 }

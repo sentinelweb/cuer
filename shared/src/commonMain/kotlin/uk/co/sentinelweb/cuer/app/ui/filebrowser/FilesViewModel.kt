@@ -4,10 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
@@ -36,6 +39,7 @@ class FilesViewModel(
     private val localPlayerLaunchHost: PlayerLaunchHost,
 ) : ViewModel(), FilesContract.ViewModel {
 
+    // fixme expose immutable
     override val modelObservable = MutableStateFlow(Initial)
 
     val _labels = MutableStateFlow<Label>(Label.Init)
@@ -119,6 +123,22 @@ class FilesViewModel(
         loadCurrentPath()
     }
 
+    override fun onSort(type: FilesContract.Sort) {
+        when (type) {
+            Alpha -> {
+                state.sortAcending = if (state.sort == Alpha) !state.sortAcending else true
+                state.sort = Alpha
+            }
+
+            Time -> {
+                state.sortAcending = if (state.sort == Time) !state.sortAcending else false
+                state.sort = Time
+            }
+        }
+        log.d("sort: $type: ${state.sortAcending}")
+        map(false)
+    }
+
     private fun launchLocalPlayer(
         targetNode: LocalNodeDomain?,
         screen: PlayerNodeDomain.Screen?,
@@ -153,12 +173,19 @@ class FilesViewModel(
         viewModelScope.launch {
             map(true)
             state.sourceNode?.apply {
-                when (this) {
-                    is RemoteNodeDomain -> state.currentFolder =
+                val folder = when (this) {
+                    is RemoteNodeDomain ->
                         filesInteractor.getFolderList(this.locator(), state.path).data
 
-                    is LocalNodeDomain -> state.currentFolder = getFolderListUseCase.getFolderList(state.path)
+                    is LocalNodeDomain -> getFolderListUseCase.getFolderList(state.path)
+                    else -> throw IllegalStateException("not supported")
                 }
+                val upItem = folder?.children?.find { "..".equals(it.title) }
+                state.upListItem = upItem?.let { mapper.mapParentItem(it) }
+                state.currentFolder = folder?.copy(
+                    children = upItem?.let { folder.children.minus(it) } ?: folder.children,
+                )
+
                 state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
             }
             map(false)
@@ -166,6 +193,9 @@ class FilesViewModel(
     }
 
     private fun map(loading: Boolean) {
-        modelObservable.value = mapper.map(state = state, loading = loading)
+        log.d("map: $loading")
+        modelObservable.value = mapper.map(state = state, loading = loading).also {
+            it.list?.forEach { (i, d)-> log.d("map: ${i.title}")}
+        }
     }
 }

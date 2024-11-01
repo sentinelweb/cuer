@@ -57,7 +57,8 @@ class GetFolderListUseCase(
                         title = it.name,
                         platform = FILESYSTEM,
                         platformId = fullToTruncatedFolderPath(it.file.path),
-                        parentId = rootId
+                        parentId = rootId,
+                        config = PlaylistDomain.PlaylistConfigDomain(lastUpdate = it.modified)
                     )
                 }.toMutableList()
 
@@ -78,7 +79,8 @@ class GetFolderListUseCase(
                         title = "..",
                         platform = FILESYSTEM,
                         platformId = parent?.path?.let { fullToTruncatedFolderPath(it) },
-                        parentId = rootId
+                        parentId = rootId,
+                        config = PlaylistDomain.PlaylistConfigDomain(lastUpdate = null)
                     ).apply { subFolders.add(0, this) }
                 }
                 val folderProperties = fullFolderPath?.let { fileOperations.properties(AFile(it)) }
@@ -91,7 +93,9 @@ class GetFolderListUseCase(
                         filesProperties.mapIndexed { index, item ->
                             mapFileToPlaylist(index, rootId, item, it)
                         }
-                    } ?: listOf()
+
+                    } ?: listOf(),
+                    config = PlaylistDomain.PlaylistConfigDomain(lastUpdate = folderProperties?.modified)
                 )
 
                 PlaylistAndChildrenDomain(
@@ -116,19 +120,19 @@ class GetFolderListUseCase(
     private fun mapFileToPlaylist(
         index: Int,
         playlistId: OrchestratorContract.Identifier<GUID>,
-        item: AFileProperties,
+        fileProperties: AFileProperties,
         folderPath: String?
     ): PlaylistItemDomain {
-        val truncatedPath = fullToTruncatedFolderPath(item.file.path)!!
+        val truncatedPath = fullToTruncatedFolderPath(fileProperties.file.path)!!
         return PlaylistItemDomain(
             id = guidCreator.create().toIdentifier(MEMORY),
-            dateAdded = timeProvider.instant(),
+            dateAdded = fileProperties.modified?:timeProvider.instant(),
             order = index.toLong(),
             playlistId = playlistId,
             media = MediaDomain(
                 id = guidCreator.create().toIdentifier(MEMORY),
-                title = item.name,
-                mediaType = checkMediaType(item),
+                title = fileProperties.name,
+                mediaType = checkMediaType(fileProperties),
                 platform = FILESYSTEM,
                 platformId = truncatedPath,
                 url = "file://${truncatedPath}",

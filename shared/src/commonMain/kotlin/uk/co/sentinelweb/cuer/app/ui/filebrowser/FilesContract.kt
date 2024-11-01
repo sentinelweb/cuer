@@ -18,6 +18,7 @@ interface FilesContract {
         fun onUpClick()
         fun onBackClick()
         fun onRefreshClick()
+        fun onSort(type: Sort)
     }
 
     data class State(
@@ -26,8 +27,14 @@ interface FilesContract {
         var path: String? = null,
         var currentFolder: PlaylistAndChildrenDomain? = null,
         var currentListItems: Map<ListItem, Domain>? = null,
+        var upListItem: Pair<ListItem, PlaylistDomain>? = null,
         var selectedFile: PlaylistItemDomain? = null,
-    )
+        var sort: Sort = Sort.Alpha,
+        var sortAcending: Boolean = false
+    ) {
+
+    }
+    enum class Sort { Alpha, Time }
 
     data class ListItem(
         val title: String,
@@ -37,6 +44,7 @@ interface FilesContract {
         val type: ListItemType,
         val ext: String? = null,
         val season: String? = null,
+        val timeSince: String? = null,
     )
 
     enum class ListItemType {
@@ -47,7 +55,8 @@ interface FilesContract {
         val loading: Boolean,
         val nodeName: String?,
         val filePath: String?,
-        val list: Map<ListItem, Domain>?,
+        val list: List<Pair<ListItem, Domain>>?,
+        var upListItem: Pair<ListItem, PlaylistDomain>? = null,
     ) {
 
         companion object {
@@ -62,7 +71,7 @@ interface FilesContract {
 
     companion object {
         val module = module {
-            factory { FilesModelMapper() }
+            factory { FilesModelMapper(get()) }
         }
     }
 }

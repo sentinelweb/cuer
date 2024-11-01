@@ -1,8 +1,14 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
+import kotlinx.datetime.Instant
+import kotlinx.datetime.toKotlinInstant
+import org.koin.core.component.KoinComponent
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
 
-actual class PlatformFileOperation {
+actual class PlatformFileOperation: KoinComponent {
 
     actual fun delete(file: AFile) {
         val platformFile = File(file.path)
@@ -37,12 +43,20 @@ actual class PlatformFileOperation {
     actual fun properties(file: AFile): AFileProperties? =
         File(file.path)
             .takeIf { it.exists() }
-            ?.let {
+            ?.let { jfile ->
                 AFileProperties(
                     file = file,
-                    name = it.name,
-                    size = it.length(),
-                    isDirectory = it.isDirectory
+                    name = jfile.name,
+                    size = jfile.length(),
+                    isDirectory = jfile.isDirectory,
+                    modified = if (jfile.isDirectory) {
+                        val filePath = Paths.get(jfile.absolutePath)
+                        val attributes = Files.readAttributes(filePath, BasicFileAttributes::class.java)
+                        attributes.lastModifiedTime().toInstant().toKotlinInstant()
+
+                    } else {
+                        Instant.fromEpochMilliseconds(jfile.lastModified())
+                    }
                 )
             }
 

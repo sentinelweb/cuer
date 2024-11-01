@@ -10,6 +10,7 @@
     <string name="menu_refresh">Refresh</string>
     <string name="menu_sort_alpha">Alphabetical</string>
     <string name="menu_sort_category">Categories</string>
+    <string name="menu_sort_time">Time</string>
     <string name="menu_delete">Delete</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_move">Move</string>
