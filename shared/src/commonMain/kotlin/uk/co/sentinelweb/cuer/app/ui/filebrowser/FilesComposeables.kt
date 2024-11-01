@@ -70,6 +70,10 @@ object FilesComposeables {
                                 Action(SortTime, { viewModel.onSort(Time) }),
                                 Action(item = Reload, action = { viewModel.onRefreshClick() }),
                             ),
+                            overflowActions = listOf(
+                                Action(Help, {  }),
+                                Action(Settings, {  }),
+                            ),
                             modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
                         )
                     }

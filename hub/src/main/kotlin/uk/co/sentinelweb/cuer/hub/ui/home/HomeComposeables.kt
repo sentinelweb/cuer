@@ -52,10 +52,13 @@ fun Home(coordinator: HomeUiCoordinator) {
                     contentColor = Color.White,
                     backgroundColor = Color(0xFF222222),
                     actions = listOf(
-                        Action(CuerMenuItem.ThemeTest, action = {coordinator.go(ThemeTest)}),
                         Action(CuerMenuItem.LocalConfig, action = {coordinator.go(LocalConfig)}),
                         Action(CuerMenuItem.Folders, action = {coordinator.go(Folders())}),
                         Action(CuerMenuItem.Settings, action = {coordinator.go(Settings)}),
+                    ),
+                    overflowActions = listOf(
+                        Action(CuerMenuItem.ThemeTest, action = {coordinator.go(ThemeTest)}),
+                        Action(CuerMenuItem.Help, action = {}),
                     ),
                 )
             }
