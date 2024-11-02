@@ -10,6 +10,7 @@ interface FilesContract {
 
     interface ViewModel {
         val modelObservable: Flow<Model>
+        val labels: Flow<Label>
 
         fun onClickFolder(folder: PlaylistDomain)
 

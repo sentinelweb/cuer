@@ -2,12 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
@@ -15,14 +14,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.Flow
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.common.compose.Action
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerMenuItem.*
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CustomSnackbar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentYellow
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.None
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
@@ -36,15 +37,24 @@ object FilesComposeables {
 
     // todo use scaffold - move up to app
     @Composable
-    fun FileBrowserAppUi(modelObservable: Flow<FilesContract.Model>, viewModel: FilesContract.ViewModel) {
-        val model = modelObservable.collectAsState(initial = Initial)
+    fun FileBrowserAppUi(viewModel: FilesContract.ViewModel) {
+        val model = viewModel.modelObservable.collectAsState(initial = Initial)
+        val snackbarHostState = remember { SnackbarHostState() }
+        val label = viewModel.labels.collectAsState(initial = None)
+
+        LaunchedEffect(label.value) {
+            when (label.value) {
+                is Label.ErrorMessage -> snackbarHostState.showSnackbar(
+                    message = (label.value as Label.ErrorMessage).message,
+                    actionLabel = "DISMISS",
+                )
+
+                else -> Unit
+            }
+        }
         CuerSharedTheme {
-            Surface {
-                Column(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(bottom = 60.dp)
-                ) {
+            Scaffold(
+                topBar = {
                     Box(
                         contentAlignment = Alignment.TopStart,
                         modifier = Modifier
@@ -71,14 +81,20 @@ object FilesComposeables {
                                 Action(item = Reload, action = { viewModel.onRefreshClick() }),
                             ),
                             overflowActions = listOf(
-                                Action(Help, {  }),
-                                Action(Settings, {  }),
+                                Action(Help, { }),
+                                Action(Settings, { }),
                             ),
                             modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
                         )
                     }
-                    FilesView(model = model.value, viewModel = viewModel)
+                },
+                snackbarHost = {
+                    SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp)) { data ->
+                        CustomSnackbar(snackbarData = data)
+                    }
                 }
+            ) {
+                FilesView(model = model.value, viewModel = viewModel)
             }
         }
     }
@@ -95,15 +111,13 @@ object FilesComposeables {
                     Box(
                         contentAlignment = Alignment.TopStart,
                         modifier = Modifier
-                            .height(60.dp)
                     ) {
                         Image(
                             painter = painterResource(Res.drawable.header_files_smoke),
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier
-                                .fillMaxSize()
-                                .wrapContentHeight(),
+                                .matchParentSize()
                         )
                         CuerSharedAppBar(
                             title = stringResource(Res.string.files_title) + ": " + (model.value.nodeName ?: "No host"),

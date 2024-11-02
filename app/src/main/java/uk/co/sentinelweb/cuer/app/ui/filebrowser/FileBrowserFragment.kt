@@ -88,7 +88,6 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
             FilesComposeables.FileBrowserAppUi(
-                modelObservable = viewModel.modelObservable,
                 viewModel = viewModel
             )
         }
@@ -102,9 +101,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
             Label.Up -> {
                 navRouter.navigate(NavigationModel(NAV_BACK, mapOf(BACK_PARAMS to R.id.navigation_remotes)))
             }
-            is Label.ErrorMessage -> {
-
-            }
+            else -> Unit
         }
     }
 

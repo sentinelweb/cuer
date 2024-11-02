@@ -47,7 +47,7 @@ class FilesViewModel(
     override val modelObservable: Flow<Model> = _modelObservable
 
     private val _labels = MutableStateFlow<Label>(None)
-    val labels: Flow<Label>
+    override val labels: Flow<Label>
         get() = _labels
 
     init {

@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.common.compose
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -172,5 +173,38 @@ fun TopAppBarOverflowMenu(
                 },
             )
         }
+    }
+}
+
+@Composable
+fun CustomSnackbar(snackbarData: SnackbarData) {
+    Snackbar(
+        modifier = Modifier.background(MaterialTheme.colorScheme.error),
+        containerColor = MaterialTheme.colorScheme.error,
+        contentColor = MaterialTheme.colorScheme.onError,
+        shape = MaterialTheme.shapes.medium,
+        action = {
+            TextButton(
+                onClick = { snackbarData.dismiss() },
+                elevation = ButtonDefaults.elevatedButtonElevation(4.dp, 2.dp, 0.dp),
+                colors = ButtonDefaults.buttonColors(
+                    contentColor = MaterialTheme.colorScheme.error,
+                    containerColor = MaterialTheme.colorScheme.onError,
+                ),
+                shape = MaterialTheme.shapes.small,
+                modifier = Modifier,
+            ) {
+                Text(
+                    text = snackbarData.visuals.actionLabel ?: "DISMISS",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            }
+        },
+    ) {
+        Text(
+            text = snackbarData.visuals.message,
+            color = MaterialTheme.colorScheme.onError
+        )
     }
 }

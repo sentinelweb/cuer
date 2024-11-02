@@ -3,14 +3,15 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -81,14 +82,13 @@ fun Home(coordinator: HomeUiCoordinator) {
                     ),
                 )
             },
-            scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
-            snackbarHost = { state ->
-                SnackbarHost(state, modifier = Modifier.padding(8.dp)) { data ->
+            snackbarHost = {
+                SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp)) { data ->
                     CustomSnackbar(snackbarData = data)
                 }
-            }
-        ) {
-            Row {
+            },
+        ) { padding ->
+            Row(modifier = Modifier.padding(padding)) {
                 Box(modifier = Modifier.width(400.dp)) {
                     coordinator.remotesCoordinator.RemotesDesktopUi()
                 }
@@ -107,29 +107,5 @@ fun Home(coordinator: HomeUiCoordinator) {
                 }
             }
         }
-    }
-}
-
-@Composable
-fun CustomSnackbar(snackbarData: SnackbarData) {
-    Snackbar(
-        modifier = Modifier.background(MaterialTheme.colors.error),
-        action = {
-            TextButton(
-                onClick = { snackbarData.dismiss() },
-                elevation = ButtonDefaults.elevation(4.dp, 2.dp, 0.dp),
-                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onError),
-                shape = MaterialTheme.shapes.medium,
-                modifier = Modifier,
-            ) {
-                Text(
-                    text = snackbarData.actionLabel ?: "DISMISS",
-                    color = MaterialTheme.colors.error
-                )
-            }
-        },
-        backgroundColor = MaterialTheme.colors.error,
-    ) {
-        Text(text = snackbarData.message, color = MaterialTheme.colors.onError)
     }
 }
