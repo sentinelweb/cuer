@@ -31,6 +31,8 @@
 
     <!-- files -->
     <string name="files_title">Files</string>
+    <string name="files_error_loading_folder">Error loading folder: %1$s %2$s</string>
+    <string name="files_error_empty">Location is empty</string>
 
     <!-- remotes -->
     <string name="rm_title">Remotes</string>
@@ -45,6 +47,10 @@
 
     <!-- misc -->
     <string name="up">Up</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="no_host">No host</string>
+
+    <!-- errors -->
 
 
 </resources>

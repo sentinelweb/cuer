@@ -58,7 +58,6 @@ fun Home(coordinator: HomeUiCoordinator) {
         when (label.value) {
             is Label.ErrorMessage -> snackbarHostState.showSnackbar(
                 message = (label.value as Label.ErrorMessage).message,
-                actionLabel = "DISMISS",
                 duration = SnackbarDuration.Short
             )
 

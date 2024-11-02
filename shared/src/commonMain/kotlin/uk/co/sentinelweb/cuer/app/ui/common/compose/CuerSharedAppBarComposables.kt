@@ -196,7 +196,7 @@ fun CustomSnackbar(snackbarData: SnackbarData) {
                 modifier = Modifier,
             ) {
                 Text(
-                    text = snackbarData.visuals.actionLabel ?: "DISMISS",
+                    text = snackbarData.visuals.actionLabel ?: stringResource(Res.string.dismiss),
                     color = MaterialTheme.colorScheme.error,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodySmall,

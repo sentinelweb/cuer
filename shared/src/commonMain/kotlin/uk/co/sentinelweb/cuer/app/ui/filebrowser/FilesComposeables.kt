@@ -36,7 +36,6 @@ import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object FilesComposeables {
 
-    // todo use scaffold - move up to app
     @Composable
     fun FileBrowserAppUi(viewModel: FilesContract.ViewModel) {
         val model = viewModel.modelObservable.collectAsState(initial = Initial)
@@ -47,7 +46,6 @@ object FilesComposeables {
             when (label.value) {
                 is Label.ErrorMessage -> snackbarHostState.showSnackbar(
                     message = (label.value as Label.ErrorMessage).message,
-                    actionLabel = "DISMISS",
                 )
 
                 else -> Unit
@@ -96,7 +94,7 @@ object FilesComposeables {
                 },
 
                 ) { padding ->
-                Box(modifier = Modifier.padding(top=padding.calculateTopPadding(), bottom = 68.dp)) {
+                Box(modifier = Modifier.padding(top = padding.calculateTopPadding(), bottom = 68.dp)) {
                     FilesView(model = model.value, viewModel = viewModel)
                 }
             }
@@ -124,7 +122,8 @@ object FilesComposeables {
                                 .matchParentSize()
                         )
                         CuerSharedAppBar(
-                            title = stringResource(Res.string.files_title) + ": " + (model.value.nodeName ?: "No host"),
+                            title = stringResource(Res.string.files_title) + ": "
+                                    + (model.value.nodeName ?: stringResource(Res.string.no_host)),
                             subTitle = model.value.filePath,
                             backgroundColor = colorTransparentYellow,
                             contentColor = Color.White,
