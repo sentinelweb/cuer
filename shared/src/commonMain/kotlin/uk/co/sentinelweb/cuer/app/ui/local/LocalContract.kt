@@ -17,6 +17,7 @@ class LocalContract {
     interface MviStore : Store<MviStore.Intent, MviStore.State, MviStore.Label> {
         sealed class Intent {
             object Up : Intent()
+            data class Update(val updated: LocalNodeDomain) : Intent()
             data class ActionSave(val updated: LocalNodeDomain) : Intent()
         }
 

@@ -73,6 +73,7 @@ class LocalUiCoordinator :
                         modelMapper = get(),
                         coroutines = get(),
                         lifecycle = get<LocalUiCoordinator>().lifecycle as Lifecycle,
+                        localRepository = get(),
                         log = get()
                     )
                 }
@@ -84,6 +85,7 @@ class LocalUiCoordinator :
                         remoteServerManager = get(),
                         localRepository = get(),
                         wifiStateProvider = get(),
+                        coroutineContextProvider = get()
                     )
                 }
                 scoped { LocalModelMapper(get(), get()) }

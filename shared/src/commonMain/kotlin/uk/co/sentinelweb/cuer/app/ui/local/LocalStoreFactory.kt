@@ -6,9 +6,12 @@ import com.arkivanov.mvikotlin.core.store.StoreFactory
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineBootstrapper
 import com.arkivanov.mvikotlin.extensions.coroutines.CoroutineExecutor
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.*
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
@@ -21,6 +24,7 @@ class LocalStoreFactory constructor(
     private val remoteServerManager: RemoteServerContract.Manager,
     private val localRepository: LocalRepository,
     private val wifiStateProvider: WifiStateProvider,
+    private val coroutineContextProvider: CoroutineContextProvider,
 ) {
 
     init {
@@ -56,13 +60,14 @@ class LocalStoreFactory constructor(
     private inner class ExecutorImpl() : CoroutineExecutor<Intent, Action, State, Result, Label>() {
         override fun executeAction(action: Action, getState: () -> State) =
             when (action) {
-                Action.Init -> testLoad()
+                Action.Init -> init()
             }
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
                 Intent.Up -> publish(Label.Up)
                 is Intent.ActionSave -> save(intent)
+                is Intent.Update-> dispatch(Result.UpdateServerState)
             }
 
         private fun save(intent: Intent.ActionSave) {
@@ -76,11 +81,23 @@ class LocalStoreFactory constructor(
                 )
                 .also { localRepository.saveLocalNode(it) }
 
-            dispatch(Result.UpdateServerState)
-            publish(Label.Saved)
+            // need a flow from the server manager to push server state to remotes
+            coroutineContextProvider.mainScope.launch {
+                if (remoteServerManager.isRunning()) {
+                    val stopListener = remoteServerManager.getService()?.stopListener
+                    remoteServerManager.stop()
+                    delay(100)
+                    remoteServerManager.start()
+                    while (remoteServerManager.getService()?.isServerStarted != true) delay(50)
+                    remoteServerManager.getService()?.stopListener = stopListener
+                    remoteServerManager.getService()?.multicastPing()
+                }
+                dispatch(Result.UpdateServerState)
+                publish(Label.Saved)
+            }
         }
 
-        private fun testLoad() {
+        private fun init() {
             dispatch(Result.UpdateServerState)
         }
 

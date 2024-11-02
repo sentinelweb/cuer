@@ -10,6 +10,7 @@ interface RemoteServerContract {
         fun stop()
         fun getService(): Service?
         fun isRunning(): Boolean
+        // todo make a flow for server state
     }
 
     interface Service {

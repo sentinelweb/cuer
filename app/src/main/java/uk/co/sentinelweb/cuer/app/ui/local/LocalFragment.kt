@@ -131,6 +131,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         modelMapper = get(),
                         coroutines = get(),
                         lifecycle = get<LocalFragment>().lifecycle.asEssentyLifecycle(),
+                        localRepository = get(),
                         log = get()
                     )
                 }
