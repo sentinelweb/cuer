@@ -19,7 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier.Locator
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.*
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
@@ -28,7 +27,6 @@ import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
-import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.ext.deserialisePlaylistItem
 import uk.co.sentinelweb.cuer.domain.ext.domainMessageJsonSerializer
 import uk.co.sentinelweb.cuer.domain.ext.rewriteIdsToSource
@@ -37,7 +35,7 @@ import uk.co.sentinelweb.cuer.domain.system.ErrorDomain
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Level.ERROR
 import uk.co.sentinelweb.cuer.domain.system.ErrorDomain.Type.HTTP
 import uk.co.sentinelweb.cuer.domain.system.ResponseDomain
-import uk.co.sentinelweb.cuer.remote.interact.RemotePlayerLaunchHost
+import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.AVAILABLE_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.FOLDER_LIST_API
 import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.PLAYER_COMMAND_API
@@ -75,7 +73,7 @@ class JvmRemoteWebServer(
     private val playerSessionHolder: PlayerSessionHolder by inject()
     private val getFolderListUseCase: GetFolderListUseCase by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
-    private val remotePlayerLaunchHost: RemotePlayerLaunchHost by inject()
+    private val remotePlayerLaunchHost: PlayerLaunchHost by inject()
     private val playerSessionMessageMapper: PlayerSessionMessageMapper by inject()
 
     override val port: Int

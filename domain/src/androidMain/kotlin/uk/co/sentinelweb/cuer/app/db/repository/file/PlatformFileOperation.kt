@@ -1,5 +1,6 @@
 package uk.co.sentinelweb.cuer.app.db.repository.file
 
+import kotlinx.datetime.Instant
 import java.io.File
 
 actual class PlatformFileOperation {
@@ -13,11 +14,11 @@ actual class PlatformFileOperation {
         } else throw IllegalArgumentException("File doesn't exist: ${file.path}")
     }
 
-    actual fun currentDir(): AFile  = AFile(System.getProperty("user.dir")!!)
+    actual fun currentDir(): AFile = AFile(System.getProperty("user.dir")!!)
 
     actual fun exists(file: AFile): Boolean = File(file.path).exists()
 
-    actual fun mkdirs(dir:AFile): Boolean = File(dir.path).mkdirs()
+    actual fun mkdirs(dir: AFile): Boolean = File(dir.path).mkdirs()
 
     actual fun writeBytes(file: AFile, bytes: ByteArray) {
         File(file.path).writeBytes(bytes)
@@ -42,11 +43,12 @@ actual class PlatformFileOperation {
                     file = file,
                     name = it.name,
                     size = it.length(),
-                    isDirectory = it.isDirectory
+                    isDirectory = it.isDirectory,
+                    modified = Instant.fromEpochMilliseconds(it.lastModified())
                 )
             }
 
-    actual fun parent(file: AFile): AFile?  =
+    actual fun parent(file: AFile): AFile? =
         File(file.path).parent?.let { AFile(it) }
 
 }

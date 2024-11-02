@@ -73,7 +73,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            LocalComposables.LocalUi(view = localMviView)
+            LocalComposables.LocalAppUi(view = localMviView)
         }
         observeLabels()
     }
@@ -131,6 +131,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         modelMapper = get(),
                         coroutines = get(),
                         lifecycle = get<LocalFragment>().lifecycle.asEssentyLifecycle(),
+                        localRepository = get(),
                         log = get()
                     )
                 }
@@ -142,6 +143,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         remoteServerManager = get(),
                         localRepository = get(),
                         wifiStateProvider = get(),
+                        coroutineContextProvider = get()
                     )
                 }
                 scoped { LocalModelMapper(get(), get()) }

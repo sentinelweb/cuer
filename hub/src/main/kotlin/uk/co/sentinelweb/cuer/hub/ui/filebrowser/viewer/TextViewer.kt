@@ -49,8 +49,7 @@ private fun TextFileWindow(path: String) {
         BasicText(
             text = fileContent,
             style = TextStyle(fontFamily = FontFamily.Monospace, color = Color.Black),
-
-            )
+        )
     }
 }
 

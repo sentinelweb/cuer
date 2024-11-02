@@ -27,6 +27,10 @@ dependencies {
     implementation(project(":remote"))
     implementation(project(":net"))
     implementation(compose.desktop.currentOs)
+    implementation(compose.desktop.common) // needed for viewModel
+    implementation(libs.kotlinx.coroutines.swing)
+    implementation(libs.androidx.lifecycle.viewmodel.compose.desktop)
+    implementation(compose.material3)
 
     implementation(libs.koinCore)
     implementation(libs.kotlinxCoroutinesCore)

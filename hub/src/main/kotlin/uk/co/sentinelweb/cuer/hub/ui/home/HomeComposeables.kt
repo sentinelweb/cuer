@@ -3,12 +3,14 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,11 +20,12 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FilesUi
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Files
-import uk.co.sentinelweb.cuer.hub.ui.home.HomeModel.DisplayRoute.Settings
+import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label.None
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
-import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesComposables.RemotesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
     val windowState = rememberWindowState(
@@ -47,37 +50,60 @@ fun home(coordinator: HomeUiCoordinator) = application {
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
     val state = coordinator.modelObservable
-        .collectAsState(initial = HomeModel(Settings))
-    MaterialTheme {
+        .collectAsState(initial = HomeContract.HomeModel(Settings))
+    val snackbarHostState = remember { SnackbarHostState() }
+    val label = coordinator.label.collectAsState(initial = None)
+
+    LaunchedEffect(label.value) {
+        when (label.value) {
+            is Label.ErrorMessage -> snackbarHostState.showSnackbar(
+                message = (label.value as Label.ErrorMessage).message,
+                duration = SnackbarDuration.Short
+            )
+
+            else -> Unit
+        }
+    }
+
+    CuerSharedTheme {
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text(text = "Cuer hub") },
-                    actions = {
-                        IconButton(onClick = { coordinator.go(Files) }) {
-                            Icon(Icons.Filled.List, contentDescription = "Files")
-                        }
-                        IconButton(onClick = { coordinator.go(Settings) }) {
-                            Icon(Icons.Filled.Settings, contentDescription = "Settings")
-                        }
-                    }
+                CuerSharedAppBarComposables.CuerSharedAppBar(
+                    title = "Cuer hub",
+                    contentColor = Color.White,
+                    backgroundColor = Color(0xFF222222),
+                    actions = listOf(
+                        Action(CuerMenuItem.LocalConfig, action = { coordinator.go(LocalConfig) }),
+                        Action(CuerMenuItem.Folders, action = { coordinator.go(Folders()) }),
+                        Action(CuerMenuItem.Settings, action = { coordinator.go(Settings) }),
+                    ),
+                    overflowActions = listOf(
+                        Action(CuerMenuItem.ThemeTest, action = { coordinator.go(ThemeTest) }),
+                        Action(CuerMenuItem.Help, action = {}),
+                    ),
                 )
-            }
-        ) {
-            Row {
+            },
+            snackbarHost = {
+                SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp)) { data ->
+                    CustomSnackbar(snackbarData = data)
+                }
+            },
+        ) { padding ->
+            Row(modifier = Modifier.padding(padding)) {
                 Box(modifier = Modifier.width(400.dp)) {
-                    RemotesUi(coordinator.remotes)
+                    coordinator.remotesCoordinator.RemotesDesktopUi()
                 }
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
+                        .fillMaxSize()
                         .background(Color.White)
                 ) {
-                    //TestUi(coordinator)
-                    when (state.value.route) {
+                    val route = state.value.route
+                    when (route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        Files -> FilesUi(coordinator.filesUiCoordinator)
+                        is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
+                        ThemeTest -> SharedThemeView.View()
+                        LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                     }
                 }
             }

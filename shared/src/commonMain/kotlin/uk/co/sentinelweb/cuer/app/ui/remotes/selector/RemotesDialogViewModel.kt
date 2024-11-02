@@ -4,35 +4,39 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract.Model
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
 
 class RemotesDialogViewModel(
     private val state: RemotesDialogContract.State,
-    private val repo: RemotesRepository,
-    private val mapper: RemotesModelMapper,
+    private val remotesRepository: RemotesRepository,
+    private val mapper: RemotesDialogModelMapper,
     private val playerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
+    private val localRepository: LocalRepository,
 ) {
 
-    lateinit var listener: (RemoteNodeDomain, PlayerNodeDomain.Screen?) -> Unit
+    lateinit var listener: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit
 
     private val _model = MutableStateFlow(Model.blank)
     val model: Flow<Model> = _model
 
     init {
-        coroutines.mainScope.launch {
-            map()
-        }
+        coroutines.mainScope.launch { map() }
     }
 
-    fun onNodeSelected(node: RemoteNodeDomain) {
+    fun setSelectNodeOnly() {
+        state.isSelectNodeOnly = true
+    }
+
+    fun onNodeSelected(node: NodeDomain) {
         coroutines.mainScope.launch {
             if (state.isSelectNodeOnly) {
                 listener(node, null)
@@ -42,33 +46,37 @@ class RemotesDialogViewModel(
         }
     }
 
-    fun onScreenSelected(node: RemoteNodeDomain, screen: PlayerNodeDomain.Screen) {
-        listener(node, screen)
-    }
-
-    private suspend fun remoteSelected(node: RemoteNodeDomain) = withContext(coroutines.IO) {
+    private suspend fun remoteSelected(node: NodeDomain) = withContext(coroutines.IO) {
         playerInteractor.playerSessionStatus(node.locator())
             .data
             ?.screen
             ?.also { listener(node, it) }
             ?: run {
-                state.selectedNodeConfig = playerInteractor.getPlayerConfig(node.locator()).data
-                state.selectedNodeConfig?.apply {
-                    if (this.screens.size == 1) {
-                        listener(node, screens[0])
-                    } else {
-                        _model.value = Model(listOf(mapper.mapNodeAndScreen(node, this)))
+                if (node is RemoteNodeDomain) {
+                    state.selectedNodeConfig = playerInteractor.getPlayerConfig(node.locator()).data
+                    state.selectedNodeConfig?.apply {
+                        if (this.screens.size == 1) {
+                            listener(node, screens[0])
+                        } else {
+                            _model.value = Model(listOf(mapper.mapNodeAndScreen(node, this)))
+                        }
                     }
+                } else {
+                    listener(node, null)
                 }
             }
     }
 
-    private fun map() {
-        _model.value = Model(repo.remoteNodes.map { mapper.mapRemoteNode(it) })
+    fun onScreenSelected(node: NodeDomain, screen: PlayerNodeDomain.Screen) {
+        listener(node, screen)
     }
 
-    fun setSelectNodeOnly() {
-        state.isSelectNodeOnly = true
+    private fun map() {
+        _model.value = Model(
+            listOf(localRepository.localNode)
+                .plus(remotesRepository.remoteNodes)
+                .map { mapper.mapNode(it) }
+        )
     }
 
     fun resetState() {

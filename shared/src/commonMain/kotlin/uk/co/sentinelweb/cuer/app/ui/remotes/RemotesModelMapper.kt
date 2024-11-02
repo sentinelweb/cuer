@@ -4,6 +4,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -51,19 +52,5 @@ class RemotesModelMapper constructor(
             hostname = it.hostname ?: "No hostname",
             authType = it.authConfig::class.simpleName ?: "-",
             domain = it
-        )
-
-    fun mapNodeAndScreen(node: RemoteNodeDomain, playerNodeDomain: PlayerNodeDomain): RemoteNodeModel =
-        mapRemoteNode(node).copy(
-            screens = playerNodeDomain.screens.map {
-                Screen(
-                    index = it.index,
-                    width = it.width,
-                    height = it.height,
-                    refreshRate = it.refreshRate,
-                    name = it.name,
-                    domain = it,
-                )
-            }
         )
 }

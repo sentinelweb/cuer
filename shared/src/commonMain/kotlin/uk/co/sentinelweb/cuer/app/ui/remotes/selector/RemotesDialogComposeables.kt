@@ -12,11 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
+import uk.co.sentinelweb.cuer.domain.ext.isAvailable
+import uk.co.sentinelweb.cuer.shared.generated.resources.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
 import uk.co.sentinelweb.cuer.shared.generated.resources.ic_tv
 import uk.co.sentinelweb.cuer.shared.generated.resources.remotes_dialog_title
@@ -45,19 +48,19 @@ object RemotesDialogComposeables {
     @Composable
     private fun Header(model: RemotesDialogContract.Model) {
         Box(
-            modifier = Modifier.height(100.dp)
+            modifier = Modifier.height(80.dp)
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary)
         ) {
-//            Image(
-//                painter = painterResource(Res.drawable.cast_header_640_T9rKvI3N0NM_unsplash),
-//                contentDescription = "Header image",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(160.dp)
-//                    .wrapContentHeight(),
-//                contentScale = ContentScale.Crop
-//            )
+            Image(
+                painter = painterResource(Res.drawable.header_remotes),
+                contentDescription = "",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+                    .wrapContentHeight(),
+                contentScale = ContentScale.Crop
+            )
             Text(
                 text = if (model.remotes.size == 1)
                     stringResource(Res.string.remotes_dialog_title_screen)
@@ -84,10 +87,10 @@ object RemotesDialogComposeables {
 
     @Composable
     private fun RemoteRow(
-        remote: RemotesContract.View.RemoteNodeModel,
+        remote: RemotesDialogContract.Model.NodeModel,
         viewModel: RemotesDialogViewModel
     ) {
-        val contentColor = remote.domain.isAvailable
+        val contentColor = remote.domain.isAvailable()
             .takeIf { it }
             ?.let { MaterialTheme.colorScheme.onSurface }
             ?: MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
@@ -128,9 +131,9 @@ object RemotesDialogComposeables {
                         modifier = Modifier.padding(start = 8.dp)
                     )
                     Text(
-                        text = "${remote.deviceType} : ${remote.device} : ${remote.authType}",
+                        text = "${remote.deviceType} : ${remote.device}",// : ${remote.authType}
                         color = contentColor,
-                        style = MaterialTheme.typography.titleSmall,
+                        style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -162,9 +165,9 @@ object RemotesDialogComposeables {
                                 .padding(start = 8.dp),
                         )
                         Text(
-                            text = "${screen.width} x ${screen.height} @ ${screen.refreshRate} ",
+                            text = "${screen.width} x ${screen.height} @ ${screen.refreshRate}",
                             color = contentColor,
-                            style = MaterialTheme.typography.titleSmall,
+                            style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.padding(start = 8.dp)
                         )
                     }

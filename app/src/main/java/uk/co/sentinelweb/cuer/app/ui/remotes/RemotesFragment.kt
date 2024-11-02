@@ -42,6 +42,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 import uk.co.sentinelweb.cuer.domain.ext.name
 
 class RemotesFragment : Fragment(), AndroidScopeComponent {
@@ -94,7 +95,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.composeView.setContent {
-            RemotesComposables.RemotesUi(remotesMviView)
+            RemotesComposables.RemotesAppUi(remotesMviView)
         }
         statusBarColor.setStatusBarColorResource(R.color.blue_grey_900)
         observeLabels()
@@ -148,7 +149,10 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                         is Message -> snackbarWrapper.make(value.msg)
                         ActionConfig -> showConfigFragment()
                         is ActionFolders -> navigationProvider.navigate(
-                            NavigationModel(FOLDER_LIST, mapOf(REMOTE_ID to value.remoteId.id.value))
+                            NavigationModel(
+                                FOLDER_LIST,
+                                mapOf(REMOTE_ID to (value.node.id?.id?.value ?: error("No Id")))
+                            )
                         )
 
                         is CuerConnected ->
@@ -159,11 +163,19 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
                                     value.screen?.index ?: 0
                                 )
                             ).show()
-
+                        is Error ->
+                            snackbarWrapper.make(value.message).show()
                         is CuerSelectScreen ->
                             remotesDialogLauncher.launchRemotesDialog(
-                                { remoteNodeDomain, screen ->
-                                    remotesMviView.dispatch(Event.OnActionCuerConnectScreen(remoteNodeDomain, screen))
+                                { nodeDomain, screen ->
+                                    if (nodeDomain is RemoteNodeDomain) {
+                                        remotesMviView.dispatch(
+                                            Event.OnActionCuerConnectScreen(
+                                                nodeDomain,
+                                                screen
+                                            )
+                                        )
+                                    }
                                     remotesDialogLauncher.hideRemotesDialog()
                                 },
                                 value.node
@@ -171,8 +183,15 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
 
                         is CuerSelectSendTo ->
                             remotesDialogLauncher.launchRemotesDialog(
-                                { remoteNodeDomain, screen ->
-                                    remotesMviView.dispatch(Event.OnActionSendToSelected(value.sendNode, remoteNodeDomain))
+                                { nodeDomain, screen ->
+                                    if (nodeDomain is RemoteNodeDomain) {
+                                        remotesMviView.dispatch(
+                                            Event.OnActionSendToSelected(
+                                                value.sendNode,
+                                                nodeDomain
+                                            )
+                                        )
+                                    }
                                     remotesDialogLauncher.hideRemotesDialog()
                                 },
                                 null

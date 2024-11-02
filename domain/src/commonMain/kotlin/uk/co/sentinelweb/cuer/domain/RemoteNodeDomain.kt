@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.domain
 
 import kotlinx.datetime.Instant
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 
@@ -9,9 +10,9 @@ data class RemoteNodeDomain(
     val id: Identifier<GUID>?,
     val ipAddress: String,
     val port: Int,
+    val hostname: String? = null,
     val ssid: String? = null,
     val isAvailable: Boolean = false,
-    val hostname: String? = null,
     val device: String? = null,
     val deviceType: DeviceType? = null,
     val authType: AuthType = AuthType.Open,

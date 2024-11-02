@@ -19,10 +19,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.PlaylistOrchestrator
 import uk.co.sentinelweb.cuer.app.orchestrator.deepOptions
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.*
-import uk.co.sentinelweb.cuer.app.orchestrator.memory.interactor.AppPlaylistInteractor
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
-import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -32,8 +29,6 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerController
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerStoreFactory
-import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
-import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -46,8 +41,7 @@ import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 @ExperimentalCoroutinesApi
 class VlcPlayerUiCoordinator(
     private val parent: HomeUiCoordinator,
-) :
-    PlayerContract.View,
+) : PlayerContract.View,
     UiCoordinator<Model>,
     BaseMviView<Model, Event>(),
     DesktopScopeComponent,
@@ -55,7 +49,7 @@ class VlcPlayerUiCoordinator(
 
     override val scope: Scope = desktopScopeWithSource(this)
 
-    override var modelObservable = MutableStateFlow(Model.blankModel())
+    override var modelObservable = MutableStateFlow(Model.Initial)
         private set
 
     private val controller: PlayerController by scope.inject()
@@ -167,12 +161,6 @@ class VlcPlayerUiCoordinator(
 
         val uiModule = module {
             factory { (parent: HomeUiCoordinator) -> VlcPlayerUiCoordinator(parent) }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(NewItems)) { EmptyCustomisationResources() }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(Starred)) { EmptyCustomisationResources() }
-            factory<AppPlaylistInteractor.CustomisationResources>(named(Unfinished)) { EmptyCustomisationResources() }
-            factory<RibbonCreator> { EmptyRibbonCreator() }
-            factory<LivePlaybackContract.Controller> { EmptyLivePlaybackController() }
-            factory<MediaSessionContract.Manager> { EmptyMediaSessionManager() }
             single { FolderMemoryPlaylistItemLoader() }
             single<PlayerContract.PlaylistItemLoader> { get<FolderMemoryPlaylistItemLoader>() }
 

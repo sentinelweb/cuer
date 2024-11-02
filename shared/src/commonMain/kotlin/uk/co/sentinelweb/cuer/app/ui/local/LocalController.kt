@@ -15,11 +15,13 @@ import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.MviStore.Intent
 import uk.co.sentinelweb.cuer.app.ui.local.LocalContract.View.Event
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 
 class LocalController constructor(
     storeFactory: LocalStoreFactory,
     private val modelMapper: LocalModelMapper,
     private val coroutines: CoroutineContextProvider,
+    private val localRepository: LocalRepository,
     lifecycle: Lifecycle?,
     log: LogWrapper,
 ) {
@@ -46,7 +48,7 @@ class LocalController constructor(
                 // store -> view
                 store.states.mapNotNull { modelMapper.map(it) } bindTo view
                 store.labels bindTo { label -> view.processLabel(label) }
-
+                localRepository.updatesFlow.mapNotNull { Intent.Update(it) } bindTo store
                 // view -> store
                 view.events
                     .onEach { println("Event: $it") }

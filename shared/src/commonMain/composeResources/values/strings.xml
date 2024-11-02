@@ -2,17 +2,55 @@
     <string name="app_name">Cuer</string>
     <string name="hub_app_name">Cuer Hub</string>
 
+    <!-- menu -->
+    <string name="menu_settings">Settings</string>
+    <string name="menu_paste">Paste &amp; add</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_search">Search</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_sort_alpha">Alphabetical</string>
+    <string name="menu_sort_category">Categories</string>
+    <string name="menu_sort_time">Time</string>
+    <string name="menu_delete">Delete</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_move">Move</string>
+    <string name="menu_ping">Ping</string>
+    <string name="menu_sendto">Send to ...</string>
+    <string name="menu_folders">Folders</string>
+    <string name="menu_theme_test">Theme</string>
+    <string name="menu_local_config">Local config</string>
+
+    <!-- cast dialog -->
     <string name="cast_dialog_not_connected">Not Connected</string>
     <string name="cast_dialog_title">Cast Status</string>
     <string name="cast_dialog_volume">Volume: %1$s</string>
 
+    <!-- remotes dialog -->
+    <string name="remotes_dialog_title">Select Device</string>
+    <string name="remotes_dialog_title_screen">Select Screen</string>
+
+    <!-- files -->
+    <string name="files_title">Files</string>
+    <string name="files_error_loading_folder">Error loading folder: %1$s %2$s</string>
+    <string name="files_error_empty">Location is empty</string>
+
     <!-- remotes -->
-    <string name="remotes_dialog_title">Select Remote</string>
-    <string name="remotes_dialog_title_screen">Select Remote Screen</string>
+    <string name="rm_title">Remotes</string>
+    <string name="rm_playlists">Playlists</string>
+    <string name="rm_folders">Folders</string>
+    <string name="rm_cuer_connect">Connect</string>
 
     <!-- cast controller -->
     <string name="cast_control_unknown">Unknown</string>
     <string name="cast_control_floating_window">Floating window</string>
     <string name="cast_control_not_connected">Not Connected</string>
+
+    <!-- misc -->
+    <string name="up">Up</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="no_host">No host</string>
+
+    <!-- errors -->
+
 
 </resources>

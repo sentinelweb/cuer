@@ -2,9 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.remotes
 
 import com.arkivanov.mvikotlin.core.store.Store
 import com.arkivanov.mvikotlin.core.view.MviView
+import kotlinx.coroutines.flow.StateFlow
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.toGuidIdentifier
+import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
@@ -39,6 +41,7 @@ class RemotesContract {
             data class RemoteFolders(val remote: RemoteNodeDomain) : Intent()
             data class CuerConnect(val remote: RemoteNodeDomain) : Intent()
             data class CuerConnectScreen(val remote: RemoteNodeDomain, val screen: Screen?) : Intent()
+            data class EditAddress(val remote: RemoteNodeDomain, val newAddress: String) : Intent()
         }
 
         sealed class Label {
@@ -49,11 +52,12 @@ class RemotesContract {
             object ActionHelp : Label()
             object ActionPasteAdd : Label()
             object ActionConfig : Label()
-            data class ActionFolders(val remoteId: Identifier<GUID>) : Label()
+            data class ActionFolders(val node: RemoteNodeDomain) : Label()
             data class Message(val msg: String) : Label()
             data class CuerSelectScreen(val node: RemoteNodeDomain) : Label()
             data class CuerConnected(val remote: RemoteNodeDomain, val screen: Screen?) : Label()
             data class CuerSelectSendTo(val sendNode: RemoteNodeDomain) : Label()
+            data class Error(val message: String) : Label()
 
         }
 
@@ -67,6 +71,7 @@ class RemotesContract {
     }
 
     interface View : MviView<View.Model, View.Event> {
+        val modelObservable: StateFlow<Model>
 
         fun processLabel(label: MviStore.Label)
 
@@ -80,7 +85,7 @@ class RemotesContract {
             val wifiState: WifiStateProvider.WifiState,
         ) {
             companion object {
-                fun blankModel() = Model(
+                val Initial = Model(
                     title = "Dummy",
                     imageUrl = "https://cuer-275020.firebaseapp.com/images/headers/remotes.png",
                     localNode = LocalNodeModel.blankModel(),
@@ -156,8 +161,12 @@ class RemotesContract {
             data class OnActionPlaylists(val remote: RemoteNodeDomain) : Event()
             data class OnActionFolders(val remote: RemoteNodeDomain) : Event()
             data class OnActionCuerConnect(val remote: RemoteNodeDomain) : Event()
-            data class OnActionCuerConnectScreen(val remote: RemoteNodeDomain, val screen: PlayerNodeDomain.Screen?) :
-                Event()
+            data class OnActionCuerConnectScreen(
+                val remote: RemoteNodeDomain,
+                val screen: PlayerNodeDomain.Screen?
+            ) : Event()
+
+            data class OnActionEditAddress(val remote: RemoteNodeDomain, val newAddress: String) : Event()
         }
     }
 }

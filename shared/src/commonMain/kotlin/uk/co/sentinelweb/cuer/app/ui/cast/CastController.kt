@@ -26,7 +26,7 @@ class CastController(
     private val chromeCastWrapper: ChromecastContract.Wrapper,
     private val floatingManager: FloatingPlayerContract.Manager,
     private val playerControls: PlayerContract.PlayerControls,
-    private val castDialogLauncher: CastContract.CastDialogLauncher,
+    private val castDialogLauncher: CastContract.DialogLauncher,
     private val ytServiceManager: CastServiceContract.Manager,
     private val coroutines: CoroutineContextProvider,
     private val log: LogWrapper,

@@ -85,7 +85,10 @@ class RemotesStoreFactory(
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionSettings -> {
+                    publish(Label.ActionSettings)
+                    publish(Label.None)
+                }
                 Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
                 Intent.ActionHelp -> publish(Label.ActionHelp)
@@ -108,7 +111,14 @@ class RemotesStoreFactory(
                 is Intent.CuerConnectScreen -> cuerConnectScreen(intent)
                 is Intent.ActionSendTo -> sendTo(intent)
                 is Intent.ActionSendToSelected -> sendToSelected(intent)
+                is Intent.EditAddress -> editAddress(intent)
             }
+
+        private fun editAddress(intent: Intent.EditAddress) {
+            coroutines.mainScope.launch {
+                remotesRepository.updateAddress(intent.remote, intent.newAddress)
+            }
+        }
 
         private fun cuerConnect(intent: Intent.CuerConnect) {
             // fixme check screens
@@ -180,15 +190,14 @@ class RemotesStoreFactory(
                 coroutines.mainScope.launch {
                     remoteServerManager.start()
                     // fixme limit?
-                    while (remoteServerManager.getService()?.isServerStarted != true) {
-                        print(".")
-                        delay(50)
-                    }
+                    while (remoteServerManager.getService()?.isServerStarted != true) delay(50)
                     log.d("isRunning ${remoteServerManager.isRunning()} svc: ${remoteServerManager.getService()} address: ${remoteServerManager.getService()?.localNode?.http()}")
 
                     remoteServerManager.getService()?.stopListener = { dispatch(Result.UpdateServerState) }
                     dispatch(Result.UpdateServerState)
                 }
+            } else {
+                dispatch(Result.UpdateServerState)
             }
         }
 
@@ -217,26 +226,39 @@ class RemotesStoreFactory(
 
         private fun syncRemote(intent: Intent.RemoteSync) {
             coroutines.ioScope.launch {
-                getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
-                    .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
-                    //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
-                    .also { log.d(it.toString()) }
-
+                runCatching {
+                    getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                        .map { getPlaylistsFromDeviceUseCase.getPlaylist(it) }
+                        //.let { playlistsOrchestrator.save(it, LOCAL.deepOptions()) }
+                        .also { log.d(it.toString()) }
+                }.onFailure { e ->
+                    withContext(coroutines.Main) {
+                        publish(Label.Error(e.message?.let { "${intent.remote.hostname}: $it" }
+                            ?: "Could not get playlists from: ${intent.remote.hostname}"))
+                    }
+                }
                 //log.d("Not implemented: Sync playlists with: ${intent.remote.ipport()}")
             }
         }
 
         private fun getRemotePlaylists(intent: Intent.RemotePlaylists) {
             coroutines.ioScope.launch {
-                val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
-                log.d(playlists.toString())
+                runCatching {
+                    val playlists = getPlaylistsFromDeviceUseCase.getPlaylists(intent.remote)
+                    log.d(playlists.toString())
+                }.onFailure { e ->
+                    withContext(coroutines.Main) {
+                        publish(Label.Error(e.message?.let { "${intent.remote.hostname}: $it" }
+                            ?: "Could not get playlists from: ${intent.remote.hostname}"))
+                    }
+                }
             }
         }
 
         private fun getRemoteFolders(intent: Intent.RemoteFolders) {
-            intent.remote.id
-                ?.run { publish(Label.ActionFolders(this)) }
-                ?.run { publish(Label.None) } // stops label re-firing on back from folders
+            intent.remote
+                .run { publish(Label.ActionFolders(this)) }
+                .run { publish(Label.None) } // stops label re-firing on back from folders
         }
     }
 

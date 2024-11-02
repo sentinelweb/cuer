@@ -72,12 +72,17 @@ kotlin {
 
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation(compose.material)
+                implementation(compose.material)// fixme try to remove this
                 implementation(compose.material3)
                 implementation(compose.materialIconsExtended)
                 implementation(compose.ui)
                 implementation(compose.components.resources)
                 implementation(compose.components.uiToolingPreview)
+                implementation(libs.androidx.lifecycle.viewmodel)
+                implementation(libs.androidx.lifecycle.viewmodel.compose)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.coil.kmp)
+//                implementation(libs.koin.composeVM)
 //                println("---------------" + compose.runtime)
 //                println("---------------" + compose.material)
 ////                println("---------------" + compose.compiler.auto)
@@ -140,7 +145,10 @@ kotlin {
 
         desktopMain.dependencies {
             implementation(compose.desktop.currentOs)
-
+            implementation(compose.desktop.common)
+            implementation(libs.kotlinx.coroutines.swing)
+//            implementation(libs.androidx.lifecycle.viewmodel.desktop)
+//            implementation(libs.androidx.lifecycle.viewmodel.compose.desktop)
         }
     }
 }
@@ -158,6 +166,9 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+}
+dependencies {
+    implementation(libs.androidx.ui.android)
 }
 
 tasks.withType<KotlinCompile>().configureEach {

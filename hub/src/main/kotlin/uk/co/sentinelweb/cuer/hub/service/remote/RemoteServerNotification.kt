@@ -3,7 +3,9 @@ package uk.co.sentinelweb.cuer.hub.service.remote
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.hub.ui.common.notif.AppleScriptNotif
+import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 
 class RemoteServerNotification constructor(
     private val service: RemoteServerContract.Service,
@@ -16,7 +18,10 @@ class RemoteServerNotification constructor(
     }
 
     override fun showNotification(content: String) {
-        AppleScriptNotif.showNotification("Server status", content)
+        // todo make something for windows and linux
+        if (getNodeDeviceType() == NodeDomain.DeviceType.MAC) {
+            AppleScriptNotif.showNotification("Server status", content)
+        }
     }
 
     override fun stopSelf() {
