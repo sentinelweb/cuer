@@ -93,6 +93,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         }
         statusBarColor.setStatusBarColorResource(R.color.black)
         bindFlow(viewModel.labels, ::observeLabels)
+        remoteIdArg?.apply { viewModel.init(this, filePathArg) }
     }
 
     private fun observeLabels(label: Label) {
@@ -115,7 +116,6 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
         super.onStart()
         //OnboardingFragment.showIntro(this@FileBrowserFragment, remotesHelpConfig)
         compactPlayerScroll.raisePlayer(this)
-        remoteIdArg?.apply { viewModel.init(this, filePathArg) }
     }
 
     override fun onResume() {

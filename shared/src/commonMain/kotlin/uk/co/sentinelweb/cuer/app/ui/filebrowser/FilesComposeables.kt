@@ -90,13 +90,13 @@ object FilesComposeables {
                     }
                 },
                 snackbarHost = {
-                    SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp)) { data ->
+                    SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp, bottom = 80.dp)) { data ->
                         CustomSnackbar(snackbarData = data)
                     }
                 },
 
                 ) { padding ->
-                Box(modifier = Modifier.padding(padding)) {
+                Box(modifier = Modifier.padding(top=padding.calculateTopPadding(), bottom = 68.dp)) {
                     FilesView(model = model.value, viewModel = viewModel)
                 }
             }

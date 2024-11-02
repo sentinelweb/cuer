@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
@@ -203,14 +202,20 @@ class FilesViewModel(
                     else -> throw IllegalStateException("not supported")
                 }
 
-                folder?.also { folderOk ->
-                    val upItem = folderOk.children.find { "..".equals(it.title) }
-                    state.upListItem = upItem?.let { mapper.mapParentItem(it) }
-                    state.currentFolder =
-                        folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
+                folder
+                    ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
+                    ?.also { _labels.value = ErrorMessage("Location is empty") }
 
-                    state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
-                } ?: also {
+                folder
+                    ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
+                    ?.also { folderOk ->
+                        val upItem = folderOk.children.find { "..".equals(it.title) }
+                        state.upListItem = upItem?.let { mapper.mapParentItem(it) }
+                        state.currentFolder =
+                            folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
+
+                        state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
+                    } ?: also {
                     state.upListItem = null
                     state.currentFolder = null
                     state.currentListItems = null
