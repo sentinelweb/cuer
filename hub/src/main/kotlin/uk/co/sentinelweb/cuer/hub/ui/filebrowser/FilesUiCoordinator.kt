@@ -2,8 +2,11 @@ package uk.co.sentinelweb.cuer.hub.ui.filebrowser
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.core.component.KoinComponent
 import org.koin.core.qualifier.named
 import org.koin.core.scope.Scope
@@ -11,12 +14,14 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesComposeables.FileBrowserDesktopUi
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.ext.name
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncherComposeables.ShowRemotesDialogIfNecessary
@@ -35,21 +40,31 @@ class FilesUiCoordinator(
         log.tag(this)
     }
 
+    private val job = SupervisorJob()
+    private val coordinatorScope = CoroutineScope(Dispatchers.Main + job)
+
     override val scope: Scope = desktopScopeWithSource(this)
-
-    val viewModel: FilesViewModel by scope.inject()
-
     override val modelObservable = MutableStateFlow(Initial)
-
-    val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
+    private val viewModel: FilesViewModel by scope.inject()
+    private val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
 
     override fun create() {
-        viewModel.viewModelScope.launch {
-            viewModel.init(null, null)
+        bindLabels()
+        viewModel.init(null, null)
+    }
+
+    private fun bindLabels() {
+        coordinatorScope.launch {
+            viewModel.labels.collectLatest {
+                when (it) {
+                    is Label.ErrorMessage -> parent.showError(it.message)
+                    else -> Unit
+                }
+            }
         }
     }
 
-    fun init(node: NodeDomain) {
+    fun openNode(node: NodeDomain?) {
         viewModel.init(node, null)
     }
 

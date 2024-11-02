@@ -138,15 +138,15 @@ fun TopAppBarOverflowMenu(
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(0.dp) }
 
-    IconButton(onClick = { expanded = true },modifier = Modifier.onGloballyPositioned { coordinates ->
-        menuOffset = coordinates.size.width.dp
-    }) {
+    IconButton(onClick = { expanded = true },
+        modifier = Modifier.onGloballyPositioned { coordinates -> menuOffset = coordinates.size.width.dp }
+    ) {
         Icon(Icons.Filled.MoreVert, contentDescription = "Overflow Menu")
     }
     DropdownMenu(
         expanded = expanded,
         onDismissRequest = { expanded = false },
-        offset = DpOffset(menuOffset.value.dp,0.dp),
+        offset = DpOffset(menuOffset.value.dp, 0.dp),
         modifier = Modifier
     ) {
         actions.forEach { action ->
@@ -170,7 +170,6 @@ fun TopAppBarOverflowMenu(
                     expanded = false
                     action.action()
                 },
-
             )
         }
     }

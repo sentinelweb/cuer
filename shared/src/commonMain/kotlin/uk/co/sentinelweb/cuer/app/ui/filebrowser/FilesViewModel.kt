@@ -8,6 +8,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.ErrorMessage
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.None
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
@@ -17,6 +20,7 @@ import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain.*
+import uk.co.sentinelweb.cuer.net.NetResult
 import uk.co.sentinelweb.cuer.net.remote.RemoteFilesInteractor
 import uk.co.sentinelweb.cuer.net.remote.RemotePlayerInteractor
 import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
@@ -39,10 +43,10 @@ class FilesViewModel(
     private val localPlayerLaunchHost: PlayerLaunchHost,
 ) : ViewModel(), FilesContract.ViewModel {
 
-    // fixme expose immutable
-    override val modelObservable = MutableStateFlow(Initial)
+    private val _modelObservable = MutableStateFlow(Initial)
+    override val modelObservable: Flow<Model> = _modelObservable
 
-    val _labels = MutableStateFlow<Label>(Label.Init)
+    private val _labels = MutableStateFlow<Label>(None)
     val labels: Flow<Label>
         get() = _labels
 
@@ -52,6 +56,7 @@ class FilesViewModel(
 
     // fixme: used by app could make remoteId=null for local
     override fun init(remoteId: GUID, path: String?) {
+        resetState()
         state.sourceRemoteId = remoteId
         state.sourceNode = remotesRepository.getById(remoteId)
         state.path = path
@@ -59,6 +64,7 @@ class FilesViewModel(
     }
 
     override fun init(node: NodeDomain?, path: String?) {
+        resetState()
         state.sourceNode = node ?: localRepository.localNode
         state.path = path
         loadCurrentPath()
@@ -88,7 +94,24 @@ class FilesViewModel(
         }
     }
 
-    private fun showFile(file: PlaylistItemDomain) = Unit // stub
+    override fun onRefreshClick() {
+        loadCurrentPath()
+    }
+
+    override fun onSort(type: FilesContract.Sort) {
+        when (type) {
+            Alpha -> {
+                state.sortAcending = if (state.sort == Alpha) !state.sortAcending else true
+                state.sort = Alpha
+            }
+
+            Time -> {
+                state.sortAcending = if (state.sort == Time) !state.sortAcending else false
+                state.sort = Time
+            }
+        }
+        map(false)
+    }
 
     private fun playMedia(file: PlaylistItemDomain) {
         state.selectedFile = file
@@ -119,25 +142,7 @@ class FilesViewModel(
         }
     }
 
-    override fun onRefreshClick() {
-        loadCurrentPath()
-    }
-
-    override fun onSort(type: FilesContract.Sort) {
-        when (type) {
-            Alpha -> {
-                state.sortAcending = if (state.sort == Alpha) !state.sortAcending else true
-                state.sort = Alpha
-            }
-
-            Time -> {
-                state.sortAcending = if (state.sort == Time) !state.sortAcending else false
-                state.sort = Time
-            }
-        }
-        log.d("sort: $type: ${state.sortAcending}")
-        map(false)
-    }
+    private fun showFile(file: PlaylistItemDomain) = Unit // stub
 
     private fun launchLocalPlayer(
         targetNode: LocalNodeDomain?,
@@ -175,27 +180,58 @@ class FilesViewModel(
             state.sourceNode?.apply {
                 val folder = when (this) {
                     is RemoteNodeDomain ->
-                        filesInteractor.getFolderList(this.locator(), state.path).data
+                        filesInteractor.getFolderList(this.locator(), state.path)
+                            .let {
+                                when (it) {
+                                    is NetResult.Data -> it.data
+                                    is NetResult.Error -> {
+                                        _labels.value =
+                                            ErrorMessage("Error loading folder: ${it.code ?: "NO_CODE"}  ${it.msg}")
+                                        null
+                                    }
+                                }
+                            }
 
-                    is LocalNodeDomain -> getFolderListUseCase.getFolderList(state.path)
+                    is LocalNodeDomain -> try {
+                        getFolderListUseCase.getFolderList(state.path)
+                    } catch (e: Exception) {
+                        _labels.value = ErrorMessage("Error loading folder: ${e.message}")
+                        null
+                    }
+
                     else -> throw IllegalStateException("not supported")
                 }
-                val upItem = folder?.children?.find { "..".equals(it.title) }
-                state.upListItem = upItem?.let { mapper.mapParentItem(it) }
-                state.currentFolder = folder?.copy(
-                    children = upItem?.let { folder.children.minus(it) } ?: folder.children,
-                )
 
-                state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
+                folder?.also { folderOk ->
+                    val upItem = folderOk.children.find { "..".equals(it.title) }
+                    state.upListItem = upItem?.let { mapper.mapParentItem(it) }
+                    state.currentFolder =
+                        folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
+
+                    state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
+                } ?: also {
+                    state.upListItem = null
+                    state.currentFolder = null
+                    state.currentListItems = null
+                }
             }
+
+
             map(false)
         }
     }
 
     private fun map(loading: Boolean) {
-        log.d("map: $loading")
-        modelObservable.value = mapper.map(state = state, loading = loading).also {
-            it.list?.forEach { (i, d)-> log.d("map: ${i.title}")}
-        }
+        _modelObservable.value = mapper.map(state = state, loading = loading)
+    }
+
+    private fun resetState() {
+        state.upListItem = null
+        state.currentFolder = null
+        state.currentListItems = null
+        state.selectedFile = null
+        state.sourceRemoteId = null
+        state.sourceNode = null
+        state.path = null
     }
 }

@@ -65,8 +65,10 @@ interface FilesContract {
     }
 
     sealed class Label {
+        object None : Label()
         object Init : Label()
         object Up : Label()
+        data class ErrorMessage(val message:String) : Label()
     }
 
     companion object {

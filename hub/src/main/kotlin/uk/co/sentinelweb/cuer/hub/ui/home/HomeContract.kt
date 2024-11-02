@@ -9,14 +9,19 @@ class HomeContract {
     ) {
 
         sealed class DisplayRoute {
-            object Settings: DisplayRoute()
-            data class Folders(val node: NodeDomain? = null): DisplayRoute()
-            object ThemeTest: DisplayRoute()
-            object LocalConfig: DisplayRoute()
+            object Settings : DisplayRoute()
+            data class Folders(val node: NodeDomain? = null) : DisplayRoute()
+            object ThemeTest : DisplayRoute()
+            object LocalConfig : DisplayRoute()
         }
 
         companion object {
             val Initial: HomeModel = HomeModel(DisplayRoute.Folders())
         }
+    }
+
+    sealed class Label {
+        object None : Label()
+        data class ErrorMessage(val message: String) : Label()
     }
 }

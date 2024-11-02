@@ -1,7 +1,10 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.core.parameter.parametersOf
@@ -12,12 +15,14 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.hub.ui.filebrowser.FilesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.Folders
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label
 import uk.co.sentinelweb.cuer.hub.ui.local.LocalUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.player.vlc.VlcPlayerUiCoordinator.Companion.PREFERRED_SCREEN_DEFAULT
@@ -29,7 +34,9 @@ import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class HomeUiCoordinator :
+class HomeUiCoordinator(
+    private val coroutines: CoroutineContextProvider
+) :
     UiCoordinator<HomeContract.HomeModel>,
     DesktopScopeComponent,
     PlayerLaunchHost,
@@ -49,6 +56,9 @@ class HomeUiCoordinator :
 
     override var modelObservable = MutableStateFlow(HomeContract.HomeModel.Initial)
         private set
+
+    private val _label = MutableSharedFlow<Label>()
+    val label: SharedFlow<Label> = _label
 
     override fun create() {
         log.tag(this)
@@ -70,7 +80,7 @@ class HomeUiCoordinator :
 
     fun go(route: HomeContract.HomeModel.DisplayRoute) {
         when (route) {
-            is Folders -> filesUiCoordinator.viewModel.init(route.node, null)
+            is Folders -> filesUiCoordinator.openNode(route.node)
             else -> Unit
         }
         modelObservable.value = modelObservable.value.copy(route = route)
@@ -106,10 +116,17 @@ class HomeUiCoordinator :
         playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, selectedScreen)
     }
 
+    fun showError(message: String) {
+        log.d("showError: $message")
+        coroutines.mainScope.launch {
+            _label.emit(Label.ErrorMessage(message))
+        }
+    }
+
     companion object {
         @JvmStatic
         val uiModule = module {
-            single { HomeUiCoordinator() }
+            single { HomeUiCoordinator(get()) }
             factory<PlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
             scope(named<HomeUiCoordinator>()) {
             }

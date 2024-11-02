@@ -2,10 +2,17 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.Scaffold
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,6 +25,8 @@ import androidx.compose.ui.window.rememberWindowState
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label
+import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label.None
 import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferenceComposeables.PreferencesUi
 
 fun home(coordinator: HomeUiCoordinator) = application {
@@ -44,6 +53,19 @@ fun home(coordinator: HomeUiCoordinator) = application {
 fun Home(coordinator: HomeUiCoordinator) {
     val state = coordinator.modelObservable
         .collectAsState(initial = HomeContract.HomeModel(Settings))
+    val snackbarHostState = remember { SnackbarHostState() }
+    val label = coordinator.label.collectAsState(initial = None)
+
+    LaunchedEffect(label.value) {
+        when (label.value) {
+            is Label.ErrorMessage -> snackbarHostState.showSnackbar(
+                message = (label.value as Label.ErrorMessage).message,
+                actionLabel = "DISMISS"
+            )
+            else -> Unit
+        }
+    }
+
     CuerSharedTheme {
         Scaffold(
             topBar = {
@@ -52,16 +74,17 @@ fun Home(coordinator: HomeUiCoordinator) {
                     contentColor = Color.White,
                     backgroundColor = Color(0xFF222222),
                     actions = listOf(
-                        Action(CuerMenuItem.LocalConfig, action = {coordinator.go(LocalConfig)}),
-                        Action(CuerMenuItem.Folders, action = {coordinator.go(Folders())}),
-                        Action(CuerMenuItem.Settings, action = {coordinator.go(Settings)}),
+                        Action(CuerMenuItem.LocalConfig, action = { coordinator.go(LocalConfig) }),
+                        Action(CuerMenuItem.Folders, action = { coordinator.go(Folders()) }),
+                        Action(CuerMenuItem.Settings, action = { coordinator.go(Settings) }),
                     ),
                     overflowActions = listOf(
-                        Action(CuerMenuItem.ThemeTest, action = {coordinator.go(ThemeTest)}),
+                        Action(CuerMenuItem.ThemeTest, action = { coordinator.go(ThemeTest) }),
                         Action(CuerMenuItem.Help, action = {}),
                     ),
                 )
-            }
+            },
+            snackbarHost = { SnackbarHost(snackbarHostState) }
         ) {
             Row {
                 Box(modifier = Modifier.width(400.dp)) {

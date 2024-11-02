@@ -34,7 +34,7 @@ import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 object FilesComposeables {
 
-    // todo use scaffold
+    // todo use scaffold - move up to app
     @Composable
     fun FileBrowserAppUi(modelObservable: Flow<FilesContract.Model>, viewModel: FilesContract.ViewModel) {
         val model = modelObservable.collectAsState(initial = Initial)
