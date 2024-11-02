@@ -143,6 +143,7 @@ class LocalFragment : DialogFragment(), AndroidScopeComponent {
                         remoteServerManager = get(),
                         localRepository = get(),
                         wifiStateProvider = get(),
+                        coroutineContextProvider = get()
                     )
                 }
                 scoped { LocalModelMapper(get(), get()) }
