@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -92,9 +93,12 @@ object FilesComposeables {
                     SnackbarHost(snackbarHostState, modifier = Modifier.padding(8.dp)) { data ->
                         CustomSnackbar(snackbarData = data)
                     }
+                },
+
+                ) { padding ->
+                Box(modifier = Modifier.padding(padding)) {
+                    FilesView(model = model.value, viewModel = viewModel)
                 }
-            ) {
-                FilesView(model = model.value, viewModel = viewModel)
             }
         }
     }
@@ -166,6 +170,7 @@ object FilesComposeables {
         }
     }
 
+    @OptIn(ExperimentalLayoutApi::class)
     @Composable
     private fun ListRow(
         viewModel: FilesContract.ViewModel,
@@ -203,18 +208,31 @@ object FilesComposeables {
                     .align(CenterVertically)
             ) {
                 Text(
-                    text = "${listItem.title} ${listItem.season ?: ""} ${listItem.ext ?: ""}",
+                    text = listItem.title,
                     style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(4.dp)
                 )
+
                 if (listItem.timeSince != null) {
-                    Text(
-                        text = listItem.timeSince,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(2.dp)
-                    )
+                    Row(Modifier.fillMaxWidth()) {
+                        val text = "${listItem.season ?: ""} ${listItem.ext ?: ""}".trim()
+                        if (text.isNotBlank()) {
+                            Text(
+                                text = text,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(4.dp).align(Alignment.CenterVertically)
+                            )
+                        }
+                        Text(
+                            text = listItem.timeSince,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(2.dp).align(Alignment.CenterVertically)
+                        )
+                    }
                 }
             }
         }

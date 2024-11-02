@@ -182,6 +182,7 @@ class FilesViewModel(
                     is RemoteNodeDomain ->
                         filesInteractor.getFolderList(this.locator(), state.path)
                             .let {
+                                log.d(it.data.toString())
                                 when (it) {
                                     is NetResult.Data -> it.data
                                     is NetResult.Error -> {
