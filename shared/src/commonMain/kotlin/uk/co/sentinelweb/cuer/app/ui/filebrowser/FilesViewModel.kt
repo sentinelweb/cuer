@@ -2,9 +2,11 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getString
 import uk.co.sentinelweb.cuer.app.ui.cast.CastController
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.ErrorMessage
@@ -26,6 +28,9 @@ import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
+import uk.co.sentinelweb.cuer.shared.generated.resources.Res
+import uk.co.sentinelweb.cuer.shared.generated.resources.files_error_empty
+import uk.co.sentinelweb.cuer.shared.generated.resources.files_error_loading_folder
 
 class FilesViewModel(
     private val state: FilesContract.State,
@@ -46,8 +51,7 @@ class FilesViewModel(
     override val modelObservable: Flow<Model> = _modelObservable
 
     private val _labels = MutableStateFlow<Label>(None)
-    override val labels: Flow<Label>
-        get() = _labels
+    override val labels: Flow<Label> = _labels
 
     init {
         log.tag(this)
@@ -110,6 +114,14 @@ class FilesViewModel(
             }
         }
         map(false)
+    }
+
+    override fun onSettings() {
+        viewModelScope.launch {
+            _labels.value = Label.Settings
+            delay(1)
+            _labels.value = None
+        }
     }
 
     private fun playMedia(file: PlaylistItemDomain) {
@@ -186,7 +198,13 @@ class FilesViewModel(
                                     is NetResult.Data -> it.data
                                     is NetResult.Error -> {
                                         _labels.value =
-                                            ErrorMessage("Error loading folder: ${it.code ?: "NO_CODE"}  ${it.msg}")
+                                            ErrorMessage(
+                                                getString(
+                                                    Res.string.files_error_loading_folder,
+                                                    it.code ?: "",
+                                                    it.msg ?: ""
+                                                )
+                                            )
                                         null
                                     }
                                 }
@@ -195,16 +213,17 @@ class FilesViewModel(
                     is LocalNodeDomain -> try {
                         getFolderListUseCase.getFolderList(state.path)
                     } catch (e: Exception) {
-                        _labels.value = ErrorMessage("Error loading folder: ${e.message}")
+                        _labels.value =
+                            ErrorMessage(getString(Res.string.files_error_loading_folder, "", e.message ?: ""))
                         null
                     }
 
-                    else -> throw IllegalStateException("not supported")
+                    else -> throw IllegalStateException("Not supported")
                 }
 
                 folder
                     ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
-                    ?.also { _labels.value = ErrorMessage("Location is empty") }
+                    ?.also { _labels.value = ErrorMessage(getString(Res.string.files_error_empty)) }
 
                 folder
                     ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }

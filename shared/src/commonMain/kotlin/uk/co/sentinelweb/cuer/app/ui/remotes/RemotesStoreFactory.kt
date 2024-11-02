@@ -85,7 +85,10 @@ class RemotesStoreFactory(
 
         override fun executeIntent(intent: Intent, getState: () -> State) =
             when (intent) {
-                Intent.ActionSettings -> publish(Label.ActionSettings)
+                Intent.ActionSettings -> {
+                    publish(Label.ActionSettings)
+                    publish(Label.None)
+                }
                 Intent.ActionPasteAdd -> publish(Label.ActionPasteAdd)
                 Intent.ActionSearch -> publish(Label.ActionSearch)
                 Intent.ActionHelp -> publish(Label.ActionHelp)

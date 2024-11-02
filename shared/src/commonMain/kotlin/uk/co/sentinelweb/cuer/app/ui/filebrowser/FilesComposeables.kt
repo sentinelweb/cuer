@@ -81,7 +81,7 @@ object FilesComposeables {
                             ),
                             overflowActions = listOf(
                                 Action(Help, { }),
-                                Action(Settings, { }),
+                                Action(Settings, { viewModel.onSettings() }),
                             ),
                             modifier = Modifier.fillMaxSize().align(Alignment.CenterStart)
                         )

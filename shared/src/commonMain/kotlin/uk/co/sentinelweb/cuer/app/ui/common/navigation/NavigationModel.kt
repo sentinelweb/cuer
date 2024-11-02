@@ -6,7 +6,7 @@ import uk.co.sentinelweb.cuer.app.ui.onboarding.OnboardingContract
 import uk.co.sentinelweb.cuer.domain.*
 import kotlin.reflect.KClass
 
-data class NavigationModel constructor(
+data class NavigationModel(
     val target: Target,
     val params: Map<Param, Any?> = mapOf(),
 //    val navOpts: NavOptions? = null
@@ -28,7 +28,7 @@ data class NavigationModel constructor(
 
     inline fun <reified T> getParam(p: Param): T? = params[p] as T
 
-    enum class Target constructor(
+    enum class Target(
         val requiredParams: List<Param> = listOf(),
         @Suppress("unused") val optionalParams: List<Param> = listOf()
     ) {

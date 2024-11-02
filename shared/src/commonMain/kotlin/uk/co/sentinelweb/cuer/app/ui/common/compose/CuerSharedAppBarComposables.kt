@@ -30,7 +30,7 @@ object CuerSharedAppBarComposables {
         subTitle: String? = null,
         modifier: Modifier = Modifier,
         backgroundColor: Color = MaterialTheme.colorScheme.primary,
-        contentColor: Color = contentColorFor(backgroundColor),
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
         actions: List<Action> = listOf(),
         overflowActions: List<Action>? = null,
         onUp: (() -> Unit)? = null,
@@ -82,7 +82,7 @@ object CuerSharedAppBarComposables {
     @Composable
     private fun Actions(
         actions: List<Action>,
-        contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
         overflow: List<Action>? = null,
     ) {
         actions.forEach { Action(it, contentColor) }
@@ -94,7 +94,7 @@ object CuerSharedAppBarComposables {
     @Composable
     private fun Action(
         action: Action,
-        contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+        contentColor: Color = MaterialTheme.colorScheme.onSurface,
     ) {
         Icon(
             painter = painterResource(action.item.icon),
@@ -135,7 +135,7 @@ data class Action(
 @Composable
 fun TopAppBarOverflowMenu(
     actions: List<Action> = listOf(),
-    contentColor: Color = MaterialTheme.colorScheme.onPrimary,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
 ) {
     var expanded by remember { mutableStateOf(false) }
     var menuOffset by remember { mutableStateOf(0.dp) }
@@ -157,7 +157,6 @@ fun TopAppBarOverflowMenu(
                     Icon(
                         painter = painterResource(action.item.icon),
                         contentDescription = null,
-                        tint = contentColor,
                         modifier = Modifier
                             .clickable {
                                 expanded = false

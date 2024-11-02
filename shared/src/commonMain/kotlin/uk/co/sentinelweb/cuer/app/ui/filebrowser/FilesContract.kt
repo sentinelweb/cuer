@@ -21,6 +21,7 @@ interface FilesContract {
         fun onBackClick()
         fun onRefreshClick()
         fun onSort(type: Sort)
+        fun onSettings()
     }
 
     data class State(
@@ -71,6 +72,7 @@ interface FilesContract {
         object None : Label()
         object Init : Label()
         object Up : Label()
+        object Settings : Label()
         data class ErrorMessage(
             val message: String,
             val unique: Int = Random.nextInt()

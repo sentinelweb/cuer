@@ -17,12 +17,9 @@ import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.R
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.BACK_PARAMS
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.getString
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoPlayerActivity
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
@@ -47,6 +44,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
     private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val navRouter: NavigationRouter by inject()
+    private val navigationProvider: NavigationProvider by inject()
     private val statusBarColor: StatusBarColorWrapper by inject()
     //private val remotesHelpConfig: RemotesHelpConfig by inject()
 
@@ -102,6 +100,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
             Label.Up -> {
                 navRouter.navigate(NavigationModel(NAV_BACK, mapOf(BACK_PARAMS to R.id.navigation_remotes)))
             }
+            Label.Settings -> navigationProvider.navigate(R.id.navigation_settings_root)
             else -> Unit
         }
     }
