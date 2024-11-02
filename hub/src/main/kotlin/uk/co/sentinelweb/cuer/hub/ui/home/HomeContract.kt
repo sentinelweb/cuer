@@ -22,6 +22,9 @@ class HomeContract {
 
     sealed class Label {
         object None : Label()
-        data class ErrorMessage(val message: String) : Label()
+        data class ErrorMessage(
+            val message: String,
+            val unique: Double = Math.random()
+        ) : Label()
     }
 }

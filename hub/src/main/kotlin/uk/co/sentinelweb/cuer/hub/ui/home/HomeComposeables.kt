@@ -2,19 +2,15 @@ package uk.co.sentinelweb.cuer.hub.ui.home
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.Scaffold
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -60,8 +56,9 @@ fun Home(coordinator: HomeUiCoordinator) {
         when (label.value) {
             is Label.ErrorMessage -> snackbarHostState.showSnackbar(
                 message = (label.value as Label.ErrorMessage).message,
-                actionLabel = "DISMISS"
+                actionLabel = "DISMISS",
             )
+
             else -> Unit
         }
     }
@@ -84,7 +81,12 @@ fun Home(coordinator: HomeUiCoordinator) {
                     ),
                 )
             },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
+            scaffoldState = rememberScaffoldState(snackbarHostState = snackbarHostState),
+            snackbarHost = { state ->
+                SnackbarHost(state, modifier = Modifier.padding(8.dp)) { data ->
+                    CustomSnackbar(snackbarData = data)
+                }
+            }
         ) {
             Row {
                 Box(modifier = Modifier.width(400.dp)) {
@@ -105,5 +107,29 @@ fun Home(coordinator: HomeUiCoordinator) {
                 }
             }
         }
+    }
+}
+
+@Composable
+fun CustomSnackbar(snackbarData: SnackbarData) {
+    Snackbar(
+        modifier = Modifier.background(MaterialTheme.colors.error),
+        action = {
+            TextButton(
+                onClick = { snackbarData.dismiss() },
+                elevation = ButtonDefaults.elevation(4.dp, 2.dp, 0.dp),
+                colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.onError),
+                shape = MaterialTheme.shapes.medium,
+                modifier = Modifier,
+            ) {
+                Text(
+                    text = snackbarData.actionLabel ?: "DISMISS",
+                    color = MaterialTheme.colors.error
+                )
+            }
+        },
+        backgroundColor = MaterialTheme.colors.error,
+    ) {
+        Text(text = snackbarData.message, color = MaterialTheme.colors.onError)
     }
 }

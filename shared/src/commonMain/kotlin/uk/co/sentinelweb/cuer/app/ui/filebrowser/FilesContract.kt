@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.domain.*
+import kotlin.random.Random
 
 interface FilesContract {
 
@@ -34,6 +35,7 @@ interface FilesContract {
     ) {
 
     }
+
     enum class Sort { Alpha, Time }
 
     data class ListItem(
@@ -68,7 +70,10 @@ interface FilesContract {
         object None : Label()
         object Init : Label()
         object Up : Label()
-        data class ErrorMessage(val message:String) : Label()
+        data class ErrorMessage(
+            val message: String,
+            val unique: Int = Random.nextInt()
+        ) : Label()
     }
 
     companion object {
