@@ -23,6 +23,7 @@ class MediaSessionManager(
     private val metadataMapper: MediaMetadataMapper,
     private val playbackStateMapper: PlaybackStateMapper,
 ) : MediaSessionContract.Manager {
+
     data class State(
         var bitmapUrl: String? = null,
         var bitmap: Bitmap? = null,

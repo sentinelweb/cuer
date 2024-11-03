@@ -2,6 +2,7 @@ package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.domain.*
 import kotlin.random.Random
@@ -24,6 +25,7 @@ interface FilesContract {
         fun onSettings()
     }
 
+    @Serializable
     data class State(
         var sourceRemoteId: GUID? = null,
         var sourceNode: NodeDomain? = null,
@@ -40,6 +42,7 @@ interface FilesContract {
 
     enum class Sort { Alpha, Time }
 
+    @Serializable
     data class ListItem(
         val title: String,
         val dateModified: Instant?,
@@ -49,10 +52,11 @@ interface FilesContract {
         val ext: String? = null,
         val season: String? = null,
         val timeSince: String? = null,
-    )
-
-    enum class ListItemType {
-        VIDEO, AUDIO, WEB, FILE, FOLDER, UP
+    ) {
+        @Serializable
+        enum class ListItemType {
+            VIDEO, AUDIO, WEB, FILE, FOLDER, UP
+        }
     }
 
     data class Model(

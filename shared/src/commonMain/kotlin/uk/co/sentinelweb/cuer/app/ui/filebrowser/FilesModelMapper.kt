@@ -1,9 +1,10 @@
 package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItem
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItem.ListItemType.*
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
 import uk.co.sentinelweb.cuer.core.mappers.TimeSinceFormatter
 import uk.co.sentinelweb.cuer.domain.Domain
 import uk.co.sentinelweb.cuer.domain.MediaDomain.MediaTypeDomain
@@ -45,7 +46,7 @@ class FilesModelMapper(
 
     fun mapToIntermediate(fileList: PlaylistAndChildrenDomain): Map<ListItem, Domain> =
         fileList.children.map { f ->
-            if ("..".equals(f.title)) {
+            if (PARENT_FOLDER_TEXT.equals(f.title)) {
                 mapParentItem(f)
             } else {
                 mapFolderItem(f)
