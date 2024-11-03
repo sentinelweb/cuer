@@ -17,6 +17,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.*
@@ -74,9 +75,8 @@ class FilesViewModel(
     }
 
     override fun onBackClick() {
-        state.currentFolder
-            ?.takeIf { it.children.size > 0 && state.path != null }
-            ?.also { onClickFolder(it.children[0]) }
+        state.upListItem
+            ?.also { onClickFolder(it.second) }
             ?: run { _labels.value = Label.Up }
     }
 
@@ -228,7 +228,7 @@ class FilesViewModel(
                 folder
                     ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
                     ?.also { folderOk ->
-                        val upItem = folderOk.children.find { "..".equals(it.title) }
+                        val upItem = folderOk.children.find { PARENT_FOLDER_TEXT.equals(it.title) }
                         state.upListItem = upItem?.let { mapper.mapParentItem(it) }
                         state.currentFolder =
                             folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)

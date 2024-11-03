@@ -25,7 +25,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.compose.CustomSnackbar
 import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentYellow
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.None
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItemType.*
+import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.ListItem.ListItemType.*
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time

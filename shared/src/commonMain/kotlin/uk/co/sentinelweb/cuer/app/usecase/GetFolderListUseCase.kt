@@ -76,7 +76,7 @@ class GetFolderListUseCase(
                     }
                     PlaylistDomain(
                         id = guidCreator.create().toIdentifier(MEMORY),
-                        title = "..",
+                        title = PARENT_FOLDER_TEXT,
                         platform = FILESYSTEM,
                         platformId = parent?.path?.let { fullToTruncatedFolderPath(it) },
                         parentId = rootId,
@@ -157,6 +157,7 @@ class GetFolderListUseCase(
     data class MediaDetail(val type: MediaTypeDomain, val mimetype: String)
 
     companion object {
+        val PARENT_FOLDER_TEXT = ".."
         val mediaTypes: Map<String, MediaDetail> = mapOf(
             "mp4" to MediaDetail(VIDEO, "video/mp4"),
             "m4v" to MediaDetail(VIDEO, "video/x-m4v"),

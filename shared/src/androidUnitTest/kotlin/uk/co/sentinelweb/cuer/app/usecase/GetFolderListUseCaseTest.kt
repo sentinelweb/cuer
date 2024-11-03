@@ -8,6 +8,7 @@ import org.junit.Test
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFile
 import uk.co.sentinelweb.cuer.app.db.repository.file.AFileProperties
 import uk.co.sentinelweb.cuer.app.db.repository.file.PlatformFileOperation
+import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
 import uk.co.sentinelweb.cuer.app.util.prefs.multiplatfom_settings.MultiPlatformPreferencesWrapper
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -64,6 +65,8 @@ class GetFolderListUseCaseTest {
         assertEquals(0, actual.playlist.items.size) // no top level folder
         assertEquals(3, actual.children.size)
 
+        assertNotEquals(PARENT_FOLDER_TEXT, actual.children[0].title)
+
         assertEquals("path1", actual.children[0].title)
         assertEquals(FILESYSTEM, actual.children[0].platform)
         assertEquals("path1", actual.children[0].platformId)
@@ -112,7 +115,7 @@ class GetFolderListUseCaseTest {
         assertEquals(1, actual.children.size) // has parent folder link
         assertEquals(2, actual.playlist.items.size)
         // verify parent folder link
-        assertEquals("..", actual.children[0].title)
+        assertEquals(PARENT_FOLDER_TEXT, actual.children[0].title)
         assertEquals(FILESYSTEM, actual.children[0].platform)
         assertNull(actual.children[0].platformId)
 
@@ -163,7 +166,7 @@ class GetFolderListUseCaseTest {
         assertEquals(1, actual.children.size) // has parent folder link
         assertEquals(2, actual.playlist.items.size)
         // verify parent folder link
-        assertEquals("..", actual.children[0].title)
+        assertEquals(PARENT_FOLDER_TEXT, actual.children[0].title)
         assertEquals(FILESYSTEM, actual.children[0].platform)
         assertEquals("path1", actual.children[0].platformId)
 
