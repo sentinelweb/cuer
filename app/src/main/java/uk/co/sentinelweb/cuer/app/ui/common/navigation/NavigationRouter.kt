@@ -27,7 +27,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class NavigationRouter constructor(
+class NavigationRouter (
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
     private val ytJavaApi: PlatformLaunchWrapper,

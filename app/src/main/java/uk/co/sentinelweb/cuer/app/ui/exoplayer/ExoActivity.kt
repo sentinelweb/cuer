@@ -17,6 +17,7 @@ package uk.co.sentinelweb.cuer.app.ui.exoplayer
 
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.*
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -192,6 +193,7 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
                 c.startActivity(
                     Intent(c, ExoActivity::class.java).apply {
                         putExtra(PLAYLIST_AND_ITEM.toString(), use.serialise())
+                        flags = FLAG_ACTIVITY_NEW_TASK
                     })
             }
 

@@ -153,13 +153,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped<PlayerLaunchHost> {
                     object : PlayerLaunchHost {
-
                         override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
-//                            val activity = get<FileBrowserFragment>().activity
-//                            val http = item.httpLocalNetworkUrl(get<LocalRepository>())
-//                            Intent(activity,  ExoActivity::class.java)
-//                                .apply { putExtra(EXTRA_ITEM_ID, http) }
-//                                .let { activity!!.startActivity(it) }
                             get<NavigationRouter>().navigate(
                                 NavigationModel(
                                     target = EXO_PLAYER_FULL,
