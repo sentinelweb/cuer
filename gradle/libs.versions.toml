@@ -88,8 +88,9 @@ jna = "5.14.0"
 paletteKtx = "1.0.0"
 uiAndroid = "1.7.4"
 coil-kmp = "3.0.0-rc01"
-exoplayer = "2.19.1"
+#exoplayer = "2.19.1"
 androidx-activity-compose = "1.3.1"
+androidx-media3 = "1.4.1"
 
 [libraries]
 kotlinStdLib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk7", version.ref = "kotlin" }
@@ -144,8 +145,11 @@ androidx-lifecycle-viewmodel-compose = { group = "org.jetbrains.androidx.lifecyc
 androidx-lifecycle-viewmodel-compose-desktop = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose-desktop", version.ref = "androidx-lifecycle" }
 coil-kmp = {group="io.coil-kt.coil3", name="coil-compose", version.ref = "coil-kmp"}
 kotlinx-coroutines-swing = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-swing", version.ref = "coroutines" }
-exoplayer = { group = "com.google.android.exoplayer", name = "exoplayer", version.ref = "exoplayer" }
+#exoplayer = { group = "com.google.android.exoplayer", name = "exoplayer", version.ref = "exoplayer" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidx-activity-compose" }
+androidx-media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "androidx-media3" }
+androidx-media3-exoplayer-dash = { group = "androidx.media3", name = "media3-exoplayer-dash", version.ref = "androidx-media3" }
+androidx-media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "androidx-media3" }
 
 # testing
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }

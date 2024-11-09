@@ -50,7 +50,8 @@ data class NavigationModel(
         NAV_BACK, // use navigation to go back
         NAV_FINISH, // use navigation to finish activity
         NAV_DONE, // nav after operation is finished
-        NAV_NONE // use to clear navigation e.g. in live data state
+        NAV_NONE, // use to clear navigation e.g. in live data state
+        EXO_PLAYER_FULL(listOf(Param.PLAYLIST_AND_ITEM)),
         ;
 
 

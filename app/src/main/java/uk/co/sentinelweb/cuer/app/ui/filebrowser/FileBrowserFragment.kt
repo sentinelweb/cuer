@@ -1,7 +1,6 @@
 package uk.co.sentinelweb.cuer.app.ui.filebrowser
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +18,9 @@ import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.common.ktx.bindFlow
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.BACK_PARAMS
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
+import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.EXO_PLAYER_FULL
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.NAV_BACK
-import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoPlayerActivity
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -31,6 +31,7 @@ import uk.co.sentinelweb.cuer.app.util.wrapper.SnackbarWrapper
 import uk.co.sentinelweb.cuer.app.util.wrapper.StatusBarColorWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.GUID
+import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.toGUID
 import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
@@ -100,6 +101,7 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
             Label.Up -> {
                 navRouter.navigate(NavigationModel(NAV_BACK, mapOf(BACK_PARAMS to R.id.navigation_remotes)))
             }
+
             Label.Settings -> navigationProvider.navigate(R.id.navigation_settings_root)
             else -> Unit
         }
@@ -151,10 +153,19 @@ class FileBrowserFragment : Fragment(), AndroidScopeComponent {
                 scoped { navigationRouter(true, this.getFragmentActivity()) }
                 scoped<PlayerLaunchHost> {
                     object : PlayerLaunchHost {
+
                         override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
-                            val activity = get<FileBrowserFragment>().activity
-                            Intent(activity,  ExoPlayerActivity::class.java)
-                                .let { activity!!.startActivity(it) }
+//                            val activity = get<FileBrowserFragment>().activity
+//                            val http = item.httpLocalNetworkUrl(get<LocalRepository>())
+//                            Intent(activity,  ExoActivity::class.java)
+//                                .apply { putExtra(EXTRA_ITEM_ID, http) }
+//                                .let { activity!!.startActivity(it) }
+                            get<NavigationRouter>().navigate(
+                                NavigationModel(
+                                    target = EXO_PLAYER_FULL,
+                                    params = mapOf(PLAYLIST_AND_ITEM to PlaylistAndItemDomain(item, null, null))
+                                )
+                            )
                         }
                     }
                 }

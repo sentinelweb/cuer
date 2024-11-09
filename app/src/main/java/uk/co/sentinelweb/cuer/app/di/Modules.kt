@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoActivity
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserFragment
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
@@ -152,6 +153,7 @@ object Modules {
         FileBrowserFragment.fragmentModule,
         CastDialogFragment.fragmentModule,
         RemotesDialogFragment.fragmentModule,
+        ExoActivity.activityModule,
     )
 
     private val uiModule = module {

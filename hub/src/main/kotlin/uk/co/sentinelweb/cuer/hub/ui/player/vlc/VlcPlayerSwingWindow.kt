@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
+import httpLocalNetworkUrl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import loadSVG
 import org.koin.core.component.KoinComponent
@@ -273,22 +274,7 @@ class VlcPlayerSwingWindow(
     }.also { log.d("command:${command::class.java.simpleName}") }
 
     private fun mapPath(item: PlaylistItemDomain) =
-        item
-            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
-            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
-            ?.takeIf { it.media.platform == PlatformDomain.FILESYSTEM }
-            ?.let {
-                it.copy(
-                    media = it.media.copy(
-                        platformId =
-                        "${it.id?.locator?.http()}${VIDEO_STREAM_API.ROUTE}/${
-                            URLEncoder.encode(it.media.platformId, "UTF-8")
-                        }"
-                    )
-                )
-            }
-            ?.media
-            ?.platformId
+        item.httpLocalNetworkUrl(localRepository)
             ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     private fun createControls() {

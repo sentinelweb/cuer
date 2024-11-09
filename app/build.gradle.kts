@@ -1,4 +1,8 @@
-// todo convert .kts
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.charset.StandardCharsets
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -176,7 +180,9 @@ dependencies {
     implementation(libs.media)
 
     // exoplayer
-    implementation(libs.exoplayer)
+    implementation(libs.androidx.media3.exoplayer)
+    implementation(libs.androidx.media3.exoplayer.dash)
+    implementation(libs.androidx.media3.ui)
 
     // firebase
 //    implementation(platform(libs.firebaseBom))
@@ -257,4 +263,49 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 
 fun getPropertyOrDefault(key: String, defaultValue: String): String {
     return project.findProperty(key) as? String ?: defaultValue
+}
+
+tasks.register("generateNetworkSecurityConfig") {
+
+    // Destination directory and file name
+    val outputDir = projectDir.resolve("src/main/res/xml")
+    val outputFile = outputDir.resolve("network_security_config.xml")
+
+    doLast {
+        // Ensure the output directory exists
+        if (!Files.exists(outputDir.toPath())) {
+            Files.createDirectories(outputDir.toPath())
+        }
+
+        // Create header and footer for the XML
+        val header = """
+            <network-security-config>
+                <domain-config cleartextTrafficPermitted="true">
+        """.trimIndent()
+
+        val footer = """
+                </domain-config>
+            </network-security-config>
+        """.trimIndent()
+
+        // Generate IP entries for 192.168.0.x and 192.168.1.x ranges
+        val ipEntries = StringBuilder()
+        for (i in 1..254) {
+            ipEntries.append("        <domain includeSubdomains=\"false\">192.168.0.$i</domain>\n")
+        }
+        for (i in 1..254) {
+            ipEntries.append("        <domain includeSubdomains=\"false\">192.168.1.$i</domain>\n")
+        }
+
+        // Combine header, entries, and footer
+        val fullContent = header + "\n" + ipEntries.toString() + footer
+
+        // Write to file
+        Files.write(outputFile.toPath(), fullContent.toByteArray(StandardCharsets.UTF_8))
+        println("Generated network_security_config.xml with entries for 192.168.0.x and 192.168.1.x ranges.")
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn("generateNetworkSecurityConfig")
 }
