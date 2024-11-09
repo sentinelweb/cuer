@@ -38,6 +38,7 @@ interface PlayerContract {
 
             object OpenInApp : Intent()
             object Share : Intent()
+            object Resume : Intent()
 
             data class InitFromService(val playlistAndItem: PlaylistAndItemDomain) : Intent()
             data class PlayItemFromService(val playlistAndItem: PlaylistAndItemDomain) : Intent()
@@ -57,6 +58,7 @@ interface PlayerContract {
         }
 
         sealed class Label {
+            object None : Label()
             object Stop : Label()
             object FocusWindow : Label()
             data class Command(val command: PlayerCommand) : Label()
@@ -185,6 +187,7 @@ interface PlayerContract {
             }
         }
 
+        // todo prefix all with 'On'
         sealed class Event {
             object TrackFwdClicked : Event()
             object TrackBackClicked : Event()
@@ -202,6 +205,7 @@ interface PlayerContract {
             object StarClick : Event()
             object ShareClick : Event()
             object OpenClick : Event()
+            object OnResume : Event()
 
             data class VolumeChanged(val vol: Float) : Event()
             data class SeekBarChanged(val fraction: Float) : Event()
@@ -223,8 +227,8 @@ interface PlayerContract {
         object Play : PlayerCommand()
         object Pause : PlayerCommand()
         data class Load(val item: PlaylistItemDomain, val startPosition: Long) : PlayerCommand()
-        data class SkipFwd(val ms: Int) : PlayerCommand()
-        data class SkipBack(val ms: Int) : PlayerCommand()
+        data class SkipFwd(val ms: Long) : PlayerCommand()
+        data class SkipBack(val ms: Long) : PlayerCommand()
         data class SeekTo(val ms: Long) : PlayerCommand()
     }
 
@@ -270,6 +274,5 @@ interface PlayerContract {
             fun skipBack()
             fun skipFwd()
         }
-
     }
 }

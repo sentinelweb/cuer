@@ -279,13 +279,14 @@ class YoutubeFullScreenActivity : YouTubeBaseActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
+                None -> Unit
                 is Command -> label.command.let { command ->
                     when (command) {
                         is Load -> player.cueVideo(command.item.media.platformId, command.startPosition.toInt())
                         is Play -> player.play()
                         is Pause -> player.pause()
-                        is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms)
-                        is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms)
+                        is SkipBack -> player.seekToMillis(player.currentTimeMillis - command.ms.toInt())
+                        is SkipFwd -> player.seekToMillis(player.currentTimeMillis + command.ms.toInt())
                         is SeekTo -> player.seekToMillis(command.ms.toInt())
                     }
                 }

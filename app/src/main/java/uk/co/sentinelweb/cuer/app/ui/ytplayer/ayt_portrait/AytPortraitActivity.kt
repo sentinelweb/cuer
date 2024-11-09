@@ -253,6 +253,7 @@ class AytPortraitActivity : AppCompatActivity(),
 
         override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
             when (label) {
+                None -> Unit
                 is Command -> label.command
                     .let { aytViewHolder.processCommand(it) }
                     .also {

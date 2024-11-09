@@ -18,6 +18,7 @@ package uk.co.sentinelweb.cuer.app.ui.exoplayer
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material.Surface
@@ -29,7 +30,9 @@ import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -125,7 +128,6 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
         if (floatingService.isRunning()) {
             floatingService.stop()
         }
-
         controller.onViewCreated(
             listOf(mviView),
             lifecycle.asEssentyLifecycle()
@@ -137,99 +139,27 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
         BaseMviView<Model, Event>(),
         PlayerContract.View {
 
-        private val _model = MutableStateFlow<Model>(Initial)
+        private val _model = MutableStateFlow(Initial)
         val model = _model.asStateFlow()
 
         override val renderer: ViewRenderer<Model> = object : ViewRenderer<Model> {
             override fun render(model: Model) {
+                Log.d("ExoActivity","playState=${model.playState}, title=${model.texts.title}")
                 _model.value = model
             }
-
         }
-//        override val renderer: ViewRenderer<Model> = diff {
-//            diff(get = Model::playState, set = {
-//                when (it) {
-//                    BUFFERING -> Unit //controlsBinding.controlsPlayFab.showProgress(true)
-//                    PLAYING -> {
-////                        updatePlayingIcon(true)
-////                        controlsBinding.controlsPlayFab.showProgress(false)
-//                    }
-//
-//                    PAUSED -> {
-////                        updatePlayingIcon(false)
-////                        controlsBinding.controlsPlayFab.showProgress(false)
-//                    }
-//
-//                    else -> Unit
-//                }
-//            })
-//            diff(get = Model::playlistItem, set = {
-//                currentItem = it
-//            })
-//            diff(get = Model::texts, set = { texts ->
-////                controlsBinding.apply {
-////                    controlsVideoTitle.text = texts.title
-////                    controlsVideoPlaylist.text = texts.playlistTitle
-////                    controlsVideoPlaylistData.text = texts.playlistData
-////                    controlsTrackLastText.text = texts.lastTrackText
-////                    controlsTrackLastText.isVisible = texts.lastTrackText != ""
-////                    controlsTrackNextText.text = texts.nextTrackText
-////                    controlsTrackNextText.isVisible = texts.nextTrackText != ""
-////                    controlsSkipfwdText.text = texts.skipFwdText
-////                    controlsSkipbackText.text = texts.skipBackText
-////                }
-//            })
-//            diff(get = Model::times, set = { times ->
-////                controlsBinding.apply {
-////                    controlsSeek.progress = (times.seekBarFraction * controlsSeek.max).toInt()
-////                    controlsCurrentTime.text = times.positionText
-////
-////                    if (times.isLive) {
-////                        controlsDuration.setBackgroundColor(res.getColor(R.color.live_background))
-////                        controlsDuration.text = res.getString(R.string.live)
-////                        controlsSeek.isEnabled = false
-////                    } else {
-////                        controlsDuration.setBackgroundColor(res.getColor(R.color.info_text_overlay_background))
-////                        controlsDuration.text = times.durationText
-////                        controlsSeek.isEnabled = true
-////                    }
-////                }
-//            })
-//        }
+
+        private val _labelFlow = MutableSharedFlow<Label>()
+        val labelFlow = _labelFlow.asSharedFlow()
 
         override suspend fun processLabel(label: Label) {
             when (label) {
+                None -> Unit
                 is Command -> label.command.let { command ->
-                    //aytViewHolder.processCommand(command)
+                    _labelFlow.emit(label)
                 }
 
-                is ChannelOpen -> Unit // todo open folder
-//                    label.channel.platformId?.let { id ->
-//                        navRouter.navigate(
-//                            NavigationModel(
-//                                YOUTUBE_CHANNEL,
-//                                mapOf(CHANNEL_ID to id)
-//                            )
-//                        )
-//                    }
-
-                is FullScreenPlayerOpen -> toast.show("Already in landscape mode - shouldn't get here")
-                is PipPlayerOpen -> {
-                    val hasPermission = floatingService.hasPermission(this@ExoActivity)
-//                    if (hasPermission) {
-//                        aytViewHolder.switchView()
-//                    }
-                    floatingService.start(this@ExoActivity, label.item)
-                    if (hasPermission) {
-                        finishAffinity()
-                    }
-                }
-
-                is PortraitPlayerOpen -> label.also {
-                    //aytViewHolder.switchView()
-                    //navRouter.navigate(NavigationModel(LOCAL_PLAYER, mapOf(PLAYLIST_ITEM to it.item)))
-                    finish()
-                }
+                is ChannelOpen -> Unit
 
                 is ShowSupport -> SupportDialogFragment.show(this@ExoActivity, label.item.media)
 
