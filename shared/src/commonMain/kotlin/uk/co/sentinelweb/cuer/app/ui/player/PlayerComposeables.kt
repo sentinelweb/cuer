@@ -11,9 +11,11 @@ import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.ui.tooling.preview.Preview
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentBlack
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables.VolumeDisplay
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
@@ -25,6 +27,7 @@ private val buttonSize = 48.dp
 private val buttonPadding = 8.dp
 
 object PlayerComposeables : KoinComponent {
+
     private val log: LogWrapper by inject<LogWrapper>()
 
     @Composable
@@ -32,7 +35,8 @@ object PlayerComposeables : KoinComponent {
         model: Model,
         view: BaseMviView<Model, Event>,
         contentColor: Color = Color.White,
-        modifier: Modifier,
+        backgroundColor: Color = colorTransparentBlack,
+        modifier: Modifier = Modifier,
     ) {
         log.tag("PlayerComposeables")
         Column(
@@ -41,7 +45,7 @@ object PlayerComposeables : KoinComponent {
             modifier = modifier
                 .fillMaxWidth()
                 .wrapContentHeight()
-                .background(colorTransparentBlack)
+                .background(backgroundColor)
         ) {
 
             Row(
@@ -159,7 +163,6 @@ object PlayerComposeables : KoinComponent {
                 )
             }
 
-
             Slider(
                 value = sliderPosition,
                 onValueChange = { fraction -> sliderPosition = fraction },
@@ -187,4 +190,10 @@ object PlayerComposeables : KoinComponent {
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun VolumeDisplayPreview() {
+    VolumeDisplay(0.5f, Modifier.fillMaxWidth())
 }

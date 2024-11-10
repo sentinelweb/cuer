@@ -52,7 +52,9 @@ class HomeUiCoordinator(
     private val log: LogWrapper by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
 
-    private var playerUiCoordinator: VlcPlayerUiCoordinator? = null
+    private var _playerUiCoordinator: VlcPlayerUiCoordinator? = null
+    val playerUiCoordinator: VlcPlayerUiCoordinator?
+        get() = _playerUiCoordinator
 
     override var modelObservable = MutableStateFlow(HomeContract.HomeModel.Initial)
         private set
@@ -73,7 +75,7 @@ class HomeUiCoordinator(
         remotesCoordinator.destroy()
         preferencesUiCoordinator.destroy()
         filesUiCoordinator.destroy()
-        playerUiCoordinator?.destroy()
+        _playerUiCoordinator?.destroy()
         localCoordinator.destroy()
         scope.close()
     }
@@ -88,22 +90,24 @@ class HomeUiCoordinator(
 
     fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
         killPlayer()
-        playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
+        _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
         val selectedScreen = playerConfigProvider.invoke()
             .screens
             .let { if (it.size > PREFERRED_SCREEN_DEFAULT) it.get(PREFERRED_SCREEN_DEFAULT) else it.get(0) }
-        playerUiCoordinator?.setupPlaylistAndItem(item, playlist, selectedScreen)
+        _playerUiCoordinator?.setupPlaylistAndItem(item, playlist, selectedScreen)
+        modelObservable.value = modelObservable.value.copy(showPlayer = true)
     }
 
     fun killPlayer() {
-        playerUiCoordinator?.destroy()
-        playerUiCoordinator = null
+        modelObservable.value = modelObservable.value.copy(showPlayer = false)
+        _playerUiCoordinator?.destroy()
+        _playerUiCoordinator = null
     }
 
     // called from the webserver
     override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
         killPlayer()
-        playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
+        _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
         val queuePlaylist = PlaylistDomain(
             id = Identifier(QueueTemp.id, MEMORY),
             title = "Queue",
@@ -113,7 +117,8 @@ class HomeUiCoordinator(
         val selectedScreen = playerConfigProvider.invoke()
             .screens
             .let { if (it.size > index) it.get(index) else it.get(0) }
-        playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, selectedScreen)
+        _playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, selectedScreen)
+        modelObservable.value = modelObservable.value.copy(showPlayer = true)
     }
 
     fun showError(message: String) {

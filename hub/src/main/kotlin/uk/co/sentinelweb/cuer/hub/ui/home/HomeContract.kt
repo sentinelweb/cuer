@@ -5,7 +5,8 @@ import uk.co.sentinelweb.cuer.domain.NodeDomain
 class HomeContract {
 
     data class HomeModel(
-        val route: DisplayRoute = DisplayRoute.Settings
+        val route: DisplayRoute = DisplayRoute.Settings,
+        val showPlayer: Boolean = false,
     ) {
 
         sealed class DisplayRoute {

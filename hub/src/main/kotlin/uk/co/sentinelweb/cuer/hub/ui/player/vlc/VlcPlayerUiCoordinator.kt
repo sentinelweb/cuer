@@ -1,6 +1,12 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import SleepPreventer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.utils.diff
@@ -23,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -66,6 +73,18 @@ class VlcPlayerUiCoordinator(
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
     private lateinit var screen: PlayerNodeDomain.Screen
 
+    @Composable
+    fun PlayerDesktopUi() {
+        val state = modelObservable.collectAsState()
+        PlayerComposeables.PlayerTransport(
+            state.value,
+            this@VlcPlayerUiCoordinator,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.height(100.dp)
+        )
+    }
+
     override fun create() {
         log.tag(this)
         lifecycle.onCreate()
@@ -106,7 +125,7 @@ class VlcPlayerUiCoordinator(
         }
     }
 
-    override val renderer: ViewRenderer<Model> = diff {
+    val modelDiffer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
             playerWindow.updateUiPlayState(it)
         })
@@ -122,6 +141,13 @@ class VlcPlayerUiCoordinator(
         diff(get = Model::buttons, set = {
             playerWindow.updateButtons(it)
         })
+    }
+
+    override val renderer: ViewRenderer<Model> = object : ViewRenderer<Model> {
+        override fun render(model: Model) {
+            modelObservable.value = model
+            modelDiffer.render(model)
+        }
     }
 
     fun focusPlayerWindow() {

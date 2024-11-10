@@ -20,6 +20,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
@@ -46,6 +47,7 @@ fun home(coordinator: HomeUiCoordinator) = application {
     }
 }
 
+@ExperimentalCoroutinesApi
 @Composable
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
@@ -93,13 +95,16 @@ fun Home(coordinator: HomeUiCoordinator) {
                 Box(modifier = Modifier.width(400.dp)) {
                     coordinator.remotesCoordinator.RemotesDesktopUi()
                 }
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
+//                        .padding(bottom=if (state.value.showPlayer) 100.dp else 0.dp)
                 ) {
-                    val route = state.value.route
-                    when (route) {
+                    if (state.value.showPlayer) {
+                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
+                    }
+                    when (state.value.route) {
                         Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
                         is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
                         ThemeTest -> SharedThemeView.View()
