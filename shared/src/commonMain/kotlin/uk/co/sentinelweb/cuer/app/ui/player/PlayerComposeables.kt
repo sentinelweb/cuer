@@ -21,6 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Model
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
+import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 
 private val buttonSize = 48.dp
@@ -79,7 +80,7 @@ object PlayerComposeables : KoinComponent {
                     )
                 }
 
-                if (model.playState == PlayerStateDomain.PLAYING) {
+                if (model.playState == PLAYING) {
                     IconButton(onClick = {
                         log.d("Pause clicked")
                         view.dispatch(PlayPauseClicked(true))
@@ -92,7 +93,13 @@ object PlayerComposeables : KoinComponent {
                                 .padding(buttonPadding)
                         )
                     }
-                } else {
+                } else if (model.playState == BUFFERING) {
+                    CircularProgressIndicator(
+                        color = contentColor,
+                        modifier = Modifier.size(buttonSize)
+                            .padding(buttonPadding)
+                    )
+                } else if (model.playState == PAUSED) {
                     IconButton(onClick = {
                         log.d("Play clicked")
                         view.dispatch(PlayPauseClicked(false))
@@ -105,6 +112,12 @@ object PlayerComposeables : KoinComponent {
                                 .padding(buttonPadding)
                         )
                     }
+                } else {
+                    Text(
+                        "?",
+                        modifier = Modifier.size(buttonSize)
+                            .padding(buttonPadding)
+                    )
                 }
 
                 Box {

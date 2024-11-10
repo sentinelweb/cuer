@@ -6,6 +6,7 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
 import javax.swing.JFrame
+import javax.swing.JPanel
 
 class ComposePopup : JFrame() {
 
@@ -13,7 +14,7 @@ class ComposePopup : JFrame() {
         defaultCloseOperation = HIDE_ON_CLOSE
         isAlwaysOnTop = true
         setUndecorated(true)
-        size = Dimension(260, 50)
+        size = Dimension(400, 68)
         layout = BorderLayout()
 
         // Create Compose Panel
@@ -21,13 +22,17 @@ class ComposePopup : JFrame() {
 
         // Set Compose content
         composePanel.setContent {
-            CustomPopupContent {
-                // Close the popup when the close button is clicked
-                hidePopup()
-            }
+            CustomPopupContent()
         }
 
-        add(composePanel, BorderLayout.CENTER)
+        // Create JPanel and add ComposePanel
+        val panel = JPanel(BorderLayout()).apply {
+            add(composePanel, BorderLayout.CENTER)
+        }
+
+        // Add JPanel to JFrame
+        add(panel, BorderLayout.CENTER)
+
         positionAtTopRight()
         // Hide initially
         isVisible = false
@@ -43,6 +48,6 @@ class ComposePopup : JFrame() {
 
     private fun positionAtTopRight() {
         val screenSize = Toolkit.getDefaultToolkit().screenSize
-        setLocation(screenSize.width - width - 20, 20)
+        setLocation(screenSize.width - width - 20, 5)
     }
 }
