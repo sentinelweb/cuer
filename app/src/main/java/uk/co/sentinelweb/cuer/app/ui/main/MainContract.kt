@@ -50,7 +50,7 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
-        fun promptToBackup(result: AutoBackupFileExporter.BackupResult)
+        fun showBackupStatusSnackbar(result: AutoBackupFileExporter.BackupResult)
     }
 
     interface PlayerViewControl {

@@ -144,7 +144,7 @@ class MainActivity :
         presenter.initialise()
     }
 
-    override fun promptToBackup(result: AutoBackupFileExporter.BackupResult) {
+    override fun showBackupStatusSnackbar(result: AutoBackupFileExporter.BackupResult) {
         if (!isOnboarding) {
             when (result) {
                 SUCCESS -> toastWrapper.show(getString(R.string.backup_success_message))

@@ -185,65 +185,58 @@ class FilesViewModel(
         }
     }
 
-    private fun loadCurrentPath() {
-        viewModelScope.launch {
-            map(true)
-            state.sourceNode?.apply {
-                val folder = when (this) {
-                    is RemoteNodeDomain ->
-                        filesInteractor.getFolderList(this.locator(), state.path)
-                            .let {
-                                log.d(it.data.toString())
-                                when (it) {
-                                    is NetResult.Data -> it.data
-                                    is NetResult.Error -> {
-                                        _labels.value =
-                                            ErrorMessage(
-                                                getString(
-                                                    Res.string.files_error_loading_folder,
-                                                    it.code ?: "",
-                                                    it.msg ?: ""
-                                                )
-                                            )
-                                        null
-                                    }
+    private fun loadCurrentPath() = viewModelScope.launch {
+        map(true)
+        state.sourceNode?.apply {
+            val folder = when (this) {
+                is RemoteNodeDomain ->
+                    filesInteractor.getFolderList(this.locator(), state.path)
+                        .let {
+                            log.d(it.data.toString())
+                            when (it) {
+                                is NetResult.Data -> it.data
+                                is NetResult.Error -> {
+                                    _labels.value = ErrorMessage(
+                                        getString(
+                                            Res.string.files_error_loading_folder, it.code ?: "", it.msg ?: ""
+                                        )
+                                    )
+                                    null
                                 }
                             }
+                        }
 
-                    is LocalNodeDomain -> try {
-                        getFolderListUseCase.getFolderList(state.path)
-                    } catch (e: Exception) {
-                        _labels.value =
-                            ErrorMessage(getString(Res.string.files_error_loading_folder, "", e.message ?: ""))
-                        null
-                    }
-
-                    else -> throw IllegalStateException("Not supported")
+                is LocalNodeDomain -> try {
+                    getFolderListUseCase.getFolderList(state.path)
+                } catch (e: Exception) {
+                    _labels.value =
+                        ErrorMessage(getString(Res.string.files_error_loading_folder, "", e.message ?: ""))
+                    null
                 }
 
-                folder
-                    ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
-                    ?.also { _labels.value = ErrorMessage(getString(Res.string.files_error_empty)) }
-
-                folder
-                    ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
-                    ?.also { folderOk ->
-                        val upItem = folderOk.children.find { PARENT_FOLDER_TEXT.equals(it.title) }
-                        state.upListItem = upItem?.let { mapper.mapParentItem(it) }
-                        state.currentFolder =
-                            folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
-
-                        state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
-                    } ?: also {
-                    state.upListItem = null
-                    state.currentFolder = null
-                    state.currentListItems = null
-                }
+                else -> throw IllegalStateException("Not supported")
             }
 
+            folder
+                ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
+                ?.also { _labels.value = ErrorMessage(getString(Res.string.files_error_empty)) }
 
-            map(false)
+            folder
+                ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
+                ?.also { folderOk ->
+                    val upItem = folderOk.children.find { PARENT_FOLDER_TEXT.equals(it.title) }
+                    state.upListItem = upItem?.let { mapper.mapParentItem(it) }
+                    state.currentFolder =
+                        folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
+
+                    state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
+                } ?: also {
+                state.upListItem = null
+                state.currentFolder = null
+                state.currentListItems = null
+            }
         }
+        map(false)
     }
 
     private fun map(loading: Boolean) {
