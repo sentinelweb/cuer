@@ -17,7 +17,7 @@ package uk.co.sentinelweb.cuer.app.ui.exoplayer
 
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.*
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
@@ -50,9 +50,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogContract
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.AlertDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.SelectDialogCreator
 import uk.co.sentinelweb.cuer.app.ui.common.dialog.support.SupportDialogFragment
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.LinkNavigator
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_AND_ITEM
-import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
@@ -71,19 +69,12 @@ import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ItemLoader
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.LocalPlayerCastListener
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.PlayerModule
-import uk.co.sentinelweb.cuer.app.ui.ytplayer.ShowHideUi
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerServiceManager
-import uk.co.sentinelweb.cuer.app.util.chromecast.ChromeCastWrapper
 import uk.co.sentinelweb.cuer.app.util.extension.activityScopeWithSource
-import uk.co.sentinelweb.cuer.app.util.wrapper.EdgeToEdgeWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ResourceWrapper
-import uk.co.sentinelweb.cuer.app.util.wrapper.ToastWrapper
-import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
-import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
+import uk.co.sentinelweb.cuer.app.util.wrapper.HideStatusBarWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
-import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
 class ExoActivity : FragmentActivity(), AndroidScopeComponent {
@@ -91,23 +82,16 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
     override val scope: Scope by activityScopeWithSource<AytLandActivity>()
 
     private val controller: PlayerController by inject()
-    private val log: LogWrapper by inject()
-    private val coroutines: CoroutineContextProvider by inject()
-    private val edgeToEdgeWrapper: EdgeToEdgeWrapper by inject()
-    private val navRouter: NavigationRouter by inject()
-    private val toast: ToastWrapper by inject()
-    private val res: ResourceWrapper by inject()
+    private val hideStatusBarWrapper: HideStatusBarWrapper by inject()
     private val castListener: LocalPlayerCastListener by inject()
-    private val chromeCastWrapper: ChromeCastWrapper by inject()
     private val floatingService: FloatingPlayerServiceManager by inject()
-
-    private var currentItem: PlaylistItemDomain? = null
 
     private lateinit var mviView: MviViewImpl
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         castListener.listen()
+        hideStatusBarWrapper.hide(this)
         mviView = MviViewImpl()
         enableEdgeToEdge()
         setContent {
@@ -135,7 +119,6 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
         )
     }
 
-    // region MVI view
     inner class MviViewImpl :
         BaseMviView<Model, Event>(),
         PlayerContract.View {
@@ -169,7 +152,6 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
             }
         }
     }
-
 
     companion object {
 
@@ -230,11 +212,10 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
                         playlistItemOrchestrator = get(),
                         playerSessionManager = get(),
                         playerSessionListener = get(),
-                        config = PlayerContract.PlayerConfig(100f),
+                        config = PlayerContract.PlayerConfig(1f),
                         prefs = get(),
                     ).create()
                 }
-                scoped { ShowHideUi(get<ExoActivity>()) }
                 scoped<PlayerContract.PlaylistItemLoader> { ItemLoader(get(), get()) }
                 scoped { navigationRouter(false, get<ExoActivity>(), withNavHost = false) }
                 scoped<SkipContract.External> {
@@ -255,7 +236,6 @@ class ExoActivity : FragmentActivity(), AndroidScopeComponent {
                 }
                 factory<AlertDialogContract.Creator> { AlertDialogCreator(get(), get()) }
                 scoped { LocalPlayerCastListener(get(), get()) }
-                scoped { LinkNavigator(get(), get(), get(), get(), get(), get(), false) }
                 scoped { ShareNavigationHack() }
             }
         }

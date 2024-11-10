@@ -20,12 +20,13 @@ import androidx.media3.common.Player
 import androidx.media3.common.VideoSize
 import androidx.media3.exoplayer.ExoPlayer
 import httpLocalNetworkUrl
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables.PlayerTransport
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables.VolumeDisplay
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.Command
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.None
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand
@@ -35,6 +36,8 @@ import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 
 private const val LOG_TAG = "ExoPlayerComposebles"
+
+private const val HIDE_CONTROLS_TIMEOUT = 3000L
 
 object ExoPlayerComposebles : KoinComponent {
 
@@ -50,6 +53,8 @@ object ExoPlayerComposebles : KoinComponent {
 
         var aspectRatioState by remember { mutableStateOf(1f) }
         var controlsVisible by remember { mutableStateOf(true) }
+        var volumeVisible by remember { mutableStateOf(true) }
+
         val exoPlayer = remember {
             ExoPlayer.Builder(context).build().apply {
                 prepare()
@@ -82,11 +87,28 @@ object ExoPlayerComposebles : KoinComponent {
             }
         }
 
+        LaunchedEffect(state.value.volume) {
+            exoPlayer.volume = state.value.volume
+                .also { volumeVisible = true }
+                .also { Log.d(LOG_TAG, "set volume = $it") }
+        }
+
         LaunchedEffect(Unit) {
             while (true) {
                 if (controlsVisible) {
-                    delay(3000L) // 3 seconds delay
+                    delay(HIDE_CONTROLS_TIMEOUT) // 3 seconds delay
                     controlsVisible = false
+                } else {
+                    delay(200L) // Short delay to keep checking
+                }
+            }
+        }
+
+        LaunchedEffect(Unit) {
+            while (true) {
+                if (volumeVisible) {
+                    delay(HIDE_CONTROLS_TIMEOUT) // 3 seconds delay
+                    volumeVisible = false
                 } else {
                     delay(200L) // Short delay to keep checking
                 }
@@ -98,10 +120,12 @@ object ExoPlayerComposebles : KoinComponent {
                 when (event) {
                     Lifecycle.Event.ON_PAUSE ->
                         view.dispatch(PlayPauseClicked(true))
+
                     Lifecycle.Event.ON_RESUME -> {
                         // fixme not resuming properly stte needs to be updted but doesnt seem to .. caching?
                         view.dispatch(PlayPauseClicked(exoPlayer.isPlaying))
                     }
+
                     Lifecycle.Event.ON_DESTROY -> exoPlayer.release()
                     else -> {}
                 }
@@ -128,15 +152,21 @@ object ExoPlayerComposebles : KoinComponent {
                     modifier = Modifier
                         .align(Alignment.Center)
                         .pointerInput(Unit) {
-                            detectTapGestures(onTap = { controlsVisible = !controlsVisible })
+                            detectTapGestures(onTap = {
+                                controlsVisible = !controlsVisible
+                                volumeVisible = !volumeVisible
+                            })
                         },
                 )
                 if (controlsVisible) {
-                    PlayerComposeables.PlayerTransport(
+                    PlayerTransport(
                         model = state.value,
                         view = view,
                         modifier = Modifier.align(Alignment.BottomCenter)
                     )
+                }
+                if (volumeVisible) {
+                    VolumeDisplay(exoPlayer.volume, modifier = Modifier.Companion.align(Alignment.TopEnd))
                 }
             }
         }

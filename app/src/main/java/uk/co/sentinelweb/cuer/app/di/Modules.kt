@@ -273,6 +273,7 @@ object Modules {
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
+        factory { HideStatusBarWrapper() }
         factory { AppListBuilder(androidApplication(), get()) }
         factory { PlayerConnectedChecker(get(), get()) }
     }

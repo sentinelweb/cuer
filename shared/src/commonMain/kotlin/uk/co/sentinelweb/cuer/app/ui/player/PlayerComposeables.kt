@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.ui.common.compose.colorTransparentBlack
@@ -168,6 +169,21 @@ object PlayerComposeables : KoinComponent {
                     activeTrackColor = contentColor,
                 ),
                 modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
+    @Composable
+    fun VolumeDisplay(
+        volume: Float, // 0..1
+        modifier: Modifier,
+    ) {
+        Row(modifier = modifier) {
+            Text(
+                stringResource(Res.string.player_volume, (volume * 100).toInt()),
+                color = Color.White,
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(8.dp)
             )
         }
     }
