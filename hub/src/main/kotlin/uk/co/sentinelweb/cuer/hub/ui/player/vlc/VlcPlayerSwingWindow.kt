@@ -1,11 +1,16 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
+import com.sun.jna.StringArray
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import toImageIcon
+import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t
+import uk.co.caprica.vlcj.binding.lib.LibVlc
+import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_new
+import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_release
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.media.Media
 import uk.co.caprica.vlcj.media.MediaEventAdapter
@@ -15,6 +20,7 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
+import uk.co.caprica.vlcj.support.version.LibVlcVersion
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
@@ -473,7 +479,7 @@ class VlcPlayerSwingWindow(
 
     companion object {
         fun checkShowWindow(): Boolean {
-            if (!NativeDiscovery().discover()) {
+            if (!NativeDiscovery().discover() && !VLCLoaderLinux.tryload()) {
                 // todo add installation instructions and link
                 val message = "Could not find VLC installation, please set VLC_PLUGIN_PATH environment variable"
                 JOptionPane.showMessageDialog(
@@ -485,6 +491,39 @@ class VlcPlayerSwingWindow(
                 return false
             } else {
                 return true
+            }
+        }
+
+        object VLCLoaderLinux {
+            init {
+                println("Loading libidn.so")
+//                System.loadLibrary("/snap/core18/2846/lib/x86_64-linux-gnu/libidn.so.11")
+                System.loadLibrary("libidn.so.11")
+                println("Loading libvlccore.so")
+//                println("Loading libvlccore.so")
+                System.loadLibrary("libvlccore.so.9.0.1")
+                // Load the VLC library from the specified path
+                println("Loading libvlc.so")
+                System.loadLibrary("libvlc.so.5.6.1")
+//                System.loadLibrary("/snap/vlc/current/usr/lib/libvlc.so.5.6.1")
+                println("Loading success")
+            }
+
+            @JvmStatic
+            fun tryload(): Boolean {
+                try {
+                    val instance: libvlc_instance_t = libvlc_new(0, StringArray(arrayOf<String>()))
+                    if (instance != null) {
+                        libvlc_release(instance);
+                        val version: LibVlcVersion = LibVlcVersion();
+                        if (version.isSupported()) {
+                            return true;
+                        }
+                    }
+                } catch (e: UnsatisfiedLinkError) {
+                    e.printStackTrace()
+                }
+                return false
             }
         }
     }
