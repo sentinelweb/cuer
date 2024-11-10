@@ -8,9 +8,12 @@ import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
-import uk.co.sentinelweb.cuer.hub.util.JarJnaCheck
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
+import uk.co.sentinelweb.cuer.hub.util.system_tray.ComposePopup
+import uk.co.sentinelweb.cuer.hub.util.system_tray.createTrayIcon
+import uk.co.sentinelweb.cuer.hub.util.system_tray.createTrayIconSimple
+import java.awt.SystemTray
 
 fun main() {
 
@@ -22,6 +25,14 @@ fun main() {
 
     koin.get<RemoteConfigFileInitialiseer>()
         .apply { initIfNecessary() }
+    //println("SystemTray.isSupported() = ${SystemTray.isSupported()}")
+    if (SystemTray.isSupported()) {
+//        createTrayIconSimple()
+        javax.swing.SwingUtilities.invokeLater {
+            val composePopup = ComposePopup()
+            createTrayIcon(composePopup)
+        }
+    }
 
     val databaseInit = koin.get<DatabaseInitializer>()
     if (!databaseInit.isInitialized()) {

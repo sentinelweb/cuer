@@ -132,8 +132,9 @@ class HomeUiCoordinator(
         @JvmStatic
         val uiModule = module {
             single { HomeUiCoordinator(get()) }
-            factory<PlayerLaunchHost> { get<HomeUiCoordinator>() } // injects to webserver
+            factory<PlayerLaunchHost> { get<HomeUiCoordinator>() }
             scope(named<HomeUiCoordinator>()) {
+
             }
         }
     }
