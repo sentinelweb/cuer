@@ -101,14 +101,16 @@ fun Home(coordinator: HomeUiCoordinator) {
                         .background(Color.White)
 //                        .padding(bottom=if (state.value.showPlayer) 100.dp else 0.dp)
                 ) {
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        when (state.value.route) {
+                            Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
+                            is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
+                            ThemeTest -> SharedThemeView.View()
+                            LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
+                        }
+                    }
                     if (state.value.showPlayer) {
                         coordinator.playerUiCoordinator?.PlayerDesktopUi()
-                    }
-                    when (state.value.route) {
-                        Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
-                        ThemeTest -> SharedThemeView.View()
-                        LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                     }
                 }
             }

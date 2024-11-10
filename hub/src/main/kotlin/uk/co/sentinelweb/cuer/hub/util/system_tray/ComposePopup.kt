@@ -14,7 +14,7 @@ class ComposePopup : JFrame() {
         defaultCloseOperation = HIDE_ON_CLOSE
         isAlwaysOnTop = true
         setUndecorated(true)
-        size = Dimension(400, 68)
+        size = Dimension(580, 100)
         layout = BorderLayout()
 
         // Create Compose Panel

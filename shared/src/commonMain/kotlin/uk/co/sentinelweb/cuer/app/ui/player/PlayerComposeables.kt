@@ -96,8 +96,9 @@ object PlayerComposeables : KoinComponent {
                 } else if (model.playState == BUFFERING) {
                     CircularProgressIndicator(
                         color = contentColor,
+                        strokeWidth = 2.dp,
                         modifier = Modifier.size(buttonSize)
-                            .padding(buttonPadding)
+                            .padding(12.dp)
                     )
                 } else if (model.playState == PAUSED) {
                     IconButton(onClick = {

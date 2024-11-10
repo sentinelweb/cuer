@@ -3,8 +3,8 @@ package uk.co.sentinelweb.cuer.hub.util.system_tray
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -26,7 +26,7 @@ object SystemTrayPopup: KoinComponent {
                 Box(modifier = Modifier.padding(8.dp, bottom=16.dp)) {
                     homeUiCoordinator.playerUiCoordinator
                         ?.PlayerDesktopUi()
-                        ?:Text("Not playing ...")
+                        ?:Text("Not playing ...", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }
