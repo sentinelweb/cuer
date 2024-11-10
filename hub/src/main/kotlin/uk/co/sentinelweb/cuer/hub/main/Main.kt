@@ -4,6 +4,7 @@ import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.getKoin
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
+import uk.co.sentinelweb.cuer.core.providers.getOS
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
@@ -26,6 +27,7 @@ fun main() {
     koin.get<RemoteConfigFileInitialiseer>()
         .apply { initIfNecessary() }
     //println("SystemTray.isSupported() = ${SystemTray.isSupported()}")
+    println("os: ${getOS()}")
     if (SystemTray.isSupported()) {
 //        createTrayIconSimple()
         javax.swing.SwingUtilities.invokeLater {

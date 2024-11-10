@@ -28,6 +28,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
+import uk.co.sentinelweb.cuer.core.providers.getOS
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -50,7 +51,6 @@ import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
-import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
 import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
@@ -139,7 +139,7 @@ object Modules {
                 versionCode = BuildConfigInject.versionCode,
                 version = BuildConfigInject.version,
                 device = getOSData(),
-                deviceType = getNodeDeviceType()
+                deviceType = getOS()
             )
         }
         factory {

@@ -16,6 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.Font
 import uk.co.sentinelweb.cuer.app.ui.common.compose.views.initButtonColors
+import uk.co.sentinelweb.cuer.core.providers.getOS
+import uk.co.sentinelweb.cuer.domain.NodeDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.LINUX
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
 import uk.co.sentinelweb.cuer.shared.generated.resources.didactgothic_regular
 import uk.co.sentinelweb.cuer.shared.generated.resources.montserrat_variable_font_wght
@@ -50,6 +53,20 @@ private val cuerDarkColors = darkColorScheme(
     error = colorError,
     onError = colorOnError,
 )
+
+private val fontWeightTitle = when (getOS()){
+    LINUX -> FontWeight.Bold
+    else -> FontWeight.Medium
+}
+private val fontWeightBody = when (getOS()){
+    LINUX -> FontWeight.Bold
+    else -> FontWeight.Normal
+}
+
+private val fontWeightLabel = when (getOS()){
+    LINUX -> FontWeight.Bold
+    else -> FontWeight.Light
+}
 
 
 @Composable
@@ -99,47 +116,47 @@ fun CuerSharedTheme(
         ),
         titleLarge = TextStyle(
             fontFamily = Didact,
-            fontWeight = FontWeight.Medium,
+            fontWeight = fontWeightTitle,
             fontSize = 28.sp
         ),
         titleMedium = TextStyle(
             fontFamily = Didact,
-            fontWeight = FontWeight.Medium,
+            fontWeight = fontWeightTitle,
             fontSize = 24.sp
         ),
         titleSmall = TextStyle(
             fontFamily = Didact,
-            fontWeight = FontWeight.Medium,
+            fontWeight = fontWeightTitle,
             fontSize = 20.sp
         ),
         bodyLarge = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Normal,
+            fontWeight = fontWeightBody,
             fontSize = 18.sp
         ),
         bodyMedium = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Normal,
+            fontWeight = fontWeightBody,
             fontSize = 16.sp
         ),
         bodySmall = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Normal,
+            fontWeight = fontWeightBody,
             fontSize = 14.sp
         ),
         labelLarge = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Light,
+            fontWeight = fontWeightLabel,
             fontSize = 16.sp
         ),
         labelMedium = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Light,
+            fontWeight = fontWeightLabel,
             fontSize = 14.sp
         ),
         labelSmall = TextStyle(
             fontFamily = Montserrat,
-            fontWeight = FontWeight.Light,
+            fontWeight = fontWeightLabel,
             fontSize = 12.sp
         ),
     )

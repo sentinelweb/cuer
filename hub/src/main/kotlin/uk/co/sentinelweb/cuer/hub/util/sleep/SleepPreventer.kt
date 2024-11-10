@@ -3,9 +3,9 @@ import com.sun.jna.Native
 import com.sun.jna.Pointer
 import com.sun.jna.PointerType
 import com.sun.jna.ptr.PointerByReference
+import uk.co.sentinelweb.cuer.core.providers.getOS
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.MAC
-import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 
 // uses JNA to prevent sleep
 class SleepPreventer {
@@ -45,7 +45,7 @@ class SleepPreventer {
 
         @JvmStatic
         fun preventSleep() {
-            if (getNodeDeviceType() == MAC) {
+            if (getOS() == MAC) {
                 if (assertionIDKeeper == null) {
                     val assertionID = PointerByReference()
                     val assertionType = CFStringRef(ASSERTION_TYPE_NO_DISPLAY_SLEEP).pointer
@@ -67,7 +67,7 @@ class SleepPreventer {
 
         @JvmStatic
         fun allowSleep() {
-            if (getNodeDeviceType() == MAC) {
+            if (getOS() == MAC) {
                 assertionIDKeeper?.let {
                     val result = iokit.IOPMAssertionRelease(it.value)
                     if (result == 0) {
