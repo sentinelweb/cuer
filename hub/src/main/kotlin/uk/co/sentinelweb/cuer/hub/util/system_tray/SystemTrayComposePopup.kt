@@ -1,7 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.util.system_tray
 
 import androidx.compose.ui.awt.ComposePanel
-import uk.co.sentinelweb.cuer.hub.util.system_tray.ComposeSystemTrayPopup.CustomPopupContent
+import uk.co.sentinelweb.cuer.hub.util.system_tray.ComposeSystemTrayPopup.SystemTrayComposePopup
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -22,7 +22,7 @@ class SystemTrayComposePopup : JFrame() {
 
         // Set Compose content
         composePanel.setContent {
-            CustomPopupContent()
+            SystemTrayComposePopup()
         }
 
         // Create JPanel and add ComposePanel

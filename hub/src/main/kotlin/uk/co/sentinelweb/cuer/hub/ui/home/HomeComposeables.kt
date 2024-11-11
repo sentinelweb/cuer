@@ -109,9 +109,9 @@ fun Home(coordinator: HomeUiCoordinator) {
                             LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                         }
                     }
-                    if (state.value.showPlayer) {
-                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
-                    }
+//                    if (state.value.showPlayer) {
+//                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
+//                    }
                 }
             }
         }

@@ -13,19 +13,19 @@ import org.koin.core.component.inject
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 
-object ComposeSystemTrayPopup: KoinComponent {
+object ComposeSystemTrayPopup : KoinComponent {
 
     private val homeUiCoordinator by inject<HomeUiCoordinator>()
 
     @Composable
-    fun CustomPopupContent() {
+    fun SystemTrayComposePopup() {
         CuerSharedTheme {
-            val state = homeUiCoordinator.modelObservable.collectAsState()
-            if (state.value.showPlayer) {
-                Box(modifier = Modifier.padding(8.dp, bottom=16.dp)) {
+            val homeState = homeUiCoordinator.modelObservable.collectAsState()
+            if (homeState.value.showPlayer) {
+                Box(modifier = Modifier.padding(8.dp, bottom = 16.dp)) {
                     homeUiCoordinator.playerUiCoordinator
-                        ?.PlayerDesktopUi()
-                        ?:Text("Not playing ...", color = MaterialTheme.colorScheme.onSurface)
+                        ?.PlayerSystrayUi()
+                        ?: Text("Not playing ...", color = MaterialTheme.colorScheme.onSurface)
                 }
             }
         }

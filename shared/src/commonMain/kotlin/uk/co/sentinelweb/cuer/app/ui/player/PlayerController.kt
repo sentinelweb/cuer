@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
@@ -65,7 +66,9 @@ class PlayerController(
         views.forEach { view ->
             log.d("Binding view: ${view::class.simpleName}")
             // store -> view
-            store.states.mapNotNull { modelMapper.map(it) } bindTo view
+            store.states
+                .onEach { log.d("State.emit(playState=${it.playerState})") }
+                .mapNotNull { modelMapper.map(it) }bindTo view
             store.labels bindTo { label -> view.processLabel(label) }
 
             // view -> store

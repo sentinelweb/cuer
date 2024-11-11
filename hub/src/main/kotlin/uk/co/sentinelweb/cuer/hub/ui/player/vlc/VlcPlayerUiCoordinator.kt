@@ -72,8 +72,21 @@ class VlcPlayerUiCoordinator(
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
     private lateinit var screen: PlayerNodeDomain.Screen
 
+    // not updating for some reason - use systray
+//    @Composable
+//    fun PlayerDesktopUi() {
+//        val state = modelObservable.collectAsState()
+//        PlayerComposeables.PlayerTransport(
+//            state.value,
+//            this@VlcPlayerUiCoordinator,
+//            contentColor = MaterialTheme.colorScheme.onSurface,
+//            backgroundColor = MaterialTheme.colorScheme.surface,
+//            modifier = Modifier.height(100.dp)
+//        )
+//    }
+
     @Composable
-    fun PlayerDesktopUi() {
+    fun PlayerSystrayUi() {
         val state = modelObservable.collectAsState()
         PlayerComposeables.PlayerTransport(
             state.value,
@@ -144,6 +157,7 @@ class VlcPlayerUiCoordinator(
 
     override val renderer: ViewRenderer<Model> = object : ViewRenderer<Model> {
         override fun render(model: Model) {
+            log.d("render: ${model.playState}")
             modelObservable.value = model
             modelDiffer.render(model)
         }
