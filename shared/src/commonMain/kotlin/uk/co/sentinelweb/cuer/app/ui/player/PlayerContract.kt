@@ -15,6 +15,10 @@ interface PlayerContract {
         val maxVolume: Float
     )
 
+    interface LocalStatus {
+        fun isPlayerActive(): Boolean
+    }
+
     interface MviStore : Store<Intent, State, Label> {
         fun endSession()
 

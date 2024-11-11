@@ -93,7 +93,8 @@ class FilesUiCoordinator(
                         cuerCastPlayerWatcher = get(),
                         getFolderListUseCase = get(),
                         localRepository = get(),
-                        localPlayerLaunchHost = get()
+                        localPlayerLaunchHost = get(),
+                        localPlayerStatus = get(),
                     )
                 }
                 scoped {

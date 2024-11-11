@@ -57,6 +57,8 @@ import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
+import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayComposePopup
+import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayIcon
 import uk.co.sentinelweb.cuer.hub.util.wrapper.EmptyVibrateWrapper
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -104,6 +106,8 @@ object Modules {
             val preferences = Preferences.userRoot().node(".cuer")
             JvmPreferencesSettings(preferences)
         }
+        single { SystemTrayIcon() }
+        factory { SystemTrayComposePopup() }
     }
 
     private val connectivityModule = module {

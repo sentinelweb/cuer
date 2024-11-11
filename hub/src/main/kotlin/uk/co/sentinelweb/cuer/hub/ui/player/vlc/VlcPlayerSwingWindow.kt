@@ -203,8 +203,8 @@ class VlcPlayerSwingWindow(
                             coordinator.dispatch(PositionReceived(newPositionLong))
                         }
                         lastPosUpdateTime = current
+                        dispatchCurrentPlayState(mediaPlayer)
                     }
-                    dispatchCurrentPlayState(mediaPlayer)
                 }
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {

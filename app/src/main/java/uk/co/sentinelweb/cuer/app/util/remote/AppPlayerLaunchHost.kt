@@ -17,7 +17,7 @@ class AppPlayerLaunchHost(
         log.tag(this)
     }
 
-    override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
+    override fun launchPlayerVideo(item: PlaylistItemDomain, screenIndex: Int?) {
         // todo try to launch on second screen
         log.d("launchVideo: item = ${item.media.title}")
         ExoActivity.start(appContext, PlaylistAndItemDomain(item, null, null))

@@ -4,17 +4,13 @@ import org.koin.core.Koin
 import org.koin.core.context.startKoin
 import org.koin.java.KoinJavaComponent.getKoin
 import uk.co.sentinelweb.cuer.app.db.init.DatabaseInitializer
-import uk.co.sentinelweb.cuer.core.providers.getOS
 import uk.co.sentinelweb.cuer.core.wrapper.WifiStateProvider
 import uk.co.sentinelweb.cuer.hub.di.Modules
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.home.home
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
-import uk.co.sentinelweb.cuer.hub.util.system_tray.ComposePopup
-import uk.co.sentinelweb.cuer.hub.util.system_tray.createTrayIcon
-import uk.co.sentinelweb.cuer.hub.util.system_tray.createTrayIconSimple
-import java.awt.SystemTray
+import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayIcon
 
 fun main() {
 
@@ -26,15 +22,8 @@ fun main() {
 
     koin.get<RemoteConfigFileInitialiseer>()
         .apply { initIfNecessary() }
-    //println("SystemTray.isSupported() = ${SystemTray.isSupported()}")
-    println("os: ${getOS()}")
-    if (SystemTray.isSupported()) {
-//        createTrayIconSimple()
-        javax.swing.SwingUtilities.invokeLater {
-            val composePopup = ComposePopup()
-            createTrayIcon(composePopup)
-        }
-    }
+
+    koin.get<SystemTrayIcon>().createTrayIcon()
 
     val databaseInit = koin.get<DatabaseInitializer>()
     if (!databaseInit.isInitialized()) {
@@ -49,7 +38,7 @@ fun main() {
 
     val homeUiCoordinator = koin.get<HomeUiCoordinator>()
         .apply { create() }
-
+// app icon data test - deosnt work
 //    if (System.getProperty("os.name").toLowerCase().contains("mac")) {
 //        //Application.getApplication().dockIconImage = loadSVG(resourcePath ="drawable/ic_bitcoin.svg", color= Color.Red, 64)
 //        System.setProperty("apple.awt.application.name", "My Custom App Name");
@@ -57,6 +46,5 @@ fun main() {
 //        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "My Custom App Name");
 //    }
 
-//    JarJnaCheck().check()
     home(homeUiCoordinator)
 }

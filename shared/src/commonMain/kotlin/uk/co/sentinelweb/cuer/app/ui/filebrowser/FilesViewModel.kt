@@ -15,6 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
@@ -46,6 +47,7 @@ class FilesViewModel(
     private val getFolderListUseCase: GetFolderListUseCase,
     private val localRepository: LocalRepository,
     private val localPlayerLaunchHost: PlayerLaunchHost,
+    private val localPlayerStatus: PlayerContract.LocalStatus,
 ) : ViewModel(), FilesContract.ViewModel {
 
     private val _modelObservable = MutableStateFlow(Initial)
@@ -129,8 +131,9 @@ class FilesViewModel(
         viewModelScope.launch {
             map(true)
             state.sourceNode?.apply {
-                // fixme when this is possible on both platforms - need a broader check
-                if (cuerCastPlayerWatcher.isWatching()) {
+                if (localPlayerStatus.isPlayerActive()) {
+                    launchLocalPlayer(null, null, file)
+                } else if (cuerCastPlayerWatcher.isWatching()) {
                     launchRemotePlayer(
                         cuerCastPlayerWatcher.remoteNode ?: throw IllegalStateException("No remote"),
                         cuerCastPlayerWatcher.screen ?: throw IllegalStateException("No remote screen")
@@ -160,7 +163,7 @@ class FilesViewModel(
         screen: PlayerNodeDomain.Screen?,
         file: PlaylistItemDomain
     ) {
-        localPlayerLaunchHost.launchVideo(file, screen?.index)
+        localPlayerLaunchHost.launchPlayerVideo(file, screen?.index)
         remoteDialogLauncher.hideRemotesDialog()
     }
 
@@ -174,10 +177,7 @@ class FilesViewModel(
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
-            // todo check if already connected to remote node
-            // todo also check if the dialog has connected
             if (!castController.isConnected()) {
-                // assumes here that sourecnode == targetnode
                 castController.connectCuerCast(targetNode, screen)
             }
             remoteDialogLauncher.hideRemotesDialog()

@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.hub.ui.home
 
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -15,6 +14,7 @@ import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.MEMORY
 import uk.co.sentinelweb.cuer.app.orchestrator.memory.PlaylistMemoryRepository.MemoryPlaylist.QueueTemp
 import uk.co.sentinelweb.cuer.app.service.remote.RemoteServerContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
@@ -39,6 +39,7 @@ class HomeUiCoordinator(
     UiCoordinator<HomeContract.HomeModel>,
     DesktopScopeComponent,
     PlayerLaunchHost,
+    PlayerContract.LocalStatus,
     KoinComponent {
     override val scope: Scope = desktopScopeWithSource(this)
 
@@ -104,7 +105,7 @@ class HomeUiCoordinator(
     }
 
     // called from the webserver
-    override fun launchVideo(item: PlaylistItemDomain, screenIndex: Int?) {
+    override fun launchPlayerVideo(item: PlaylistItemDomain, screenIndex: Int?) {
         killPlayer()
         _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
         val queuePlaylist = PlaylistDomain(
@@ -120,6 +121,8 @@ class HomeUiCoordinator(
         modelObservable.value = modelObservable.value.copy(showPlayer = true)
     }
 
+    override fun isPlayerActive(): Boolean = _playerUiCoordinator != null
+
     fun showError(message: String) {
         log.d("showError: $message")
         coroutines.mainScope.launch {
@@ -132,9 +135,11 @@ class HomeUiCoordinator(
         val uiModule = module {
             single { HomeUiCoordinator(get()) }
             factory<PlayerLaunchHost> { get<HomeUiCoordinator>() }
+            factory<PlayerContract.LocalStatus> { get<HomeUiCoordinator>() }
             scope(named<HomeUiCoordinator>()) {
 
             }
         }
     }
+
 }

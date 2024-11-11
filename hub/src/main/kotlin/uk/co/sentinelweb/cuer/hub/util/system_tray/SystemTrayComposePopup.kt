@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.hub.util.system_tray
 
 import androidx.compose.ui.awt.ComposePanel
-import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayPopup.CustomPopupContent
+import uk.co.sentinelweb.cuer.hub.util.system_tray.ComposeSystemTrayPopup.CustomPopupContent
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
 import javax.swing.JFrame
 import javax.swing.JPanel
 
-class ComposePopup : JFrame() {
+class SystemTrayComposePopup : JFrame() {
 
     init {
         defaultCloseOperation = HIDE_ON_CLOSE
