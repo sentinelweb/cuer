@@ -45,7 +45,6 @@ import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
-@ExperimentalCoroutinesApi
 class VlcPlayerUiCoordinator(
     private val parent: HomeUiCoordinator,
 ) : PlayerContract.View,

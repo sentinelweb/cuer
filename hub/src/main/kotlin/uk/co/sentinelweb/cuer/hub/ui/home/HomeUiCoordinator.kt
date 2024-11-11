@@ -33,7 +33,6 @@ import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 
-@OptIn(ExperimentalCoroutinesApi::class)
 class HomeUiCoordinator(
     private val coroutines: CoroutineContextProvider
 ) :

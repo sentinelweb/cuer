@@ -39,6 +39,7 @@ class JvmMultiCastSocket(
             theSocket = MulticastSocket(config.multicastPort)
             // fixme play with this and maybe just get the iface by ip address?
             val networkInterface = findInterface(listOf("wlan0", "en0", "wlp", "eth0"))
+            log.d("found networkInterface: $networkInterface")
             theSocket!!.networkInterface = networkInterface
             theSocket!!.joinGroup(broadcastAddress, networkInterface)
             val buffer = ByteArray(1 * 1024)
@@ -65,8 +66,9 @@ class JvmMultiCastSocket(
         val networkInterfaces = NetworkInterface.getNetworkInterfaces()
         for (netInterface in networkInterfaces) {
             if (netInterface.isUp && !netInterface.isLoopback) {
-                //if (names.contains(netInterface.name)) {
-                if (names.map { netInterface.name.contains(it) }.any()) {
+                log.d("checking network interface: ${netInterface.name}")
+                if (names.any { netInterface.name.contains(it) }) {
+                    log.d("found interface: ${netInterface.name}")
                     return netInterface
                 }
             }

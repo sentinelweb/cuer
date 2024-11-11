@@ -51,8 +51,6 @@ import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
-
-@ExperimentalCoroutinesApi
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
@@ -499,12 +497,10 @@ class VlcPlayerSwingWindow(
             fun tryload(): Boolean {
                 try {
                     val instance: libvlc_instance_t = libvlc_new(0, StringArray(arrayOf<String>()))
-                    if (instance != null) {
-                        libvlc_release(instance);
-                        val version: LibVlcVersion = LibVlcVersion();
-                        if (version.isSupported()) {
-                            return true;
-                        }
+                    libvlc_release(instance);
+                    val version: LibVlcVersion = LibVlcVersion();
+                    if (version.isSupported()) {
+                        return true;
                     }
                 } catch (e: UnsatisfiedLinkError) {
                     e.printStackTrace()
