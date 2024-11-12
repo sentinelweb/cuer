@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Model.Companion.Initial
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.EmptyChromecastDialogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
@@ -44,7 +44,7 @@ class RemotesUiCoordinator(
 
     override val modelObservable = MutableStateFlow(Initial)
 
-    val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
+    val remotesDialogLauncher: NodesDialogContract.Launcher by scope.inject()
 
     private val controller: RemotesController by scope.inject()
     private val log: LogWrapper by inject()

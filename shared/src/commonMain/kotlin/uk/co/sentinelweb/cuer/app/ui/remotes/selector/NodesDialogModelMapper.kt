@@ -1,14 +1,14 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes.selector
 
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.*
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract.Model.NodeModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract.Model.NodeModel
 import uk.co.sentinelweb.cuer.domain.LocalNodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.NodeDomain.DeviceType.OTHER
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
-class RemotesDialogModelMapper {
+class NodesDialogModelMapper {
     fun mapNode(it: NodeDomain) = when (it) {
         is LocalNodeDomain -> mapNode(it)
         is RemoteNodeDomain -> mapNode(it)

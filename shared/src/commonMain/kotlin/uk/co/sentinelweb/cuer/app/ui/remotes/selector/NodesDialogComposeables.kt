@@ -17,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedTheme
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract
 import uk.co.sentinelweb.cuer.domain.ext.isAvailable
 import uk.co.sentinelweb.cuer.shared.generated.resources.*
 import uk.co.sentinelweb.cuer.shared.generated.resources.Res
@@ -25,18 +24,18 @@ import uk.co.sentinelweb.cuer.shared.generated.resources.ic_tv
 import uk.co.sentinelweb.cuer.shared.generated.resources.remotes_dialog_title
 import uk.co.sentinelweb.cuer.shared.generated.resources.remotes_dialog_title_screen
 
-object RemotesDialogComposeables {
+object NodesDialogComposeables {
 
     @Composable
-    fun RemotesDialogUi(viewModel: RemotesDialogViewModel) {
-        val state = viewModel.model.collectAsState(initial = RemotesDialogContract.Model.blank)
+    fun RemotesDialogUi(viewModel: NodesDialogViewModel) {
+        val state = viewModel.model.collectAsState(initial = NodesDialogContract.Model.blank)
         CuerSharedTheme {
             RemotesDialogView(state.value, viewModel)
         }
     }
 
     @Composable
-    fun RemotesDialogView(model: RemotesDialogContract.Model, viewModel: RemotesDialogViewModel) {
+    fun RemotesDialogView(model: NodesDialogContract.Model, viewModel: NodesDialogViewModel) {
         Column {
             Header(model)
             model.remotes.forEach {
@@ -46,7 +45,7 @@ object RemotesDialogComposeables {
     }
 
     @Composable
-    private fun Header(model: RemotesDialogContract.Model) {
+    private fun Header(model: NodesDialogContract.Model) {
         Box(
             modifier = Modifier.height(80.dp)
                 .fillMaxWidth()
@@ -87,8 +86,8 @@ object RemotesDialogComposeables {
 
     @Composable
     private fun RemoteRow(
-        remote: RemotesDialogContract.Model.NodeModel,
-        viewModel: RemotesDialogViewModel
+        remote: NodesDialogContract.Model.NodeModel,
+        viewModel: NodesDialogViewModel
     ) {
         val contentColor = remote.domain.isAvailable()
             .takeIf { it }
@@ -107,7 +106,7 @@ object RemotesDialogComposeables {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Image(
-                    painter = painterResource(RemotesIconMapper.map(remote.deviceType)),
+                    painter = painterResource(NodesIconMapper.map(remote.deviceType)),
                     contentDescription = "Remote Icon",
                     colorFilter = ColorFilter.tint(contentColor),
                     modifier = Modifier

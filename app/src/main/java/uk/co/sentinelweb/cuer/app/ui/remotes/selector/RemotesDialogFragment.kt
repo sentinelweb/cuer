@@ -28,7 +28,7 @@ class RemotesDialogFragment(
 ) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
-    private val viewModel: RemotesDialogViewModel by inject()
+    private val viewModel: NodesDialogViewModel by inject()
     private val log: LogWrapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
@@ -70,7 +70,7 @@ class RemotesDialogFragment(
                 ?.apply { viewModel.onNodeSelected(this) }
         }
         binding.composeView.setContent {
-            RemotesDialogComposeables.RemotesDialogUi(viewModel)
+            NodesDialogComposeables.RemotesDialogUi(viewModel)
         }
     }
 
@@ -107,8 +107,8 @@ class RemotesDialogFragment(
         val fragmentModule = module {
             scope(named<RemotesDialogFragment>()) {
                 scoped {
-                    RemotesDialogViewModel(
-                        state = RemotesDialogContract.State(),
+                    NodesDialogViewModel(
+                        state = NodesDialogContract.State(),
                         remotesRepository = get(),
                         mapper = get(),
                         coroutines = get(),

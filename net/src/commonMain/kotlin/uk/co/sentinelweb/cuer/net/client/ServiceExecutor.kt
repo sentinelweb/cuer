@@ -37,7 +37,7 @@ internal class ServiceExecutor(
         }
         response.body<T>()
     } catch (e: Exception) {
-        log.e("get", e)
+        log.e("GET: $path params: $urlParams", e)
         throw e
     }
 
@@ -72,7 +72,7 @@ internal class ServiceExecutor(
         }
         response.body<T>()
     } catch (e: Exception) {
-        log.e("post", e)
+        log.e("POST: $path params: $urlParams", e)
         throw e
     }
 
@@ -93,7 +93,7 @@ internal class ServiceExecutor(
         }
         response.body<T>()
     } catch (e: Exception) {
-        log.e("put", e)
+        log.e("POSTDATA: $path params: $urlParams $postData", e)
         throw e
     }
 

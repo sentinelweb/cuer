@@ -1,14 +1,13 @@
 package uk.co.sentinelweb.cuer.app.ui.remotes.selector
 
 import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Identifier
-import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.RemoteNodeModel
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Screen
 import uk.co.sentinelweb.cuer.domain.GUID
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
-interface RemotesDialogContract {
+interface NodesDialogContract {
     interface Launcher {
         fun launchRemotesDialog(
             callback: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit,

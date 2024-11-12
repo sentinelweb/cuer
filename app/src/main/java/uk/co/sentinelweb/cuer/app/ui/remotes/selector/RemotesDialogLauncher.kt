@@ -9,7 +9,7 @@ import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 // fixme memory leak somewhere - see leak canary
 class RemotesDialogLauncher(
     private val activity: FragmentActivity
-) : RemotesDialogContract.Launcher {
+) : NodesDialogContract.Launcher {
 
     private var dialogFragment: DialogFragment? = null
     override fun launchRemotesDialog(

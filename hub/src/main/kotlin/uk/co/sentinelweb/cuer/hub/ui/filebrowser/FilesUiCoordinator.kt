@@ -15,7 +15,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Label.ErrorMessag
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.State
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesViewModel
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
@@ -43,7 +43,7 @@ class FilesUiCoordinator(
     override val modelObservable = MutableStateFlow(Initial)
 
     private val viewModel: FilesViewModel by scope.inject()
-    private val remotesDialogLauncher: RemotesDialogContract.Launcher by scope.inject()
+    private val remotesDialogLauncher: NodesDialogContract.Launcher by scope.inject()
 
     override fun create() {
         bindLabels()

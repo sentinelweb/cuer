@@ -20,7 +20,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
@@ -188,7 +188,7 @@ object Modules {
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
-        single<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get()) }
+        single<NodesDialogContract.Launcher> { RemotesDialogLauncher(get()) }
     }
 
     val emptyModule = module {

@@ -16,7 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.I
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
@@ -42,7 +42,7 @@ class FilesViewModel(
     private val playerInteractor: RemotePlayerInteractor,
     private val log: LogWrapper,
     private val castController: CastController,
-    private val remoteDialogLauncher: RemotesDialogContract.Launcher,
+    private val remoteDialogLauncher: NodesDialogContract.Launcher,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
     private val getFolderListUseCase: GetFolderListUseCase,
     private val localRepository: LocalRepository,

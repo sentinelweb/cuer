@@ -11,10 +11,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import kotlinx.coroutines.flow.onEach
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogComposeables
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogComposeables
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher.DisplayModel
 
@@ -37,7 +36,7 @@ object RemotesDialogLauncherComposeables: KoinComponent {
                             .wrapContentSize()
                             .background(Color.White)
                     ) {
-                        RemotesDialogComposeables.RemotesDialogUi(remotesDialogLauncher.viewModel)
+                        NodesDialogComposeables.RemotesDialogUi(remotesDialogLauncher.viewModel)
                     }
                 }
             }

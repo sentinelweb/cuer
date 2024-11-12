@@ -18,7 +18,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.inteface.CommitHost
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.*
 import uk.co.sentinelweb.cuer.app.ui.play_control.EmptyPlayerControls
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.scan.ScanContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
@@ -160,7 +160,7 @@ interface ShareContract {
                         chromeCastWrapper = get()
                     )
                 }
-                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<ShareActivity>()) }
+                scoped<NodesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<ShareActivity>()) }
                 scoped { StatusBarColorWrapper(activity = get<ShareActivity>()) }
             }
         }
