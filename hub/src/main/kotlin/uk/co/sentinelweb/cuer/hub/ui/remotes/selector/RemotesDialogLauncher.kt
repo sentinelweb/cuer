@@ -64,7 +64,8 @@ class RemotesDialogLauncher(
                     coroutines = get(),
                     playerInteractor = get(),
                     state = NodesDialogContract.State(),
-                    localRepository = get()
+                    localRepository = get(),
+                    locaStatus = get()
                 )
             }
         }

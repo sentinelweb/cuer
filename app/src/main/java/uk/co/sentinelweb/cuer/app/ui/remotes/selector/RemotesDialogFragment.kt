@@ -14,8 +14,10 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.player.AndroidPlayerLocalStatus
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -113,9 +115,11 @@ class RemotesDialogFragment(
                         mapper = get(),
                         coroutines = get(),
                         playerInteractor = get(),
-                        localRepository = get()
+                        localRepository = get(),
+                        locaStatus = get(),
                     )
                 }
+                scoped<PlayerContract.LocalStatus> { AndroidPlayerLocalStatus() }
             }
         }
     }

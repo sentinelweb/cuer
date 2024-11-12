@@ -32,6 +32,7 @@ import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
 
 class HomeUiCoordinator(
     private val coroutines: CoroutineContextProvider
@@ -119,6 +120,10 @@ class HomeUiCoordinator(
             .let { if (it.size > index) it.get(index) else it.get(0) }
         _playerUiCoordinator?.setupPlaylistAndItem(item, queuePlaylist, selectedScreen)
         modelObservable.value = modelObservable.value.copy(showPlayer = true)
+    }
+
+    override fun playerStatus(): PlayerSessionContract.PlayerStatusMessage {
+        TODO("Not yet implemented")
     }
 
     override fun isPlayerActive(): Boolean = _playerUiCoordinator != null

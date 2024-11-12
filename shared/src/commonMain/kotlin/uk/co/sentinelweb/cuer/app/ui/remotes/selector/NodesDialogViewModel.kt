@@ -4,6 +4,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract.Model
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.NodeDomain
@@ -21,6 +22,7 @@ class NodesDialogViewModel(
     private val playerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
+    private val locaStatus: PlayerContract.LocalStatus,
 ) {
 
     lateinit var listener: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit
@@ -72,7 +74,8 @@ class NodesDialogViewModel(
     }
 
     private fun localSelected(node: NodeDomain) {
-        // fixme get local node screens and display to user
+        // fixme get local node screens and display to user .. fill in playerStatus() stub
+        // locaStatus.playerStatus()
         listener(node, null)
     }
 

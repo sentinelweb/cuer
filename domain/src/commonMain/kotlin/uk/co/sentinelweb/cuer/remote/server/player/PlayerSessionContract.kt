@@ -9,15 +9,6 @@ interface PlayerSessionContract {
     interface Manager {
         fun checkCreateMediaSession(controls: Listener)
         fun destroyMediaSession()
-//        fun setMedia(item: PlaylistItemDomain, playlist: PlaylistDomain?)
-//        fun updatePlaybackState(
-//            item: PlaylistItemDomain,
-//            state: PlayerStateDomain,
-//            liveOffset: Long?,
-//            playlist: PlaylistDomain?
-//        )
-
-        //fun setMedia(media: MediaDomain, playlist: PlaylistDomain?)
         fun setItem(item: PlaylistItemDomain, playlist: PlaylistDomain?)
         fun updatePlaybackState(
             item: PlaylistItemDomain,

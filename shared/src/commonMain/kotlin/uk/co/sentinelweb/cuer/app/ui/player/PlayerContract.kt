@@ -8,6 +8,8 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerContract.State.Targe
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.*
 import uk.co.sentinelweb.cuer.domain.*
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.UNKNOWN
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract
+import uk.co.sentinelweb.cuer.remote.server.player.PlayerSessionContract.PlayerStatusMessage
 
 interface PlayerContract {
 
@@ -17,6 +19,7 @@ interface PlayerContract {
 
     interface LocalStatus {
         fun isPlayerActive(): Boolean
+        fun playerStatus(): PlayerStatusMessage
     }
 
     interface MviStore : Store<Intent, State, Label> {
