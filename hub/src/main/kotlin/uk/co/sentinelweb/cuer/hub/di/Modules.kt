@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.di
 
 import PlatformWifiInfo
+import SleepPreventerMac
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.russhwolf.settings.JvmPreferencesSettings
 import com.russhwolf.settings.Settings
@@ -38,6 +39,7 @@ import uk.co.sentinelweb.cuer.db.di.JvmDatabaseModule
 import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
@@ -57,6 +59,9 @@ import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventer
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventerEmpty
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventerLinuxDBus
 import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayComposePopup
 import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayIcon
 import uk.co.sentinelweb.cuer.hub.util.wrapper.EmptyVibrateWrapper
@@ -108,6 +113,18 @@ object Modules {
         }
         single { SystemTrayIcon() }
         factory { SystemTrayComposePopup() }
+        single<SleepPreventer> {
+            when (getOS()) {
+                NodeDomain.DeviceType.MAC -> SleepPreventerMac()
+                NodeDomain.DeviceType.LINUX -> SleepPreventerLinuxDBus()
+                else -> SleepPreventerEmpty()
+//                NodeDomain.DeviceType.ANDROID -> TODO()
+//                NodeDomain.DeviceType.IOS -> TODO()
+//                NodeDomain.DeviceType.WEB -> TODO()
+//                NodeDomain.DeviceType.WINDOWS -> TODO()
+//                NodeDomain.DeviceType.OTHER -> TODO()
+            }
+        }
     }
 
     private val connectivityModule = module {

@@ -3,13 +3,11 @@ package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 import androidx.compose.ui.graphics.Color.Companion.Black
 import com.sun.jna.StringArray
 import httpLocalNetworkUrl
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import toImageIcon
 import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t
-import uk.co.caprica.vlcj.binding.lib.LibVlc
 import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_new
 import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_release
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
@@ -22,7 +20,6 @@ import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.support.version.LibVlcVersion
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -32,16 +29,11 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
-import uk.co.sentinelweb.cuer.remote.server.http
-import uk.co.sentinelweb.cuer.remote.server.locator
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
@@ -51,6 +43,8 @@ import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
+const val WINDOW_NAME = "CuerVlcSwingVideo"
+
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
@@ -58,7 +52,7 @@ class VlcPlayerSwingWindow(
     private val keyMap: VlcPlayerKeyMap,
     private val localRepository: LocalRepository,
     private val coroutineContextProvider: CoroutineContextProvider
-) : JFrame(), KoinComponent {
+) : JFrame(WINDOW_NAME), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
@@ -272,8 +266,8 @@ class VlcPlayerSwingWindow(
 
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
         is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
-        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
-        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
+        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms)
+        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms)
         is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
     }.also { log.d("command:${command::class.java.simpleName}") }
 
@@ -497,10 +491,10 @@ class VlcPlayerSwingWindow(
             fun tryload(): Boolean {
                 try {
                     val instance: libvlc_instance_t = libvlc_new(0, StringArray(arrayOf<String>()))
-                    libvlc_release(instance);
-                    val version: LibVlcVersion = LibVlcVersion();
+                    libvlc_release(instance)
+                    val version = LibVlcVersion()
                     if (version.isSupported()) {
-                        return true;
+                        return true
                     }
                 } catch (e: UnsatisfiedLinkError) {
                     e.printStackTrace()

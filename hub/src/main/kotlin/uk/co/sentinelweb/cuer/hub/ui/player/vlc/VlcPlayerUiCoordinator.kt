@@ -1,6 +1,5 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
-import SleepPreventer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -13,7 +12,6 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -43,6 +41,7 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventer
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
 class VlcPlayerUiCoordinator(
@@ -66,6 +65,7 @@ class VlcPlayerUiCoordinator(
     private val playlistOrchestrator: PlaylistOrchestrator by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val queueProducer: QueueMediatorContract.Producer by inject()
+    private val sleepPreventer: SleepPreventer by inject()
 
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
@@ -106,7 +106,7 @@ class VlcPlayerUiCoordinator(
         playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
                 .apply { assemble(screen) }
-                .also { SleepPreventer.preventSleep() }
+                .also { sleepPreventer.preventSleep() }
         } else error("Can't find VLC")
     }
 
@@ -116,7 +116,7 @@ class VlcPlayerUiCoordinator(
                 ?.takeIf { it.source == MEMORY }
                 ?.also { playlistOrchestrator.delete(it.id, it.deepOptions()) }
             playerWindow.destroy()
-            SleepPreventer.allowSleep()
+            sleepPreventer.allowSleep()
             lifecycle.onPause()
             lifecycle.onStop()
             controller.onViewDestroyed()
