@@ -11,10 +11,7 @@ import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t
 import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_new
 import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_release
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
-import uk.co.caprica.vlcj.media.Media
-import uk.co.caprica.vlcj.media.MediaEventAdapter
-import uk.co.caprica.vlcj.media.MediaParsedStatus
-import uk.co.caprica.vlcj.media.MediaRef
+import uk.co.caprica.vlcj.media.*
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
@@ -107,7 +104,8 @@ class VlcPlayerSwingWindow(
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        val preferredExists = screenDevices.size > preferredScreen.index
+        // fixme revert
+        val preferredExists = false //screenDevices.size > preferredScreen.index//
         val selectedScreenIndex = if (preferredExists) {
             preferredScreen.index
         } else 0
@@ -156,6 +154,7 @@ class VlcPlayerSwingWindow(
                         durationMs = ms
                         coordinator.dispatch(DurationReceived(ms))
                     }
+                    selectAudioTrack("en")
                 }
             }
         )
@@ -246,6 +245,21 @@ class VlcPlayerSwingWindow(
             ?.apply { log.d("playItem: current ${this.mrl()}") }
             ?: log.d("playItem: current is null")
         mediaPlayerComponent.mediaPlayer().media().play(path)
+    }
+
+    fun selectAudioTrack(lang: String) {
+        log.d("selectAudioTrack: $lang " +
+                "title: ${mediaPlayerComponent.mediaPlayer().media().info().tracks()}" +
+                "audioTracks: ${mediaPlayerComponent.mediaPlayer().media().info().audioTracks()}" +
+                "videoTracks: ${mediaPlayerComponent.mediaPlayer().media().info().videoTracks()}" +
+                "")
+        mediaPlayerComponent.mediaPlayer().media().info()
+            .audioTracks()
+            .find {
+                log.d("track language: ${it.language()} <- ${lang.lowercase()}")
+                it.language().lowercase().startsWith(lang.lowercase())
+            }
+            ?.also { mediaPlayerComponent.mediaPlayer().audio().setTrack(it.id()) }
     }
 
     fun destroy() {
