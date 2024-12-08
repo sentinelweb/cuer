@@ -302,7 +302,6 @@ object BrowseComposables {
         count: Int,
         content: @Composable () -> Unit,
     ) {
-
         Layout(
             content = content,
             modifier = modifier

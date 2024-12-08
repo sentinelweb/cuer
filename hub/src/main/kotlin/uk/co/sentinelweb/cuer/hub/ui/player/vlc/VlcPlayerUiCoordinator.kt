@@ -12,7 +12,7 @@ import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -72,22 +72,26 @@ class VlcPlayerUiCoordinator(
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
     private lateinit var screen: PlayerNodeDomain.Screen
 
-    // not updating for some reason - use systray
-//    @Composable
-//    fun PlayerDesktopUi() {
-//        val state = modelObservable.collectAsState()
-//        PlayerComposeables.PlayerTransport(
-//            state.value,
-//            this@VlcPlayerUiCoordinator,
-//            contentColor = MaterialTheme.colorScheme.onSurface,
-//            backgroundColor = MaterialTheme.colorScheme.surface,
-//            modifier = Modifier.height(100.dp)
-//        )
-//    }
+    @Composable
+    fun PlayerDesktopUi() {
+        val state = modelObservable
+            .collectAsState(Model.Initial, coroutines.Main)
+
+        PlayerComposeables.PlayerTransport(
+            state.value,
+            this@VlcPlayerUiCoordinator,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.height(100.dp)
+        )
+    }
 
     @Composable
     fun PlayerSystrayUi() {
-        val state = modelObservable.collectAsState()
+        val state = modelObservable
+            .onEach { log.d("PlayerDesktopUi:${it.playState}") }
+            .collectAsState(Model.Initial)
+
         PlayerComposeables.PlayerTransport(
             state.value,
             this@VlcPlayerUiCoordinator,
@@ -129,6 +133,7 @@ class VlcPlayerUiCoordinator(
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
+        log.d("processLabel: $label")
         when (label) {
             is Command -> playerWindow.playStateChanged(label.command)
             Stop -> destroyPlayerWindow()
@@ -157,7 +162,7 @@ class VlcPlayerUiCoordinator(
 
     override val renderer: ViewRenderer<Model> = object : ViewRenderer<Model> {
         override fun render(model: Model) {
-            log.d("render: ${model.playState}")
+            log.d("coord.renderer: ${model.playState}")
             modelObservable.value = model
             modelDiffer.render(model)
         }

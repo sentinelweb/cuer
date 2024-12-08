@@ -56,6 +56,7 @@ class VlcPlayerSwingWindow(
     private val timeProvider: TimeProvider by inject()
     private val timeFormatter: TimeFormatter by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
+
     private lateinit var screenUsed: PlayerNodeDomain.Screen
 
     private lateinit var playButton: JButton
@@ -105,7 +106,7 @@ class VlcPlayerSwingWindow(
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
         // fixme revert
-        val preferredExists = false //screenDevices.size > preferredScreen.index//
+        val preferredExists = screenDevices.size > preferredScreen.index//false //
         val selectedScreenIndex = if (preferredExists) {
             preferredScreen.index
         } else 0
@@ -249,17 +250,26 @@ class VlcPlayerSwingWindow(
 
     fun selectAudioTrack(lang: String) {
         log.d("selectAudioTrack: $lang " +
-                "title: ${mediaPlayerComponent.mediaPlayer().media().info().tracks()}" +
-                "audioTracks: ${mediaPlayerComponent.mediaPlayer().media().info().audioTracks()}" +
-                "videoTracks: ${mediaPlayerComponent.mediaPlayer().media().info().videoTracks()}" +
+//                "title: ${mediaPlayerComponent.mediaPlayer().media().info().}" +
+                "\naudioTracks: ${mediaPlayerComponent.mediaPlayer().media().info().audioTracks().joinToString("\n")}" +
+                "\nvideoTracks: ${mediaPlayerComponent.mediaPlayer().media().info().videoTracks().joinToString("\n")}" +
+                "\ntextTracks: ${mediaPlayerComponent.mediaPlayer().media().info().textTracks().joinToString("\n")}" +
                 "")
         mediaPlayerComponent.mediaPlayer().media().info()
             .audioTracks()
             .find {
-                log.d("track language: ${it.language()} <- ${lang.lowercase()}")
+                //log.d("track language: ${it.language()} <- ${lang.lowercase()}")
                 it.language().lowercase().startsWith(lang.lowercase())
             }
             ?.also { mediaPlayerComponent.mediaPlayer().audio().setTrack(it.id()) }
+
+//        mediaPlayerComponent.mediaPlayer().media().info()
+//            .textTracks()
+//            .find {
+//                //log.d("track language: ${it.language()} <- ${lang.lowercase()}")
+//                it.language().lowercase().startsWith(lang.lowercase())
+//            }
+//            ?.also { mediaPlayerComponent.mediaPlayer().media().}
     }
 
     fun destroy() {

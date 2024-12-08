@@ -30,7 +30,6 @@ private val AppShapes = Shapes(
     large = CutCornerShape(topStart = 32.dp, bottomEnd = 32.dp),
 )
 
-
 val colorDelete = Color( 0xFFe53935)
 val colorEdit = Color( 0xFF43a047)
 val colorMove = Color( 0xFF1e88e5)
@@ -38,7 +37,6 @@ val colorTransparentBlack = Color( 0x44000000)
 val colorTransparentYellow = Color( 0x66888800)
 val colorError = Color( 0xffb53910)
 val colorOnError = Color.White
-
 
 private val cuerLightColors = lightColorScheme(
     primary = Color( 0xFFe53935),
@@ -63,7 +61,7 @@ private val fontWeightBody = when (getOS()){
     else -> FontWeight.Normal
 }
 
-private val fontWeightLabel = when (getOS()){
+private val fontWeightLabel = when (getOS()) {
     LINUX -> FontWeight.Bold
     else -> FontWeight.Light
 }

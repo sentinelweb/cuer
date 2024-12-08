@@ -22,5 +22,9 @@ actual class TimeFormatter {
     actual fun formatFrom(time: LocalDateTime, format: Format): String {
         TODO("Not yet implemented")
     }
+
+    actual fun format(millis: Long, format: Format): String {
+        TODO("Not yet implemented")
+    }
 }
 

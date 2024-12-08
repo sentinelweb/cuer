@@ -58,6 +58,8 @@ class QueueMediator constructor(
         get() = _currentItemFlow.distinctUntilChanged { old, new -> old == new }
             .onEach { log.d("currentItemFlow.onEach: ${it?.summarise()}") }
 
+    // fixme shared flow will not emit on connect?
+    // https://kt.academy/article/viewmodel-stateflow-sharedflow-channel
     private var _currentPlaylistFlow: MutableSharedFlow<PlaylistDomain> = MutableSharedFlow()
     override val currentPlaylistFlow: Flow<PlaylistDomain>
         get() = _currentPlaylistFlow.distinctUntilChanged()
@@ -313,6 +315,7 @@ class QueueMediator constructor(
             recentLocalPlaylists.addRecent(playlistDomain)
         }
         state.playlist = playlistDomain
+//        log.d("refreshQueueFrom: emit currentItem: ${currentItem?.summarise()}")
         _currentItemFlow.emit(currentItem)
         state.playlist?.also { _currentPlaylistFlow.emit(it) }
     }

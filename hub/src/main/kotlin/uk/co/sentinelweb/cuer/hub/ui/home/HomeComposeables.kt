@@ -22,6 +22,7 @@ import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label
@@ -70,7 +71,7 @@ fun Home(coordinator: HomeUiCoordinator) {
     CuerSharedTheme {
         Scaffold(
             topBar = {
-                CuerSharedAppBarComposables.CuerSharedAppBar(
+                CuerSharedAppBar(
                     title = "Cuer hub",
                     contentColor = Color.White,
                     backgroundColor = Color(0xFF222222),
@@ -109,9 +110,9 @@ fun Home(coordinator: HomeUiCoordinator) {
                             LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
                         }
                     }
-//                    if (state.value.showPlayer) {
-//                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
-//                    }
+                    if (state.value.showPlayer) {
+                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
+                    }
                 }
             }
         }

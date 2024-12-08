@@ -261,11 +261,9 @@ class PlayerStoreFactory(
             playerSessionManager.setVolumeMax(config.maxVolume)
             playerSessionManager.setItem(intent.item, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
-            publish(
-                Label.Command(
-                    Load(intent.item, intent.item.media.startPosition())
-                )
-            )
+            Label.Command(Load(intent.item, intent.item.media.startPosition()))
+                .also { publish(it) }
+                .also { log.d("emitted label: $it") }
         }
 
         private fun updatePosition(

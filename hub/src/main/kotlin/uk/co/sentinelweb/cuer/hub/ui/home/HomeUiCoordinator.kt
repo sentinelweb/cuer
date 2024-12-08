@@ -89,15 +89,15 @@ class HomeUiCoordinator(
         modelObservable.value = modelObservable.value.copy(route = route)
     }
 
-    fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
-        killPlayer()
-        _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
-        val selectedScreen = playerConfigProvider.invoke()
-            .screens
-            .let { if (it.size > PREFERRED_SCREEN_DEFAULT) it.get(PREFERRED_SCREEN_DEFAULT) else it.get(0) }
-        _playerUiCoordinator?.setupPlaylistAndItem(item, playlist, selectedScreen)
-        modelObservable.value = modelObservable.value.copy(showPlayer = true)
-    }
+//    fun showPlayer(item: PlaylistItemDomain, playlist: PlaylistDomain) {
+//        killPlayer()
+//        _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
+//        val selectedScreen = playerConfigProvider.invoke()
+//            .screens
+//            .let { if (it.size > PREFERRED_SCREEN_DEFAULT) it.get(PREFERRED_SCREEN_DEFAULT) else it.get(0) }
+//        _playerUiCoordinator?.setupPlaylistAndItem(item, playlist, selectedScreen)
+//        modelObservable.value = modelObservable.value.copy(showPlayer = true)
+//    }
 
     fun killPlayer() {
         modelObservable.value = modelObservable.value.copy(showPlayer = false)
@@ -105,9 +105,9 @@ class HomeUiCoordinator(
         _playerUiCoordinator = null
     }
 
-    // called from the webserver
     override fun launchPlayerVideo(item: PlaylistItemDomain, screenIndex: Int?) {
         killPlayer()
+        log.d("------------ launchPlayerVideo: item: ${item.media.title} ----------------------------------")
         _playerUiCoordinator = getKoin().get(parameters = { parametersOf(this@HomeUiCoordinator) })
         val queuePlaylist = PlaylistDomain(
             id = Identifier(QueueTemp.id, MEMORY),

@@ -22,7 +22,7 @@ class DesktopConnectivityWrapper(
         coroutines.mainScope.launch {
             monitor.connectivityStatus.collectLatest { status ->
                 this@DesktopConnectivityWrapper.status = status
-                log.d("Connected: $status")
+                //log.d("Connected: $status")
             }
         }
     }
