@@ -20,7 +20,9 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import uk.co.sentinelweb.cuer.app.ui.common.compose.*
+import uk.co.sentinelweb.cuer.app.ui.common.compose.CuerSharedAppBarComposables.CuerSharedAppBar
 import uk.co.sentinelweb.cuer.app.ui.local.LocalComposables
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.HomeModel.DisplayRoute.*
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeContract.Label
@@ -46,6 +48,7 @@ fun home(coordinator: HomeUiCoordinator) = application {
     }
 }
 
+@ExperimentalCoroutinesApi
 @Composable
 @Preview
 fun Home(coordinator: HomeUiCoordinator) {
@@ -68,7 +71,7 @@ fun Home(coordinator: HomeUiCoordinator) {
     CuerSharedTheme {
         Scaffold(
             topBar = {
-                CuerSharedAppBarComposables.CuerSharedAppBar(
+                CuerSharedAppBar(
                     title = "Cuer hub",
                     contentColor = Color.White,
                     backgroundColor = Color(0xFF222222),
@@ -93,17 +96,22 @@ fun Home(coordinator: HomeUiCoordinator) {
                 Box(modifier = Modifier.width(400.dp)) {
                     coordinator.remotesCoordinator.RemotesDesktopUi()
                 }
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.White)
+//                        .padding(bottom=if (state.value.showPlayer) 100.dp else 0.dp)
                 ) {
-                    val route = state.value.route
-                    when (route) {
-                        Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
-                        is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
-                        ThemeTest -> SharedThemeView.View()
-                        LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
+                    Box(modifier = Modifier.weight(1f).fillMaxHeight()) {
+                        when (state.value.route) {
+                            Settings -> PreferencesUi(coordinator.preferencesUiCoordinator)
+                            is Folders -> coordinator.filesUiCoordinator.FileBrowserDesktopUi()
+                            ThemeTest -> SharedThemeView.View()
+                            LocalConfig -> LocalComposables.LocalDesktopUi(coordinator.localCoordinator)
+                        }
+                    }
+                    if (state.value.showPlayer) {
+                        coordinator.playerUiCoordinator?.PlayerDesktopUi()
                     }
                 }
             }

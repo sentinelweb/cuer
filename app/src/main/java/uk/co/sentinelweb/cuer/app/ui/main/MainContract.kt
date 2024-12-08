@@ -19,7 +19,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationProvider
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.navigationRouter
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerFragment
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.app.ui.share.ShareNavigationHack
 import uk.co.sentinelweb.cuer.app.util.chromecast.CastDialogWrapper
@@ -50,7 +50,7 @@ interface MainContract {
         fun checkPlayServices()
         fun isRecreating(): Boolean
         fun showMessage(msg: String)
-        fun promptToBackup(result: AutoBackupFileExporter.BackupResult)
+        fun showBackupStatusSnackbar(result: AutoBackupFileExporter.BackupResult)
     }
 
     interface PlayerViewControl {
@@ -158,7 +158,7 @@ interface MainContract {
                         chromeCastWrapper = get()
                     )
                 }
-                scoped<RemotesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<MainActivity>()) }
+                scoped<NodesDialogContract.Launcher> { RemotesDialogLauncher(activity = get<MainActivity>()) }
                 scoped { CuerSimpleVolumeController(castController = get(), log = get()) }
                 scoped { StatusBarColorWrapper(activity = get<MainActivity>()) }
             }

@@ -59,7 +59,7 @@ class MainPresenter(
         }
         castController.checkCastConnectionToActivity()
 
-        autoBackupFileExporter.attemptAutoBackup { result -> view.promptToBackup(result) }
+        autoBackupFileExporter.attemptAutoBackup { result -> view.showBackupStatusSnackbar(result) }
 
         notificationPermissionCheckDialog.checkToShow()
     }

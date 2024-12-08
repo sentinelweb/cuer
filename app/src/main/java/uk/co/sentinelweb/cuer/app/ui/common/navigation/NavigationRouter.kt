@@ -16,6 +16,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Param.PLAYLIST_ITEM
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.*
 import uk.co.sentinelweb.cuer.app.ui.common.navigation.NavigationModel.Target.Companion.KEY
+import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoActivity
 import uk.co.sentinelweb.cuer.app.ui.share.ShareActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_land.AytLandActivity
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.ayt_portrait.AytPortraitActivity
@@ -26,7 +27,7 @@ import uk.co.sentinelweb.cuer.domain.PlaylistAndItemDomain
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.domain.ext.serialise
 
-class NavigationRouter constructor(
+class NavigationRouter (
     private val activity: Activity,
     private val toastWrapper: ToastWrapper,
     private val ytJavaApi: PlatformLaunchWrapper,
@@ -49,6 +50,12 @@ class NavigationRouter constructor(
             LOCAL_PLAYER -> {
                 (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
                     AytPortraitActivity.start(activity, it)
+                } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
+            }
+
+            EXO_PLAYER_FULL -> {
+                (nav.params[PLAYLIST_AND_ITEM] as PlaylistAndItemDomain?)?.let {
+                    ExoActivity.start(activity, it)
                 } ?: throw IllegalArgumentException("$LOCAL_PLAYER: $PLAYLIST_ITEM param required")
             }
 

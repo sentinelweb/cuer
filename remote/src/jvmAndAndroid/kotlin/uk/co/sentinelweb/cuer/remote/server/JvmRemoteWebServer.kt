@@ -312,7 +312,7 @@ class JvmRemoteWebServer(
                             .let { deserialisePlaylistItem(it) }
                             .also { logWrapper.d("launchitem: ${it.id?.serialise()}") }
                             .let { item ->
-                                remotePlayerLaunchHost.launchVideo(
+                                remotePlayerLaunchHost.launchPlayerVideo(
                                     item,
                                     // todo send bad request if no P_SCREEN_INDEX
                                     call.parameters[P_SCREEN_INDEX]?.toInt()

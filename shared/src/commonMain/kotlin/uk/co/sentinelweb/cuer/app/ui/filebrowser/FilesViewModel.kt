@@ -15,7 +15,8 @@ import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Model.Companion.Initial
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Alpha
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract.Sort.Time
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase
 import uk.co.sentinelweb.cuer.app.usecase.GetFolderListUseCase.Companion.PARENT_FOLDER_TEXT
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
@@ -41,11 +42,12 @@ class FilesViewModel(
     private val playerInteractor: RemotePlayerInteractor,
     private val log: LogWrapper,
     private val castController: CastController,
-    private val remoteDialogLauncher: RemotesDialogContract.Launcher,
+    private val remoteDialogLauncher: NodesDialogContract.Launcher,
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher,
     private val getFolderListUseCase: GetFolderListUseCase,
     private val localRepository: LocalRepository,
     private val localPlayerLaunchHost: PlayerLaunchHost,
+    private val localPlayerStatus: PlayerContract.LocalStatus,
 ) : ViewModel(), FilesContract.ViewModel {
 
     private val _modelObservable = MutableStateFlow(Initial)
@@ -129,8 +131,9 @@ class FilesViewModel(
         viewModelScope.launch {
             map(true)
             state.sourceNode?.apply {
-                // fixme when this is possible on both platforms - need a broader check
-                if (cuerCastPlayerWatcher.isWatching()) {
+                if (localPlayerStatus.isPlayerActive()) {
+                    launchLocalPlayer(null, null, file)
+                } else if (cuerCastPlayerWatcher.isWatching()) {
                     launchRemotePlayer(
                         cuerCastPlayerWatcher.remoteNode ?: throw IllegalStateException("No remote"),
                         cuerCastPlayerWatcher.screen ?: throw IllegalStateException("No remote screen")
@@ -160,7 +163,7 @@ class FilesViewModel(
         screen: PlayerNodeDomain.Screen?,
         file: PlaylistItemDomain
     ) {
-        localPlayerLaunchHost.launchVideo(file, screen?.index)
+        localPlayerLaunchHost.launchPlayerVideo(file, screen?.index)
         remoteDialogLauncher.hideRemotesDialog()
     }
 
@@ -174,10 +177,7 @@ class FilesViewModel(
                 state.selectedFile ?: throw IllegalStateException(),
                 screen.index
             )
-            // todo check if already connected to remote node
-            // todo also check if the dialog has connected
             if (!castController.isConnected()) {
-                // assumes here that sourecnode == targetnode
                 castController.connectCuerCast(targetNode, screen)
             }
             remoteDialogLauncher.hideRemotesDialog()
@@ -185,65 +185,58 @@ class FilesViewModel(
         }
     }
 
-    private fun loadCurrentPath() {
-        viewModelScope.launch {
-            map(true)
-            state.sourceNode?.apply {
-                val folder = when (this) {
-                    is RemoteNodeDomain ->
-                        filesInteractor.getFolderList(this.locator(), state.path)
-                            .let {
-                                log.d(it.data.toString())
-                                when (it) {
-                                    is NetResult.Data -> it.data
-                                    is NetResult.Error -> {
-                                        _labels.value =
-                                            ErrorMessage(
-                                                getString(
-                                                    Res.string.files_error_loading_folder,
-                                                    it.code ?: "",
-                                                    it.msg ?: ""
-                                                )
-                                            )
-                                        null
-                                    }
+    private fun loadCurrentPath() = viewModelScope.launch {
+        map(true)
+        state.sourceNode?.apply {
+            val folder = when (this) {
+                is RemoteNodeDomain ->
+                    filesInteractor.getFolderList(this.locator(), state.path)
+                        .let {
+                            log.d(it.data.toString())
+                            when (it) {
+                                is NetResult.Data -> it.data
+                                is NetResult.Error -> {
+                                    _labels.value = ErrorMessage(
+                                        getString(
+                                            Res.string.files_error_loading_folder, it.code ?: "", it.msg ?: ""
+                                        )
+                                    )
+                                    null
                                 }
                             }
+                        }
 
-                    is LocalNodeDomain -> try {
-                        getFolderListUseCase.getFolderList(state.path)
-                    } catch (e: Exception) {
-                        _labels.value =
-                            ErrorMessage(getString(Res.string.files_error_loading_folder, "", e.message ?: ""))
-                        null
-                    }
-
-                    else -> throw IllegalStateException("Not supported")
+                is LocalNodeDomain -> try {
+                    getFolderListUseCase.getFolderList(state.path)
+                } catch (e: Exception) {
+                    _labels.value =
+                        ErrorMessage(getString(Res.string.files_error_loading_folder, "", e.message ?: ""))
+                    null
                 }
 
-                folder
-                    ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
-                    ?.also { _labels.value = ErrorMessage(getString(Res.string.files_error_empty)) }
-
-                folder
-                    ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
-                    ?.also { folderOk ->
-                        val upItem = folderOk.children.find { PARENT_FOLDER_TEXT.equals(it.title) }
-                        state.upListItem = upItem?.let { mapper.mapParentItem(it) }
-                        state.currentFolder =
-                            folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
-
-                        state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
-                    } ?: also {
-                    state.upListItem = null
-                    state.currentFolder = null
-                    state.currentListItems = null
-                }
+                else -> throw IllegalStateException("Not supported")
             }
 
+            folder
+                ?.takeIf { it.children.isEmpty() && it.playlist.items.isEmpty() }
+                ?.also { _labels.value = ErrorMessage(getString(Res.string.files_error_empty)) }
 
-            map(false)
+            folder
+                ?.takeIf { it.children.isNotEmpty() || it.playlist.items.isNotEmpty() }
+                ?.also { folderOk ->
+                    val upItem = folderOk.children.find { PARENT_FOLDER_TEXT.equals(it.title) }
+                    state.upListItem = upItem?.let { mapper.mapParentItem(it) }
+                    state.currentFolder =
+                        folderOk.copy(children = upItem?.let { folderOk.children.minus(it) } ?: folderOk.children)
+
+                    state.currentListItems = state.currentFolder?.let { mapper.mapToIntermediate(it) }
+                } ?: also {
+                state.upListItem = null
+                state.currentFolder = null
+                state.currentListItems = null
+            }
         }
+        map(false)
     }
 
     private fun map(loading: Boolean) {

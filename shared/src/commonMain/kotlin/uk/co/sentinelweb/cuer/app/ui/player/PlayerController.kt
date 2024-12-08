@@ -8,6 +8,7 @@ import com.arkivanov.mvikotlin.extensions.coroutines.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.service.remote.player.PlayerSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Intent
@@ -57,18 +58,25 @@ class PlayerController(
         if (binder != null) throw IllegalStateException("Already bound")
         binder =
             bind(viewLifecycle, BinderLifecycleMode.START_STOP, mainContext = coroutines.mainScope.coroutineContext) {
-            bindTheThings(views)
-        }
+                bindTheThings(views)
+            }
     }
 
     private fun BindingsBuilder.bindTheThings(views: List<PlayerContract.View>) {
         views.forEach { view ->
+            log.d("Binding view: ${view::class.simpleName}")
             // store -> view
-            store.states.mapNotNull { modelMapper.map(it) } bindTo view
+            store.states
+                .onEach { log.d("State.emit(playState=${it.playerState})") }
+                .mapNotNull { modelMapper.map(it) }bindTo view
             store.labels bindTo { label -> view.processLabel(label) }
 
             // view -> store
-            view.events.mapNotNull(PlayerEventToIntentMapper.eventToIntent) bindTo store
+            view.events
+                .mapNotNull {
+                    PlayerEventToIntentMapper.eventToIntent(it)
+                        .also { log.d("Intent rx: ${it}") }
+                } bindTo store
         }
         mediaSessionListener.intentFlow bindTo store
         playSessionListener.intentFlow bindTo store
@@ -93,7 +101,7 @@ class PlayerController(
         binder = null
     }
 
-    fun onDestroy(endSession:Boolean) {
+    fun onDestroy(endSession: Boolean) {
         if (endSession) {
             store.endSession()
         }

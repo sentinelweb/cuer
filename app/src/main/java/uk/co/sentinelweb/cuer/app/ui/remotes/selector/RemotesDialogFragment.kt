@@ -14,8 +14,10 @@ import org.koin.core.scope.Scope
 import org.koin.dsl.module
 import uk.co.sentinelweb.cuer.app.databinding.FragmentComposeBinding
 import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
 import uk.co.sentinelweb.cuer.app.util.extension.linkScopeToActivity
+import uk.co.sentinelweb.cuer.app.util.player.AndroidPlayerLocalStatus
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -28,7 +30,7 @@ class RemotesDialogFragment(
 ) : DialogFragment(), AndroidScopeComponent {
 
     override val scope: Scope by fragmentScopeWithSource<RemotesDialogFragment>()
-    private val viewModel: RemotesDialogViewModel by inject()
+    private val viewModel: NodesDialogViewModel by inject()
     private val log: LogWrapper by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
 
@@ -70,7 +72,7 @@ class RemotesDialogFragment(
                 ?.apply { viewModel.onNodeSelected(this) }
         }
         binding.composeView.setContent {
-            RemotesDialogComposeables.RemotesDialogUi(viewModel)
+            NodesDialogComposeables.RemotesDialogUi(viewModel)
         }
     }
 
@@ -107,15 +109,17 @@ class RemotesDialogFragment(
         val fragmentModule = module {
             scope(named<RemotesDialogFragment>()) {
                 scoped {
-                    RemotesDialogViewModel(
-                        state = RemotesDialogContract.State(),
+                    NodesDialogViewModel(
+                        state = NodesDialogContract.State(),
                         remotesRepository = get(),
                         mapper = get(),
                         coroutines = get(),
                         playerInteractor = get(),
-                        localRepository = get()
+                        localRepository = get(),
+                        locaStatus = get(),
                     )
                 }
+                scoped<PlayerContract.LocalStatus> { AndroidPlayerLocalStatus() }
             }
         }
     }

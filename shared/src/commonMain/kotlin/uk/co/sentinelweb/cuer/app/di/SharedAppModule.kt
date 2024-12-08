@@ -32,14 +32,13 @@ import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipModelMapper
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionContract
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesContract
-import uk.co.sentinelweb.cuer.app.ui.filebrowser.FilesModelMapper
 import uk.co.sentinelweb.cuer.app.ui.play_control.CastPlayerUiMapper
 import uk.co.sentinelweb.cuer.app.ui.player.MediaSessionListener
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerEventToIntentMapper
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerModelMapper
 import uk.co.sentinelweb.cuer.app.ui.playlist.IdGenerator
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesModelMapper
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogModelMapper
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogModelMapper
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingContract
 import uk.co.sentinelweb.cuer.app.ui.upcoming.UpcomingPresenter
 import uk.co.sentinelweb.cuer.app.usecase.*
@@ -309,7 +308,7 @@ object SharedAppModule {
             )
         }
         factory { RemotesModelMapper(strings = get(), log = get()) }
-        factory { RemotesDialogModelMapper() }
+        factory { NodesDialogModelMapper() }
     }
 
     private val uiModules = listOf(FilesContract.module)

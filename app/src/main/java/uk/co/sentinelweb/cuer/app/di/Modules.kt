@@ -37,6 +37,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.ribbon.AndroidRibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.common.views.PlayYangProgress
 import uk.co.sentinelweb.cuer.app.ui.common.views.description.DescriptionView
+import uk.co.sentinelweb.cuer.app.ui.exoplayer.ExoActivity
 import uk.co.sentinelweb.cuer.app.ui.filebrowser.FileBrowserFragment
 import uk.co.sentinelweb.cuer.app.ui.local.LocalFragment
 import uk.co.sentinelweb.cuer.app.ui.main.MainContract
@@ -83,6 +84,7 @@ import uk.co.sentinelweb.cuer.app.util.permission.NotificationPermissionCheck
 import uk.co.sentinelweb.cuer.app.util.prefs.GeneralPreferencesWrapper
 import uk.co.sentinelweb.cuer.app.util.prefs.SharedPrefsWrapper
 import uk.co.sentinelweb.cuer.app.util.remote.AndroidWakeLockManager
+import uk.co.sentinelweb.cuer.app.util.remote.AppPlayerLaunchHost
 import uk.co.sentinelweb.cuer.app.util.share.SharingShortcutsManager
 import uk.co.sentinelweb.cuer.app.util.share.scan.AndroidLinkScanner
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
@@ -105,6 +107,7 @@ import uk.co.sentinelweb.cuer.net.NetModuleConfig
 import uk.co.sentinelweb.cuer.net.client.ServiceType
 import uk.co.sentinelweb.cuer.net.di.DomainNetModule
 import uk.co.sentinelweb.cuer.net.di.NetModule
+import uk.co.sentinelweb.cuer.remote.interact.PlayerLaunchHost
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.WakeLockManager
@@ -152,6 +155,7 @@ object Modules {
         FileBrowserFragment.fragmentModule,
         CastDialogFragment.fragmentModule,
         RemotesDialogFragment.fragmentModule,
+        ExoActivity.activityModule,
     )
 
     private val uiModule = module {
@@ -193,6 +197,7 @@ object Modules {
         }
         single<WakeLockManager> { AndroidWakeLockManager(androidApplication()) }
         single<WifiStateProvider> { WifiStateReceiver(androidApplication(), get()) }
+        single<PlayerLaunchHost> { AppPlayerLaunchHost(androidApplication(), get()) }
     }
 
     private val utilModule = module {
@@ -268,6 +273,7 @@ object Modules {
         }
         factory { ServiceWrapper(androidApplication(), get()) }
         factory { EdgeToEdgeWrapper() }
+        factory { HideStatusBarWrapper() }
         factory { AppListBuilder(androidApplication(), get()) }
         factory { PlayerConnectedChecker(get(), get()) }
     }

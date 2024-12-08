@@ -2,11 +2,19 @@ package uk.co.sentinelweb.cuer.core.mappers
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.toJavaLocalDateTime
+import java.time.Instant
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 actual class TimeFormatter {
     private val timeStampFormatterMillis = DateTimeFormatter.ofPattern(TIME_PATTERN_MILLIS)
     private val timeStampFormatterSecs = DateTimeFormatter.ofPattern(TIME_PATTERN_SECS)
+
+    actual fun format(millis: Long, format: Format): String {
+        val instant = Instant.ofEpochMilli(millis)
+        val dateTime = java.time.LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
+        return formatter(format).format(dateTime)
+    }
 
     actual fun formatTime(time: LocalDateTime, format: Format): String =
         formatter(format).format(time.toJavaLocalDateTime()).strip00()

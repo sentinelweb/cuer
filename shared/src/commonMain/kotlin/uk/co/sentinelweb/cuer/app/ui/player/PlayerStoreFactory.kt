@@ -51,6 +51,7 @@ class PlayerStoreFactory(
     }
 
     private sealed class Result {
+        object Update : Result()
         object NoVideo : Result()
         data class State(val state: PlayerStateDomain) : Result()
         data class SetVideo(val item: PlaylistItemDomain, val playlist: PlaylistDomain? = null) : Result()
@@ -88,6 +89,7 @@ class PlayerStoreFactory(
                 is Result.Position -> copy(position = msg.pos)
                 is Result.Volume -> copy(volume = msg.vol)
                 is Result.Screen -> copy(screen = screen)
+                is Result.Update -> copy()
             }//.also { println("PlayerStoreFactory: volume=${it.volume} msg=$msg") }
     }
 
@@ -151,7 +153,12 @@ class PlayerStoreFactory(
                 Intent.FocusWindow -> publish(Label.FocusWindow)
                 is Intent.VolumeChanged -> volumeChanged(intent)
                 is Intent.ScreenAcquired -> screenAcquired(intent)
+                Intent.Resume -> resumeEvent()
             }
+
+        private fun resumeEvent() {
+
+        }
 
         private fun screenAcquired(intent: Intent.ScreenAcquired) {
             playerSessionManager.setScreen(intent.screen)
@@ -254,11 +261,9 @@ class PlayerStoreFactory(
             playerSessionManager.setVolumeMax(config.maxVolume)
             playerSessionManager.setItem(intent.item, queueConsumer.playlist)
             dispatch(Result.SetVideo(intent.item, queueConsumer.playlist))
-            publish(
-                Label.Command(
-                    Load(intent.item, intent.item.media.startPosition())
-                )
-            )
+            Label.Command(Load(intent.item, intent.item.media.startPosition()))
+                .also { publish(it) }
+                .also { log.d("emitted label: $it") }
         }
 
         private fun updatePosition(

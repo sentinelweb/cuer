@@ -1,14 +1,18 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
-import SleepPreventer
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.arkivanov.essenty.lifecycle.Lifecycle
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.arkivanov.mvikotlin.core.utils.diff
 import com.arkivanov.mvikotlin.core.view.BaseMviView
 import com.arkivanov.mvikotlin.core.view.ViewRenderer
 import com.arkivanov.mvikotlin.main.store.DefaultStoreFactory
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -23,6 +27,7 @@ import uk.co.sentinelweb.cuer.app.queue.QueueMediatorContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.EmptySkipView
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipContract
 import uk.co.sentinelweb.cuer.app.ui.common.skip.SkipPresenter
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerComposeables
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event
@@ -36,9 +41,9 @@ import uk.co.sentinelweb.cuer.domain.ext.serialise
 import uk.co.sentinelweb.cuer.hub.ui.home.HomeUiCoordinator
 import uk.co.sentinelweb.cuer.hub.util.extension.DesktopScopeComponent
 import uk.co.sentinelweb.cuer.hub.util.extension.desktopScopeWithSource
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventer
 import uk.co.sentinelweb.cuer.hub.util.view.UiCoordinator
 
-@ExperimentalCoroutinesApi
 class VlcPlayerUiCoordinator(
     private val parent: HomeUiCoordinator,
 ) : PlayerContract.View,
@@ -60,11 +65,41 @@ class VlcPlayerUiCoordinator(
     private val playlistOrchestrator: PlaylistOrchestrator by inject()
     private val coroutines: CoroutineContextProvider by inject()
     private val queueProducer: QueueMediatorContract.Producer by inject()
+    private val sleepPreventer: SleepPreventer by inject()
 
     private lateinit var playerWindow: VlcPlayerSwingWindow
 
     private var playlistId: OrchestratorContract.Identifier<GUID>? = null
     private lateinit var screen: PlayerNodeDomain.Screen
+
+    @Composable
+    fun PlayerDesktopUi() {
+        val state = modelObservable
+            .collectAsState(Model.Initial, coroutines.Main)
+
+        PlayerComposeables.PlayerTransport(
+            state.value,
+            this@VlcPlayerUiCoordinator,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.height(100.dp)
+        )
+    }
+
+    @Composable
+    fun PlayerSystrayUi() {
+        val state = modelObservable
+            .onEach { log.d("PlayerDesktopUi:${it.playState}") }
+            .collectAsState(Model.Initial)
+
+        PlayerComposeables.PlayerTransport(
+            state.value,
+            this@VlcPlayerUiCoordinator,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+            backgroundColor = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.height(100.dp)
+        )
+    }
 
     override fun create() {
         log.tag(this)
@@ -75,7 +110,7 @@ class VlcPlayerUiCoordinator(
         playerWindow = if (VlcPlayerSwingWindow.checkShowWindow()) {
             scope.get<VlcPlayerSwingWindow>(VlcPlayerSwingWindow::class)
                 .apply { assemble(screen) }
-                .also { SleepPreventer.preventSleep() }
+                .also { sleepPreventer.preventSleep() }
         } else error("Can't find VLC")
     }
 
@@ -85,7 +120,7 @@ class VlcPlayerUiCoordinator(
                 ?.takeIf { it.source == MEMORY }
                 ?.also { playlistOrchestrator.delete(it.id, it.deepOptions()) }
             playerWindow.destroy()
-            SleepPreventer.allowSleep()
+            sleepPreventer.allowSleep()
             lifecycle.onPause()
             lifecycle.onStop()
             controller.onViewDestroyed()
@@ -98,6 +133,7 @@ class VlcPlayerUiCoordinator(
     }
 
     override suspend fun processLabel(label: PlayerContract.MviStore.Label) {
+        log.d("processLabel: $label")
         when (label) {
             is Command -> playerWindow.playStateChanged(label.command)
             Stop -> destroyPlayerWindow()
@@ -106,7 +142,7 @@ class VlcPlayerUiCoordinator(
         }
     }
 
-    override val renderer: ViewRenderer<Model> = diff {
+    val modelDiffer: ViewRenderer<Model> = diff {
         diff(get = Model::playState, set = {
             playerWindow.updateUiPlayState(it)
         })
@@ -122,6 +158,14 @@ class VlcPlayerUiCoordinator(
         diff(get = Model::buttons, set = {
             playerWindow.updateButtons(it)
         })
+    }
+
+    override val renderer: ViewRenderer<Model> = object : ViewRenderer<Model> {
+        override fun render(model: Model) {
+            log.d("coord.renderer: ${model.playState}")
+            modelObservable.value = model
+            modelDiffer.render(model)
+        }
     }
 
     fun focusPlayerWindow() {

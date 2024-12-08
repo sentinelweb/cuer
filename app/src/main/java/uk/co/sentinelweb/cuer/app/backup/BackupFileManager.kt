@@ -16,7 +16,9 @@ import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.PlaylistDomain
 import uk.co.sentinelweb.cuer.domain.backup.BackupFileModel
 import uk.co.sentinelweb.cuer.domain.ext.serialise
+import java.io.BufferedInputStream
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipFile
@@ -41,43 +43,96 @@ class BackupFileManager constructor(
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun makeBackupZipFile(): AFile = withContext(contextProvider.IO) {
         val f = File(context.cacheDir, makeFileName())
-        try {
-            val out = ZipOutputStream(FileOutputStream(f))
-            val e = ZipEntry(DB_FILE_JSON)
-            out.putNextEntry(e)
-            val playlists = playlistRepository.loadList(AllFilter, flat = false).data!!
-            val jsonDataBytes = backupDataJson(playlists).toByteArray()
-            out.write(jsonDataBytes, 0, jsonDataBytes.size)
-            out.closeEntry()
-            playlists
-                .map { listOf(it.image, it.thumb) }
-                .flatten()
-                .mapNotNull { it }
-                .filter { it.url.startsWith(REPO_SCHEME) }
-                .distinct()
-                .forEach {
-                    imageFileRepository.loadImage(it)?.apply {
-                        val imgEntry = ZipEntry(it.url.getFileName())
-                        out.putNextEntry(imgEntry)
-                        out.write(this, 0, this.size)
-                        out.closeEntry()
-                    }
+        //try {
+        val out = ZipOutputStream(FileOutputStream(f))
+        val playlistsFlat = playlistRepository.loadList(AllFilter, flat = true).data!!
+
+        val dbJsonFile = File(context.cacheDir, DB_FILE_JSON)
+        createBackupJsonFile(playlistsFlat, dbJsonFile)
+        if (!dbJsonFile.exists()) error("Failed to save backup file")
+        val e = ZipEntry(DB_FILE_JSON)
+        out.putNextEntry(e)
+//            val jsonDataBytes = backupDataJson(playlists).toByteArray()
+//            out.write(jsonDataBytes, 0, jsonDataBytes.size)
+        copyDbJsonFileToOutput(dbJsonFile, out)
+        out.flush()
+        out.closeEntry()
+        dbJsonFile.delete()
+
+        playlistsFlat
+            .map { listOf(it.image, it.thumb) }
+            .flatten()
+            .mapNotNull { it }
+            .filter { it.url.startsWith(REPO_SCHEME) }
+            .distinct()
+            .forEach {
+                imageFileRepository.loadImage(it)?.apply {
+                    val imgEntry = ZipEntry(it.url.getFileName())
+                    out.putNextEntry(imgEntry)
+                    out.write(this, 0, this.size)
+                    out.flush()
+                    out.closeEntry()
                 }
-            out.close()
-        } catch (t: Throwable) {
-            log.e("Error backing up", t)
-        }
+            }
+        out.close()
+        //} catch (t: Throwable) {
+        //    log.e("Error backing up", t)
+        //}
         AFile(f.absolutePath)
     }
 
-    private suspend fun backupDataJson(playlists: List<PlaylistDomain>) =
-        withContext(contextProvider.IO) {
-            BackupFileModel(
-                version = BACKUP_VERSION,
-                medias = listOf(), // todo remove?
-                playlists = playlists
-            ).serialise()
+    private fun copyDbJsonFileToOutput(dbJsonFile: File, out: ZipOutputStream) {
+        val bufferSize = 1024
+        FileInputStream(dbJsonFile).use { fis ->
+            BufferedInputStream(fis, bufferSize).use { bis ->
+                val buffer = ByteArray(bufferSize)
+                var length: Int
+                while (bis.read(buffer).also { length = it } > 0) {
+                    out.write(buffer, 0, length)
+                }
+            }
         }
+    }
+
+    suspend fun createBackupJsonFile(playlistsFlat: List<PlaylistDomain>, file: File) {
+        FileOutputStream(file).use { fos ->
+            // serialises empty backup json and splits it at the playlist point
+            val template = backupDataJsonTemplate()
+            val locatorString = "\"playlists\": []"
+            val splitPoint = template.lastIndexOf(locatorString) + locatorString.length - 1
+            val templateHeader = template.substring(0, splitPoint)
+            val templateFooter = template.substring(splitPoint)
+            fos.write(templateHeader.toByteArray())
+
+            var firstChunk = true
+
+            playlistsFlat
+                .map { playlistRepository.load(it.id!!.id, flat = false).data!! }
+                .forEach { playlist ->
+                    val jsonDataChunk = playlist.serialise()
+
+                    if (!firstChunk) {
+                        fos.write(",".toByteArray())
+                    }
+                    fos.write(jsonDataChunk.toByteArray())
+
+                    //log.d("data chunk:playlistid:${playlist.id?.id} ${jsonDataChunk.length} bytes")
+
+                    firstChunk = false
+                    fos.flush()
+                }
+
+            fos.write(templateFooter.toByteArray())
+        }
+    }
+
+    private fun backupDataJsonTemplate() =
+        BackupFileModel(
+            version = BACKUP_VERSION,
+            medias = listOf(), // todo remove?
+            playlists = listOf()
+        ).serialise()
+
 
     @Suppress("BlockingMethodInNonBlockingContext")
     override suspend fun restoreDataZip(f: AFile): Boolean = withContext(contextProvider.IO) {
@@ -91,7 +146,8 @@ class BackupFileManager constructor(
                         }
 
                         else -> { // assume image
-                            File(imageFileRepository._dir.path, entry.name).outputStream()
+                            File(imageFileRepository._dir.path, entry.name)
+                                .outputStream()
                                 .use { output -> input.copyTo(output) }
                         }
                     }

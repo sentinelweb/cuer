@@ -11,6 +11,7 @@ expect class TimeFormatter() {
     fun formatNow(format: Format = Format.SECS): String
     fun formatMillis(l: Long, format: Format = Format.MILLIS): String
     fun formatFrom(time: LocalDateTime, format: Format = Format.SECS): String
+    fun format(millis: Long, format: Format = Format.MILLIS): String
 }
 
 expect class DateTimeFormatter() {

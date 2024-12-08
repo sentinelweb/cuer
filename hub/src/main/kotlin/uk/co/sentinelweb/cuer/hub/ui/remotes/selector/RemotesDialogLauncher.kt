@@ -4,8 +4,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.koin.dsl.module
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogViewModel
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogViewModel
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -14,12 +14,12 @@ import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher.Disp
 
 class RemotesDialogLauncher(
     private val log: LogWrapper,
-) : RemotesDialogContract.Launcher, KoinComponent {
+) : NodesDialogContract.Launcher, KoinComponent {
 
     var modelObservable = MutableStateFlow(Initial)
         private set
 
-    val viewModel: RemotesDialogViewModel by inject()
+    val viewModel: NodesDialogViewModel by inject()
 
     init {
         log.tag(this)
@@ -58,13 +58,14 @@ class RemotesDialogLauncher(
         @JvmStatic
         val launcherModule = module {
             factory {
-                RemotesDialogViewModel(
+                NodesDialogViewModel(
                     remotesRepository = get(),
                     mapper = get(),
                     coroutines = get(),
                     playerInteractor = get(),
-                    state = RemotesDialogContract.State(),
-                    localRepository = get()
+                    state = NodesDialogContract.State(),
+                    localRepository = get(),
+                    locaStatus = get()
                 )
             }
         }

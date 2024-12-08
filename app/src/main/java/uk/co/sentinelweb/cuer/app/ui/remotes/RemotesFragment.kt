@@ -30,7 +30,7 @@ import uk.co.sentinelweb.cuer.app.ui.play_control.CompactPlayerScroll
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.MviStore.Label.*
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event
 import uk.co.sentinelweb.cuer.app.ui.remotes.RemotesContract.View.Event.OnUpClicked
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.search.SearchBottomSheetFragment
 import uk.co.sentinelweb.cuer.app.util.cuercast.CuerCastPlayerWatcher
 import uk.co.sentinelweb.cuer.app.util.extension.fragmentScopeWithSource
@@ -56,7 +56,7 @@ class RemotesFragment : Fragment(), AndroidScopeComponent {
     private val navigationProvider: NavigationProvider by inject()
     private val compactPlayerScroll: CompactPlayerScroll by inject()
     private val remotesHelpConfig: RemotesHelpConfig by inject()
-    private val remotesDialogLauncher: RemotesDialogContract.Launcher by inject()
+    private val remotesDialogLauncher: NodesDialogContract.Launcher by inject()
     private val cuerCastPlayerWatcher: CuerCastPlayerWatcher by inject()
     private val statusBarColor: StatusBarColorWrapper by inject()
 

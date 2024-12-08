@@ -4,7 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract.Model
+import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract.Model
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
@@ -14,13 +15,14 @@ import uk.co.sentinelweb.cuer.remote.server.LocalRepository
 import uk.co.sentinelweb.cuer.remote.server.RemotesRepository
 import uk.co.sentinelweb.cuer.remote.server.locator
 
-class RemotesDialogViewModel(
-    private val state: RemotesDialogContract.State,
+class NodesDialogViewModel(
+    private val state: NodesDialogContract.State,
     private val remotesRepository: RemotesRepository,
-    private val mapper: RemotesDialogModelMapper,
+    private val mapper: NodesDialogModelMapper,
     private val playerInteractor: RemotePlayerInteractor,
     private val coroutines: CoroutineContextProvider,
     private val localRepository: LocalRepository,
+    private val locaStatus: PlayerContract.LocalStatus,
 ) {
 
     lateinit var listener: (NodeDomain, PlayerNodeDomain.Screen?) -> Unit
@@ -41,7 +43,11 @@ class RemotesDialogViewModel(
             if (state.isSelectNodeOnly) {
                 listener(node, null)
             } else {
-                remoteSelected(node)
+                if (node.locator() == localRepository.localNode.locator()) {
+                    localSelected(node)
+                } else {
+                    remoteSelected(node)
+                }
             }
         }
     }
@@ -65,6 +71,12 @@ class RemotesDialogViewModel(
                     listener(node, null)
                 }
             }
+    }
+
+    private fun localSelected(node: NodeDomain) {
+        // fixme get local node screens and display to user .. fill in playerStatus() stub
+        // locaStatus.playerStatus()
+        listener(node, null)
     }
 
     fun onScreenSelected(node: NodeDomain, screen: PlayerNodeDomain.Screen) {

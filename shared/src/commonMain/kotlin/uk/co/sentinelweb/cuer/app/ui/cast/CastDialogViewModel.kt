@@ -3,13 +3,13 @@ package uk.co.sentinelweb.cuer.app.ui.cast
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.domain.RemoteNodeDomain
 
 class CastDialogViewModel(
     private val castController: CastController,
-    private val remotesLauncher: RemotesDialogContract.Launcher,
+    private val remotesLauncher: NodesDialogContract.Launcher,
     private val coroutines: CoroutineContextProvider
 ) {
     private val _model = MutableStateFlow(CastDialogModel.blank)

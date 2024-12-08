@@ -1,21 +1,22 @@
 package uk.co.sentinelweb.cuer.hub.ui.player.vlc
 
 import androidx.compose.ui.graphics.Color.Companion.Black
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.sun.jna.StringArray
+import httpLocalNetworkUrl
 import loadSVG
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import toImageIcon
+import uk.co.caprica.vlcj.binding.internal.libvlc_instance_t
+import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_new
+import uk.co.caprica.vlcj.binding.lib.LibVlc.libvlc_release
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
-import uk.co.caprica.vlcj.media.Media
-import uk.co.caprica.vlcj.media.MediaEventAdapter
-import uk.co.caprica.vlcj.media.MediaParsedStatus
-import uk.co.caprica.vlcj.media.MediaRef
+import uk.co.caprica.vlcj.media.*
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
 import uk.co.caprica.vlcj.player.base.State
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
-import uk.co.sentinelweb.cuer.app.orchestrator.OrchestratorContract.Source.LOCAL_NETWORK
+import uk.co.caprica.vlcj.support.version.LibVlcVersion
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.PlayerCommand.*
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract.View.Event.*
@@ -25,16 +26,11 @@ import uk.co.sentinelweb.cuer.core.providers.CoroutineContextProvider
 import uk.co.sentinelweb.cuer.core.providers.PlayerConfigProvider
 import uk.co.sentinelweb.cuer.core.providers.TimeProvider
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
-import uk.co.sentinelweb.cuer.core.wrapper.URLEncoder
-import uk.co.sentinelweb.cuer.domain.PlatformDomain
 import uk.co.sentinelweb.cuer.domain.PlayerNodeDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain
 import uk.co.sentinelweb.cuer.domain.PlayerStateDomain.*
 import uk.co.sentinelweb.cuer.domain.PlaylistItemDomain
 import uk.co.sentinelweb.cuer.remote.server.LocalRepository
-import uk.co.sentinelweb.cuer.remote.server.RemoteWebServerContract.Companion.VIDEO_STREAM_API
-import uk.co.sentinelweb.cuer.remote.server.http
-import uk.co.sentinelweb.cuer.remote.server.locator
 import java.awt.BorderLayout
 import java.awt.BorderLayout.*
 import java.awt.Color
@@ -44,8 +40,8 @@ import javax.swing.*
 import javax.swing.JOptionPane.ERROR_MESSAGE
 import javax.swing.event.ChangeEvent
 
+const val WINDOW_NAME = "CuerVlcSwingVideo"
 
-@ExperimentalCoroutinesApi
 class VlcPlayerSwingWindow(
     private val coordinator: VlcPlayerUiCoordinator,
     private val folderListUseCase: GetFolderListUseCase,
@@ -53,13 +49,14 @@ class VlcPlayerSwingWindow(
     private val keyMap: VlcPlayerKeyMap,
     private val localRepository: LocalRepository,
     private val coroutineContextProvider: CoroutineContextProvider
-) : JFrame(), KoinComponent {
+) : JFrame(WINDOW_NAME), KoinComponent {
 
     lateinit var mediaPlayerComponent: CallbackMediaPlayerComponent
     private val log: LogWrapper by inject()
     private val timeProvider: TimeProvider by inject()
     private val timeFormatter: TimeFormatter by inject()
     private val playerConfigProvider: PlayerConfigProvider by inject()
+
     private lateinit var screenUsed: PlayerNodeDomain.Screen
 
     private lateinit var playButton: JButton
@@ -108,7 +105,8 @@ class VlcPlayerSwingWindow(
 
         val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
         val screenDevices = ge.screenDevices
-        val preferredExists = screenDevices.size > preferredScreen.index
+        // fixme revert
+        val preferredExists = screenDevices.size > preferredScreen.index//false //
         val selectedScreenIndex = if (preferredExists) {
             preferredScreen.index
         } else 0
@@ -157,6 +155,7 @@ class VlcPlayerSwingWindow(
                         durationMs = ms
                         coordinator.dispatch(DurationReceived(ms))
                     }
+                    selectAudioTrack("en")
                 }
             }
         )
@@ -198,8 +197,8 @@ class VlcPlayerSwingWindow(
                             coordinator.dispatch(PositionReceived(newPositionLong))
                         }
                         lastPosUpdateTime = current
+                        dispatchCurrentPlayState(mediaPlayer)
                     }
-                    dispatchCurrentPlayState(mediaPlayer)
                 }
 
                 override fun mediaPlayerReady(mediaPlayer: MediaPlayer?) {
@@ -249,6 +248,30 @@ class VlcPlayerSwingWindow(
         mediaPlayerComponent.mediaPlayer().media().play(path)
     }
 
+    fun selectAudioTrack(lang: String) {
+        log.d("selectAudioTrack: $lang " +
+//                "title: ${mediaPlayerComponent.mediaPlayer().media().info().}" +
+                "\naudioTracks: ${mediaPlayerComponent.mediaPlayer().media().info().audioTracks().joinToString("\n")}" +
+                "\nvideoTracks: ${mediaPlayerComponent.mediaPlayer().media().info().videoTracks().joinToString("\n")}" +
+                "\ntextTracks: ${mediaPlayerComponent.mediaPlayer().media().info().textTracks().joinToString("\n")}" +
+                "")
+        mediaPlayerComponent.mediaPlayer().media().info()
+            .audioTracks()
+            .find {
+                //log.d("track language: ${it.language()} <- ${lang.lowercase()}")
+                it.language().lowercase().startsWith(lang.lowercase())
+            }
+            ?.also { mediaPlayerComponent.mediaPlayer().audio().setTrack(it.id()) }
+
+//        mediaPlayerComponent.mediaPlayer().media().info()
+//            .textTracks()
+//            .find {
+//                //log.d("track language: ${it.language()} <- ${lang.lowercase()}")
+//                it.language().lowercase().startsWith(lang.lowercase())
+//            }
+//            ?.also { mediaPlayerComponent.mediaPlayer().media().}
+    }
+
     fun destroy() {
         mediaPlayerComponent.mediaPlayer().release()
         this@VlcPlayerSwingWindow.dispose()
@@ -267,28 +290,13 @@ class VlcPlayerSwingWindow(
 
         is Pause -> mediaPlayerComponent.mediaPlayer().controls().pause()
         is Play -> mediaPlayerComponent.mediaPlayer().controls().play()
-        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms.toLong())
-        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms.toLong())
+        is SkipFwd -> mediaPlayerComponent.mediaPlayer().controls().skipTime(command.ms)
+        is SkipBack -> mediaPlayerComponent.mediaPlayer().controls().skipTime(-command.ms)
         is SeekTo -> mediaPlayerComponent.mediaPlayer().controls().setTime(command.ms)
     }.also { log.d("command:${command::class.java.simpleName}") }
 
     private fun mapPath(item: PlaylistItemDomain) =
-        item
-            .takeIf { it.id != null && it.id?.source == LOCAL_NETWORK && it.id?.locator != null }
-            ?.takeIf { localRepository.localNode.locator() != it.id?.locator }
-            ?.takeIf { it.media.platform == PlatformDomain.FILESYSTEM }
-            ?.let {
-                it.copy(
-                    media = it.media.copy(
-                        platformId =
-                        "${it.id?.locator?.http()}${VIDEO_STREAM_API.ROUTE}/${
-                            URLEncoder.encode(it.media.platformId, "UTF-8")
-                        }"
-                    )
-                )
-            }
-            ?.media
-            ?.platformId
+        item.httpLocalNetworkUrl(localRepository)
             ?: folderListUseCase.truncatedToFullFolderPath(item.media.platformId)
 
     private fun createControls() {
@@ -473,7 +481,7 @@ class VlcPlayerSwingWindow(
 
     companion object {
         fun checkShowWindow(): Boolean {
-            if (!NativeDiscovery().discover()) {
+            if (!NativeDiscovery().discover() && !VLCLoaderLinux.tryload()) {
                 // todo add installation instructions and link
                 val message = "Could not find VLC installation, please set VLC_PLUGIN_PATH environment variable"
                 JOptionPane.showMessageDialog(
@@ -485,6 +493,37 @@ class VlcPlayerSwingWindow(
                 return false
             } else {
                 return true
+            }
+        }
+
+        object VLCLoaderLinux {
+            init {
+                println("Loading libidn.so")
+//                System.loadLibrary("/snap/core18/2846/lib/x86_64-linux-gnu/libidn.so.11")
+                System.loadLibrary("libidn.so.11")
+                println("Loading libvlccore.so")
+//                println("Loading libvlccore.so")
+                System.loadLibrary("libvlccore.so.9.0.1")
+                // Load the VLC library from the specified path
+                println("Loading libvlc.so")
+                System.loadLibrary("libvlc.so.5.6.1")
+//                System.loadLibrary("/snap/vlc/current/usr/lib/libvlc.so.5.6.1")
+                println("Loading success")
+            }
+
+            @JvmStatic
+            fun tryload(): Boolean {
+                try {
+                    val instance: libvlc_instance_t = libvlc_new(0, StringArray(arrayOf<String>()))
+                    libvlc_release(instance)
+                    val version = LibVlcVersion()
+                    if (version.isSupported()) {
+                        return true
+                    }
+                } catch (e: UnsatisfiedLinkError) {
+                    e.printStackTrace()
+                }
+                return false
             }
         }
     }

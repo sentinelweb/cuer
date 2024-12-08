@@ -1,6 +1,7 @@
 package uk.co.sentinelweb.cuer.hub.di
 
 import PlatformWifiInfo
+import SleepPreventerMac
 import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 import com.russhwolf.settings.JvmPreferencesSettings
 import com.russhwolf.settings.Settings
@@ -20,7 +21,7 @@ import uk.co.sentinelweb.cuer.app.ui.common.resources.DefaultStringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.resources.StringDecoder
 import uk.co.sentinelweb.cuer.app.ui.common.ribbon.RibbonCreator
 import uk.co.sentinelweb.cuer.app.ui.player.PlayerContract
-import uk.co.sentinelweb.cuer.app.ui.remotes.selector.RemotesDialogContract
+import uk.co.sentinelweb.cuer.app.ui.remotes.selector.NodesDialogContract
 import uk.co.sentinelweb.cuer.app.ui.ytplayer.floating.FloatingPlayerContract
 import uk.co.sentinelweb.cuer.app.util.android_yt_player.live.LivePlaybackContract
 import uk.co.sentinelweb.cuer.app.util.chromecast.listener.ChromecastContract
@@ -28,6 +29,7 @@ import uk.co.sentinelweb.cuer.app.util.mediasession.MediaSessionContract
 import uk.co.sentinelweb.cuer.app.util.permission.LocationPermissionLaunch
 import uk.co.sentinelweb.cuer.app.util.share.scan.LinkScanner
 import uk.co.sentinelweb.cuer.app.util.wrapper.VibrateWrapper
+import uk.co.sentinelweb.cuer.core.providers.getOS
 import uk.co.sentinelweb.cuer.core.wrapper.ConnectivityWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.LogWrapper
 import uk.co.sentinelweb.cuer.core.wrapper.SystemLogWrapper
@@ -37,6 +39,7 @@ import uk.co.sentinelweb.cuer.db.di.JvmDatabaseModule
 import uk.co.sentinelweb.cuer.di.DomainModule
 import uk.co.sentinelweb.cuer.di.JvmDomainModule
 import uk.co.sentinelweb.cuer.domain.BuildConfigDomain
+import uk.co.sentinelweb.cuer.domain.NodeDomain
 import uk.co.sentinelweb.cuer.hub.BuildConfigInject
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerService
 import uk.co.sentinelweb.cuer.hub.service.remote.RemoteServerServiceManager
@@ -50,13 +53,17 @@ import uk.co.sentinelweb.cuer.hub.ui.preferences.PreferencesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.RemotesUiCoordinator
 import uk.co.sentinelweb.cuer.hub.ui.remotes.selector.RemotesDialogLauncher
 import uk.co.sentinelweb.cuer.hub.util.permission.EmptyLocationPermissionLaunch
-import uk.co.sentinelweb.cuer.hub.util.platform.getNodeDeviceType
 import uk.co.sentinelweb.cuer.hub.util.platform.getOSData
 import uk.co.sentinelweb.cuer.hub.util.remote.EmptyWakeLockManager
 import uk.co.sentinelweb.cuer.hub.util.remote.FileEncryption
 import uk.co.sentinelweb.cuer.hub.util.remote.KeyStoreManager
 import uk.co.sentinelweb.cuer.hub.util.remote.RemoteConfigFileInitialiseer
 import uk.co.sentinelweb.cuer.hub.util.share.scan.TodoLinkScanner
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventer
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventerEmpty
+import uk.co.sentinelweb.cuer.hub.util.sleep.SleepPreventerLinuxDBus
+import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayComposePopup
+import uk.co.sentinelweb.cuer.hub.util.system_tray.SystemTrayIcon
 import uk.co.sentinelweb.cuer.hub.util.wrapper.EmptyVibrateWrapper
 import uk.co.sentinelweb.cuer.net.ApiKeyProvider
 import uk.co.sentinelweb.cuer.net.NetModuleConfig
@@ -104,6 +111,20 @@ object Modules {
             val preferences = Preferences.userRoot().node(".cuer")
             JvmPreferencesSettings(preferences)
         }
+        single { SystemTrayIcon() }
+        factory { SystemTrayComposePopup() }
+        single<SleepPreventer> {
+            when (getOS()) {
+                NodeDomain.DeviceType.MAC -> SleepPreventerMac()
+                NodeDomain.DeviceType.LINUX -> SleepPreventerLinuxDBus()
+                else -> SleepPreventerEmpty()
+//                NodeDomain.DeviceType.ANDROID -> TODO()
+//                NodeDomain.DeviceType.IOS -> TODO()
+//                NodeDomain.DeviceType.WEB -> TODO()
+//                NodeDomain.DeviceType.WINDOWS -> TODO()
+//                NodeDomain.DeviceType.OTHER -> TODO()
+            }
+        }
     }
 
     private val connectivityModule = module {
@@ -139,7 +160,7 @@ object Modules {
                 versionCode = BuildConfigInject.versionCode,
                 version = BuildConfigInject.version,
                 device = getOSData(),
-                deviceType = getNodeDeviceType()
+                deviceType = getOS()
             )
         }
         factory {
@@ -184,7 +205,7 @@ object Modules {
         factory<LinkScanner> { TodoLinkScanner() }
         factory<RemoteServerContract.Service> { RemoteServerService(get()) }
         single<RemoteServerContract.Manager> { RemoteServerServiceManager(get()) }
-        single<RemotesDialogContract.Launcher> { RemotesDialogLauncher(get()) }
+        single<NodesDialogContract.Launcher> { RemotesDialogLauncher(get()) }
     }
 
     val emptyModule = module {

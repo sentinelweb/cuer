@@ -45,6 +45,9 @@
     <string name="cast_control_floating_window">Floating window</string>
     <string name="cast_control_not_connected">Not Connected</string>
 
+    <!-- player -->
+    <string name="player_volume">Volume: %1$s%</string>
+
     <!-- misc -->
     <string name="up">Up</string>
     <string name="dismiss">Dismiss</string>
